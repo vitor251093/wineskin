@@ -1,0 +1,11 @@
+#!/bin/bash
+THEAPP="$1"
+TOREPLACE="$THEAPP/Contents"
+REPLACEFROM="/tmp/WineskinWinery.app/Contents"
+sleep 1
+rm -rf "$TOREPLACE"
+mv "$REPLACEFROM" "$TOREPLACE"
+rm -rf "/tmp/WineskinWinery.app"
+rm -rf "/tmp/WineskinWinery.app.tar"
+rm -rf "/tmp/WineskinWinery.app.tar.7z"
+open "$THEAPP"

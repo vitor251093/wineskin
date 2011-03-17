@@ -1,0 +1,28 @@
+/*
+ ***************************************************
+ *  WineskinLauncher code for Wineskin and wrappers
+ *  Made by doh123 (doh123@doh123.com)
+ *  With the help of Syaoran of dotalux.com
+ *
+ *  Version 1.0
+ *  Made for Wineskin 2.0
+ *
+ *  This code is Open Source and licensed under the
+ *  terms of the GNU Lesser General Public License.
+ *  If the License file is not with this source, the
+ *  full license can be read at the following URL
+ *
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+ *
+ *  For Wineskin information, see the project website at
+ *  http://wineskin.doh123.com
+ *
+ ****************************************************
+ */
+//
+// Prefix header for all source files of the 'WineskinLauncher' target in the 'WineskinLauncher' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif

@@ -1,0 +1,28 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Control Panel\Colors]
+"background"="0 0 0"
+
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"FontSmoothing"="1"
+
+[HKEY_CURRENT_USER\Software\Wine\Direct3D]
+
+[HKEY_CURRENT_USER\Software\Wine\X11 Driver]
+"Decorated"="N"
+"Managed"="N"
+
+[HKEY_CURRENT_USER\Software\Wine\Drivers]
+"Audio"="coreaudio"
+
+[HKEY_CLASSES_ROOT\htmlfile\shell\open\command]
+@="C:\\windows\\system32\\winebrowser.exe -nohome %1"
+
+[HKEY_CLASSES_ROOT\htmlfile\shell\opennew\command]
+@="C:\\windows\\system32\\winebrowser.exe -nohome %1"
+
+[HKEY_CLASSES_ROOT\http\shell\open\command]
+@="C:\\windows\\system32\\winebrowser.exe -nohome %1"
+
+[HKEY_CLASSES_ROOT\https\shell\open\command]
+@="C:\\windows\\system32\\winebrowser.exe -nohome %1"

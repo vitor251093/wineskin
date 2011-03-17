@@ -1,0 +1,293 @@
+// !$*UTF8*$!
+{
+	089C165DFE840E0CC02AAC07 /* English */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {875, 594}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 45}";
+		};
+	};
+	256AC3D80F4B6AC300CF3369 /* WineskinAppDelegate.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {875, 3029}}";
+			sepNavSelRange = "{8211, 22}";
+			sepNavVisRange = "{6388, 1886}";
+			sepNavWindowFrame = "{{38, 90}, {1049, 662}}";
+		};
+	};
+	256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1944, 21762}}";
+			sepNavSelRange = "{84143, 0}";
+			sepNavVisRange = "{83040, 2144}";
+			sepNavWindowFrame = "{{170, 52}, {1049, 662}}";
+		};
+	};
+	256AC3F00F4B6AF500CF3369 /* Wineskin_Prefix.pch */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {875, 619}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 147}";
+		};
+	};
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeArchitecturePreference = x86_64;
+		activeBuildConfigurationName = Debug;
+		activeExecutable = A8993728127B4E78006A7581 /* Wineskin */;
+		activeTarget = 8D1107260486CEB800E47090 /* Wineskin */;
+		addToTargets = (
+			8D1107260486CEB800E47090 /* Wineskin */,
+		);
+		breakpoints = (
+		);
+		codeSenseManager = A8993732127B4E80006A7581 /* Code sense */;
+		executables = (
+			A8993728127B4E78006A7581 /* Wineskin */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					697,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					776,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 322018578;
+			PBXWorkspaceStateSaveDate = 322018578;
+		};
+		perUserProjectItems = {
+			A8061D8413217E0600119A6A = A8061D8413217E0600119A6A /* PBXTextBookmark */;
+			A8222EBB12F8BF6F00CD4C03 = A8222EBB12F8BF6F00CD4C03 /* PBXTextBookmark */;
+			A8222EDF12F8C46400CD4C03 = A8222EDF12F8C46400CD4C03 /* PBXTextBookmark */;
+			A824F47813070AD10012890F = A824F47813070AD10012890F /* PlistBookmark */;
+			A824F6831308AD5D00DD40D2 = A824F6831308AD5D00DD40D2 /* PBXTextBookmark */;
+			A824F6841308AD5D00DD40D2 = A824F6841308AD5D00DD40D2 /* PBXTextBookmark */;
+			A88CCE54127BEACF007FBC32 = A88CCE54127BEACF007FBC32 /* PBXBookmark */;
+			A88CCE55127BEACF007FBC32 = A88CCE55127BEACF007FBC32 /* PBXBookmark */;
+			A88DB9941310584000C8567D = A88DB9941310584000C8567D /* PBXTextBookmark */;
+			A8B325C812F4671000F2A42D = A8B325C812F4671000F2A42D /* PBXTextBookmark */;
+			A8B44CBA12A428B100DA8C3A = A8B44CBA12A428B100DA8C3A /* PBXBookmark */;
+			A8B44CBB12A428B100DA8C3A = A8B44CBB12A428B100DA8C3A /* PBXBookmark */;
+			A8BC321213269CF3003D484B = A8BC321213269CF3003D484B /* PBXTextBookmark */;
+		};
+		sourceControlManager = A8993731127B4E80006A7581 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	29B97316FDCFA39411CA2CEA /* main.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {875, 619}}";
+			sepNavSelRange = "{196, 0}";
+			sepNavVisRange = "{0, 322}";
+		};
+	};
+	8D1107260486CEB800E47090 /* Wineskin */ = {
+		activeExec = 0;
+		executables = (
+			A8993728127B4E78006A7581 /* Wineskin */,
+		);
+	};
+	A8061D8413217E0600119A6A /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */;
+		name = "WineskinAppDelegate.m: 1636";
+		rLen = 0;
+		rLoc = 84143;
+		rType = 0;
+		vrLen = 2045;
+		vrLoc = 83139;
+	};
+	A8222EBB12F8BF6F00CD4C03 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = A8B325D912F4710700F2A42D /* Wineskin.cpp */;
+		name = "Wineskin.cpp: 978";
+		rLen = 1;
+		rLoc = 48291;
+		rType = 0;
+		vrLen = 1727;
+		vrLoc = 47827;
+	};
+	A8222EDF12F8C46400CD4C03 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 089C165DFE840E0CC02AAC07 /* English */;
+		name = "InfoPlist.strings: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 45;
+		vrLoc = 0;
+	};
+	A824F47813070AD10012890F /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Wineskin-Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleVersion,
+		);
+		name = "/Developer/Wineskin/Wineskin-Info.plist";
+		rLen = 0;
+		rLoc = 9223372036854775808;
+	};
+	A824F6831308AD5D00DD40D2 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.m */;
+		name = "main.m: 6";
+		rLen = 0;
+		rLoc = 196;
+		rType = 0;
+		vrLen = 322;
+		vrLoc = 0;
+	};
+	A824F6841308AD5D00DD40D2 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3F00F4B6AF500CF3369 /* Wineskin_Prefix.pch */;
+		name = "Wineskin_Prefix.pch: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 147;
+		vrLoc = 0;
+	};
+	A868FC2C12820230001EBA25 /* remakedefaults.reg */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {875, 594}}";
+			sepNavSelRange = "{317, 0}";
+			sepNavVisRange = "{0, 726}";
+		};
+	};
+	A88CCE54127BEACF007FBC32 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */;
+	};
+	A88CCE55127BEACF007FBC32 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A88CCE4E127B9CED007FBC32 /* Wineskin.icns */;
+	};
+	A88DB9941310584000C8567D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D80F4B6AC300CF3369 /* WineskinAppDelegate.h */;
+		name = "WineskinAppDelegate.h: 227";
+		rLen = 22;
+		rLoc = 8211;
+		rType = 0;
+		vrLen = 1886;
+		vrLoc = 6388;
+	};
+	A8993728127B4E78006A7581 /* Wineskin */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Wineskin;
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+	};
+	A8993731127B4E80006A7581 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	A8993732127B4E80006A7581 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	A8B325C812F4671000F2A42D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = A868FC2C12820230001EBA25 /* remakedefaults.reg */;
+		name = "remakedefaults.reg: 16";
+		rLen = 0;
+		rLoc = 317;
+		rType = 0;
+		vrLen = 726;
+		vrLoc = 0;
+	};
+	A8B325D912F4710700F2A42D /* Wineskin.cpp */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.cpp.cpp;
+		name = Wineskin.cpp;
+		path = "/Users/doh123/Dropbox/Wineskin 2.0/WineskinCPP/Wineskin.cpp";
+		sourceTree = "<absolute>";
+	};
+	A8B44CBA12A428B100DA8C3A /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A8B44CA512A3FF2400DA8C3A /* ScreenOptionsHelp.png */;
+	};
+	A8B44CBB12A428B100DA8C3A /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = A8B44CA712A4050D00DA8C3A /* AdvancedConfigHelp.png */;
+	};
+	A8BC321213269CF3003D484B /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */;
+		name = "WineskinAppDelegate.m: 1636";
+		rLen = 0;
+		rLoc = 84143;
+		rType = 0;
+		vrLen = 2144;
+		vrLoc = 83040;
+	};
+}

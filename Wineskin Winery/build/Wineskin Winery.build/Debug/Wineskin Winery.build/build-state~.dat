@@ -1,0 +1,688 @@
+TWineskin Winery
+v7
+r0
+t318825548.337697
+cCheck dependencies
+cProcessInfoPlistFile "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Info.plist" Wineskin_Winery-Info.plist
+cCopyStringsFile "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/English.lproj/InfoPlist.strings" English.lproj/InfoPlist.strings
+cCompileXIB "/Developer/Wineskin Winery/English.lproj/MainMenu.xib"
+cCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/7za" 7za
+cCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/Wineskin.icns" Wineskin.icns
+cCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/WineskinBanner.jpg" WineskinBanner.jpg
+cCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/WineskinWineryUpdater" WineskinWineryUpdater
+cProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dcpfvlhxbuwtgbaosdvtwwwsgzws/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal x86_64 objective-c com.apple.compilers.gcc.4_2
+cProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-fasdifhobjfrsgclnqvemgsuzfui/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o" "/Developer/Wineskin Winery/main.m" normal x86_64 objective-c com.apple.compilers.gcc.4_2
+cCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o" "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" normal x86_64 objective-c com.apple.compilers.gcc.4_2
+cCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o" "/Developer/Wineskin Winery/main.m" normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o" "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" normal i386 objective-c com.apple.compilers.gcc.4_2
+cLd "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery" normal x86_64
+cLd "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery" normal i386
+cCreateUniversalBinary "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery" normal "x86_64 i386"
+cTouch "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app"
+
+N/Developer/SDKs/MacOSX10.5.sdk
+c000000004A49A9E400000000000000EE
+t1246341604
+s238
+
+N/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/Cocoa.framework/Headers/Cocoa.h
+c0000000040C4AA6800000000000001E5
+t1086630504
+s485
+
+N/Developer/SDKs/MacOSX10.6.sdk
+c000000004A769DAB00000000000000EE
+t1249287595
+s238
+
+N/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Cocoa.framework/Headers/Cocoa.h
+c0000000040C4AA6800000000000001E5
+t1086630504
+s485
+
+N/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSPathUtilities.h
+c000000004A600B850000000000001502
+t1247808389
+s5378
+
+N/Developer/Wineskin Winery/7za
+c000000004CA0B2FA000000000016CF18
+t1285599994
+s1494808
+
+N/Developer/Wineskin Winery/Downloader.h
+c000000004CC71EC60000000000000443
+t1288117958
+s1091
+i<Cocoa/Cocoa.h>
+i"Wineskin_WineryAppDelegate.h"
+
+N/Developer/Wineskin Winery/Downloader.m
+c000000004CC71F970000000000001800
+t1288118167
+s6144
+i"Downloader.h"
+
+N/Developer/Wineskin Winery/English.lproj/InfoPlist.strings
+c000000004CC48F04000000000000002D
+t1287950084
+s45
+
+N/Developer/Wineskin Winery/English.lproj/MainMenu.xib
+c000000004D50AC8B000000000004A8D3
+t1297132683
+s305363
+
+N/Developer/Wineskin Winery/Updater
+c000000004CC9FBE9000000000000011C
+t1288305641
+s284
+
+N/Developer/Wineskin Winery/Wineskin.h
+c000000004CC5B01300000000000000D3
+t1288024083
+s211
+i<Cocoa/Cocoa.h>
+
+N/Developer/Wineskin Winery/Wineskin.icns
+c000000004CC6F431000000000002197F
+t1288107057
+s137599
+
+N/Developer/Wineskin Winery/Wineskin.jpg
+c00000000000000000000000000000000
+t2
+s0
+
+N/Developer/Wineskin Winery/Wineskin.m
+c000000004CC5B02A00000000000000DB
+t1288024106
+s219
+i"Wineskin.h"
+i"Downloader.h"
+
+N/Developer/Wineskin Winery/WineskinBanner.jpg
+c000000004CC48F68000000000000361B
+t1287950184
+s13851
+
+N/Developer/Wineskin Winery/WineskinWineryUpdater
+c000000004CC9FBE9000000000000011C
+t1288305641
+s284
+
+N/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.h
+c000000004D50AC9B000000000000122E
+t1297132699
+s4654
+i<Cocoa/Cocoa.h>
+
+N/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m
+c000000004D50AACA000000000000A4DA
+t1297132234
+s42202
+i"Wineskin_WineryAppDelegate.h"
+
+N/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch
+c000000004CC48F0400000000000000A1
+t1287950084
+s161
+i<Cocoa/Cocoa.h>
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app
+t1297132748
+s102
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Info.plist
+t1297132741
+s1160
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery
+t1297132748
+s159360
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/PkgInfo
+t1297132741
+s8
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/7za
+t1297132741
+s1494808
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/English.lproj/InfoPlist.strings
+t1297132741
+s92
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/English.lproj/MainMenu.nib
+t1297132741
+s62087
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/Updater
+t1288363236
+s284
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/Wineskin.icns
+t1297132741
+s137599
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/Wineskin.jpg
+t2
+s0
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/WineskinBanner.jpg
+t1297132741
+s13851
+
+N/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/WineskinWineryUpdater
+t1297132741
+s284
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Downloader.o
+t1288118483
+s35692
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery
+t1297132748
+s65152
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery.LinkFileList
+c000000004D50ACC500000000000000F2
+t1297132741
+s242
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o
+t1297132747
+s126572
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o
+t1297132747
+s4832
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Downloader.o
+t1288024523
+s30556
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery
+t1297132748
+s87712
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery.LinkFileList
+c000000004D50ACC500000000000000F6
+t1297132741
+s246
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin.o
+t1288024036
+s17840
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o
+t1297132747
+s161060
+
+N/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o
+t1297132746
+s4968
+
+N/Developer/Wineskin Winery/main.m
+c000000004CC48F040000000000000100
+t1287950084
+s256
+i<Cocoa/Cocoa.h>
+
+N/System/Library/Frameworks/Cocoa.framework/Cocoa
+c000000004B5FA877000000000000A5E0
+t1264560247
+s42464
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-acuxjqfnabeywxaahcyuxugwebkv/Wineskin_Winery_Prefix.pch.gch
+t1288363316
+s54322960
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-aepjjgodanmirocynzmooytcwjdz/Wineskin_Winery_Prefix.pch.gch
+t2
+s0
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-ahhidiiaymbbblcwslehlmiatbwy/Wineskin_Winery_Prefix.pch.gch
+t1288045161
+s56903472
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-bwwoavjpwdbsecgduewvksfsvmxh/Wineskin_Winery_Prefix.pch.gch
+t1287950917
+s54265616
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dcpfvlhxbuwtgbaosdvtwwwsgzws/Wineskin_Winery_Prefix.pch.gch
+t1297132746
+s51179824
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dgvdjgkximktqoegvoqmxikpsbqo/Wineskin_Winery_Prefix.pch.gch
+t1290463474
+s32817828
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-eierzewoqivbaceuumbckqtzzpbv/Wineskin_Winery_Prefix.pch.gch
+t1290463474
+s34665236
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-falavgxwcowdalccvxtcavqvzlou/Wineskin_Winery_Prefix.pch.gch
+t2
+s0
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-fasdifhobjfrsgclnqvemgsuzfui/Wineskin_Winery_Prefix.pch.gch
+t1297132746
+s54116784
+
+N/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-grhayggtzcebigdfzoymjfiussus/Wineskin_Winery_Prefix.pch.gch
+t1288363244
+s56960816
+
+NWineskin_Winery-Info.plist
+c000000004D488D3C00000000000004A2
+t1296600380
+s1186
+
+CCheck dependencies
+r0
+lSLF07#2@18"Check dependencies318825541#318825541#0(0"0(0#1#0"8624268448#0"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Downloader.o" "/Developer/Wineskin Winery/Downloader.m" normal i386 objective-c com.apple.compilers.gcc.4_2
+s309811283.321813
+e309811283.592420
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Downloader.o
+x/Developer/Wineskin Winery/Downloader.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+o/Developer/Wineskin Winery/Downloader.m: In function '-[Downloader connectionDidFinishLoading:]':
+o/Developer/Wineskin Winery/Downloader.m:91: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'
+o/Developer/Wineskin Winery/Downloader.m:91: warning: (Messages without a matching method signature
+o/Developer/Wineskin Winery/Downloader.m:91: warning: will be assumed to return 'id' and accept
+o/Developer/Wineskin Winery/Downloader.m:91: warning: '...' as arguments.)
+o/Developer/Wineskin Winery/Downloader.m:99: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'
+o/Developer/Wineskin Winery/Downloader.m:111: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'
+o/Developer/Wineskin Winery/Downloader.m:119: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'
+lSLF07#2@47"Compile /Developer/Wineskin Winery/Downloader.m309811283#309811283#0(864"/Developer/Wineskin Winery/Downloader.m: In function '-[Downloader connectionDidFinishLoading:]':/Developer/Wineskin Winery/Downloader.m:91: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'/Developer/Wineskin Winery/Downloader.m:91: warning: (Messages without a matching method signature/Developer/Wineskin Winery/Downloader.m:91: warning: will be assumed to return 'id' and accept/Developer/Wineskin Winery/Downloader.m:91: warning: '...' as arguments.)/Developer/Wineskin Winery/Downloader.m:99: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'/Developer/Wineskin Winery/Downloader.m:111: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'/Developer/Wineskin Winery/Downloader.m:119: warning: 'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'5(22@70"'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'309811283#98#124#0(6@39"/Developer/Wineskin Winery/Downloader.m309810967#91#0#91#0#26"'*' may not respond to '*'0(13@108"(Messages without a matching method signature will be assumed to return 'id' and accept '...' as arguments.)309811283#222#99#0(6@39"/Developer/Wineskin Winery/Downloader.m309810967#91#0#91#0#0"0(22@70"'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'309811283#490#124#0(6@39"/Developer/Wineskin Winery/Downloader.m309810967#99#0#99#0#26"'*' may not respond to '*'0(22@70"'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'309811283#614#125#0(6@39"/Developer/Wineskin Winery/Downloader.m309810967#111#0#111#0#26"'*' may not respond to '*'0(22@70"'Wineskin_WineryAppDelegate' may not respond to '+makeFoldersAndFiles'309811283#739#125#0(6@39"/Developer/Wineskin Winery/Downloader.m309810967#119#0#119#0#26"'*' may not respond to '*'0(0#0#39"/Developer/Wineskin Winery/Downloader.m8620257792#1506"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.6 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-ahhidiiaymbbblcwslehlmiatbwy/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/Downloader.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Downloader.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o" "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" normal i386 objective-c com.apple.compilers.gcc.4_0
+s312388887.955886
+e312388888.352431
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o
+x/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_0
+lSLF07#2@63"Compile /Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m312388887#312388888#0(0"0(0#0#55"/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m8645193632#1538"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.0 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-eierzewoqivbaceuumbckqtzzpbv/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o" "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" normal i386 objective-c com.apple.compilers.gcc.4_2
+s318825547.047118
+e318825547.434044
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o
+x/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@63"Compile /Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m318825547#318825547#0(0"0(0#0#55"/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m8623562208#1538"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-fasdifhobjfrsgclnqvemgsuzfui/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin_WineryAppDelegate.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o" "/Developer/Wineskin Winery/main.m" normal i386 objective-c com.apple.compilers.gcc.4_0
+s312156274.907362
+e312156275.017614
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o
+x/Developer/Wineskin Winery/main.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_0
+lSLF07#2@41"Compile /Developer/Wineskin Winery/main.m312156274#312156275#0(0"0(0#0#33"/Developer/Wineskin Winery/main.m8599580256#1494"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.0 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-eierzewoqivbaceuumbckqtzzpbv/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/main.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o" "/Developer/Wineskin Winery/main.m" normal i386 objective-c com.apple.compilers.gcc.4_2
+s318825546.888146
+e318825547.047012
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o
+x/Developer/Wineskin Winery/main.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@41"Compile /Developer/Wineskin Winery/main.m318825546#318825547#0(0"0(0#0#33"/Developer/Wineskin Winery/main.m8624446784#1494"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-fasdifhobjfrsgclnqvemgsuzfui/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/main.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/main.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Downloader.o" "/Developer/Wineskin Winery/Downloader.m" normal x86_64 objective-c com.apple.compilers.gcc.4_2
+s309717323.049030
+e309717323.498072
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Downloader.o
+x/Developer/Wineskin Winery/Downloader.m
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@47"Compile /Developer/Wineskin Winery/Downloader.m309717323#309717323#0(0"0(0#0#39"/Developer/Wineskin Winery/Downloader.m8696650400#1512"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.6 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-bwwoavjpwdbsecgduewvksfsvmxh/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/Downloader.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Downloader.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin.o" "/Developer/Wineskin Winery/Wineskin.m" normal x86_64 objective-c com.apple.compilers.gcc.4_2
+s309716836.235484
+e309716836.448055
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin.o
+x/Developer/Wineskin Winery/Wineskin.m
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@45"Compile /Developer/Wineskin Winery/Wineskin.m309716836#309716836#0(0"0(0#0#37"/Developer/Wineskin Winery/Wineskin.m8727339296#1508"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.6 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-bwwoavjpwdbsecgduewvksfsvmxh/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/Wineskin.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o" "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" normal x86_64 objective-c com.apple.compilers.gcc.4_0
+s312388887.774625
+e312388888.337243
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o
+x/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_0
+lSLF07#2@63"Compile /Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m312388887#312388888#0(0"0(0#0#55"/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m8644160672#1544"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.0 -x objective-c -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dgvdjgkximktqoegvoqmxikpsbqo/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o" "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" normal x86_64 objective-c com.apple.compilers.gcc.4_2
+s318825546.697213
+e318825547.165104
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o
+x/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@63"Compile /Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m318825546#318825547#0(0"0(0#0#55"/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m8622291904#1544"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dcpfvlhxbuwtgbaosdvtwwwsgzws/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/Wineskin_WineryAppDelegate.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin_WineryAppDelegate.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o" "/Developer/Wineskin Winery/main.m" normal x86_64 objective-c com.apple.compilers.gcc.4_0
+s312156274.576648
+e312156274.907261
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o
+x/Developer/Wineskin Winery/main.m
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_0
+lSLF07#2@41"Compile /Developer/Wineskin Winery/main.m312156274#312156274#0(0"0(0#0#33"/Developer/Wineskin Winery/main.m8607400288#1500"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.0 -x objective-c -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dgvdjgkximktqoegvoqmxikpsbqo/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/main.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o"0#
+
+CCompileC "build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o" "/Developer/Wineskin Winery/main.m" normal x86_64 objective-c com.apple.compilers.gcc.4_2
+s318825546.695953
+e318825546.888044
+r1
+xCompileC
+xbuild/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o
+x/Developer/Wineskin Winery/main.m
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@41"Compile /Developer/Wineskin Winery/main.m318825546#318825546#0(0"0(0#0#33"/Developer/Wineskin Winery/main.m8621722816#1500"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -include /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dcpfvlhxbuwtgbaosdvtwwwsgzws/Wineskin_Winery_Prefix.pch -c "/Developer/Wineskin Winery/main.m" -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/main.o"0#
+
+CCompileXIB "/Developer/Wineskin Winery/English.lproj/MainMenu.xib"
+s318825541.210097
+e318825541.833599
+r1
+xCompileXIB
+x/Developer/Wineskin Winery/English.lproj/MainMenu.xib
+o/* com.apple.ibtool.document.notices */
+o/Developer/Wineskin Winery/English.lproj/MainMenu.xib:880: note: This view is clipping its content.
+lSLF07#2@37"CompileXIB English.lproj/MainMenu.xib318825541#318825541#0(140"/* com.apple.ibtool.document.notices *//Developer/Wineskin Winery/English.lproj/MainMenu.xib:880: note: This view is clipping its content.1(13@34"This view is clipping its content.318825541#18446744073709551615#0#0(6@53"/Developer/Wineskin Winery/English.lproj/MainMenu.xib318825483#880#0#880#0#0"0(0#0#53"/Developer/Wineskin Winery/English.lproj/MainMenu.xib8622393632#342"    cd "/Developer/Wineskin Winery"    /Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/English.lproj/MainMenu.nib" "/Developer/Wineskin Winery/English.lproj/MainMenu.xib" --sdk /Developer/SDKs/MacOSX10.5.sdk0#
+
+CCopyStringsFile "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/English.lproj/InfoPlist.strings" English.lproj/InfoPlist.strings
+s318825541.209186
+e318825541.729484
+r1
+xCopyStringsFile
+x/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/English.lproj/InfoPlist.strings
+xEnglish.lproj/InfoPlist.strings
+o/Developer/Library/Xcode/Plug-ins/CoreBuildTasks.xcplugin/Contents/Resources/copystrings:125: warning: Insecure world writable dir /Developer/usr/bin in PATH, mode 040777
+lSLF07#2@36"Copy English.lproj/InfoPlist.strings318825541#318825541#0(171"/Developer/Library/Xcode/Plug-ins/CoreBuildTasks.xcplugin/Contents/Resources/copystrings:125: warning: Insecure world writable dir /Developer/usr/bin in PATH, mode 0407770(0#0#58"/Developer/Wineskin Winery/English.lproj/InfoPlist.strings8622523360#353"    cd "/Developer/Wineskin Winery"    setenv ICONV /usr/bin/iconv    /Developer/Library/Xcode/Plug-ins/CoreBuildTasks.xcplugin/Contents/Resources/copystrings --validate --inputencoding utf-8 --outputencoding UTF-16 English.lproj/InfoPlist.strings --outdir "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources/English.lproj"0#
+
+CCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/7za" 7za
+s318825541.729576
+e318825541.825491
+r1
+xCpResource
+xbuild/Debug/Wineskin Winery.app/Contents/Resources/7za
+x7za
+lSLF07#2@8"Copy 7za318825541#318825541#0(0"0(0#0#30"/Developer/Wineskin Winery/7za8624013664#311"    cd "/Developer/Wineskin Winery"    /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -resolve-src-symlinks "/Developer/Wineskin Winery/7za" "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources"0#
+
+CCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/Updater" Updater
+s310056036.752576
+e310056036.757454
+r1
+xCpResource
+xbuild/Debug/Wineskin Winery.app/Contents/Resources/Updater
+xUpdater
+lSLF07#2@12"Copy Updater310056036#310056036#0(0"0(0#0#34"/Developer/Wineskin Winery/Updater8610828544#301"    cd "/Developer/Wineskin Winery"    /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks "/Developer/Wineskin Winery/Updater" "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources"0#
+
+CCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/Wineskin.icns" Wineskin.icns
+s318825541.730320
+e318825541.781463
+r1
+xCpResource
+xbuild/Debug/Wineskin Winery.app/Contents/Resources/Wineskin.icns
+xWineskin.icns
+lSLF07#2@18"Copy Wineskin.icns318825541#318825541#0(0"0(0#0#40"/Developer/Wineskin Winery/Wineskin.icns8623896768#321"    cd "/Developer/Wineskin Winery"    /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -resolve-src-symlinks "/Developer/Wineskin Winery/Wineskin.icns" "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources"0#
+
+CCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/Wineskin.jpg" Wineskin.jpg
+s309643713.742446
+e309643713.909348
+r1
+xCpResource
+xbuild/Debug/Wineskin Winery.app/Contents/Resources/Wineskin.jpg
+xWineskin.jpg
+lSLF07#2@17"Copy Wineskin.jpg309643713#309643713#0(0"0(0#0#39"/Developer/Wineskin Winery/Wineskin.jpg8618921376#306"    cd "/Developer/Wineskin Winery"    /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks "/Developer/Wineskin Winery/Wineskin.jpg" "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources"0#
+
+CCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/WineskinBanner.jpg" WineskinBanner.jpg
+s318825541.731062
+e318825541.748089
+r1
+xCpResource
+xbuild/Debug/Wineskin Winery.app/Contents/Resources/WineskinBanner.jpg
+xWineskinBanner.jpg
+lSLF07#2@23"Copy WineskinBanner.jpg318825541#318825541#0(0"0(0#0#45"/Developer/Wineskin Winery/WineskinBanner.jpg8623857248#326"    cd "/Developer/Wineskin Winery"    /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -resolve-src-symlinks "/Developer/Wineskin Winery/WineskinBanner.jpg" "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources"0#
+
+CCpResource "build/Debug/Wineskin Winery.app/Contents/Resources/WineskinWineryUpdater" WineskinWineryUpdater
+s318825541.732634
+e318825541.757110
+r1
+xCpResource
+xbuild/Debug/Wineskin Winery.app/Contents/Resources/WineskinWineryUpdater
+xWineskinWineryUpdater
+lSLF07#2@26"Copy WineskinWineryUpdater318825541#318825541#0(0"0(0#0#48"/Developer/Wineskin Winery/WineskinWineryUpdater8623787936#329"    cd "/Developer/Wineskin Winery"    /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -resolve-src-symlinks "/Developer/Wineskin Winery/WineskinWineryUpdater" "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Resources"0#
+
+CCreateUniversalBinary "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery" normal "x86_64 i386"
+s318825548.291606
+e318825548.323524
+r1
+xCreateUniversalBinary
+x/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery
+xnormal
+xx86_64 i386
+lSLF07#2@107"CreateUniversalBinary "build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery" normal "x86_64 i386"318825548#318825548#0(0"0(0#0#38"/Developer/Wineskin Winery/x86_64 i3868622105088#406"    cd "/Developer/Wineskin Winery"    /usr/bin/lipo -create "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery" "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery" -output "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery"0#
+
+CLd "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery" normal i386
+s312391596.727153
+e312391596.759696
+r1
+xLd
+x/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery
+xnormal
+xi386
+lSLF07#2@94"Link /Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery312391596#312391596#0(0"0(0#0#0"8590318240#528"    cd "/Developer/Wineskin Winery"    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/gcc-4.2 -arch i386 -isysroot /Developer/SDKs/MacOSX10.5.sdk "-L/Developer/Wineskin Winery/build/Debug" "-F/Developer/Wineskin Winery/build/Debug" -filelist "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery.LinkFileList" -mmacosx-version-min=10.5 -framework Cocoa -o "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery"0#
+
+CLd "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery" normal x86_64
+s309737771.526861
+e309737771.569125
+r1
+xLd
+x/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery
+xnormal
+xx86_64
+lSLF07#2@94"Link /Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery309737771#309737771#0(0"0(0#0#0"8696617664#532"    cd "/Developer/Wineskin Winery"    setenv MACOSX_DEPLOYMENT_TARGET 10.6    /Developer/usr/bin/gcc-4.2 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk "-L/Developer/Wineskin Winery/build/Debug" "-F/Developer/Wineskin Winery/build/Debug" -filelist "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery.LinkFileList" -mmacosx-version-min=10.6 -framework Cocoa -o "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/MacOS/Wineskin Winery"0#
+
+CLd "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery" normal i386
+s318825547.434134
+e318825548.281334
+r1
+xLd
+x/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery
+xnormal
+xi386
+lSLF07#2@123"Link /Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery318825547#318825548#0(0"0(0#0#0"8623875136#557"    cd "/Developer/Wineskin Winery"    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/gcc-4.2 -arch i386 -isysroot /Developer/SDKs/MacOSX10.5.sdk "-L/Developer/Wineskin Winery/build/Debug" "-F/Developer/Wineskin Winery/build/Debug" -filelist "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery.LinkFileList" -mmacosx-version-min=10.5 -framework Cocoa -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/i386/Wineskin Winery"0#
+
+CLd "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery" normal x86_64
+s318825547.165198
+e318825548.291510
+r1
+xLd
+x/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery
+xnormal
+xx86_64
+lSLF07#2@125"Link /Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery318825547#318825548#0(0"0(0#0#0"8622435872#563"    cd "/Developer/Wineskin Winery"    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Developer/usr/bin/gcc-4.2 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk "-L/Developer/Wineskin Winery/build/Debug" "-F/Developer/Wineskin Winery/build/Debug" -filelist "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery.LinkFileList" -mmacosx-version-min=10.5 -framework Cocoa -o "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Objects-normal/x86_64/Wineskin Winery"0#
+
+CProcessInfoPlistFile "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Info.plist" Wineskin_Winery-Info.plist
+s318825541.203270
+e318825541.209091
+r1
+xProcessInfoPlistFile
+x/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Info.plist
+xWineskin_Winery-Info.plist
+lSLF07#2@34"Process Wineskin_Winery-Info.plist318825541#318825541#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery-Info.plist8623224704#304"    cd "/Developer/Wineskin Winery"    builtin-infoPlistUtility Wineskin_Winery-Info.plist -genpkginfo "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/PkgInfo" -expandbuildsettings -platform macosx -o "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app/Contents/Info.plist"0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-acuxjqfnabeywxaahcyuxugwebkv/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal x86_64 objective-c com.apple.compilers.gcc.4_2
+s310056112.881071
+e310056116.373518
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-acuxjqfnabeywxaahcyuxugwebkv/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch310056112#310056116#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8596999904#1408"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c-header -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-acuxjqfnabeywxaahcyuxugwebkv/Wineskin_Winery_Prefix.pch.gch0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-aepjjgodanmirocynzmooytcwjdz/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_0
+r0
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-ahhidiiaymbbblcwslehlmiatbwy/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+s309737957.410651
+e309737961.529558
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-ahhidiiaymbbblcwslehlmiatbwy/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch309737957#309737961#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8605857792#1404"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c-header -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.6 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-ahhidiiaymbbblcwslehlmiatbwy/Wineskin_Winery_Prefix.pch.gch0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-bwwoavjpwdbsecgduewvksfsvmxh/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal x86_64 objective-c com.apple.compilers.gcc.4_2
+s309643714.005045
+e309643717.422853
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-bwwoavjpwdbsecgduewvksfsvmxh/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch309643714#309643717#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8617465568#1408"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c-header -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.6 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-bwwoavjpwdbsecgduewvksfsvmxh/Wineskin_Winery_Prefix.pch.gch0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dcpfvlhxbuwtgbaosdvtwwwsgzws/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal x86_64 objective-c com.apple.compilers.gcc.4_2
+s318825541.833719
+e318825546.257656
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dcpfvlhxbuwtgbaosdvtwwwsgzws/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch318825541#318825546#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8623436032#1408"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c-header -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dcpfvlhxbuwtgbaosdvtwwwsgzws/Wineskin_Winery_Prefix.pch.gch0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dgvdjgkximktqoegvoqmxikpsbqo/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal x86_64 objective-c com.apple.compilers.gcc.4_0
+s312156266.989857
+e312156274.528472
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dgvdjgkximktqoegvoqmxikpsbqo/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xx86_64
+xobjective-c
+xcom.apple.compilers.gcc.4_0
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch312156266#312156274#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8608572512#1408"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.0 -x objective-c-header -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/x86_64" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-dgvdjgkximktqoegvoqmxikpsbqo/Wineskin_Winery_Prefix.pch.gch0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-eierzewoqivbaceuumbckqtzzpbv/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_0
+s312156267.027718
+e312156274.576541
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-eierzewoqivbaceuumbckqtzzpbv/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_0
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch312156267#312156274#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8608271808#1404"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.0 -x objective-c-header -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-eierzewoqivbaceuumbckqtzzpbv/Wineskin_Winery_Prefix.pch.gch0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-falavgxwcowdalccvxtcavqvzlou/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal x86_64 objective-c com.apple.compilers.gcc.4_0
+r0
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-fasdifhobjfrsgclnqvemgsuzfui/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+s318825541.834745
+e318825546.695812
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-fasdifhobjfrsgclnqvemgsuzfui/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch318825541#318825546#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8622946848#1404"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c-header -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.5.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-fasdifhobjfrsgclnqvemgsuzfui/Wineskin_Winery_Prefix.pch.gch0#
+
+CProcessPCH /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-grhayggtzcebigdfzoymjfiussus/Wineskin_Winery_Prefix.pch.gch Wineskin_Winery_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+s310056037.269430
+e310056044.856571
+r1
+xProcessPCH
+x/var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-grhayggtzcebigdfzoymjfiussus/Wineskin_Winery_Prefix.pch.gch
+xWineskin_Winery_Prefix.pch
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@37"Precompile Wineskin_Winery_Prefix.pch310056037#310056044#0(0"0(0#0#53"/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch8701422976#1404"    cd "/Developer/Wineskin Winery"    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x objective-c-header -arch i386 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.5 -gdwarf-2 -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-generated-files.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-own-target-headers.hmap" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-all-target-headers.hmap" -iquote "/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/Wineskin Winery-project-headers.hmap" "-F/Developer/Wineskin Winery/build/Debug" "-I/Developer/Wineskin Winery/build/Debug/include" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources/i386" "-I/Developer/Wineskin Winery/build/Wineskin Winery.build/Debug/Wineskin Winery.build/DerivedSources" -c "/Developer/Wineskin Winery/Wineskin_Winery_Prefix.pch" -o /var/folders/zS/zSfMHSngE9CRgI+-XSqkzU+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/Wineskin_Winery_Prefix-grhayggtzcebigdfzoymjfiussus/Wineskin_Winery_Prefix.pch.gch0#
+
+CTouch "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app"
+s318825548.323631
+e318825548.337503
+r1
+xTouch
+x/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app
+lSLF07#2@64"Touch /Developer/Wineskin Winery/build/Debug/Wineskin Winery.app318825548#318825548#0(0"0(0#0#0"8605728448#119"    cd "/Developer/Wineskin Winery"    /usr/bin/touch -c "/Developer/Wineskin Winery/build/Debug/Wineskin Winery.app"0#
+
