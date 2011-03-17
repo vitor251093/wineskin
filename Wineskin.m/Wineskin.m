@@ -1,6 +1,6 @@
 //  Wineskin.m
-//  Copyright 2011 doh123@doh123.com and the Wineskin Project All rights reserved.
-//  This file is closed source and you have no license to use it, look at it, or reproduce any part of it.
+//  Copyright 2010 by The Wineskin Project and doh123@doh1223.com. All rights reserved.
+//  Licensed for use under the LGPL <http://www.gnu.org/licenses/lgpl-2.1.txt>
 
 #import <Cocoa/Cocoa.h>
 //#include <signal.h>
