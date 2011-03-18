@@ -123,6 +123,6 @@
 - (IBAction) createWrapperCancelButtonPressed:(id)sender;
 
 //pass in a string to see it in a pop up, for devel testing string values.
-- (void)displayString:(NSString *)input;
+- (void)ds:(NSString *)input;
 
 @end

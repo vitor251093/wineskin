@@ -326,7 +326,7 @@
 	[updateAvailableLabel setHidden:NO];
 }
 
-- (void)displayString:(NSString *)input
+- (void)ds:(NSString *)input
 {
 	if (input == nil) input=@"nil";
 	NSAlert *TESTER = [[NSAlert alloc] init];
@@ -516,15 +516,15 @@
 {
 	[self refreshButtonPressed:self];
 	[self makeFoldersAndFiles];
-	[addEngineWindow orderOut:self];
 	[wineskinEngineBuilderWindow makeKeyAndOrderFront:self];
+	[addEngineWindow orderOut:self];
 	NSString *currentEngineBuild = [self currentEngineBuildVersion];
 	[engineBuildCurrentEngineBase setStringValue:currentEngineBuild];
 	NSString *availableEngineBase = [self availableEngineBuildVersion];
 	//set default engine name
 	[engineBuildEngineName setStringValue:[NSString stringWithFormat:@"%@-MyCustomEngine",[currentEngineBuild stringByReplacingOccurrencesOfString:@"EngineBase" withString:@""]]];
 	//set update button and label
-	if ([availableEngineBase isEqualToString:currentEngineBuild])
+	if ([availableEngineBase isEqualToString:currentEngineBuild] || [availableEngineBase isEqualToString:@"ERROR"])
 	{
 		[engineBuildUpdateButton setEnabled:NO];
 		[engineBuildUpdateAvailable setHidden:YES];
