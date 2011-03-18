@@ -1,6 +1,6 @@
 //  Wineskin.m
-//  Copyright 2011 by The Wineskin Project and doh123@doh123.com All rights reserved.
-//  Licensed for use under the LGPL <http://www.gnu.org/licenses/lgpl-2.1.txt>
+//  Copyright 2011 doh123@doh123.com and the Wineskin Project All rights reserved.
+//  This file is closed source and you have no license to use it, look at it, or reproduce any part of it.
 
 #import <Cocoa/Cocoa.h>
 //#include <signal.h>
@@ -778,6 +778,9 @@
 			[self writeStringArray:[NSArray arrayWithArray:newUserDefReg] toFile:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
 			// need Temp folder in Public folder
 			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Public/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
+			// do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
+			[self systemCommand:[NSString stringWithFormat:@"chmod -RP 755 \"%@\"",appNameWithPath]];
+			
 		}
 		else if ([wssCommand isEqualToString:@"WSS-winetricks"])
 		{
