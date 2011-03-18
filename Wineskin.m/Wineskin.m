@@ -779,8 +779,12 @@
 			// need Temp folder in Public folder
 			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Public/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
 			// do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
-			[self systemCommand:[NSString stringWithFormat:@"chmod -RP 755 \"%@\"",appNameWithPath]];
-			
+			//[self systemCommand:[NSString stringWithFormat:@"chmod -RP 755 \"%@\"",appNameWithPath]];  //update to objc/cocoa
+			// Task Number 3221715 Fix Wrapper Permissions
+			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:755],@"NSFilePosixPermissions",nil];
+			NSArray *tmpy = [fm subpathsAtPath:appNameWithPath];
+			for (NSString *item in tmpy)
+				[fm setAttributes:attributes ofItemAtPath:item error:nil];
 		}
 		else if ([wssCommand isEqualToString:@"WSS-winetricks"])
 		{
