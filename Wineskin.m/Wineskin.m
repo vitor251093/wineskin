@@ -361,7 +361,7 @@
 	CGDirectDisplayID activeDisplays[] = {0,0,0,0,0,0,0,0};
 	CGDisplayCount activeDisplaysNum,totalDisplaysNum=8;
 	CGDisplayErr error1 = CGGetActiveDisplayList(totalDisplaysNum,activeDisplays,&activeDisplaysNum);
-	if (error1!=0) NSLog(@"setGamma() function active display list failed! error = %d",error1);
+	if (error1!=0) NSLog(@"setGamma function active display list failed! error = %d",error1);
 	CGGammaValue gammaMin = 0.0;
 	CGGammaValue gammaMax = 1.0;
 	CGGammaValue gammaSettingsRED = gamma;
@@ -896,7 +896,10 @@
 	int oldTimeStamp=0;
 	int oldInfoPlistTimeStamp=0;
 	struct stat stat_p;
+	if (useGamma) [self setGamma:gammaCorrection];
 	NSString *newScreenReso;
+	BOOL fixGamma = NO;
+	int fixGammaCounter = 0;
 	while ([self pidRunning:wineServerPID])
 	{
 		//check for xrandr made files in /tmp
@@ -909,6 +912,13 @@
 			[fm removeItemAtPath:@"/tmp/WineskinXrandrTempFile" error:nil];
 			randrXres = [tempArray objectAtIndex:0];
 			randrYres = [tempArray objectAtIndex:1];
+			if (useGamma)
+			{
+				// OSX sets gamma back to default on a resolution change, but not right away.. it can take a few seconds
+				// nned to make a way it'll try a few times over the next few loops to fix the gamma
+				fixGamma = YES;
+				fixGammaCounter = 0;
+			}
 		}
 		if ([fm fileExistsAtPath:@"/tmp/WineskinXrandrTempFileSwitch"])
 		{
@@ -957,7 +967,12 @@
 			stat ([[NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix] UTF8String], &stat_p);
 			oldTimeStamp = stat_p.st_mtime;
 		}
-		if (useGamma) [self setGamma:gammaCorrection];
+		if (fixGamma)
+		{
+			[self setGamma:gammaCorrection];
+			fixGammaCounter++;
+		}
+		if (fixGammaCounter > 6) fixGamma = NO;
 		usleep(1250000); // sleeping in background 1.25 seconds
 	}
 	[fm release];
