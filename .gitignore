@@ -2,9 +2,7 @@
 .DS_Store
 
 #Xcode build folders
-Wineskin/build/
-Wineskin Winery/build/
-WineskinLauncher/build/
+build/
 
 #user-specific project settings: breakpoints, custom executables, etc.; files are inside the .xcodeproj bundle
 *.mode1v3
