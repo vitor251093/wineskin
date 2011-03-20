@@ -1,0 +1,34 @@
+#Spotlight junk
+.DS_Store
+
+#Xcode build folders
+Wineskin/build/
+Wineskin Winery/build/
+WineskinLauncher/build/
+
+#user-specific project settings: breakpoints, custom executables, etc.; files are inside the .xcodeproj bundle
+*.mode1v3
+
+#user-specific xcode workspace settings; files are inside the .xcodeproj bundle
+*.pbxuser
+
+#some merge tools or editors generate .bak files to store old versions backups
+*.bak
+
+#some merge tools or editors generate .orig files to store old versions backups
+*.orig
+
+#some merge tools or editors generate ~ files to store old versions backups
+*~
+
+#ignore resource forks in non-HFS+ filesystems
+._*
+
+#stuff that appears in non-HFS+ filesystems accessed through afp:// shares
+.Apple*
+
+#nasty windows xp thumbnail cache
+Thumbs.db
+
+#vim/MacVim temporary swap files
+.*.swp
