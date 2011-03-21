@@ -127,25 +127,28 @@
 - (IBAction)installWindowsSoftwareButtonPressed:(id)sender
 {
 	// have user choose install program
-	NSOpenPanel *panel = [NSOpenPanel openPanel];
+	//NSOpenPanel *panel = [NSOpenPanel openPanel];
+	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
 	[panel setTitle:@"Please choose the install program"];
 	[panel setPrompt:@"Choose"];
 	[panel setCanChooseDirectories:NO];
 	[panel setCanChooseFiles:YES];
 	[panel setAllowsMultipleSelection:NO];
+	int error;
 	if ([self theOSVersionIs105])
 		[panel setDirectory:@"/"];
 	else
-		[panel setDirectoryURL:[NSURL URLWithString:@"file:///"]]; // 10.6+
+		[panel setDirectoryURL:[NSURL URLWithString:@"file:///"]];
 	//deprecated in 10.6, and 10.7 but still works, but no real way around using it and supporting 10.5
 	//10.5 will probably be dropped by 10.8
-	int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
+	error = [panel runModalForTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
 	//exit method if cancel pushed
 	if (error == 0) return;
 	//show busy window
 	[busyWindow makeKeyAndOrderFront:self];
 	// get rid of main window
 	[window orderOut:self];
+	[panel release];
 	//make 1st array of .exe, .msi, and .bat files
 	NSArray *filesTEMP1 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files1 = [NSMutableArray arrayWithCapacity:10];
@@ -616,8 +619,8 @@
 }
 - (IBAction)windowsExeBrowseButtonPressed:(id)sender
 {
-	
-	NSOpenPanel *panel = [NSOpenPanel openPanel];
+	//NSOpenPanel *panel = [NSOpenPanel openPanel];
+	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
 	[panel setTitle:@"Please choose the .exe, .msi, or .bat file that should run"];
 	[panel setPrompt:@"Choose"];
 	[panel setCanChooseDirectories:NO];
@@ -629,7 +632,6 @@
 		[panel setDirectory:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	else // 10.6+ because of deprecated function.  Not working in 10.7..
 		[panel setDirectoryURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Contents/Resources/drive_c",[[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent] stringByReplacingOccurrencesOfString:@" " withString:@"%20"]]]];
-	
 	//loop until choice is in drive_c
 	BOOL inDriveC = false;
 	while (!inDriveC)
@@ -643,19 +645,22 @@
 			inDriveC = true;
 	}
 	//if cancel, return
-	if (!inDriveC) return;
-	
+	if (!inDriveC)
+	{
+		[panel release];
+		return;
+	}
 	//write the result in windowsExeTextField, remove up through drive_c folder.
 	[windowsExeTextField setStringValue:[[[panel filenames] objectAtIndex:0] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withString:@""]];
-	
 	//if it is a .bat or a .msi, check the Use Start Exe Option
 	if ([[windowsExeTextField stringValue] hasSuffix:@".bat"] || [[windowsExeTextField stringValue] hasSuffix:@".msi"])
 		[useStartExeCheckmark setState:1];
-	
+	[panel release];
 }
 - (IBAction)iconToUseBrowseButtonPressed:(id)sender
 {
-	NSOpenPanel *panel = [NSOpenPanel openPanel];
+	//NSOpenPanel *panel = [NSOpenPanel openPanel];
+	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
 	[panel setTitle:@"Please choose the .icns file to use in the wrapper"];
 	[panel setPrompt:@"Choose"];
 	[panel setCanChooseDirectories:NO];
@@ -670,7 +675,11 @@
 	//open browse to get .icns choice
 	int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"icns",nil]];
 	//if cancel return
-	if (error == 0) return;
+	if (error == 0)
+	{
+		[panel release];
+		return;
+	}
 	// delete old Wineskin.icns
 	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Wineskin.icns",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	// copy [[panel filenames] objectAtIndex:0]] to be Wineskin.icns
@@ -682,7 +691,7 @@
 	//rename the .app then name it back to fix the caching issues
 	[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:[NSString stringWithFormat:@"%@WineskinTempRenamer",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"%@WineskinTempRenamer",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:[NSString stringWithFormat:@"%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-	
+	[panel release];
 }
 - (IBAction)extPlusButtonPressed:(id)sender
 {
@@ -1216,7 +1225,8 @@
 }
 - (IBAction)cEXEBrowseButtonPressed:(id)sender
 {
-	NSOpenPanel *panel = [NSOpenPanel openPanel];
+	//NSOpenPanel *panel = [NSOpenPanel openPanel];
+	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
 	[panel setTitle:@"Please choose the .exe, .msi, or .bat file that should run"];
 	[panel setPrompt:@"Choose"];
 	[panel setCanChooseDirectories:NO];
@@ -1235,13 +1245,17 @@
 	{
 		//open browse window to get .exe choice
 		int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
-		if ([[[panel filenames] objectAtIndex:0] hasPrefix:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
-			inDriveC = true;
 		//exit loop if cancel pushed
 		if (error == 0) break;
+		if ([[[panel filenames] objectAtIndex:0] hasPrefix:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
+			inDriveC = true;
 	}
 	//if cancel, return
-	if (!inDriveC) return;
+	if (!inDriveC)
+	{
+		[panel release];
+		return;
+	}
 	
 	//write the result in windowsExeTextField, remove up through drive_c folder.
 	[cEXEWindowsExeTextField setStringValue:[[[panel filenames] objectAtIndex:0] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withString:@""]];
@@ -1249,10 +1263,12 @@
 	//if it is a .bat or a .msi, check the Use Start Exe Option
 	if ([[cEXEWindowsExeTextField stringValue] hasSuffix:@".bat"] || [[cEXEWindowsExeTextField stringValue] hasSuffix:@".msi"])
 		[cEXEUseStartExeCheckmark setState:1];
+	[panel release];
 }
 - (IBAction)cEXEIconBrowseButtonPressed:(id)sender
 {
-	NSOpenPanel *panel = [NSOpenPanel openPanel];
+	//NSOpenPanel *panel = [NSOpenPanel openPanel];
+	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
 	[panel setTitle:@"Please choose the .icns file to use in the wrapper"];
 	[panel setPrompt:@"Choose"];
 	[panel setCanChooseDirectories:NO];
@@ -1267,7 +1283,11 @@
 	//open browse to get .icns choice
 	int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"icns",nil]];
 	//if cancel return
-	if (error == 0) return;
+	if (error == 0)
+	{
+		[panel release];
+		return;
+	}
 	// delete old Wineskin.icns
 	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/Wineskin.icns" error:nil];
 	// copy [[panel filenames] objectAtIndex:0]] to be Wineskin.icns in tmp folder.  Save will use the one in tmp
@@ -1276,6 +1296,7 @@
 	NSImage *theImage = [[NSImage alloc] initByReferencingFile:@"/tmp/Wineskin.icns"];
 	[cEXEIconImageView setImage:theImage];
 	[theImage release];
+	[panel release];
 }
 - (IBAction)cEXEAutomaticButtonPressed:(id)sender
 {
