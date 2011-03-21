@@ -174,8 +174,6 @@
 			if (([item2 isEqualToString:item1]) || ([item2 hasPrefix:@"users/Wineskin"]) || ([item2 hasPrefix:@"windows/Installer"])) matchFound=YES;
 		if (!matchFound) [finalList addObject:[NSString stringWithFormat:@"/%@",item2]];
 	}
-	//close busy window
-	[busyWindow orderOut:self];
 	//display warning if final array is 0 length and exit method
 	if ([finalList count] == 0)
 	{
@@ -195,6 +193,8 @@
 		[exeChoicePopUp addItemWithTitle:item];
 	//show choose exe window
 	[chooseExeWindow makeKeyAndOrderFront:self];
+	//close busy window
+	[busyWindow orderOut:self];
 	//control here will pass over to chooseExeOKButtonPressed
 }
 - (IBAction)chooseExeOKButtonPressed:(id)sender
@@ -210,14 +210,14 @@
 - (IBAction)setScreenOptionsPressed:(id)sender
 {
 	[self loadScreenOptionsData];
-	[window orderOut:self];
 	[screenOptionsWindow makeKeyAndOrderFront:self];
+	[window orderOut:self];
 }
 - (IBAction)advancedButtonPressed:(id)sender
 {
 	[self loadAllData];
-	[window orderOut:self];
 	[advancedWindow makeKeyAndOrderFront:self];
+	[window orderOut:self];
 }
 //*************************************************************
 //************* Screen Options window methods *****************
@@ -396,8 +396,8 @@
 - (IBAction)doneButtonPressed:(id)sender
 {
 	[self saveScreenOptionsData];
-	[screenOptionsWindow orderOut:self];
 	[window makeKeyAndOrderFront:self];
+	[screenOptionsWindow orderOut:self];
 }
 - (IBAction)automaticClicked:(id)sender
 {
@@ -515,8 +515,8 @@
 - (IBAction)advancedMenuDoneButtonPressed:(id)sender
 {
 	[self saveAllData];
-	[advancedWindow orderOut:self];
 	[window makeKeyAndOrderFront:self];
+	[advancedWindow orderOut:self];
 }
 - (IBAction)testRunButtonPressed:(id)sender
 {
@@ -1196,8 +1196,6 @@
 	[plistDictionary release];
 	//move /tmp/Wineskin.icns into the cexe
 	[[NSFileManager defaultManager] moveItemAtPath:@"/tmp/Wineskin.icns" toPath:[NSString stringWithFormat:@"%@/%@.app/Contents/Resources/Wineskin.icns",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]] error:nil];
-	//hide busy window
-	[busyWindow orderOut:self];
 	//give done message
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"OK"];
@@ -1208,6 +1206,8 @@
 	[alert release];
 	//show advanced window
 	[advancedWindow makeKeyAndOrderFront:self];
+	//hide busy window
+	[busyWindow orderOut:self];
 }
 - (IBAction)cEXECancelButtonPressed:(id)sender
 {
