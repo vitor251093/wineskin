@@ -138,7 +138,15 @@
 	if ([self theOSVersionIs105])
 		[panel setDirectory:@"/"];
 	else
-		[panel setDirectoryURL:[NSURL URLWithString:@"file:///"]];
+		/* 
+		 * setDirectoryURL not working in 10.7 build 11A390, but it should be...
+		 * affecting all "setDirectoryURL" in code
+		 * https://sourceforge.net/tracker/?func=detail&aid=3221696&group_id=292583&atid=2091053
+		 *
+		 */
+		
+		[panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]]; 
+
 	//deprecated in 10.6, and 10.7 but still works, but no real way around using it and supporting 10.5
 	//10.5 will probably be dropped by 10.8
 	error = [panel runModalForTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
@@ -631,7 +639,7 @@
 	if ([self theOSVersionIs105])
 		[panel setDirectory:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	else // 10.6+ because of deprecated function.  Not working in 10.7..
-		[panel setDirectoryURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Contents/Resources/drive_c",[[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent] stringByReplacingOccurrencesOfString:@" " withString:@"%20"]]]];
+		[panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]]];
 	//loop until choice is in drive_c
 	BOOL inDriveC = false;
 	while (!inDriveC)
@@ -671,7 +679,7 @@
 	if ([self theOSVersionIs105])
 		[panel setDirectory:@"/"];
 	else
-		[panel setDirectoryURL:[NSURL URLWithString:@"file:///"]]; // 10.6+
+		[panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
 	//open browse to get .icns choice
 	int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"icns",nil]];
 	//if cancel return
@@ -1237,7 +1245,7 @@
 	if ([self theOSVersionIs105])
 		[panel setDirectory:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	else // 10.6+
-		[panel setDirectoryURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Contents/Resources/drive_c",[[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]  stringByReplacingOccurrencesOfString:@" " withString:@"%20"]]]];
+		[panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]]];
 	
 	//loop until choice is in drive_c
 	BOOL inDriveC = false;
@@ -1279,7 +1287,7 @@
 	if ([self theOSVersionIs105])
 		[panel setDirectory:@"/"];
 	else
-		[panel setDirectoryURL:[NSURL URLWithString:@"file:///"]]; // 10.6+
+		[panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
 	//open browse to get .icns choice
 	int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"icns",nil]];
 	//if cancel return
