@@ -16,8 +16,9 @@
 {
 	srand(time(NULL));
 	[waitWheel startAnimation:self];
+	[busyWindow makeKeyAndOrderFront:self];
 	[self refreshButtonPressed:self];
-	[self checkForUpdates];	
+	[self checkForUpdates];
 }
 - (IBAction)aboutWindow:(id)sender
 {
@@ -52,6 +53,7 @@
 	if (!([newVersion hasPrefix:@"Wineskin"]) || ([currentVersion isEqualToString:newVersion]))
 	{
 		[window makeKeyAndOrderFront:self];
+		[busyWindow orderOut:self];
 		return;
 	}
 	NSAlert *alert = [[NSAlert alloc] init];
@@ -72,6 +74,7 @@
 		[alert release];
 		//bring main window up
 		[window makeKeyAndOrderFront:self];
+		[busyWindow orderOut:self];
 		return;
 	}
 	[alert release];
@@ -84,8 +87,9 @@
 	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinWinery/WineskinWinery.app.tar.7z?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:@"file:///tmp/WineskinWinery.app.tar.7z"];
 	[fileName setStringValue:@"Wineskin Winery Update"];
-	[window orderOut:self];
 	[downloadingWindow makeKeyAndOrderFront:self];
+	[window orderOut:self];
+	[busyWindow orderOut:self];
 }
 
 - (IBAction)createNewBlankWrapperButtonPressed:(id)sender
@@ -93,8 +97,8 @@
 	NSString *selectedEngine = [[NSString alloc] initWithString:[installedEnginesList objectAtIndex:[installedEngines selectedRow]]];
 	[createWrapperEngine setStringValue:selectedEngine];
 	[selectedEngine release];
-	[window orderOut:self];
 	[createWrapperWindow makeKeyAndOrderFront:self];
+	[window orderOut:self];
 }
 
 - (IBAction)refreshButtonPressed:(id)sender
@@ -160,8 +164,8 @@
 		[self engineWindowEngineListChanged:self];
 	}
 	//show the engines window
-	[window orderOut:self];
 	[addEngineWindow makeKeyAndOrderFront:self];
+	[window orderOut:self];
 }
 
 
@@ -208,13 +212,13 @@
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.app.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"Wrapper"];
-	[window orderOut:self];
 	[downloadingWindow makeKeyAndOrderFront:self];
+	[window orderOut:self];
 }
 
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://wineskin.doh123.com/?"]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/?%@",[[NSNumber numberWithLong:rand()] stringValue]]]];
 }
 
 - (void)getInstalledEngines
@@ -400,13 +404,13 @@
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"EngineBase"];
-	[wineskinEngineBuilderWindow orderOut:self];
 	[downloadingWindow makeKeyAndOrderFront:self];
+	[wineskinEngineBuilderWindow orderOut:self];
 }
 - (IBAction)engineBuildCancelButtonPressed:(id)sender
 {
-	[wineskinEngineBuilderWindow orderOut:self];
 	[window makeKeyAndOrderFront:self];
+	[wineskinEngineBuilderWindow orderOut:self];
 }
 - (NSString *)currentEngineBuildVersion
 {
@@ -446,8 +450,8 @@
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",[[engineWindowEngineList selectedItem] title]]];
 	[fileName setStringValue:[[engineWindowEngineList selectedItem] title]];
 	[fileNameDestination setStringValue:@"Engines"];
-	[addEngineWindow orderOut:self];
 	[downloadingWindow makeKeyAndOrderFront:self];
+	[addEngineWindow orderOut:self];
 }
 - (IBAction)engineWindowViewWineReleaseNotesButtonPressed:(id)sender
 {
@@ -537,8 +541,8 @@
 }
 - (IBAction)engineWindowCancelButtonPressed:(id)sender
 {
-	[addEngineWindow orderOut:self];
 	[window makeKeyAndOrderFront:self];
+	[addEngineWindow orderOut:self];
 	[self refreshButtonPressed:self];
 }
 //***************************** Downloader ************************
@@ -563,7 +567,6 @@
 		[alert setInformativeText:@"unable to download!"];
 		[alert setAlertStyle:NSCriticalAlertStyle];
 		[alert beginSheetModalForWindow:[cancelButton window] modalDelegate:self didEndSelector:nil contextInfo:nil];
-		
 		[self downloadToggle:NO];
 	}
 }
@@ -574,13 +577,13 @@
 	[self downloadToggle:NO];
 	if (([[fileNameDestination stringValue] isEqualToString:@"EngineBase"]))
 	{
-		[downloadingWindow orderOut:self];
 		[wineskinEngineBuilderWindow makeKeyAndOrderFront:self];
+		[downloadingWindow orderOut:self];
 	}
 	else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
 	{
-		[downloadingWindow orderOut:self];
 		[addEngineWindow makeKeyAndOrderFront:self];
+		[downloadingWindow orderOut:self];
 	}
 	else if ([[fileName stringValue] isEqualToString:@"Wineskin Winery Update"])
 	{
@@ -591,13 +594,13 @@
 		[warning setInformativeText:@"Some things may not function properly with new Wrappers or Engines until you update!"];
 		[warning runModal];
 		[warning release];
-		[downloadingWindow orderOut:self];
 		[window makeKeyAndOrderFront:self];
+		[downloadingWindow orderOut:self];
 	}
 	else
 	{
-		[downloadingWindow orderOut:self];
 		[window makeKeyAndOrderFront:self];
+		[downloadingWindow orderOut:self];
 	}
 }
 
@@ -620,14 +623,12 @@
 - (void)connection:(NSURLConnection *)conn didReceiveResponse:(NSURLResponse *)response
 {
 	//NSLog(@"Recieved response with expected length: %i", [response expectedContentLength]);
-	
 	[payload setLength:0];
 	[progressBar setMaxValue:[response expectedContentLength]];
 }
 - (void)connection:(NSURLConnection *)conn didReceiveData:(NSData *)data
 {
 	//NSLog(@"Recieving data. Incoming Size: %i  Total Size: %i", [data length], [payload length]);
-	
 	[payload appendData:data];
 	[progressBar setDoubleValue:[payload length]];
 }
@@ -644,11 +645,10 @@
 	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app.tar.7z" error:nil];
 	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app.tar" error:nil];
 	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app" error:nil];
-	//NSString *output = [urlOutput stringValue];
 	[payload writeToURL:[NSURL URLWithString:[urlOutput stringValue]] atomically:YES];
 	[conn release];
-	[downloadingWindow orderOut:self];
 	[busyWindow makeKeyAndOrderFront:self];
+	[downloadingWindow orderOut:self];
 	if (([[fileNameDestination stringValue] isEqualToString:@"Wrapper"]))
 	{
 		//uncompress download
@@ -663,8 +663,8 @@
 		[self makeFoldersAndFiles];
 		//move download into place
 		[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.app",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
-		[busyWindow orderOut:self];
 		[window makeKeyAndOrderFront:self];
+		[busyWindow orderOut:self];
 	}
 	else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
 	{
@@ -675,8 +675,8 @@
 		NSString *ignoreList = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/IgnoredEngines.txt",NSHomeDirectory()] encoding:NSUTF8StringEncoding error:nil];
 		ignoreList = [ignoreList stringByReplacingOccurrencesOfString:[fileName stringValue] withString:@""];
 		[ignoreList writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
-		[busyWindow orderOut:self];
 		[window makeKeyAndOrderFront:self];
+		[busyWindow orderOut:self];
 	}
 	else if (([[fileNameDestination stringValue] isEqualToString:@"EngineBase"]))
 	{
@@ -708,8 +708,8 @@
 			[engineBuildUpdateButton setEnabled:YES];
 			[engineBuildUpdateAvailable setHidden:NO];
 		}
-		[busyWindow orderOut:self];
 		[wineskinEngineBuilderWindow makeKeyAndOrderFront:self];
+		[busyWindow orderOut:self];
 	}
 	if ([[fileName stringValue] isEqualToString:@"Wineskin Winery Update"])
 	{
@@ -729,18 +729,14 @@
 - (void)connection:(NSURLConnection *)conn didFailWithError:(NSError *)error
 {
 	[self downloadToggle:NO];
-	
-	[payload setLength:0];
-	
-	// Create and display an alert sheet
+	[payload setLength:0];	
 	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
 	[alert addButtonWithTitle:@"OK"];
 	[alert setMessageText:[error localizedDescription]];
 	[alert setAlertStyle:NSCriticalAlertStyle];
-	
 	[alert beginSheetModalForWindow:[cancelButton window] modalDelegate:self didEndSelector:nil contextInfo:nil];
-	[downloadingWindow orderOut:self];
 	[window makeKeyAndOrderFront:self];
+	[downloadingWindow orderOut:self];
 }
 //*********************** wrapper creation **********************
 - (IBAction)createWrapperOkButtonPressed:(id)sender
@@ -778,8 +774,8 @@
 	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@":" withString:@""]];
 	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"@" withString:@""]];
 	//get rid of window
-	[createWrapperWindow orderOut:self];
 	[busyWindow makeKeyAndOrderFront:self];
+	[createWrapperWindow orderOut:self];
 	[self makeFoldersAndFiles];
 	//delete files that might already exist
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -787,9 +783,7 @@
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),[createWrapperEngine stringValue]] error:nil];
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] error:nil];
 	//copy master wrapper to /tmp with correct name
-	//NSError *error = nil;
 	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@.app",NSHomeDirectory(),[wrapperVersion stringValue]] toPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] error:nil];
-	//[self displayString:[error localizedDescription]];
 	//decompress engine
 	system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z\" \"-o/%@/Library/Application Support/Wineskin/Engines\"", NSHomeDirectory(),NSHomeDirectory(),[createWrapperEngine stringValue],NSHomeDirectory()] UTF8String]);
 	system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/Library/Application Support/Wineskin/Engines\" -xf \"%@/Library/Application Support/Wineskin/Engines/%@.tar\"",NSHomeDirectory(),NSHomeDirectory(),[createWrapperEngine stringValue]] UTF8String]);
@@ -802,7 +796,6 @@
 	//move wrapper to ~/Applications/Wineskin
 	[fm moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] toPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]] error:nil];
 	//put ending message
-	[busyWindow orderOut:self];
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"View wrapper in Finder"];
 	[alert addButtonWithTitle:@"OK"];
@@ -813,11 +806,12 @@
 		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Applications/Wineskin/",NSHomeDirectory()]]];
 	// bring main window back
 	[window makeKeyAndOrderFront:self];
+	[busyWindow orderOut:self];
 }
 - (IBAction)createWrapperCancelButtonPressed:(id)sender
 {
-	[createWrapperWindow orderOut:self];
 	[window makeKeyAndOrderFront:self];
+	[createWrapperWindow orderOut:self];
 }
 //***************************** OVERRIDES *************************
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView

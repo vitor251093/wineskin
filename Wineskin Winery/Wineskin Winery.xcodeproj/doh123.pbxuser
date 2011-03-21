@@ -2,23 +2,23 @@
 {
 	089C165DFE840E0CC02AAC07 /* English */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {747, 305}}";
+			sepNavIntBoundsRect = "{{0, 0}, {891, 555}}";
 			sepNavSelRange = "{0, 0}";
 			sepNavVisRange = "{0, 45}";
 		};
 	};
 	256AC3D80F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {891, 1794}}";
-			sepNavSelRange = "{2356, 10}";
-			sepNavVisRange = "{1274, 1576}";
+			sepNavIntBoundsRect = "{{0, 0}, {891, 1677}}";
+			sepNavSelRange = "{4479, 28}";
+			sepNavVisRange = "{817, 1517}";
 		};
 	};
 	256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1468, 11206}}";
-			sepNavSelRange = "{1128, 182}";
-			sepNavVisRange = "{407, 2814}";
+			sepNavIntBoundsRect = "{{0, 0}, {2196, 10660}}";
+			sepNavSelRange = "{42084, 0}";
+			sepNavVisRange = "{41697, 1124}";
 			sepNavWindowFrame = "{{84, 35}, {720, 675}}";
 		};
 	};
@@ -102,27 +102,35 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 319566504;
-			PBXWorkspaceStateSaveDate = 319566504;
+			PBXPerProjectTemplateStateSaveDate = 322366074;
+			PBXWorkspaceStateSaveDate = 322366074;
 		};
 		perUserProjectItems = {
-			A8235CAB129F645400EC86CC /* PBXTextBookmark */ = A8235CAB129F645400EC86CC /* PBXTextBookmark */;
-			A824F72E1309B34300DD40D2 /* PBXTextBookmark */ = A824F72E1309B34300DD40D2 /* PBXTextBookmark */;
-			A824F7C8130C32DB00DD40D2 /* PBXTextBookmark */ = A824F7C8130C32DB00DD40D2 /* PBXTextBookmark */;
-			A824F7C9130C32DB00DD40D2 /* PBXTextBookmark */ = A824F7C9130C32DB00DD40D2 /* PBXTextBookmark */;
-			A85F90641301AAF40087A990 /* PBXTextBookmark */ = A85F90641301AAF40087A990 /* PBXTextBookmark */;
-			A85F90651301AAF40087A990 /* PBXTextBookmark */ = A85F90651301AAF40087A990 /* PBXTextBookmark */;
-			A89936E4127B28C3006A7581 /* PBXBookmark */ = A89936E4127B28C3006A7581 /* PBXBookmark */;
-			A8993733127B4F84006A7581 /* PlistBookmark */ = A8993733127B4F84006A7581 /* PlistBookmark */;
-			A8993735127B4F84006A7581 /* PBXBookmark */ = A8993735127B4F84006A7581 /* PBXBookmark */;
-			A8B44D0E12A4356500DA8C3A /* PBXTextBookmark */ = A8B44D0E12A4356500DA8C3A /* PBXTextBookmark */;
-			A8EBE9251275E4A700CC9815 /* PBXTextBookmark */ = A8EBE9251275E4A700CC9815 /* PBXTextBookmark */;
-			A8EBE9271275E4A700CC9815 /* PBXTextBookmark */ = A8EBE9271275E4A700CC9815 /* PBXTextBookmark */;
-			A8EBE9291275E4A700CC9815 /* PBXTextBookmark */ = A8EBE9291275E4A700CC9815 /* PBXTextBookmark */;
-			A8EBE92B1275E4A700CC9815 /* PBXTextBookmark */ = A8EBE92B1275E4A700CC9815 /* PBXTextBookmark */;
-			A8EBE92D1275E4A700CC9815 /* PBXTextBookmark */ = A8EBE92D1275E4A700CC9815 /* PBXTextBookmark */;
-			A8EBE92F1275E4A700CC9815 /* PBXTextBookmark */ = A8EBE92F1275E4A700CC9815 /* PBXTextBookmark */;
-			A8FCE7F81300DCDC00EA593C /* PlistBookmark */ = A8FCE7F81300DCDC00EA593C /* PlistBookmark */;
+			A81AA3A11336EADF00CD7FA5 /* PBXTextBookmark */ = A81AA3A11336EADF00CD7FA5 /* PBXTextBookmark */;
+			A81AA3A21336EADF00CD7FA5 /* PBXTextBookmark */ = A81AA3A21336EADF00CD7FA5 /* PBXTextBookmark */;
+			A81AA3A31336EADF00CD7FA5 /* PBXTextBookmark */ = A81AA3A31336EADF00CD7FA5 /* PBXTextBookmark */;
+			A81AA3B71336F20600CD7FA5 /* PBXTextBookmark */ = A81AA3B71336F20600CD7FA5 /* PBXTextBookmark */;
+			A81AA3B81336F20600CD7FA5 /* PlistBookmark */ = A81AA3B81336F20600CD7FA5 /* PlistBookmark */;
+			A81AA3B91336F20600CD7FA5 /* PBXTextBookmark */ = A81AA3B91336F20600CD7FA5 /* PBXTextBookmark */;
+			A81AA3BA1336F20600CD7FA5 /* PBXTextBookmark */ = A81AA3BA1336F20600CD7FA5 /* PBXTextBookmark */;
+			A81AA3BB1336F20600CD7FA5 /* PBXTextBookmark */ = A81AA3BB1336F20600CD7FA5 /* PBXTextBookmark */;
+			A8235CAB129F645400EC86CC = A8235CAB129F645400EC86CC /* PBXTextBookmark */;
+			A824F72E1309B34300DD40D2 = A824F72E1309B34300DD40D2 /* PBXTextBookmark */;
+			A824F7C8130C32DB00DD40D2 = A824F7C8130C32DB00DD40D2 /* PBXTextBookmark */;
+			A824F7C9130C32DB00DD40D2 = A824F7C9130C32DB00DD40D2 /* PBXTextBookmark */;
+			A85F90641301AAF40087A990 = A85F90641301AAF40087A990 /* PBXTextBookmark */;
+			A85F90651301AAF40087A990 = A85F90651301AAF40087A990 /* PBXTextBookmark */;
+			A89936E4127B28C3006A7581 = A89936E4127B28C3006A7581 /* PBXBookmark */;
+			A8993733127B4F84006A7581 = A8993733127B4F84006A7581 /* PlistBookmark */;
+			A8993735127B4F84006A7581 = A8993735127B4F84006A7581 /* PBXBookmark */;
+			A8B44D0E12A4356500DA8C3A = A8B44D0E12A4356500DA8C3A /* PBXTextBookmark */;
+			A8EBE9251275E4A700CC9815 = A8EBE9251275E4A700CC9815 /* PBXTextBookmark */;
+			A8EBE9271275E4A700CC9815 = A8EBE9271275E4A700CC9815 /* PBXTextBookmark */;
+			A8EBE9291275E4A700CC9815 = A8EBE9291275E4A700CC9815 /* PBXTextBookmark */;
+			A8EBE92B1275E4A700CC9815 = A8EBE92B1275E4A700CC9815 /* PBXTextBookmark */;
+			A8EBE92D1275E4A700CC9815 = A8EBE92D1275E4A700CC9815 /* PBXTextBookmark */;
+			A8EBE92F1275E4A700CC9815 = A8EBE92F1275E4A700CC9815 /* PBXTextBookmark */;
+			A8FCE7F81300DCDC00EA593C = A8FCE7F81300DCDC00EA593C /* PlistBookmark */;
 		};
 		sourceControlManager = A8EBE7B11274C69800CC9815 /* Source Control */;
 		userBookmarkGroup = A8EBE7921274C68400CC9815 /* PBXBookmarkGroup */;
@@ -142,6 +150,88 @@
 			A8EBE7951274C68400CC9815 /* Wineskin Winery */,
 		);
 	};
+	A81AA3A11336EADF00CD7FA5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D80F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.h */;
+		name = "Wineskin_WineryAppDelegate.h: 122";
+		rLen = 28;
+		rLoc = 4479;
+		rType = 0;
+		vrLen = 1798;
+		vrLoc = 2892;
+	};
+	A81AA3A21336EADF00CD7FA5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
+		name = "Wineskin_WineryAppDelegate.m: 36";
+		rLen = 0;
+		rLoc = 1147;
+		rType = 0;
+		vrLen = 2668;
+		vrLoc = 728;
+	};
+	A81AA3A31336EADF00CD7FA5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
+		name = "Wineskin_WineryAppDelegate.m: 815";
+		rLen = 0;
+		rLoc = 41987;
+		rType = 0;
+		vrLen = 3614;
+		vrLoc = 38442;
+	};
+	A81AA3B71336F20600CD7FA5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 089C165DFE840E0CC02AAC07 /* English */;
+		name = "InfoPlist.strings: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 45;
+		vrLoc = 0;
+	};
+	A81AA3B81336F20600CD7FA5 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Wineskin_Winery-Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+			CFBundleShortVersionString,
+		);
+		name = "/Users/doh123/Dropbox/gitwork/wineskin/Wineskin Winery/Wineskin_Winery-Info.plist";
+		rLen = 0;
+		rLoc = 9223372036854775807;
+	};
+	A81AA3B91336F20600CD7FA5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D80F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.h */;
+		name = "Wineskin_WineryAppDelegate.h: 122";
+		rLen = 28;
+		rLoc = 4479;
+		rType = 0;
+		vrLen = 1517;
+		vrLoc = 817;
+	};
+	A81AA3BA1336F20600CD7FA5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
+		name = "Wineskin_WineryAppDelegate.m: 815";
+		rLen = 0;
+		rLoc = 41987;
+		rType = 0;
+		vrLen = 3507;
+		vrLoc = 38719;
+	};
+	A81AA3BB1336F20600CD7FA5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
+		name = "Wineskin_WineryAppDelegate.m: 813";
+		rLen = 0;
+		rLoc = 42084;
+		rType = 0;
+		vrLen = 1124;
+		vrLoc = 41697;
+	};
 	A8235CAB129F645400EC86CC /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = A89936DD127B283A006A7581 /* WineskinWineryUpdater */;
@@ -157,7 +247,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = "Wineskin_WineryAppDelegate.m: 27";
 		rLen = 40;
-		rLoc = 852;
+		rLoc = 892;
 		rType = 0;
 		vrLen = 1968;
 		vrLoc = 2750;
@@ -177,7 +267,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = "Wineskin_WineryAppDelegate.m: 37";
 		rLen = 182;
-		rLoc = 1128;
+		rLoc = 1168;
 		rType = 0;
 		vrLen = 2814;
 		vrLoc = 407;
@@ -427,7 +517,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = makeFoldersAndFiles;
 		rLen = 19;
-		rLoc = 982;
+		rLoc = 1022;
 		rType = 0;
 		vrLen = 1905;
 		vrLoc = 219;
@@ -437,7 +527,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = checkForUpdates;
 		rLen = 15;
-		rLoc = 2181;
+		rLoc = 2221;
 		rType = 0;
 		vrLen = 2269;
 		vrLoc = 623;
@@ -447,7 +537,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = createNewBlankWrapperButtonPressed;
 		rLen = 34;
-		rLoc = 4433;
+		rLoc = 4562;
 		rType = 0;
 		vrLen = 943;
 		vrLoc = 4201;
@@ -457,7 +547,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = refreshButtonPressed;
 		rLen = 20;
-		rLoc = 4783;
+		rLoc = 4912;
 		rType = 0;
 		vrLen = 744;
 		vrLoc = 4546;
@@ -467,7 +557,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = downloadPackagesManuallyButtonPressed;
 		rLen = 37;
-		rLoc = 5601;
+		rLoc = 5730;
 		rType = 0;
 		vrLen = 583;
 		vrLoc = 4785;
@@ -477,7 +567,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = plusButtonPressed;
 		rLen = 17;
-		rLoc = 5878;
+		rLoc = 6007;
 		rType = 0;
 		vrLen = 583;
 		vrLoc = 4785;
@@ -487,7 +577,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = minusButtonPressed;
 		rLen = 18;
-		rLoc = 7120;
+		rLoc = 7249;
 		rType = 0;
 		vrLen = 583;
 		vrLoc = 4785;
@@ -497,7 +587,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = updateButtonPressed;
 		rLen = 19;
-		rLoc = 8645;
+		rLoc = 8774;
 		rType = 0;
 		vrLen = 482;
 		vrLoc = 5019;
@@ -507,7 +597,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = getInstalledEngines;
 		rLen = 19;
-		rLoc = 10111;
+		rLoc = 10317;
 		rType = 0;
 		vrLen = 482;
 		vrLoc = 5019;
@@ -517,7 +607,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = getCurrentWrapperVersion;
 		rLen = 24;
-		rLoc = 12299;
+		rLoc = 12505;
 		rType = 0;
 		vrLen = 574;
 		vrLoc = 5263;
@@ -527,7 +617,7 @@
 		fRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */;
 		name = displayString;
 		rLen = 13;
-		rLoc = 14643;
+		rLoc = 14849;
 		rType = 0;
 		vrLen = 574;
 		vrLoc = 5263;
