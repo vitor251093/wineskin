@@ -92,6 +92,7 @@
 	[plistDictionary release];
 	[aboutWindow makeKeyAndOrderFront:self];
 }
+/* Functions deactivated, not currently being used
 - (NSString *)OSVersion
 {
 	SInt32 majorVersion,minorVersion;
@@ -101,22 +102,25 @@
 }
 - (BOOL)theOSVersionIs105
 {
-	BOOL answer = NO;
-	if ([[self OSVersion] isEqualToString:@"10.5"]) answer = YES;
-	return answer;
+	if ([[self OSVersion] isEqualToString:@"10.5"]) return YES;
+	return NO;
 }
 - (BOOL)theOSVersionIs106
 {
-	BOOL answer = NO;
-	if ([[self OSVersion] isEqualToString:@"10.6"]) answer = YES;
-	return answer;
+	if ([[self OSVersion] isEqualToString:@"10.6"]) return YES;
+	return NO;
 }
 - (BOOL)theOSVersionIs107
 {
-	BOOL answer = NO;
-	if ([[self OSVersion] isEqualToString:@"10.7"]) answer = YES;
-	return answer;
+	if ([[self OSVersion] isEqualToString:@"10.7"]) return YES;
+	return NO;
 }
+- (BOOL)theOSVersionIs107
+{
+	if ([[self OSVersion] isEqualToString:@"10.7"]) return YES;
+	return NO;
+}
+*/
 //*************************************************************
 //******************** Main Menu Methods **********************
 //*************************************************************
@@ -134,22 +138,8 @@
 	[panel setCanChooseDirectories:NO];
 	[panel setCanChooseFiles:YES];
 	[panel setAllowsMultipleSelection:NO];
-	int error;
-	if ([self theOSVersionIs105])
-		[panel setDirectory:@"/"];
-	else
-		/* 
-		 * setDirectoryURL not working in 10.7 build 11A390, but it should be...
-		 * affecting all "setDirectoryURL" in code
-		 * https://sourceforge.net/tracker/?func=detail&aid=3221696&group_id=292583&atid=2091053
-		 *
-		 */
-		
-		[panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]]; 
-
-	//deprecated in 10.6, and 10.7 but still works, but no real way around using it and supporting 10.5
-	//10.5 will probably be dropped by 10.8
-	error = [panel runModalForTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
+	// runModalForDirectory deprecated in 10.6, but only method currently working in Lion beta for this.
+	int error = [panel runModalForDirectory:@"/" file:nil types:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
 	//exit method if cancel pushed
 	if (error == 0) return;
 	//show busy window
@@ -636,21 +626,16 @@
 	[panel setAllowsMultipleSelection:NO];
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
-	if ([self theOSVersionIs105])
-		[panel setDirectory:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-	else // 10.6+ because of deprecated function.  Not working in 10.7..
-		[panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]]];
 	//loop until choice is in drive_c
-	BOOL inDriveC = false;
+	BOOL inDriveC = NO;
 	while (!inDriveC)
 	{
 		//open browse window to get .exe choice
-		int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
-		// Lion fix... ??? moved error beak up
+		int error = [panel runModalForDirectory:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] file:nil types:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
 		//exit loop if cancel pushed
 		if (error == 0) break;
 		if ([[[panel filenames] objectAtIndex:0] hasPrefix:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
-			inDriveC = true;
+			inDriveC = YES;
 	}
 	//if cancel, return
 	if (!inDriveC)
@@ -676,12 +661,8 @@
 	[panel setAllowsMultipleSelection:NO];
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
-	if ([self theOSVersionIs105])
-		[panel setDirectory:@"/"];
-	else
-		[panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
 	//open browse to get .icns choice
-	int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"icns",nil]];
+	int error = [panel runModalForDirectory:@"/" file:nil types:[NSArray arrayWithObjects:@"icns",nil]];
 	//if cancel return
 	if (error == 0)
 	{
@@ -1242,21 +1223,16 @@
 	[panel setAllowsMultipleSelection:NO];
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
-	if ([self theOSVersionIs105])
-		[panel setDirectory:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-	else // 10.6+
-		[panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]]];
-	
 	//loop until choice is in drive_c
-	BOOL inDriveC = false;
+	BOOL inDriveC = NO;
 	while (!inDriveC)
 	{
 		//open browse window to get .exe choice
-		int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
+		int error = [panel runModalForDirectory:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] file:nil types:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
 		//exit loop if cancel pushed
 		if (error == 0) break;
 		if ([[[panel filenames] objectAtIndex:0] hasPrefix:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
-			inDriveC = true;
+			inDriveC = YES;
 	}
 	//if cancel, return
 	if (!inDriveC)
@@ -1284,12 +1260,8 @@
 	[panel setAllowsMultipleSelection:NO];
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
-	if ([self theOSVersionIs105])
-		[panel setDirectory:@"/"];
-	else
-		[panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
 	//open browse to get .icns choice
-	int error = [panel runModalForTypes:[NSArray arrayWithObjects:@"icns",nil]];
+	int error = [panel runModalForDirectory:@"/" file:nil types:[NSArray arrayWithObjects:@"icns",nil]];
 	//if cancel return
 	if (error == 0)
 	{

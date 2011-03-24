@@ -142,10 +142,13 @@
 - (void)systemCommand:(NSString *)commandToRun withArgs:(NSArray *)args;
 - (IBAction)topMenuHelpSelected:(id)sender;
 - (IBAction)aboutWindow:(id)sender;
+/* Functions deactivated, not currently being used
 - (NSString *)OSVersion;
 - (BOOL)theOSVersionIs105;
 - (BOOL)theOSVersionIs106;
 - (BOOL)theOSVersionIs107;
+- (BOOL)theOSVersionIs108;
+*/
 
 //main menu methods
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender;
