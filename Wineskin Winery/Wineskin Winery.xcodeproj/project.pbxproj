@@ -12,9 +12,9 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		A839A85F12772BB10010A36A /* Wineskin.icns in Resources */ = {isa = PBXBuildFile; fileRef = A839A85E12772BB10010A36A /* Wineskin.icns */; };
-		A839A86F12772C490010A36A /* WineskinBanner.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A839A86E12772C490010A36A /* WineskinBanner.jpg */; };
+		A852C515133BF63E00143814 /* WineskinBanner.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A852C514133BF63E00143814 /* WineskinBanner.jpg */; };
 		A89936DE127B283A006A7581 /* WineskinWineryUpdater in Resources */ = {isa = PBXBuildFile; fileRef = A89936DD127B283A006A7581 /* WineskinWineryUpdater */; };
+		A8C39E9F133BF58F001B3110 /* Wineskin.icns in Resources */ = {isa = PBXBuildFile; fileRef = A8C39E9E133BF58F001B3110 /* Wineskin.icns */; };
 		A8EBE81B1274E83500CC9815 /* 7za in Resources */ = {isa = PBXBuildFile; fileRef = A8EBE81A1274E83500CC9815 /* 7za */; };
 /* End PBXBuildFile section */
 
@@ -31,9 +31,9 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Wineskin_Winery-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Wineskin_Winery-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Wineskin Winery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wineskin Winery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A839A85E12772BB10010A36A /* Wineskin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = Wineskin.icns; path = "Wineskin Winery/Wineskin.icns"; sourceTree = DEVELOPER_DIR; };
-		A839A86E12772C490010A36A /* WineskinBanner.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = WineskinBanner.jpg; path = "Wineskin Winery/WineskinBanner.jpg"; sourceTree = DEVELOPER_DIR; };
+		A852C514133BF63E00143814 /* WineskinBanner.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner.jpg; sourceTree = "<group>"; };
 		A89936DD127B283A006A7581 /* WineskinWineryUpdater */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = WineskinWineryUpdater; path = "Wineskin Winery/WineskinWineryUpdater"; sourceTree = DEVELOPER_DIR; };
+		A8C39E9E133BF58F001B3110 /* Wineskin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Wineskin.icns; sourceTree = "<group>"; };
 		A8EBE81A1274E83500CC9815 /* 7za */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = 7za; path = "Wineskin Winery/7za"; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
@@ -108,8 +108,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A839A86E12772C490010A36A /* WineskinBanner.jpg */,
-				A839A85E12772BB10010A36A /* Wineskin.icns */,
+				A8C39E9E133BF58F001B3110 /* Wineskin.icns */,
+				A852C514133BF63E00143814 /* WineskinBanner.jpg */,
 				A8EBE81A1274E83500CC9815 /* 7za */,
 				A89936DD127B283A006A7581 /* WineskinWineryUpdater */,
 				8D1107310486CEB800E47090 /* Wineskin_Winery-Info.plist */,
@@ -181,9 +181,9 @@
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
 				A8EBE81B1274E83500CC9815 /* 7za in Resources */,
-				A839A85F12772BB10010A36A /* Wineskin.icns in Resources */,
-				A839A86F12772C490010A36A /* WineskinBanner.jpg in Resources */,
 				A89936DE127B283A006A7581 /* WineskinWineryUpdater in Resources */,
+				A8C39E9F133BF58F001B3110 /* Wineskin.icns in Resources */,
+				A852C515133BF63E00143814 /* WineskinBanner.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

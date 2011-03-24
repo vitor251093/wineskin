@@ -141,6 +141,7 @@
 	NSLog(@"reading all configuration information...");
 	//open Info.plist to read all needed info
 	NSDictionary *plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
+	NSDictionary *cexePlistDictionary;
 	NSString *resolutionTemp = @"";
 	if (!cexeRun)
 	{
@@ -153,7 +154,7 @@
 	}
 	else
 	{
-		NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[argv objectAtIndex:1]]];
+		cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[argv objectAtIndex:1]]];
 		programNameAndPath = [cexePlistDictionary valueForKey:@"Program Name and Path"];
 		programFlags = [cexePlistDictionary valueForKey:@"Program Flags"];
 		fullScreenOption = [[cexePlistDictionary valueForKey:@"Fullscreen"] intValue];
@@ -161,7 +162,6 @@
 		runWithStartExe = [[cexePlistDictionary valueForKey:@"use start.exe"] intValue];
 		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
-		[cexePlistDictionary release];
 	}
 	gammaCorrection = [plistDictionary valueForKey:@"Gamma Correction"];
 	x11PrefFileName = [plistDictionary valueForKey:@"CFBundleIdentifier"];
@@ -347,6 +347,7 @@
 	[self cleanUpAndShutDown];
 	NSLog(@"Finished!\n");
 	[plistDictionary release];
+	[cexePlistDictionary release];
 	return;
 }
 
