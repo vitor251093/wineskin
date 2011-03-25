@@ -72,6 +72,9 @@
 //sets the drive_c/user/Wineskin folder correctly for a run
 - (void)setUserFolders;
 
+//Makes sure the current user owns the winepeefix, or Wine will not run
+- (void)fixWinePrefixForCurrentUser;
+
 //starts up WineskinX11 and passes its PID back
 - (NSString *)startX11;
 
@@ -305,6 +308,9 @@
 	NSLog(@"Fixing user folders in Drive C to current user");
 	[self setUserFolders];
 	
+	//********** fix wineprefix
+	[self fixWinePrefixForCurrentUser];
+	
 	//**********start wine
 	NSLog(@"Starting specified executable in Wine");
 	wineServerPID = [self startWine];
@@ -319,21 +325,6 @@
 		NSLog(@"Changing to requested starting resolution of %@...",vdResolution);
 		[self setResolution:vdResolution];
 	}
-	//**********tell app to come to the front as selected program
-	//doing this right after starting WineskinX11 now... commented out for future reference.
-	//NSApplscript launch is faling.. making a second dummy Icon.. osascript call works fine.
-//	NSMutableDictionary* quickEdit1 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
-//	[quickEdit1 setValue:@"WineskinExtraLineThatShouldError" forKey:@"NSPrincipalClass"];
-//	[quickEdit1 writeToFile:infoPlistFile atomically:YES];
-//	[quickEdit1 release];	
-//	NSAppleScript *bringToFront = [[NSAppleScript alloc] initWithSource:[NSString stringWithFormat:@"tell application \"%@\" to activate",appNameWithPath]];
-//	[bringToFront executeAndReturnError:nil];
-//	[bringToFront release];
-//	[self systemCommand:[NSString stringWithFormat:@"/usr/bin/arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
-//	NSMutableDictionary* quickEdit2 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
-//	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
-//	[quickEdit2 writeToFile:infoPlistFile atomically:YES];
-//	[quickEdit2 release];
 	
 	//**********sleep and monitor in background while app is running
 	NSLog(@"Sleeping and monitoring from the background while app runs...");
@@ -346,8 +337,6 @@
 	NSLog(@"Application finished, cleaning up and shut down...\n");
 	[self cleanUpAndShutDown];
 	NSLog(@"Finished!\n");
-	[plistDictionary release];
-	[cexePlistDictionary release];
 	return;
 }
 
@@ -437,8 +426,35 @@
 		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Videos",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Movies",NSHomeDirectory()] error:nil];
 		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Music",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Music",NSHomeDirectory()] error:nil];
 		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Pictures",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Pictures",NSHomeDirectory()] error:nil];
-		
 	}
+	[fm release];
+}
+
+- (void)fixWinePrefixForCurrentUser
+{
+	// changing owner just fails, need this to work for normal users without admin password on the fly.
+	// Needed folders are set to 777, so just make a new resources folder and move items, should always work.
+	// NSFileManager changing posix permissions still failing to work right, using chmod as a system command
+	NSFileManager *fm = [NSFileManager defaultManager];
+	//if owner and current user match, exit
+	NSDictionary *checkThis = [fm attributesOfItemAtPath:winePrefix error:nil];
+	if ([NSUserName() isEqualToString:[checkThis valueForKey:@"NSFileOwnerAccountName"]])
+	{
+		[fm release];
+		return;
+	}
+	//make ResoTemp
+	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/ResoTemp",contentsFold] withIntermediateDirectories:NO attributes:nil error:nil];
+	//move everything from Resources to ResoTemp
+	NSArray *tmpy = [fm contentsOfDirectoryAtPath:winePrefix error:nil];
+	for (NSString *item in tmpy)
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Resources/%@",contentsFold,item] toPath:[NSString stringWithFormat:@"%@/ResoTemp/%@",contentsFold,item] error:nil];
+	//delete Resources
+	[fm removeItemAtPath:winePrefix error:nil];
+	//rename ResoTemp to Resources
+	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/ResoTemp",contentsFold] toPath:[NSString stringWithFormat:@"%@/Resources",contentsFold] error:nil];
+	//fix Reosurces to 777
+	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
 	[fm release];
 }
 
@@ -469,16 +485,8 @@
 	//make proper files and symlinks in x11InstallPath
 	//remove for files just in case some other version had made symlinks here, will cause a failure
 	[fm removeItemAtPath:x11InstallPath error:nil];
-	//**try symlinking X11 straight to /tmp/Wineskin
+	//symlink X11 straight to x11InstallPath
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@",x11InstallPath] withDestinationPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",winePrefix] error:nil];
-	//[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/bin",x11InstallPath] withIntermediateDirectories:YES attributes:nil error:nil];
-	//[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/share",x11InstallPath] withIntermediateDirectories:YES attributes:nil error:nil];
-	//create new symlinks needed for launch... only xkb stuff is needed here
-	//symlink quartz-wm too.. using bug in launch of xquartz to run it, but wont work if spaces
-	//[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/bin/xkbcomp",x11InstallPath] withDestinationPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/bin/xkbcomp",winePrefix] error:nil];
-	//[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/bin/quartz-wm",x11InstallPath] withDestinationPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/bin/quartz-wm",winePrefix] error:nil];
-	//[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/share/X11",x11InstallPath] withDestinationPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/share/X11",winePrefix] error:nil];
-	// wineserver check to see if this is a multirun customexe
 	NSArray *winePidCheck = [self readFileToStringArray:wineserverPIDFile];
 	if ([self pidRunning:[winePidCheck objectAtIndex:0]])
 	{
@@ -780,12 +788,15 @@
 			// need Temp folder in Public folder
 			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Public/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
 			// do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
-			//[self systemCommand:[NSString stringWithFormat:@"chmod -RP 755 \"%@\"",appNameWithPath]];  //update to objc/cocoa
 			// Task Number 3221715 Fix Wrapper Permissions
-			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:755],@"NSFilePosixPermissions",nil];
-			NSArray *tmpy = [fm subpathsAtPath:appNameWithPath];
-			for (NSString *item in tmpy)
-				[fm setAttributes:attributes ofItemAtPath:item error:nil];
+			//cocoa command don't seem to be working right, but chmod system command works fine.
+			[self systemCommand:[NSString stringWithFormat:@"chmod -R 755 \"%@\"",appNameWithPath]];
+			// need to chmod 777 on Contents, Resources, and Resources/* for multiuser fix on same machine
+			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",contentsFold]];
+			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
+			NSArray *tmpy2 = [fm contentsOfDirectoryAtPath:winePrefix error:nil];
+			for (NSString *item in tmpy2)
+				[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,item]];
 		}
 		else if ([wssCommand isEqualToString:@"WSS-winetricks"])
 		{
@@ -955,7 +966,6 @@
 					}
 				}
 			}
-			
 			//if not in debug mode blank the log
 			if (!debugEnabled)
 			{
