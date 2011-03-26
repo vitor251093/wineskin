@@ -864,6 +864,7 @@
 }
 - (IBAction)winetricksButtonPressed:(id)sender
 {
+	/*  Winetricks adding support for having spaces... commenting out check for spaces code for now.
 	if ([[[[NSBundle mainBundle] bundlePath] componentsSeparatedByString:@" "] count] > 1)
 	{
 		//there are spaces in the path/name, give error and return
@@ -876,6 +877,7 @@
 		[alert release];
 		return;
 	}
+	 */
 	[self winetricksShowPackageListButtonPressed:self];
 }
 - (IBAction)winetricksDoneButtonPressed:(id)sender
