@@ -2,18 +2,17 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J567</string>
+		<string key="IBDocument.SystemVersion">10J3250</string>
 		<string key="IBDocument.InterfaceBuilderVersion">823</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">462.00</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">823</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="614"/>
-			<integer value="371"/>
+			<integer value="1225"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -643,7 +642,7 @@
 				<nil key="NSViewClass"/>
 				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<object class="NSView" key="NSWindowView" id="439893737">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -794,7 +793,6 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{254, 167}</string>
-					<reference key="NSSuperview"/>
 					<int key="NSViewLayerContentsRedrawPolicy">2</int>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
@@ -829,6 +827,7 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{18, 14}, {203, 32}}</string>
 											<reference key="NSSuperview" ref="105565948"/>
+											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<int key="NSNumRows">1</int>
 											<int key="NSNumCols">2</int>
@@ -947,10 +946,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									</object>
 									<string key="NSFrame">{{1, 1}, {239, 56}}</string>
 									<reference key="NSSuperview" ref="373796301"/>
+									<reference key="NSWindow"/>
 								</object>
 							</object>
 							<string key="NSFrame">{{338, 192}, {241, 72}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -984,6 +985,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{16, 17}, {207, 25}}</string>
 											<reference key="NSSuperview" ref="901164377"/>
+											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSSliderCell" key="NSCell" id="339565949">
 												<int key="NSCellFlags">-2080244224</int>
@@ -1005,6 +1007,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{15, 6}, {32, 11}}</string>
 											<reference key="NSSuperview" ref="901164377"/>
+											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="568452275">
 												<int key="NSCellFlags">68288064</int>
@@ -1033,6 +1036,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{171, 6}, {53, 11}}</string>
 											<reference key="NSSuperview" ref="901164377"/>
+											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="432869397">
 												<int key="NSCellFlags">68288064</int>
@@ -1047,11 +1051,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									</object>
 									<string key="NSFrame">{{1, 7}, {239, 51}}</string>
 									<reference key="NSSuperview" ref="829273428"/>
+									<reference key="NSWindow"/>
 								</object>
 							</object>
 							<string key="NSFrame">{{338, 126}, {241, 67.5}}</string>
 							<string key="NSBounds">{{0, 6}, {241, 67}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -1075,6 +1081,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{335, 12}, {216, 32}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="58713787">
 								<int key="NSCellFlags">67239424</int>
@@ -1096,6 +1103,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<int key="NSvFlags">4108</int>
 							<string key="NSFrame">{{16, 91}, {312, 96}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="122823376">
@@ -1110,6 +1118,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{17, 17}, {125, 42}}</string>
 												<reference key="NSSuperview" ref="998446056"/>
+												<reference key="NSWindow"/>
 												<int key="NSNumRows">2</int>
 												<int key="NSNumCols">1</int>
 												<object class="NSMutableArray" key="NSCells">
@@ -1208,6 +1217,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{137, 15}, {139, 22}}</string>
 												<reference key="NSSuperview" ref="998446056"/>
+												<reference key="NSWindow"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSPopUpButtonCell" key="NSCell" id="77165964">
 													<int key="NSCellFlags">-1539178944</int>
@@ -1459,6 +1469,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 										</object>
 										<string key="NSFrame">{{10, 7}, {292, 76}}</string>
 										<reference key="NSSuperview" ref="125364625"/>
+										<reference key="NSWindow"/>
 									</object>
 									<string key="NSLabel">Rootless</string>
 									<reference key="NSColor" ref="384442021"/>
@@ -1938,6 +1949,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<int key="NSvFlags">12</int>
 							<string key="NSFrame">{{330, 12}, {5, 252}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -1970,6 +1982,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{18, 14}, {272, 32}}</string>
 											<reference key="NSSuperview" ref="660353262"/>
+											<reference key="NSWindow"/>
 											<int key="NSNumRows">1</int>
 											<int key="NSNumCols">2</int>
 											<object class="NSMutableArray" key="NSCells">
@@ -2067,10 +2080,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									</object>
 									<string key="NSFrame">{{1, 1}, {308, 56}}</string>
 									<reference key="NSSuperview" ref="61155510"/>
+									<reference key="NSWindow"/>
 								</object>
 							</object>
 							<string key="NSFrame">{{17, 192}, {310, 72}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -2104,6 +2119,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{18, 14}, {272, 34}}</string>
 											<reference key="NSSuperview" ref="486591796"/>
+											<reference key="NSWindow"/>
 											<int key="NSNumRows">1</int>
 											<int key="NSNumCols">2</int>
 											<object class="NSMutableArray" key="NSCells">
@@ -2201,11 +2217,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									</object>
 									<string key="NSFrame">{{1, 1.5}, {308, 58}}</string>
 									<reference key="NSSuperview" ref="912727771"/>
+									<reference key="NSWindow"/>
 								</object>
 							</object>
 							<string key="NSFrame">{{17, 16}, {310, 74}}</string>
 							<string key="NSBounds">{{0, 0.5}, {310, 74}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -2239,6 +2257,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{15, 22}, {142, 18}}</string>
 											<reference key="NSSuperview" ref="141238821"/>
+											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="271795625">
 												<int key="NSCellFlags">67239424</int>
@@ -2264,11 +2283,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									</object>
 									<string key="NSFrame">{{1, 11}, {239, 58}}</string>
 									<reference key="NSSuperview" ref="590512626"/>
+									<reference key="NSWindow"/>
 								</object>
 							</object>
 							<string key="NSFrame">{{338, 48}, {241, 74}}</string>
 							<string key="NSBounds">{{0, 10}, {241, 74}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -2292,6 +2313,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{554, 16}, {25, 25}}</string>
 							<reference key="NSSuperview" ref="313074974"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="635513153">
 								<int key="NSCellFlags">67239424</int>
@@ -2311,6 +2333,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<string key="NSFrameSize">{596, 272}</string>
 					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
@@ -4377,7 +4400,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<string key="NSWindowContentMaxSize">{800, 500}</string>
 				<string key="NSWindowContentMinSize">{800, 500}</string>
 				<object class="NSView" key="NSWindowView" id="139969770">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4622,6 +4645,26 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
 						</object>
+						<object class="NSButton" id="271090360">
+							<reference key="NSNextResponder" ref="139969770"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{644, 71}, {96, 32}}</string>
+							<reference key="NSSuperview" ref="139969770"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="569593762">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">134217728</int>
+								<string key="NSContents">Cancel</string>
+								<reference key="NSSupport" ref="66818554"/>
+								<reference key="NSControlView" ref="271090360"/>
+								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags2">129</int>
+								<string key="NSAlternateContents"/>
+								<string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
 						<object class="NSBox" id="1009737945">
 							<reference key="NSNextResponder" ref="139969770"/>
 							<int key="NSvFlags">12</int>
@@ -4715,6 +4758,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						</object>
 					</object>
 					<string key="NSFrameSize">{800, 500}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{800, 522}</string>
@@ -9168,6 +9212,22 @@ LmRvaDEyMy5jb20vA</bytes>
 					</object>
 					<int key="connectionID">1509</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">winetricksCancelButton</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="271090360"/>
+					</object>
+					<int key="connectionID">1513</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">winetricksCancelButtonPressed:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="271090360"/>
+					</object>
+					<int key="connectionID">1514</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -12307,6 +12367,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<reference ref="658823322"/>
 							<reference ref="544042747"/>
 							<reference ref="463000091"/>
+							<reference ref="271090360"/>
 						</object>
 						<reference key="parent" ref="410143881"/>
 					</object>
@@ -13522,6 +13583,20 @@ LmRvaDEyMy5jb20vA</bytes>
 						<reference key="object" ref="63435313"/>
 						<reference key="parent" ref="482164746"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1510</int>
+						<reference key="object" ref="271090360"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="569593762"/>
+						</object>
+						<reference key="parent" ref="139969770"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1511</int>
+						<reference key="object" ref="569593762"/>
+						<reference key="parent" ref="271090360"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -13979,6 +14054,9 @@ LmRvaDEyMy5jb20vA</bytes>
 					<string>1507.IBPluginDependency</string>
 					<string>1507.IBViewBoundsToFrameTransform</string>
 					<string>1508.IBPluginDependency</string>
+					<string>1510.IBPluginDependency</string>
+					<string>1510.IBViewBoundsToFrameTransform</string>
+					<string>1511.IBPluginDependency</string>
 					<string>19.IBPluginDependency</string>
 					<string>19.ImportedFromIB2</string>
 					<string>195.IBPluginDependency</string>
@@ -14723,9 +14801,9 @@ LmRvaDEyMy5jb20vA</bytes>
 						<bytes key="NSTransformStruct">P4AAAL+AAABD74AAwtAAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{144, 37}, {800, 500}}</string>
+					<string>{{135, 656}, {800, 500}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{144, 37}, {800, 500}}</string>
+					<string>{{135, 656}, {800, 500}}</string>
 					<boolean value="NO"/>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
@@ -14755,7 +14833,7 @@ LmRvaDEyMy5jb20vA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABEAAAAwz0AAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABEAAAAwsoAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -15153,6 +15231,11 @@ LmRvaDEyMy5jb20vA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABEAUAAwsAAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -15299,9 +15382,9 @@ LmRvaDEyMy5jb20vA</bytes>
 						<bytes key="NSTransformStruct">P4AAAL+AAADAQAAAwyWAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{246, 356}, {596, 272}}</string>
+					<string>{{262, 621}, {596, 272}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{246, 356}, {596, 272}}</string>
+					<string>{{262, 621}, {596, 272}}</string>
 					<boolean value="NO"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -15835,7 +15918,7 @@ LmRvaDEyMy5jb20vA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1509</int>
+			<int key="maxID">1514</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -15896,6 +15979,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>winecfgButtonPressed:</string>
 							<string>wineskinWebsiteButtonPressed:</string>
 							<string>winetricksButtonPressed:</string>
+							<string>winetricksCancelButtonPressed:</string>
 							<string>winetricksDoneButtonPressed:</string>
 							<string>winetricksRunButtonPressed:</string>
 							<string>winetricksShowPackageListButtonPressed:</string>
@@ -15903,6 +15987,7 @@ LmRvaDEyMy5jb20vA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -16011,6 +16096,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>winecfgButtonPressed:</string>
 							<string>wineskinWebsiteButtonPressed:</string>
 							<string>winetricksButtonPressed:</string>
+							<string>winetricksCancelButtonPressed:</string>
 							<string>winetricksDoneButtonPressed:</string>
 							<string>winetricksRunButtonPressed:</string>
 							<string>winetricksShowPackageListButtonPressed:</string>
@@ -16215,6 +16301,10 @@ LmRvaDEyMy5jb20vA</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">winetricksCancelButtonPressed:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">winetricksDoneButtonPressed:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -16229,6 +16319,654 @@ LmRvaDEyMy5jb20vA</bytes>
 							<object class="IBActionInfo">
 								<string key="name">winetricksUpdateButtonPressed:</string>
 								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>aboutWindow</string>
+							<string>aboutWindowVersionNumber</string>
+							<string>advancedDoneButton</string>
+							<string>advancedWindow</string>
+							<string>automaticOverrideToggle</string>
+							<string>automaticOverrideToggleAutomaticButton</string>
+							<string>busyWindow</string>
+							<string>cEXEBrowseButton</string>
+							<string>cEXEColorDepth</string>
+							<string>cEXEFlagsTextField</string>
+							<string>cEXEFullscreenResolution</string>
+							<string>cEXEFullscreenRootlesToggleTabView</string>
+							<string>cEXEFullscreenRootlessToggle</string>
+							<string>cEXEFullscreenRootlessToggleRootlessButton</string>
+							<string>cEXEGammaSlider</string>
+							<string>cEXEIconBrowseButton</string>
+							<string>cEXEIconImageView</string>
+							<string>cEXENameToUseTextField</string>
+							<string>cEXENormalWindowsVirtualDesktopToggle</string>
+							<string>cEXENormalWindowsVirtualDesktopToggleNormalWindowsButton</string>
+							<string>cEXESwitchPause</string>
+							<string>cEXEUseStartExeCheckmark</string>
+							<string>cEXEVirtualDesktopResolution</string>
+							<string>cEXEWindow</string>
+							<string>cEXEWindowsExeTextField</string>
+							<string>cEXEautoOrOvverrideDesktopToggle</string>
+							<string>cEXEautoOrOvverrideDesktopToggleAutomaticButton</string>
+							<string>changeEngineButton</string>
+							<string>changeEngineWindow</string>
+							<string>changeEngineWindowPopUpButton</string>
+							<string>chooseExeWindow</string>
+							<string>colorDepth</string>
+							<string>configHelpWindow</string>
+							<string>currentVersionTextField</string>
+							<string>customExeButton</string>
+							<string>engineWindowOkButton</string>
+							<string>exeBrowseButton</string>
+							<string>exeChoicePopUp</string>
+							<string>exeFlagsTextField</string>
+							<string>extAddEditWindow</string>
+							<string>extCommandTextField</string>
+							<string>extEditButton</string>
+							<string>extExtensionTextField</string>
+							<string>extPopUpButton</string>
+							<string>forceNormalWindowsUseTheseSettingsToggle</string>
+							<string>forceNormalWindowsUseTheseSettingsToggleForceButton</string>
+							<string>fullscreenResolution</string>
+							<string>fullscreenRootlesToggleTabView</string>
+							<string>fullscreenRootlessToggle</string>
+							<string>fullscreenRootlessToggleRootlessButton</string>
+							<string>gammaSlider</string>
+							<string>helpWindow</string>
+							<string>iconBrowseButton</string>
+							<string>iconImageView</string>
+							<string>menubarNameTextField</string>
+							<string>normalWindowsVirtualDesktopToggle</string>
+							<string>normalWindowsVirtualDesktopToggleNormalWindowsButton</string>
+							<string>rebuildWrapperButton</string>
+							<string>refreshWrapperButton</string>
+							<string>regeditButton</string>
+							<string>screenOptionsWindow</string>
+							<string>switchPause</string>
+							<string>tab</string>
+							<string>taskmgrButton</string>
+							<string>testRunButton</string>
+							<string>toolRunningPI</string>
+							<string>toolRunningPIText</string>
+							<string>toolsHelpWindow</string>
+							<string>uninstallerButton</string>
+							<string>updateWrapperButton</string>
+							<string>useStartExeCheckmark</string>
+							<string>versionTextField</string>
+							<string>virtualDesktopResolution</string>
+							<string>waitWheel</string>
+							<string>window</string>
+							<string>windowManagerCheckBoxButton</string>
+							<string>windowsExeTextField</string>
+							<string>wineDebugTextField</string>
+							<string>winecfgButton</string>
+							<string>winetricksButton</string>
+							<string>winetricksCancelButton</string>
+							<string>winetricksCommandList</string>
+							<string>winetricksDoneButton</string>
+							<string>winetricksOutputText</string>
+							<string>winetricksOutputTextScrollView</string>
+							<string>winetricksRunButton</string>
+							<string>winetricksShowPackageListButton</string>
+							<string>winetricksUpdateButton</string>
+							<string>winetricksWaitWheel</string>
+							<string>winetricksWindow</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSWindow</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSWindow</string>
+							<string>NSMatrix</string>
+							<string>NSButtonCell</string>
+							<string>NSWindow</string>
+							<string>NSButton</string>
+							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
+							<string>NSTabView</string>
+							<string>NSMatrix</string>
+							<string>NSButtonCell</string>
+							<string>NSSlider</string>
+							<string>NSButton</string>
+							<string>NSImageView</string>
+							<string>NSTextField</string>
+							<string>NSMatrix</string>
+							<string>NSButtonCell</string>
+							<string>NSPopUpButton</string>
+							<string>NSButton</string>
+							<string>NSPopUpButton</string>
+							<string>NSWindow</string>
+							<string>NSTextField</string>
+							<string>NSMatrix</string>
+							<string>NSButtonCell</string>
+							<string>NSButton</string>
+							<string>NSWindow</string>
+							<string>NSPopUpButton</string>
+							<string>NSWindow</string>
+							<string>NSPopUpButton</string>
+							<string>NSWindow</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
+							<string>NSMatrix</string>
+							<string>NSButtonCell</string>
+							<string>NSPopUpButton</string>
+							<string>NSTabView</string>
+							<string>NSMatrix</string>
+							<string>NSButtonCell</string>
+							<string>NSSlider</string>
+							<string>NSWindow</string>
+							<string>NSButton</string>
+							<string>NSImageView</string>
+							<string>NSTextField</string>
+							<string>NSMatrix</string>
+							<string>NSButtonCell</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSWindow</string>
+							<string>NSPopUpButton</string>
+							<string>NSTabView</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSWindow</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSPopUpButton</string>
+							<string>NSButton</string>
+							<string>NSTextView</string>
+							<string>NSScrollView</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSWindow</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>aboutWindow</string>
+							<string>aboutWindowVersionNumber</string>
+							<string>advancedDoneButton</string>
+							<string>advancedWindow</string>
+							<string>automaticOverrideToggle</string>
+							<string>automaticOverrideToggleAutomaticButton</string>
+							<string>busyWindow</string>
+							<string>cEXEBrowseButton</string>
+							<string>cEXEColorDepth</string>
+							<string>cEXEFlagsTextField</string>
+							<string>cEXEFullscreenResolution</string>
+							<string>cEXEFullscreenRootlesToggleTabView</string>
+							<string>cEXEFullscreenRootlessToggle</string>
+							<string>cEXEFullscreenRootlessToggleRootlessButton</string>
+							<string>cEXEGammaSlider</string>
+							<string>cEXEIconBrowseButton</string>
+							<string>cEXEIconImageView</string>
+							<string>cEXENameToUseTextField</string>
+							<string>cEXENormalWindowsVirtualDesktopToggle</string>
+							<string>cEXENormalWindowsVirtualDesktopToggleNormalWindowsButton</string>
+							<string>cEXESwitchPause</string>
+							<string>cEXEUseStartExeCheckmark</string>
+							<string>cEXEVirtualDesktopResolution</string>
+							<string>cEXEWindow</string>
+							<string>cEXEWindowsExeTextField</string>
+							<string>cEXEautoOrOvverrideDesktopToggle</string>
+							<string>cEXEautoOrOvverrideDesktopToggleAutomaticButton</string>
+							<string>changeEngineButton</string>
+							<string>changeEngineWindow</string>
+							<string>changeEngineWindowPopUpButton</string>
+							<string>chooseExeWindow</string>
+							<string>colorDepth</string>
+							<string>configHelpWindow</string>
+							<string>currentVersionTextField</string>
+							<string>customExeButton</string>
+							<string>engineWindowOkButton</string>
+							<string>exeBrowseButton</string>
+							<string>exeChoicePopUp</string>
+							<string>exeFlagsTextField</string>
+							<string>extAddEditWindow</string>
+							<string>extCommandTextField</string>
+							<string>extEditButton</string>
+							<string>extExtensionTextField</string>
+							<string>extPopUpButton</string>
+							<string>forceNormalWindowsUseTheseSettingsToggle</string>
+							<string>forceNormalWindowsUseTheseSettingsToggleForceButton</string>
+							<string>fullscreenResolution</string>
+							<string>fullscreenRootlesToggleTabView</string>
+							<string>fullscreenRootlessToggle</string>
+							<string>fullscreenRootlessToggleRootlessButton</string>
+							<string>gammaSlider</string>
+							<string>helpWindow</string>
+							<string>iconBrowseButton</string>
+							<string>iconImageView</string>
+							<string>menubarNameTextField</string>
+							<string>normalWindowsVirtualDesktopToggle</string>
+							<string>normalWindowsVirtualDesktopToggleNormalWindowsButton</string>
+							<string>rebuildWrapperButton</string>
+							<string>refreshWrapperButton</string>
+							<string>regeditButton</string>
+							<string>screenOptionsWindow</string>
+							<string>switchPause</string>
+							<string>tab</string>
+							<string>taskmgrButton</string>
+							<string>testRunButton</string>
+							<string>toolRunningPI</string>
+							<string>toolRunningPIText</string>
+							<string>toolsHelpWindow</string>
+							<string>uninstallerButton</string>
+							<string>updateWrapperButton</string>
+							<string>useStartExeCheckmark</string>
+							<string>versionTextField</string>
+							<string>virtualDesktopResolution</string>
+							<string>waitWheel</string>
+							<string>window</string>
+							<string>windowManagerCheckBoxButton</string>
+							<string>windowsExeTextField</string>
+							<string>wineDebugTextField</string>
+							<string>winecfgButton</string>
+							<string>winetricksButton</string>
+							<string>winetricksCancelButton</string>
+							<string>winetricksCommandList</string>
+							<string>winetricksDoneButton</string>
+							<string>winetricksOutputText</string>
+							<string>winetricksOutputTextScrollView</string>
+							<string>winetricksRunButton</string>
+							<string>winetricksShowPackageListButton</string>
+							<string>winetricksUpdateButton</string>
+							<string>winetricksWaitWheel</string>
+							<string>winetricksWindow</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">aboutWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">aboutWindowVersionNumber</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">advancedDoneButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">advancedWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">automaticOverrideToggle</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">automaticOverrideToggleAutomaticButton</string>
+								<string key="candidateClassName">NSButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">busyWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEBrowseButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEColorDepth</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEFlagsTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEFullscreenResolution</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEFullscreenRootlesToggleTabView</string>
+								<string key="candidateClassName">NSTabView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEFullscreenRootlessToggle</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEFullscreenRootlessToggleRootlessButton</string>
+								<string key="candidateClassName">NSButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEGammaSlider</string>
+								<string key="candidateClassName">NSSlider</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEIconBrowseButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEIconImageView</string>
+								<string key="candidateClassName">NSImageView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXENameToUseTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXENormalWindowsVirtualDesktopToggle</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXENormalWindowsVirtualDesktopToggleNormalWindowsButton</string>
+								<string key="candidateClassName">NSButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXESwitchPause</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEUseStartExeCheckmark</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEVirtualDesktopResolution</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEWindowsExeTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEautoOrOvverrideDesktopToggle</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cEXEautoOrOvverrideDesktopToggleAutomaticButton</string>
+								<string key="candidateClassName">NSButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">changeEngineButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">changeEngineWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">changeEngineWindowPopUpButton</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">chooseExeWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">colorDepth</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">configHelpWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">currentVersionTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">customExeButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">engineWindowOkButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">exeBrowseButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">exeChoicePopUp</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">exeFlagsTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">extAddEditWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">extCommandTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">extEditButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">extExtensionTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">extPopUpButton</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">forceNormalWindowsUseTheseSettingsToggle</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">forceNormalWindowsUseTheseSettingsToggleForceButton</string>
+								<string key="candidateClassName">NSButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fullscreenResolution</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fullscreenRootlesToggleTabView</string>
+								<string key="candidateClassName">NSTabView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fullscreenRootlessToggle</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fullscreenRootlessToggleRootlessButton</string>
+								<string key="candidateClassName">NSButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">gammaSlider</string>
+								<string key="candidateClassName">NSSlider</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">helpWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">iconBrowseButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">iconImageView</string>
+								<string key="candidateClassName">NSImageView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">menubarNameTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">normalWindowsVirtualDesktopToggle</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">normalWindowsVirtualDesktopToggleNormalWindowsButton</string>
+								<string key="candidateClassName">NSButtonCell</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">rebuildWrapperButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">refreshWrapperButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">regeditButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">screenOptionsWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">switchPause</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">tab</string>
+								<string key="candidateClassName">NSTabView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">taskmgrButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">testRunButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">toolRunningPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">toolRunningPIText</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">toolsHelpWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">uninstallerButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">updateWrapperButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">useStartExeCheckmark</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">versionTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">virtualDesktopResolution</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">waitWheel</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">window</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">windowManagerCheckBoxButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">windowsExeTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">wineDebugTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winecfgButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksCancelButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksCommandList</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksDoneButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksOutputText</string>
+								<string key="candidateClassName">NSTextView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksOutputTextScrollView</string>
+								<string key="candidateClassName">NSScrollView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksRunButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksShowPackageListButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksUpdateButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksWaitWheel</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">winetricksWindow</string>
+								<string key="candidateClassName">NSWindow</string>
 							</object>
 						</object>
 					</object>

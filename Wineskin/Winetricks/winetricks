@@ -304,7 +304,7 @@ winetricks_wintounix()
     # Remove drive letter and colon
     _W_winp="${_W_winp_#??}"
     # Prepend the location of drive c
-    printf %s ${WINEPREFIX}/dosdevices/c:
+    printf %s "$WINEPREFIX"/dosdevices/c:
     # Change backslashes to slashes
     echo $_W_winp | sed 's,\\,/,g' 
 }
@@ -1284,7 +1284,7 @@ w_workaround_wine_bug()
     de*) w_warn "Wine-Fehler ${1} wird umgegangen $_W_msg" ;;
     *)   w_warn "Working around wine bug ${1} $_W_msg" ;;
     esac
-    winetricks_stats_log_command w_workaround_wine_bug "$*"
+    winetricks_stats_log_command w_workaround_wine_bug-$1
     return 0
 }
 
@@ -3049,8 +3049,8 @@ winetricks_handle_option()
 # Must initialize variables before calling w_metadata
 if ! test "$WINETRICKS_LIB"
 then
-    WINETRICKS_SRCDIR=`dirname $0`
-    WINETRICKS_SRCDIR=`cd $WINETRICKS_SRCDIR; /bin/pwd`
+    WINETRICKS_SRCDIR=`dirname "$0"`
+    WINETRICKS_SRCDIR=`cd "$WINETRICKS_SRCDIR"; /bin/pwd`
 
     # Which GUI helper to use (none/zenity/kdialog).  See winetricks_detect_gui.
     WINETRICKS_GUI=none
@@ -5121,21 +5121,10 @@ load_vb6run()
 
 #----------------------------------------------------------------
 
-w_metadata  vcrun6 dlls \
-   title="Visual C++ 6 sp4 libraries (mfc42, msvcp60, msvcrt)" \
-   publisher="Microsoft" \
-   year="2000" \
-   media="download" \
-   file1="vc6redistsetup_enu.exe" \
-   installed_file1="$W_SYSTEM32_DLLS_WIN/mfc42u.dll"
-
-load_vcrun6()
-{
-    # Load the Visual C++ 6 runtime libraries, including the elusive mfc42u.dll
-
+winetricks_vcrun6_helper() {
     if test ! -f "$W_CACHE"/vcrun6/vcredist.exe
     then
-       w_download http://download.microsoft.com/download/vc60pro/update/1/w9xnt4/en-us/vc6redistsetup_enu.exe 382c8f5a7f41189af8d4165cf441f274b7e2a457
+       w_download_to vcrun6 http://download.microsoft.com/download/vc60pro/update/1/w9xnt4/en-us/vc6redistsetup_enu.exe 382c8f5a7f41189af8d4165cf441f274b7e2a457
 
        w_try $WINE "$W_CACHE"/vcrun6/vc6redistsetup_enu.exe "/T:$W_TMP_WIN" /c $W_UNATTENDED_SLASH_Q
        if test ! -f "$W_TMP"/vcredist.exe
@@ -5144,6 +5133,21 @@ load_vcrun6()
        fi
        mv "$W_TMP"/vcredist.exe "$W_CACHE"/vcrun6
     fi
+}
+
+w_metadata  vcrun6 dlls \
+   title="Visual C++ 6 sp4 libraries (mfc42, msvcp60, msvcrt)" \
+   publisher="Microsoft" \
+   year="2000" \
+   media="download" \
+   file1="vc6redistsetup_enu.exe" \
+   installed_file1="$W_SYSTEM32_DLLS_WIN/msvcrt.dll"
+
+load_vcrun6()
+{
+    # Load the Visual C++ 6 runtime libraries, including the elusive mfc42u.dll
+    winetricks_vcrun6_helper
+
     # Delete some fake dlls to avoid vcredist installer warnings
     rm -f "$W_SYSTEM32_DLLS"/comcat.dll
     rm -f "$W_SYSTEM32_DLLS"/msvcrt.dll
@@ -5160,7 +5164,7 @@ load_vcrun6()
 
     # And then some apps need mfc42u.dll, dunno what right way
     # is to get it, vcredist doesn't install it by default?
-    w_try_cabextract "$W_CACHE"/vcrun6/vcredist.exe -d "$W_SYSTEM32_DLLS" -F mfc42u.dll
+    load_mfc42
 
     w_override_dlls native,builtin msvcrt
 }
@@ -5175,7 +5179,9 @@ w_metadata  mfc42 dlls \
 
 load_mfc42()
 {
-    w_call vcrun6
+    winetricks_vcrun6_helper
+
+    w_try_cabextract "$W_CACHE"/vcrun6/vcredist.exe -d "$W_SYSTEM32_DLLS" -F "mfc42*.dll"
 }
 
 #----------------------------------------------------------------
@@ -5190,7 +5196,7 @@ w_metadata  vcrun6sp6 dlls \
    year="2004" \
    media="download" \
    file1="Vs6sp6.exe" \
-   installed_file1="$W_SYSTEM32_DLLS_WIN/mfc42u.dll"
+   installed_file1="$W_SYSTEM32_DLLS_WIN/msvcrt.dll"
 
 load_vcrun6sp6()
 {
@@ -5219,6 +5225,7 @@ load_vcrun6sp6()
     # And then some apps need mfc42u.dll, dunno what right way
     # is to get it, vcredist doesn't install it by default?
     w_try_cabextract vcredist.exe -d "$W_SYSTEM32_DLLS" -F mfc42u.dll
+    # Should the mfc42 verb install this one instead?
 
     w_override_dlls native,builtin msvcrt
 }
@@ -8110,6 +8117,53 @@ load_atmosphir()
         winwaitclose
     "
     w_declare_exe "$W_PROGRAMS_X86_WIN/Minor Studios/Atmosphir" Atmosphir.exe
+}
+
+#----------------------------------------------------------------
+
+w_metadata bttf101 games \
+    title="Back to the Future Episode 1" \
+    publisher="Telltale" \
+    year="2011" \
+    media="manual_download" \
+    file1="bttf_101_setup.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Telltale Games/Back to the Future The Game/Episode 1/BackToTheFuture101.exe"
+
+load_bttf101()
+{
+    w_download_manual http://www.telltalegames.com/bttf bttf_101_setup.exe 9b15e26d9b4d454f714d6559efe509562df9c10b
+
+    if w_workaround_wine_bug 26371 "Installing d3dx9_36 to work around crash"
+    then
+        w_call d3dx9_36
+    fi
+
+    cd "$W_CACHE/$W_PACKAGE"
+    w_ahk_do "
+        SetWinDelay 1000
+        SetTitleMatchMode, 2
+        run, bttf_101_setup.exe
+        winwait, Back to the Future, Welcome
+        u = $W_OPT_UNATTENDED
+        if ( u > 0 ) {
+            ControlClick, Button2   ; Next
+            winwait, Back to the Future, Checking DirectX
+            ControlClick, Button5   ; Don't check
+            ControlClick, Button2   ; Next
+            winwait, Back to the Future, License
+            ControlClick, Button2   ; Agree
+            winwait, Back to the Future, Location
+            ControlClick, Button2   ; Install
+        }
+        winwait, Back to the Future, has been installed
+        if ( u > 0 ) {
+            ControlClick Button4    ; Don't start now
+            ControlClick Button2    ; Finish
+        }
+        WinWaitClose
+    "
+
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Telltale Games\\Back to the Future The Game\\Episode 1" BackToTheFuture101.exe
 }
 
 #----------------------------------------------------------------
@@ -11768,6 +11822,105 @@ load_sims3()
 
 #----------------------------------------------------------------
 
+w_metadata simsmed games \
+    title="The Sims Medieval (drm broken on wine)" \
+    publisher="EA" \
+    year="2011" \
+    media="dvd" \
+    file1="TSimsM.iso" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Electronic Arts/The Sims Medieval/Game/Bin/TSM.exe" \
+    wine_showstoppers="26273"
+
+load_simsmed()
+{
+    if w_workaround_wine_bug 21517 "Old wine needs native DirectX for this game" 1.3.8,
+    then
+        w_call d3dx9_36
+    fi
+
+    w_read_key
+
+    w_mount TSimsM
+    # Default lang, USA, accept defaults, uncheck EA dl mgr, uncheck readme
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        run ${W_ISO_MOUNT_LETTER}:SimsMedievalSetup.exe
+        winwait, Choose Setup Language
+        u = $W_OPT_UNATTENDED
+        if ( u > 0 ) {
+            send {Enter}
+            SetTitleMatchMode, 2
+            winwait, - InstallShield Wizard
+            sleep 1000
+            ControlClick &Next >, - InstallShield Wizard
+            sleep 1000
+            send uuuuuu{Tab}{Tab}{Enter}
+            WinWait, Sims, License
+            ControlClick Button3   ; Accept
+            sleep 1000
+            ControlClick Button1   ; Next
+            sleep 1000
+            send {Raw}$W_KEY
+            send {Enter}
+            winwait, - InstallShield Wizard, Setup Type
+            send {Enter}
+            winwait, - InstallShield Wizard, Click Install to begin
+            send {Enter}
+            ; FIXME: work around bug 25535 only if needed
+             winwait,,.NET Framework 4 has not been installed
+             ControlClick Button3  ; Finish
+             winwait, .NET Framework Initialization Error
+             send {Enter}
+            winwait, Sims, Customer Experience Improvement
+            send {Enter}           ; Next
+        }
+        winwait, - InstallShield Wizard, Complete
+        if ( u > 0 ) {
+            ControlClick Button1   ; Don't view readme
+            send {Enter}           ; Finish
+        }
+        winwaitclose
+    "
+
+    # DVD Region code is last digit.
+    # FIXME: download appropriate one rather than just US version.
+    w_download http://akamai.cdn.ea.com/eadownloads/u/f/sims/sims/patches/TheSimsMedievalPatch_1.1.10.00001_Update.exe 7214ced8af7315741e05024faeacf9053b999b1b
+
+    cd "$W_CACHE"/$W_PACKAGE
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        SetWinDelay 500
+        run TheSimsMedievalPatch_1.1.10.00001_Update.exe
+        winwait, Medieval, will reset any in-progress quests
+        send {Enter}
+        winwait, Medieval, Welcome
+        u = $W_OPT_UNATTENDED
+        if ( u > 0 ) {
+            send {Enter}
+        }
+        winwait, - InstallShield Wizard, Complete
+        if ( u > 0 ) {
+            ControlClick Finish, - InstallShield Wizard
+        }
+        winwaitclose
+    "
+
+    if w_workaround_wine_bug 25535 ".net 4 doesn't install on Wine, fixing menu to run game directly"
+    then
+        myexec="Exec=env WINEPREFIX=\"$HOME/.local/share/wineprefixes/$W_PACKAGE\" wine cmd /c 'C:\\\\\\Run-$W_PACKAGE.bat'"
+        mymenu="$HOME/.local/share/applications/wine/Programs/Electronic Arts/The Sims Medieval/The Sims™ Medieval.desktop"
+        if test -f "$mymenu" && w_workaround_wine_bug 26487 "Fixing system menu"
+        then
+            sed -i "s,Exec=.*,$myexec," "$mymenu"
+        fi
+        echo FIXME: fix icon, too
+    fi
+
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Electronic Arts\\The Sims Medieval\\Game\\Bin" "TSM.exe"
+}
+
+#----------------------------------------------------------------
+
 w_metadata starcraft2_demo games \
     title="Starcraft II Demo" \
     publisher="Blizzard" \
@@ -13603,7 +13756,7 @@ winetricks_stats_report()
     echo "You opted in, so reporting '$WINETRICKS_STATS_BREADCRUMBS' to the winetricks maintainer so he knows which winetricks verbs get used and which don't.  Use --optout to disable future reports."
 
     report="os=`winetricks_os_description`&winetricks=$WINETRICKS_VERSION&breadcrumbs=$WINETRICKS_STATS_BREADCRUMBS"
-    report="`echo $report | tr ' ' '%20'`"
+    report="`echo $report | sed 's/ /%20/g'`"
     # Just do a HEAD request with the raw commandline.  
     # Yes, this can be fooled by caches.  That's ok.
     if [ -x "`which wget 2>/dev/null`" ]

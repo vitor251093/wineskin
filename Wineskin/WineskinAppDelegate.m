@@ -15,6 +15,8 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	isIce=NO;
+	shPIDs = [[NSMutableArray alloc] init];
+	[winetricksCancelButton setEnabled:NO];
 	disableButtonCounter=0;
 	disableXButton=NO;
 	[waitWheel startAnimation:self];
@@ -80,6 +82,20 @@
 - (void)systemCommand:(NSString *)commandToRun withArgs:(NSArray *)args
 {
 	[[NSTask launchedTaskWithLaunchPath:commandToRun arguments:args] waitUntilExit];
+}
+- (NSString *)systemCommandWithOutputReturned:(NSString *)command
+{
+	FILE *fp;
+	char buff[512];
+	NSString *returnString = @"";
+	fp = popen([command cStringUsingEncoding:NSUTF8StringEncoding], "r");
+	while (fgets( buff, sizeof buff, fp))
+		returnString = [NSString stringWithFormat:@"%@%@",returnString,[NSString stringWithCString:buff encoding:NSUTF8StringEncoding]];
+	pclose(fp);
+	//cut out trailing new line
+	if ([returnString hasSuffix:@"\n"])
+		returnString = [returnString substringToIndex:[returnString rangeOfString:@"\n" options:NSBackwardsSearch].location];
+	return returnString;
 }
 - (IBAction)topMenuHelpSelected:(id)sender
 {
@@ -1001,6 +1017,7 @@
 - (IBAction)winetricksRunButtonPressed:(id)sender
 {
 	winetricksDone = NO;
+	winetricksCanceled = NO;
 	// disable X button
 	disableXButton = YES;
 	// disable all buttons on Winetricks window
@@ -1009,13 +1026,59 @@
 	[winetricksUpdateButton setEnabled:NO];
 	[winetricksShowPackageListButton setEnabled:NO];
 	[winetricksDoneButton setEnabled:NO];
+	//enable cancel button
+	[winetricksCancelButton setEnabled:YES];
 	// start prog wheel
 	[winetricksWaitWheel startAnimation:self];
 	// delete log file
 	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	//killing sh processes from Winetricks will cancel out Winetricks correctly
+	//get first list of running "sh" processes
+	NSArray *firstPIDlist = [self makePIDArray:@"sh"];
 	// call runWinetrick in new thread
 	[NSThread detachNewThreadSelector:@selector(runWinetrick) toTarget:self withObject:nil];
 	[NSThread detachNewThreadSelector:@selector(updateWinetrickOutput) toTarget:self withObject:nil];
+	//clear out shPIDs
+	[shPIDs removeAllObjects];
+	//loop though a second list and matching pids several times to try and get all the correct "sh" processes.  Sadly this may get stray other processes on the system if people are multitasking a lot... not sure how else to handle it.
+	int i;
+	for (i=0;i<3;i++)
+	{
+		//get second list of running "sh" processes
+		NSArray *secondPIDlist = [self makePIDArray:@"sh"];
+		//compare first and second list, and ones in second list are the Winetricks ones, if cancel button pressed these are the ones to kill
+		BOOL match = YES;
+		for (NSString *secondPIDlistItem in secondPIDlist)
+		{
+			match = NO;
+			for (NSString *firstPIDlistItem in firstPIDlist)
+				if ([secondPIDlistItem isEqualToString:firstPIDlistItem]) match = YES;
+			if (!match) [shPIDs addObject:secondPIDlistItem];
+		}
+		usleep(1000000);
+	}
+}
+- (IBAction)winetricksCancelButtonPressed:(id)sender
+{
+	//confirm to kill with big warning window
+	NSAlert *alert = [[NSAlert alloc] init];
+	[alert addButtonWithTitle:@"Yes, do the cancel"];
+	[alert addButtonWithTitle:@"I changed my mind..."];
+	[alert setMessageText:@"Are You Sure?"];
+	[alert setInformativeText:@"Are you sure you want to cancel Winetricks?\n\nThis will kill the running Winetricks process, but has a chance to accidently leave \"sh\" processes running until you manually end them or reboot\n\nIt could also mess up the wrapper where you may need to do a full rebuild to get it working right again (this will not usually be a problem)."];
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	if ([alert runModal] == NSAlertSecondButtonReturn)
+	{
+		[alert release];
+		return;
+	}
+	[alert release];	
+	[winetricksCancelButton setEnabled:NO];
+	//kill shPIDs
+	winetricksCanceled = YES;
+	char *tmp;
+	for (NSString *item in shPIDs)
+		kill((pid_t)(strtoimax([item UTF8String], &tmp, 10)), 9);	
 }
 - (void)runWinetrick
 {
@@ -1029,19 +1092,24 @@
 }
 - (void)doTheDangUpdate
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// update text area with Winetricks log
-	 NSArray *winetricksOutput = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
-	 [winetricksOutputText setEditable:YES];
-	 [winetricksOutputText setString:@""];
-	 for (NSString *item in winetricksOutput)
-	 if (!([item hasPrefix:@"XIO:"]) && !([item hasPrefix:@"      after"])) [winetricksOutputText insertText:[NSString stringWithFormat:@"%@\n",item]];
-	 [winetricksOutputText setEditable:NO];
+	NSArray *winetricksOutput = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+	[winetricksOutputText setEditable:YES];
+	[winetricksOutputText setString:@""];
+	for (NSString *item in winetricksOutput)
+	if (!([item hasPrefix:@"XIO:"]) && !([item hasPrefix:@"      after"])) [winetricksOutputText insertText:[NSString stringWithFormat:@"%@\n",item]];
+	[winetricksOutputText setEditable:NO];
+	[pool release];
 }
 - (void)winetricksWriteFinished
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[winetricksOutputText setEditable:YES];
+	if (winetricksCanceled) [winetricksOutputText insertText:@"\n\n Winetricks CANCELED!!\nIt is possible that there are now problems with the wrapper, or other shell processes may have accidently been affected as well.  Usually its best to not cancel Winetricks, but in many cases it will not hurt.  You may need to refresh the wrapper, or in bad cases do a rebuild.\n\n"];
 	[winetricksOutputText insertText:@"\n\n Winetricks Finished!!\n\n"];
 	[winetricksOutputText setEditable:NO];
+	[pool release];
 }
 - (void)updateWinetrickOutput
 {
@@ -1066,8 +1134,18 @@
 	[winetricksDoneButton setEnabled:YES];
 	//enable X button
 	disableXButton = NO;
+	//disable cancel button
+	[winetricksCancelButton setEnabled:NO];
 	[pool release];
 }
+- (NSArray *)makePIDArray:(NSString *)processToLookFor
+{
+	NSString *resultString = [NSString stringWithFormat:@"00000\n%@",[self systemCommandWithOutputReturned:[NSString stringWithFormat:@"ps axc|awk \"{if (\\$5==\\\"%@\\\") print \\$1}\"",processToLookFor]]];
+	return [resultString componentsSeparatedByString:@"\n"];
+}
+
+
+//*********** CEXE
 - (IBAction)createCustomExeLauncherButtonPressed:(id)sender
 {
 	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/Wineskin.icns" error:nil];

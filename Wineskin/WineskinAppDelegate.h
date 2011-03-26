@@ -119,12 +119,15 @@
 	IBOutlet NSWindow *winetricksWindow;
 	IBOutlet NSPopUpButton *winetricksCommandList;
 	IBOutlet NSButton *winetricksRunButton;
+	IBOutlet NSButton *winetricksCancelButton;
 	IBOutlet NSButton *winetricksUpdateButton;
 	IBOutlet NSButton *winetricksShowPackageListButton;
 	IBOutlet NSButton *winetricksDoneButton;
 	IBOutlet NSProgressIndicator *winetricksWaitWheel;
 	IBOutlet NSTextView *winetricksOutputText;
 	IBOutlet NSScrollView *winetricksOutputTextScrollView;
+	NSMutableArray *shPIDs;
+	BOOL winetricksCanceled;
 	
 	//extensions window
 	IBOutlet NSWindow *extAddEditWindow;
@@ -140,6 +143,7 @@
 - (void)enableButtons;
 - (void)disableButtons;
 - (void)systemCommand:(NSString *)commandToRun withArgs:(NSArray *)args;
+- (NSString *)systemCommandWithOutputReturned:(NSString *)command;
 - (IBAction)topMenuHelpSelected:(id)sender;
 - (IBAction)aboutWindow:(id)sender;
 /* Functions deactivated, not currently being used
@@ -208,10 +212,12 @@
 - (IBAction)winetricksShowPackageListButtonPressed:(id)sender;
 - (IBAction)winetricksUpdateButtonPressed:(id)sender;
 - (IBAction)winetricksRunButtonPressed:(id)sender;
+- (IBAction)winetricksCancelButtonPressed:(id)sender;
 - (void)runWinetrick;
 - (void)doTheDangUpdate;
 - (void)winetricksWriteFinished;
 - (void)updateWinetrickOutput;
+- (NSArray *)makePIDArray:(NSString *)processToLookFor;
 // cexe maker
 - (IBAction)createCustomExeLauncherButtonPressed:(id)sender;
 - (IBAction)cEXESaveButtonPressed:(id)sender;
