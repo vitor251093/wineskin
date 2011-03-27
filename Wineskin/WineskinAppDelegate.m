@@ -19,6 +19,13 @@
 	[winetricksCancelButton setEnabled:NO];
 	disableButtonCounter=0;
 	disableXButton=NO;
+	//clear out cells in Screen Options, They need to be blank but IB likes putting them back to defaults by just opening it and resaving
+	[fullscreenRootlessToggleRootlessButton setIntegerValue:0];
+	[fullscreenRootlessToggleFullscreenButton setIntegerValue:0];
+	[normalWindowsVirtualDesktopToggleNormalWindowsButton setIntegerValue:0];
+	[normalWindowsVirtualDesktopToggleVirtualDesktopButton setIntegerValue:0];
+	[forceNormalWindowsUseTheseSettingsToggleForceButton setIntegerValue:0];
+	[forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton setIntegerValue:0];	
 	[waitWheel startAnimation:self];
 	[busyWindow makeKeyAndOrderFront:self];
 	[self loadAllData];
@@ -39,6 +46,7 @@
 		[exeFlagsTextField setEnabled:YES];
 		[menubarNameTextField setEnabled:YES];
 		[versionTextField setEnabled:YES];
+		[customCommandsTextField setEnabled:YES];
 		[useStartExeCheckmark setEnabled:YES];
 		[iconImageView setEditable:YES];
 		[exeBrowseButton setEnabled:YES];
@@ -62,6 +70,7 @@
 	[exeFlagsTextField setEnabled:NO];
 	[menubarNameTextField setEnabled:NO];
 	[versionTextField setEnabled:NO];
+	[customCommandsTextField setEnabled:NO];
 	[useStartExeCheckmark setEnabled:NO];
 	[iconImageView setEditable:NO];
 	[exeBrowseButton setEnabled:NO];
@@ -241,7 +250,7 @@
 //*************************************************************
 - (void)saveScreenOptionsData
 {
-	NSMutableDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	//gamma always set the same, set it first
 	if ([gammaSlider doubleValue] == 80.0)
 		[plistDictionary setValue:@"default" forKey:@"Gamma Correction"];
@@ -597,9 +606,10 @@
 //*************************************************************
 - (void)saveAllData
 {
-	NSMutableDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	[plistDictionary setValue:[windowsExeTextField stringValue] forKey:@"Program Name and Path"];
 	[plistDictionary setValue:[versionTextField stringValue] forKey:@"CFBundleShortVersionString"];
+	[plistDictionary setValue:[customCommandsTextField stringValue] forKey:@"CLI Custom Commands"];
 	[plistDictionary setValue:[exeFlagsTextField stringValue] forKey:@"Program Flags"];
 	[plistDictionary setValue:[menubarNameTextField stringValue] forKey:@"CFBundleName"];
 	[plistDictionary setValue:[wineDebugTextField stringValue] forKey:@"WINEDEBUG="];
@@ -617,6 +627,8 @@
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	[windowsExeTextField setStringValue:[plistDictionary valueForKey:@"Program Name and Path"]];
 	[versionTextField setStringValue:[plistDictionary valueForKey:@"CFBundleShortVersionString"]];
+	if ([[plistDictionary valueForKey:@"CLI Custom Commands"] length] > 0)
+		[customCommandsTextField setStringValue:[plistDictionary valueForKey:@"CLI Custom Commands"]];
 	[exeFlagsTextField setStringValue:[plistDictionary valueForKey:@"Program Flags"]];
 	[menubarNameTextField setStringValue:[plistDictionary valueForKey:@"CFBundleName"]];
 	[wineDebugTextField setStringValue:[plistDictionary valueForKey:@"WINEDEBUG="]];
@@ -1222,7 +1234,7 @@
 	[[NSFileManager defaultManager] copyItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/CustomEXE.app",[[NSBundle mainBundle] bundlePath]] toPath:[NSString stringWithFormat:@"%@/%@.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]] error:nil];
 	//read cexe info.plist in
 	NSString *TEST = [NSString stringWithFormat:@"%@/%@.app/Contents/Info.plist.cexe",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]];
-	NSMutableDictionary *plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:TEST];
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:TEST];
 	//fix Program Name and Path line
 	[plistDictionary setValue:[cEXEWindowsExeTextField stringValue] forKey:@"Program Name and Path"];
 	//fix flags line
@@ -1565,7 +1577,11 @@
 	[[NSFileManager defaultManager] copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Resources/WineskinLauncher.nib",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinLauncher.nib",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	//edit Info.plist to new wrapper version, replace - with spaces, and dump .app
 	[plistDictionary setValue:[[masterWrapperName stringByReplacingOccurrencesOfString:@".app" withString:@""] stringByReplacingOccurrencesOfString:@"-" withString:@" "] forKey:@"CFBundleVersion"];
-	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+	//Make sure new keys are added to the old Info.plist
+	NSMutableDictionary *newPlistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Info.plist",NSHomeDirectory(),masterWrapperName]]; 
+	[newPlistDictionary addEntriesFromDictionary:plistDictionary];	
+	[newPlistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+	[newPlistDictionary release];
 	[plistDictionary release];
 	//force delete Wineskin.app and copy in new
 	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];

@@ -8,14 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-///*
-#if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
-@interface WineskinAppDelegate : NSObject
-#else
-@interface WineskinAppDelegate : NSObject <NSApplicationDelegate>
-#endif
-//*/
-//@interface WineskinAppDelegate : NSObject <NSApplicationDelegate>
+@interface WineskinAppDelegate : NSObject //<NSApplicationDelegate>
 {
 	int disableButtonCounter;
 	BOOL disableXButton;
@@ -32,6 +25,10 @@
 	//Screen Options window
 	IBOutlet NSWindow *screenOptionsWindow;
 	IBOutlet NSMatrix *automaticOverrideToggle;
+	IBOutlet NSButtonCell *automaticOverrideToggleOverrideButton;
+	IBOutlet NSButtonCell *fullscreenRootlessToggleFullscreenButton;
+	IBOutlet NSButtonCell *normalWindowsVirtualDesktopToggleVirtualDesktopButton;
+	IBOutlet NSButtonCell *forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton;
 	IBOutlet NSButtonCell *automaticOverrideToggleAutomaticButton;
 	IBOutlet NSMatrix *fullscreenRootlessToggle;
 	IBOutlet NSTabView *fullscreenRootlesToggleTabView;
@@ -64,6 +61,7 @@
 	IBOutlet NSTextField *menubarNameTextField;
 	IBOutlet NSTextField *versionTextField;
 	IBOutlet NSTextField *wineDebugTextField;
+	IBOutlet NSTextField *customCommandsTextField;
 	IBOutlet NSButton *useStartExeCheckmark;
 	IBOutlet NSImageView *iconImageView;
 	IBOutlet NSButton *exeBrowseButton;

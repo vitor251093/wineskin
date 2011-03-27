@@ -50,6 +50,7 @@
 	NSString *randrXres;					//holds X res for keyboard shortcut to toggle back to fullscreen mode
 	NSString *randrYres;					//holds Y res for keyboard shortcut to toggle back to fullscreen mode
 	BOOL killWineskin;						//sets to true if opening files and wineserver was already running, kills extra wineskin
+	NSString *cliCustomCommands;			//from CLI Variables entry in info.plist
 }
 //the main running of the program...
 - (void)mainRun:(NSArray *)argv;
@@ -190,6 +191,11 @@
 	currentResolution = [self getResolution];
 	if ([vdResolution isEqualToString:@"Current Resolution"])
 		vdResolution = [NSString stringWithFormat:@"%@",currentResolution];
+	// get cliCustomCommands
+	cliCustomCommands = [plistDictionary valueForKey:@"CLI Custom Commands"];
+	// strip off trailing ; on cliCustomCommands if it exists
+	if (!([cliCustomCommands hasSuffix:@";"]) && ([cliCustomCommands length] > 0))
+		cliCustomCommands = [NSString stringWithFormat:@"%@;",cliCustomCommands];
 	//******* fix all data correctly
 	//list of possile options
 	//WSS-installer {path/file}	- Installer is calling the program
@@ -827,7 +833,7 @@
 			//make first pid array
 			NSArray *firstPIDlist = [self makePIDArray:@"wineserver"];
 			//start wineserver
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver > /dev/null 2>&1",winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,theDisplayNumber,winePrefix,winePrefix,winePrefix,winePrefix]];
+			[self systemCommand:[NSString stringWithFormat:@"%@export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver > /dev/null 2>&1",cliCustomCommands,winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,theDisplayNumber,winePrefix,winePrefix,winePrefix,winePrefix]];
 			//do loop compare to find correct PID, only try 3 times, then fail
 			BOOL match = YES;
 			int i = 0;
@@ -893,9 +899,9 @@
 		//Wine start section... if opening files handle differently.
 		if (openingFiles)
 			for (NSString *item in filesToRun) //start wine with files
-				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine start /unix \"%@\" > \"%@\" 2>&1 &",winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,winePrefix,winePrefix,winePrefix,item,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"%@export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine start /unix \"%@\" > \"%@\" 2>&1 &",cliCustomCommands,winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,winePrefix,winePrefix,winePrefix,item,wineLogFile]];
 		else  //launch Wine normally
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,wineRunLocation,winePrefix,winePrefix,startExeLine,wineRunFile,programFlags,wineLogFile]];
+			[self systemCommand:[NSString stringWithFormat:@"%@export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",cliCustomCommands,winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,wineRunLocation,winePrefix,winePrefix,startExeLine,wineRunFile,programFlags,wineLogFile]];
 		vdResolution = [vdResolution stringByReplacingOccurrencesOfString:@"x" withString:@" "];
 	}
 	[fm release];
