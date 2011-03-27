@@ -54,7 +54,6 @@
 	IBOutlet NSTextField *toolRunningPIText;
 	IBOutlet NSTabView *tab;
 	
-	
 	//advanced menu - Configuration Tab
 	IBOutlet NSTextField *windowsExeTextField;
 	IBOutlet NSTextField *exeFlagsTextField;
@@ -68,6 +67,7 @@
 	IBOutlet NSButton *iconBrowseButton;
 	IBOutlet NSPopUpButton *extPopUpButton;
 	IBOutlet NSButton *extEditButton;
+	IBOutlet NSButton *optSendsAltCheckBoxButton;
 	
 	//advanced menu - Tools Tab
 	IBOutlet NSButton *winecfgButton;
@@ -187,6 +187,7 @@
 - (IBAction)extPlusButtonPressed:(id)sender;
 - (IBAction)extMinusButtonPressed:(id)sender;
 - (IBAction)extEditButtonPressed:(id)sender;
+- (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 
 //advanced menu - Tools Tab
 - (IBAction)winecfgButtonPressed:(id)sender;

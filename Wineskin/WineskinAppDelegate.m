@@ -642,6 +642,10 @@
 	else
 		[extEditButton setEnabled:YES];
 	[plistDictionary release];
+	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
+	[optSendsAltCheckBoxButton setState:[[plistDictionary2 valueForKey:@"option_sends_alt"] intValue]];
+	[plistDictionary2 release];
 }
 - (IBAction)windowsExeBrowseButtonPressed:(id)sender
 {
@@ -803,6 +807,18 @@
 	[extAddEditWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
+- (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
+{
+	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:x11PlistFile];
+	if ([optSendsAltCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"option_sends_alt"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"option_sends_alt"];
+	[plistDictionary writeToFile:x11PlistFile atomically:YES];
+	[plistDictionary release];
+}
+
 //*************************************************************
 //**************** Advanced Menu - Tools Tab ******************
 //*************************************************************
