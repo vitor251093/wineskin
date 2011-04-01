@@ -43,6 +43,7 @@
 	IBOutlet NSPopUpButton *switchPause;
 	IBOutlet NSSlider *gammaSlider;
 	IBOutlet NSButton *windowManagerCheckBoxButton;
+	IBOutlet NSButton *autoDetectGPUInfoCheckBoxButton;
 	
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;

@@ -76,6 +76,12 @@
 //Makes sure the current user owns the winepeefix, or Wine will not run
 - (void)fixWinePrefixForCurrentUser;
 
+//Tries to get the GPU info and enter it in the Wine Registry, use before starting Wine
+- (void)tryToUseGPUInfo;
+
+//remove GPU info from Registry
+- (void)removeGPUInfo;
+
 //starts up WineskinX11 and passes its PID back
 - (NSString *)startX11;
 
@@ -317,6 +323,9 @@
 	//********** fix wineprefix
 	[self fixWinePrefixForCurrentUser];
 	
+	//********** If setting GPU info, do it
+	if ([[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue] == 1) [self tryToUseGPUInfo];
+	
 	//**********start wine
 	NSLog(@"Starting specified executable in Wine");
 	wineServerPID = [self startWine];
@@ -342,6 +351,7 @@
 	//********** app finished, time to clean up and shut down
 	NSLog(@"Application finished, cleaning up and shut down...\n");
 	[self cleanUpAndShutDown];
+	if ([[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue] == 1) [self removeGPUInfo];
 	NSLog(@"Finished!\n");
 	return;
 }
@@ -462,6 +472,150 @@
 	//fix Reosurces to 777
 	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
 	[fm release];
+}
+
+- (void)tryToUseGPUInfo
+{
+	//if user.reg doesn't exist, don't do anything
+	if (!([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]])) return;
+	NSString *deviceID = @"error";
+	NSString *vendorID = @"error";
+	NSString *VRAM = @"error";
+	NSArray *results = [[self systemCommand:@"system_profiler SPDisplaysDataType"] componentsSeparatedByString:@"\n"];
+	int i;
+	int findCounter = 0;
+	int displaysLineCounter = 0;
+	BOOL doTesting = NO;
+	//need to go through backwards.  After finding a suffix "Online: Yes" then next VRAM Device ID and Vendor is the correct ones, exit after finding all 3
+	// if we hit a prefix of "Displays:" a second time after start testing, we have gone too far.
+	for (i = [results count] - 1; i >= 0; i--)
+	{
+		NSString *temp = [[results objectAtIndex:i] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		if ([temp hasSuffix:@"Online: Yes"])
+		{
+			doTesting = YES;
+			continue;
+		}
+		if (doTesting)
+		{
+			if ([temp hasPrefix:@"Displays:"]) displaysLineCounter++;  // make sure somehting missing on some GPU will not pull info from 2 GPUs.
+			if (displaysLineCounter > 1) findCounter=3;
+			else if ([temp hasPrefix:@"Device ID:"])
+			{
+				deviceID = [[temp stringByReplacingOccurrencesOfString:@"Device ID:" withString:@""] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				findCounter++;
+			}
+			else if ([temp hasPrefix:@"Vendor:"])
+			{
+				vendorID = [temp substringFromIndex:[temp rangeOfString:@"("].location+1];
+				vendorID = [[vendorID stringByReplacingOccurrencesOfString:@")" withString:@""] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				findCounter++;
+			}
+			else if ([temp hasPrefix:@"VRAM (Total):"])
+			{
+				VRAM = [temp stringByReplacingOccurrencesOfString:@"VRAM (Total): " withString:@""];
+				VRAM = [[VRAM stringByReplacingOccurrencesOfString:@" MB" withString:@""] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				findCounter++;
+			}
+			
+		}
+		if (findCounter > 2) break;
+	}
+	// write each of the 3 in the Registry if not = "error"
+	//read in user.reg to an array
+	NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+	NSMutableArray *newUserRegContents = [NSMutableArray arrayWithCapacity:[userRegContents count]];
+	BOOL deviceIDFound = NO;
+	BOOL vendorIDFound = NO;
+	BOOL VRAMFound = NO;
+	BOOL startTesting = NO;
+	for (NSString *item in userRegContents)
+	{
+		if ([item hasPrefix:@"[Software\\\\Wine\\\\Direct3D]"])
+		{
+			[newUserRegContents addObject:item];
+			startTesting = YES;
+			continue;
+		}
+		if (startTesting)
+		{
+			if ([item hasPrefix:@"\"VideoMemorySize\""] && !([VRAM isEqualToString:@"error"]))
+			{
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoMemorySize\"=\"%@\"",VRAM]];
+				VRAMFound = YES;
+				continue;
+			}
+			else if ([item hasPrefix:@"\"VideoPciDeviceID\""] && !([deviceID isEqualToString:@"error"]))
+			{
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciDeviceID\"=\"%@\"",deviceID]];
+				deviceIDFound = YES;
+				continue;
+			}
+			else if ([item hasPrefix:@"\"VideoPciVendorID\""] && !([vendorID isEqualToString:@"error"]))
+			{
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciVendorID\"=\"%@\"",vendorID]];
+				vendorIDFound = YES;
+				continue;
+			}
+		}
+		if (startTesting && [item hasPrefix:@"["])
+		{
+			// its out of the Direct3D section, write in any items still needed
+			startTesting = NO;
+			if (!VRAMFound && !([VRAM isEqualToString:@"error"]))
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoMemorySize\"=\"%@\"",VRAM]];
+			if (!deviceIDFound && !([deviceID isEqualToString:@"error"]))
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciDeviceID\"=\"%@\"",deviceID]];
+			if (!vendorIDFound && !([vendorID isEqualToString:@"error"]))
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciVendorID\"=\"%@\"",vendorID]];
+		}
+		//if it makes it through everything, then its a normal line that is needed as is.
+		[newUserRegContents addObject:item];
+	}
+	//write array back to file
+	[self writeStringArray:[NSArray arrayWithArray:newUserRegContents] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+}
+
+- (void)removeGPUInfo
+{
+	NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+	NSMutableArray *newUserRegContents = [NSMutableArray arrayWithCapacity:[userRegContents count]];
+	BOOL deviceIDFound = NO;
+	BOOL vendorIDFound = NO;
+	BOOL VRAMFound = NO;
+	BOOL startTesting = NO;
+	for (NSString *item in userRegContents)
+	{
+		if ([item hasPrefix:@"[Software\\\\Wine\\\\Direct3D]"]) //make sure we are in the same place
+		{
+			[newUserRegContents addObject:item];
+			startTesting = YES;
+			continue;
+		}
+		if (startTesting)
+		{
+			if ([item hasPrefix:@"\"VideoMemorySize\""])
+			{
+				VRAMFound = YES;
+				continue;
+			}
+			else if ([item hasPrefix:@"\"VideoPciDeviceID\""])
+			{
+				deviceIDFound = YES;
+				continue;
+			}
+			else if ([item hasPrefix:@"\"VideoPciVendorID\""])
+			{
+				vendorIDFound = YES;
+				continue;
+			}
+		}
+		if ([item hasPrefix:@"["]) startTesting = NO;
+		//if it makes it through everything, then its a normal line that is needed as is.
+		[newUserRegContents addObject:item];
+	}
+	//write array back to file
+	[self writeStringArray:[NSArray arrayWithArray:newUserRegContents] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 }
 
 - (NSString *)startX11

@@ -288,6 +288,11 @@
 			[plistDictionary setValue:[NSString stringWithFormat:@"%@x%@sleep%@",[[fullscreenResolution selectedItem] title],[[[colorDepth selectedItem] title] stringByReplacingOccurrencesOfString:@" bit" withString:@""],[[[switchPause selectedItem] title] stringByReplacingOccurrencesOfString:@" sec." withString:@""]] forKey:@"Resolution"];
 		}
 	}
+	//write GPU info check
+	if ([autoDetectGPUInfoCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"Try To Use GPU Info"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Try To Use GPU Info"];
 	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
 	[plistDictionary release];
 }
@@ -326,7 +331,9 @@
 	{
 		//uncheck mark
 		[windowManagerCheckBoxButton setState:1];
-	}	
+	}
+	//set get GPU info check
+	[autoDetectGPUInfoCheckBoxButton setState:[[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue]];
 	[automaticOverrideToggle deselectAllCells];
 	[automaticOverrideToggle selectCellWithTag:[[plistDictionary valueForKey:@"Use RandR"] intValue]];
 	if ([[plistDictionary valueForKey:@"Gamma Correction"] isEqualToString:@"default"])
