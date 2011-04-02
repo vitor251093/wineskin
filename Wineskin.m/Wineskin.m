@@ -570,7 +570,8 @@
 		{
 			// its out of the Direct3D section, write in any items still needed
 			startTesting = NO;
-			[newUserRegContents removeLastObject];
+			if ([[newUserRegContents lastObject] length] < 1) // just in case someone editing manually and didn't leave a space
+				[newUserRegContents removeLastObject];
 			if (!VRAMFound && !([VRAM isEqualToString:@"error"]))
 				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoMemorySize\"=\"%@\"",VRAM]];
 			if (!deviceIDFound && !([deviceID isEqualToString:@"error"]))
