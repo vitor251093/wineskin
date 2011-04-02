@@ -521,6 +521,14 @@
 		}
 		if (findCounter > 2) break;
 	}
+	//need to strip 0x off the front of deviceID and vendorID, and pad with 0's in front until its a total of 8 digits long.
+	vendorID = [vendorID stringByReplacingOccurrencesOfString:@"0x" withString:@""];
+	deviceID = [deviceID stringByReplacingOccurrencesOfString:@"0x" withString:@""];
+	while ([vendorID length] < 8)
+		vendorID = [NSString stringWithFormat:@"0%@",vendorID];
+	while ([deviceID length] < 8)
+		deviceID = [NSString stringWithFormat:@"0%@",deviceID];
+	
 	// write each of the 3 in the Registry if not = "error"
 	//read in user.reg to an array
 	NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
@@ -547,13 +555,13 @@
 			}
 			else if ([item hasPrefix:@"\"VideoPciDeviceID\""] && !([deviceID isEqualToString:@"error"]))
 			{
-				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciDeviceID\"=\"%@\"",deviceID]];
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciDeviceID\"=dword:%@",deviceID]];
 				deviceIDFound = YES;
 				continue;
 			}
 			else if ([item hasPrefix:@"\"VideoPciVendorID\""] && !([vendorID isEqualToString:@"error"]))
 			{
-				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciVendorID\"=\"%@\"",vendorID]];
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciVendorID\"=dword:%@",vendorID]];
 				vendorIDFound = YES;
 				continue;
 			}
@@ -562,12 +570,14 @@
 		{
 			// its out of the Direct3D section, write in any items still needed
 			startTesting = NO;
+			[newUserRegContents removeLastObject];
 			if (!VRAMFound && !([VRAM isEqualToString:@"error"]))
 				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoMemorySize\"=\"%@\"",VRAM]];
 			if (!deviceIDFound && !([deviceID isEqualToString:@"error"]))
-				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciDeviceID\"=\"%@\"",deviceID]];
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciDeviceID\"=dword:%@",deviceID]];
 			if (!vendorIDFound && !([vendorID isEqualToString:@"error"]))
-				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciVendorID\"=\"%@\"",vendorID]];
+				[newUserRegContents addObject:[NSString stringWithFormat:@"\"VideoPciVendorID\"=dword:%@",vendorID]];
+			[newUserRegContents addObject:@""];
 		}
 		//if it makes it through everything, then its a normal line that is needed as is.
 		[newUserRegContents addObject:item];
