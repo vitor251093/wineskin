@@ -71,7 +71,7 @@
 - (NSArray *)makePIDArray:(NSString *)processToLookFor;
 
 //sets the drive_c/user/Wineskin folder correctly for a run
-- (void)setUserFolders;
+- (void)setUserFolders:(BOOL)doSymlinks;
 
 //Makes sure the current user owns the winepeefix, or Wine will not run
 - (void)fixWinePrefixForCurrentUser;
@@ -110,7 +110,7 @@
 - (void)sleepAndMonitor;
 
 //run when shutting down
-- (void)cleanUpAndShutDown;
+- (void)cleanUpAndShutDown:(BOOL)removeSymlinks;
 
 //test display string in pop up
 - (void)ds:(NSString *)input;
@@ -318,7 +318,10 @@
 	NSLog(@"WineskinX11 running on PID %@",x11PID);
 	//**********set user folders
 	NSLog(@"Fixing user folders in Drive C to current user");
-	[self setUserFolders];
+	if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
+		[self setUserFolders:YES];
+	else
+		[self setUserFolders:NO];
 	
 	//********** fix wineprefix
 	[self fixWinePrefixForCurrentUser];
@@ -350,7 +353,10 @@
 	
 	//********** app finished, time to clean up and shut down
 	NSLog(@"Application finished, cleaning up and shut down...\n");
-	[self cleanUpAndShutDown];
+	if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
+		[self cleanUpAndShutDown:YES];
+	else
+		[self cleanUpAndShutDown:NO];
 	if ([[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue] == 1) [self removeGPUInfo];
 	NSLog(@"Finished!\n");
 	return;
@@ -413,35 +419,57 @@
 	return [resultString componentsSeparatedByString:@"\n"];
 }
 
-- (void)setUserFolders
+- (void)setUserFolders:(BOOL)doSymlinks
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix]])
 	{
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] toPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Documents",winePrefix,NSUserName()] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/Desktop",winePrefix,NSUserName()] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Videos",winePrefix,NSUserName()] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Music",winePrefix,NSUserName()] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Pictures",winePrefix,NSUserName()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Documents",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Documents",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/Desktop",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Desktop",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Videos",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Movies",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Music",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Music",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Pictures",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Pictures",NSHomeDirectory()] error:nil];
+		if (doSymlinks)
+		{
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Documents",winePrefix,NSUserName()] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/Desktop",winePrefix,NSUserName()] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Videos",winePrefix,NSUserName()] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Music",winePrefix,NSUserName()] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Pictures",winePrefix,NSUserName()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Documents",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Documents",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/Desktop",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Desktop",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Videos",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Movies",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Music",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Music",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Pictures",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/Pictures",NSHomeDirectory()] error:nil];
+		}
+		else
+		{
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Documents",winePrefix,NSUserName()] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/Desktop",winePrefix,NSUserName()] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Videos",winePrefix,NSUserName()] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Music",winePrefix,NSUserName()] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@/My Pictures",winePrefix,NSUserName()] withIntermediateDirectories:NO attributes:nil error:nil];
+		}
 	}
 	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix]])
 	{
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Documents",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/Desktop",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Videos",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Music",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Pictures",winePrefix] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Documents",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Documents",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/Desktop",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Desktop",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Videos",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Movies",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Music",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Music",NSHomeDirectory()] error:nil];
-		[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Pictures",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Pictures",NSHomeDirectory()] error:nil];
+		if (doSymlinks)
+		{
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Documents",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/Desktop",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Videos",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Music",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Pictures",winePrefix] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Documents",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Documents",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/Desktop",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Desktop",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Videos",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Movies",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Music",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Music",NSHomeDirectory()] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Pictures",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Pictures",NSHomeDirectory()] error:nil];
+		}
+		else
+		{
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Documents",winePrefix] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/Desktop",winePrefix] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Videos",winePrefix] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Music",winePrefix] withIntermediateDirectories:NO attributes:nil error:nil];
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Pictures",winePrefix] withIntermediateDirectories:NO attributes:nil error:nil];			
+		}
 	}
 	[fm release];
 }
@@ -1160,7 +1188,7 @@
 	[fm release];
 }
 
-- (void)cleanUpAndShutDown
+- (void)cleanUpAndShutDown:(BOOL)removeSymlinks
 {
 	//fix screen resolution back to original if fullscreen
 	if (fullScreenOption)
@@ -1176,13 +1204,16 @@
 	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()]])
 	{
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Desktop",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Videos",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Music",winePrefix] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix] error:nil];
+		if (removeSymlinks)
+		{
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Desktop",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Videos",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Music",winePrefix] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix] error:nil];
+		}
 	}
-	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix]])
+	if (removeSymlinks && [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix]])
 	{
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/My Documents",winePrefix] error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover/Desktop",winePrefix] error:nil];

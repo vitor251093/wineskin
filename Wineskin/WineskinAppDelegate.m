@@ -648,6 +648,7 @@
 		[extEditButton setEnabled:NO];
 	else
 		[extEditButton setEnabled:YES];
+	[mapUserFoldersCheckBoxButton setState:[[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue]];
 	[plistDictionary release];
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
@@ -814,6 +815,9 @@
 	[extAddEditWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
+//*************************************************************
+//*************** Advanced Menu - Options Tab *****************
+//*************************************************************
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 {
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
@@ -823,6 +827,16 @@
 	else
 		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"option_sends_alt"];
 	[plistDictionary writeToFile:x11PlistFile atomically:YES];
+	[plistDictionary release];
+}
+- (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender
+{
+	NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	if ([mapUserFoldersCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"Symlinks In User Folder"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Symlinks In User Folder"];
+	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
 	[plistDictionary release];
 }
 

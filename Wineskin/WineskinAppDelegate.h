@@ -68,7 +68,6 @@
 	IBOutlet NSButton *iconBrowseButton;
 	IBOutlet NSPopUpButton *extPopUpButton;
 	IBOutlet NSButton *extEditButton;
-	IBOutlet NSButton *optSendsAltCheckBoxButton;
 	
 	//advanced menu - Tools Tab
 	IBOutlet NSButton *winecfgButton;
@@ -82,6 +81,10 @@
 	IBOutlet NSButton *changeEngineButton;
 	IBOutlet NSTextField *currentVersionTextField;
 	IBOutlet NSButton *updateWrapperButton;
+	
+	//advanced menu - Options Tab
+	IBOutlet NSButton *optSendsAltCheckBoxButton;
+	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
 	
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -188,7 +191,6 @@
 - (IBAction)extPlusButtonPressed:(id)sender;
 - (IBAction)extMinusButtonPressed:(id)sender;
 - (IBAction)extEditButtonPressed:(id)sender;
-- (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 
 //advanced menu - Tools Tab
 - (IBAction)winecfgButtonPressed:(id)sender;
@@ -206,6 +208,11 @@
 - (IBAction)changeEngineUsedCancelButtonPressed:(id)sender;
 - (IBAction)updateWrapperButtonPressed:(id)sender;
 - (IBAction)logsButtonPressed:(id)sender;
+
+//advanced menu - Tools Tab
+- (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
+- (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
+
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;
 - (IBAction)winetricksDoneButtonPressed:(id)sender;
