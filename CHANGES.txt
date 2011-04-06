@@ -1,0 +1,19 @@
+Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
+
+Release 2.2
+• Option to add GPU info automatically to Wine registry on run.
+• Custom EXE Launchers should have Icons again.
+• Making links in user folder to OSX User folders is now optional.
+• Winetricks updated, an GUI update button should now work again for Winetricks that may have non-utf-8 encoding.
+
+Release 2.1
+•All OSX 10.7 Lion (preview version) bugs found and fixed
+•Winetricks now works with spaces in the path ok.
+•Winetricks has an added cancel button
+•Wineskin.app has an option to change wether Alt/Opt works as an Alt key for the Windows program, or an Option key for the Mac side.
+•Multiple wrappers running will no longer fight each other over gamma
+•A single wrapper can run from /Applications for any user on the machine. Updated 2.0 to 2.1 wrappers may have issues still, you may want to make a new wrapper.
+•Wineskin.app has a new commands blank where you can enter custom commands (like setting variables) that will run along with Wine.
+•Engines changes should no longer prompt about Gecko
+•Refresh wrapper will no longer load in Wineskin default registry entries.
+•Wineskin ICE (Installable Compressed Engine) support added in, and a single first ICE engine is released (WS7Wine1.2.2ICE).  The engine installs locally to your machine automatically, and all wrappers that use the same ICE version will use the same installed version.  This is useful if you have many wrappers that all can use the same ICE version, as it will end up saving a lot of hard drive space.

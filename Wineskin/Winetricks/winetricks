@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Name of this version of winetricks (YYYYMMDD)
-WINETRICKS_VERSION=20110324
+WINETRICKS_VERSION=20110402
 
 #--------------------------------------------------------------------
 #
@@ -121,13 +121,14 @@ w_askpermission()
     echo "$@"
     echo "------------------------------------------------------"
 
-    case "$W_OPT_UNATTENDED" in
-    1) _W_timeout="--timeout 5";;
-    esac
+    if test $W_OPT_UNATTENDED
+    then
+        _W_timeout="--timeout 5"
+    fi
 
     case $WINETRICKS_GUI in
-    zenity) zenity $_W_timeout --question --title=winetricks --text="`echo $@ | sed 's,\\\\,\\\\\\\\,g'`" --no-wrap;;
-    kdialog) kdialog --title winetricks --warningcontinuecancel "$@" ;;
+    zenity) $WINETRICKS_GUI $_W_timeout --question --title=winetricks --text="`echo $@ | sed 's,\\\\,\\\\\\\\,g'`" --no-wrap;;
+    kdialog) $WINETRICKS_GUI --title winetricks --warningcontinuecancel "$@" ;;
     none) printf %s "Press Y or N, then Enter: " ; read response ; test "$response" = Y || test "$response" = y;;
     esac
 
@@ -150,28 +151,29 @@ w_info()
     _W_timeout="--timeout 3"
 
     case $WINETRICKS_GUI in
-    zenity) zenity $_W_timeout --info --title=winetricks --text="`echo $@ | sed 's,\\\\,\\\\\\\\,g'`" --no-wrap;;
-    kdialog) kdialog --title winetricks --msgbox "$@" ;;
+    zenity) $WINETRICKS_GUI $_W_timeout --info --title=winetricks --text="`echo $@ | sed 's,\\\\,\\\\\\\\,g'`" --no-wrap;;
+    kdialog) $WINETRICKS_GUI --title winetricks --msgbox "$@" ;;
     none) ;;
     esac
 
     unset _W_timeout
 }
 
-# Display warning message
+# Display warning message to stderr (since it is called inside redirected code)
 w_warn()
 {
-    echo "------------------------------------------------------"
-    echo "$@"
-    echo "------------------------------------------------------"
+    echo "------------------------------------------------------" >&2
+    echo "$@" >&2
+    echo "------------------------------------------------------" >&2
 
-    case "$W_OPT_UNATTENDED" in
-    1) _W_timeout="--timeout 5";;
-    esac
+    if test $W_OPT_UNATTENDED
+    then
+        _W_timeout="--timeout 5"
+    fi
 
     case $WINETRICKS_GUI in
-    zenity) zenity $_W_timeout --error --title=winetricks --text="`echo $@ | sed 's,\\\\,\\\\\\\\,g'`";;
-    kdialog) kdialog --title winetricks --error "$@" ;;
+    zenity) $WINETRICKS_GUI $_W_timeout --error --title=winetricks --text="`echo $@ | sed 's,\\\\,\\\\\\\\,g'`";;
+    kdialog) $WINETRICKS_GUI --title winetricks --error "$@" ;;
     none) ;;
     esac
 
@@ -258,9 +260,11 @@ w_try_unzip()
 
 w_read_key()
 {
-    case "$W_OPT_UNATTENDED" in
-    0) W_KEY=dummy_to_make_autohotkey_happy ; return 0 ;;
-    esac
+    if test ! "$W_OPT_UNATTENDED"
+    then
+        W_KEY=dummy_to_make_autohotkey_happy
+        return 0
+    fi
 
     mkdir -p "$W_CACHE/$W_PACKAGE"
     _W_keyfile="$W_CACHE/$W_PACKAGE/key.txt"
@@ -290,7 +294,8 @@ w_read_key()
         fi
         echo "$W_KEY" > "$_W_keyfile"
     fi
-    W_KEY=`cat "$_W_keyfile" | tr -d '[:blank:][=-=]'`
+    W_RAW_KEY=`cat "$_W_keyfile"`
+    W_KEY=`echo $W_RAW_KEY | tr -d '[:blank:][=-=]'`
     unset _W_keyfile _W_keymsg _W_nokeymsg
 }
 
@@ -351,7 +356,7 @@ winetricks_wget_progress()
         (
             wget "$@" 2>&1 |
             sed -u 's/^.* \+\([0-9]\+%\) \+\([0-9,.]\+[GMKB]\) \+\([0-9hms,.]\+\).*$/\1\n# Downloading... \2 (\3)/' | \
-            zenity --progress --width 400 --title="$_W_file" --auto-kill --auto-close
+            $WINETRICKS_GUI --progress --width 400 --title="$_W_file" --auto-kill --auto-close
         )
         err=$?
         if test $err -gt 128 
@@ -393,7 +398,7 @@ w_download_to()
         _W_file=`basename "$_W_url"`
     fi
     _W_cache="$W_CACHE/$_W_packagename"
-    mkdir -p "$_W_cache"
+    w_try mkdir -p "$_W_cache"
 
     # Try download twice
     checksum_ok=""
@@ -651,32 +656,32 @@ sub read_into_container{
     while (<FILE>) {
        chomp;
        if (/"([^"]*)"\s*"([^"]*)"$/) {
-	   ${$pcontainer}{$1} = $2;
+           ${$pcontainer}{$1} = $2;
        } elsif (/"([^"]*)"$/) {
            my( %newcon, $name );
-	   $name = $1;
-	   read_into_container(\%newcon);
-	   ${$pcontainer}{$name} = \%newcon;
+           $name = $1;
+           read_into_container(\%newcon);
+           ${$pcontainer}{$name} = \%newcon;
         } elsif (/}/) {
-	   return;
-	} else {
-	   die "huh?";
-	}
+           return;
+        } else {
+           die "huh?";
+        }
     }
 }
 
 sub dump_container{
     my( $pcontainer, $indent ) = @_;
     foreach (sort(keys(%{$pcontainer}))) {
-	my( $val ) = ${$pcontainer}{$_};
-	if (ref $val eq 'HASH') {
-	    print "${indent}\"$_\"\n";
-	    print "${indent}{\n";
-	    dump_container($val, "$indent\t");
-	    print "${indent}}\n";
-	} else {
-	    print "${indent}\"${_}\"\t\t\"$val\"\n";
-	}
+        my( $val ) = ${$pcontainer}{$_};
+        if (ref $val eq 'HASH') {
+            print "${indent}\"$_\"\n";
+            print "${indent}{\n";
+            dump_container($val, "$indent\t");
+            print "${indent}}\n";
+        } else {
+            print "${indent}\"${_}\"\t\t\"$val\"\n";
+        }
     }
 }
 
@@ -771,11 +776,24 @@ w_steam_install_game()
         winwaitclose
         winwait Steam  ; wait for small <<connecting>> window
         winwaitclose
+     "
+
+if [ "$STEAM_DVD" = "TRUE" ]
+then
+     w_ahk_do "
+        ; Run a fourth time, have it install the app.
+        run steam.exe -install ${W_ISO_MOUNT_LETTER}:\\
+     "
+else
+     w_ahk_do "
         ; Run a fourth time, have it install the app.
         run steam.exe -applaunch $_W_steamid
+     "
+fi
+
+     w_ahk_do "
         winwait Install - $_W_steamtitle
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {enter}          ; next (for 1st of 3 pages of install dialog)
             sleep 1000
             click 32, 91          ; uncheck create menu item?
@@ -792,7 +810,21 @@ w_steam_install_game()
                     break
             }
         }
-        ; relaunch to coax steam into showing its nice small download progress dialog
+    "
+
+if [ "$STEAM_DVD" = "TRUE" ]
+then
+    # Wait for install to finish
+    while true
+    do
+        grep "SetHasAllLocalContent(true) called for $_W_steamid" "$W_PROGRAMS_X86_UNIX/Steam/logs/download_log.txt" && break
+        sleep 5
+    done
+fi
+
+    w_ahk_do "
+        ; For DVD's: theoretically, it should be installed now, but most games want to download updates. Do that now.
+        ; For regular downloads: relaunch to coax steam into showing its nice small download progress dialog
         process close, Steam.exe
         run steam.exe -login $W_STEAM_ID $W_STEAM_PASSWORD -applaunch $_W_steamid
         winwait Ready -
@@ -878,7 +910,10 @@ w_ahk_do()
     fi
 
     _W_CR=`printf \\\\r`
-    echo "$@" | sed "s/\$/$CR/" > "$W_TMP"/tmp.ahk
+    cat <<_EOF_ | sed "s/\$/$CR/" > "$W_TMP"/tmp.ahk
+w_opt_unattended = ${W_OPT_UNATTENDED:-0}
+$@
+_EOF_
     $WINE "$W_CACHE_WIN/ahk/AutoHotkey.exe" "$W_TMP_WIN"\\tmp.ahk
     unset _W_CR
 }
@@ -1318,10 +1353,10 @@ w_metadata()
     for arg
     do
         case "$arg" in
-        installed_exe1=/*) w_die "bug: w_metadata $_W_md_cmd has a unix path for installed_exe1, should be a windows path";;
-        esac
-        case "$arg" in
-        installed_file1=/*) w_die "bug: w_metadata $_W_md_cmd has a unix path for installed_file1, should be a windows path";;
+        installed_exe1=/*)
+            w_die "bug: w_metadata $_W_md_cmd has a unix path for installed_exe1, should be a windows path";;
+        installed_file1=/*)
+            w_die "bug: w_metadata $_W_md_cmd has a unix path for installed_file1, should be a windows path";;
         esac
         # Use longest match when stripping value,
         # and shortest match when stripping name,
@@ -1606,7 +1641,8 @@ winetricks_get_prefix_var()
 {
     (
         . "$W_PREFIXES_ROOT/$p/wrapper.cfg"
-        eval echo \$ww_$1
+        # The cryptic sed is there to turn ' into '\''
+        eval echo \$ww_$1 | sed "s/'/'\\\''/"
     )
 }
 
@@ -1680,7 +1716,16 @@ winetricks_prefixmenu()
 
     kdialog)
         (
-        printf %s "kdialog --geometry 600x400+100+100 --title '$_W_msg_title' --separate-output --radiolist '$_W_msg_help' help off '$_W_msg_body' games      '$_W_msg_games' off benchmarks '$_W_msg_benchmarks' off apps '$_W_msg_apps' off main '$_W_msg_default' on "
+        printf %s "kdialog \
+            --geometry 600x400+100+100 \
+            --title '$_W_msg_title' \
+            --separate-output \
+            --radiolist '$_W_msg_body' \
+            help       '$_W_msg_help'       off \
+            games      '$_W_msg_games'      off \
+            benchmarks '$_W_msg_benchmarks' off \
+            apps       '$_W_msg_apps'       off \
+            main       '$_W_msg_default'    on "
         if ls -d "$W_PREFIXES_ROOT"/*/dosdevices > /dev/null 2>&1
         then
             for prefix in "$W_PREFIXES_ROOT"/*/dosdevices
@@ -1694,8 +1739,8 @@ winetricks_prefixmenu()
                     _W_msg_name="$p"
                 fi
                 printf %s "prefix='$p' 'Select $_W_msg_name' off "
-	    done
-	fi
+            done
+        fi
         ) > "$WINETRICKS_WORKDIR"/kdialog.sh
         sh "$WINETRICKS_WORKDIR"/kdialog.sh
         ;;
@@ -1774,7 +1819,7 @@ winetricks_mainmenu()
         ;;
 
     kdialog)
-        kdialog --geometry 600x400+100+100 \
+        $WINETRICKS_GUI --geometry 600x400+100+100 \
                 --title "$_W_msg_title" \
                 --separate-output \
                 --radiolist \
@@ -1851,7 +1896,7 @@ winetricks_settings_menu()
             title='?'
             author='?'
             . $metadatafile
-            printf %s " " FALSE \
+            printf "%s %s %s %s" " " FALSE \
                     $code \
                     "\"$title\""
             )
@@ -2434,20 +2479,21 @@ winetricks_cache_iso()
     echo $WINETRICKS_DD_PID > $WINETRICKS_WORKDIR/dd-pid
 
     # Note: if user presses ^C, winetricks_cleanup will call winetricks_iso_cleanup
+    # FIXME: add progress bar for kde, too
     case $WINETRICKS_GUI in
-    none)
+    none|kdialog)
         while ps -p $WINETRICKS_DD_PID > /dev/null 2>&1
         do
           sleep 5
           ls -l "$W_CACHE"/temp.iso
         done
         ;;
-    *)
+    zenity)
         while ps -p $WINETRICKS_DD_PID > /dev/null 2>&1
         do
           echo 1
           sleep 2
-        done | zenity --title "Copying to $_W_expected_volname.iso" --progress --pulsate --auto-kill
+        done | $WINETRICKS_GUI --title "Copying to $_W_expected_volname.iso" --progress --pulsate --auto-kill
         ;;
     esac
     rm $WINETRICKS_WORKDIR/dd-pid
@@ -2626,7 +2672,9 @@ winetricks_mount_real_volume()
 
     if test "$WINE" = ""
     then
-        w_die Windows not yet supported
+        # Assume already mounted, just get drive letter
+        W_ISO_MOUNT_LETTER=`awk '/iso/ {print $1}' < /proc/mounts | tr -d :`
+        W_ISO_MOUNT_ROOT=`awk '/iso/ {print $2}' < /proc/mounts`
     else
         while ! winetricks_is_mounted "$_W_expected_volname"
         do
@@ -2669,6 +2717,12 @@ winetricks_kill_handler()
 
 winetricks_set_unattended()
 {
+    # We shouldn't use all these extra variables.  Instead, we should
+    # use ${foo:+bar} to jam in commandline options for silent install 
+    # only if W_OPT_UNATTENDED is nonempty.  See
+    # http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02
+    # So in attended mode, W_OPT_UNATTENDED should be empty.
+
     case $1 in
     1)
         W_OPT_UNATTENDED=1
@@ -2680,7 +2734,7 @@ winetricks_set_unattended()
         W_UNATTENDED_SLASH_SILENT="/silent"
         ;;
     *)
-        W_OPT_UNATTENDED=0
+        W_OPT_UNATTENDED=""
         W_UNATTENDED_DASH_Q=""
         W_UNATTENDED_SLASH_Q=""
         W_UNATTENDED_SLASH_S=""
@@ -3418,6 +3472,31 @@ load_d3dx9_42()
 
 #----------------------------------------------------------------
 
+w_metadata d3dx11_42 dlls \
+   title="MS d3dx11_42.dll" \
+   publisher="Microsoft" \
+   year="2010" \
+   media="download" \
+   file1="../directx9/directx_Jun2010_redist.exe" \
+   installed_file1="$W_SYSTEM32_DLLS_WIN/d3dx11_42.dll"
+
+load_d3dx11_42()
+{
+    dllname=d3dx11_42
+
+    helper_directx_Jun2010
+
+    w_try_cabextract -d "$W_TMP" -L -F "*$dllname*x86*" "$W_CACHE"/directx9/$DIRECTX_NAME
+    for x in "$W_TMP"/*.cab
+    do
+      w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F "$dllname.dll" "$x"
+    done
+
+    w_override_dlls native $dllname
+}
+
+#----------------------------------------------------------------
+
 w_metadata d3dx11_43 dlls \
    title="MS d3dx11_43.dll" \
    publisher="Microsoft" \
@@ -3719,7 +3798,7 @@ load_dotnet11()
     w_call corefonts
 
     # Use builtin regsvcs.exe to work around http://bugs.winehq.org/show_bug.cgi?id=25120
-    if test $W_OPT_UNATTENDED = 1
+    if test $W_OPT_UNATTENDED
     then
         WINEDLLOVERRIDES="regsvcs.exe=b" w_try $WINE "$W_CACHE"/dotnet11/dotnetfx.exe /q /C:"install /q"
     else
@@ -3742,7 +3821,7 @@ load_dotnet11sp1()
     w_call dotnet11
     w_download http://download.microsoft.com/download/8/b/4/8b4addd8-e957-4dea-bdb8-c4e00af5b94b/NDP1.1sp1-KB867460-X86.exe 74a5b25d65a70b8ecd6a9c301a0aea10d8483a23
 
-    if test $W_OPT_UNATTENDED = 1
+    if test $W_OPT_UNATTENDED
     then
         WINEDLLOVERRIDES="regsvcs.exe=b" w_try $WINE "$W_CACHE"/dotnet11sp1/NDP1.1sp1-KB867460-X86.exe /q /C:"install /q"
     else
@@ -4168,8 +4247,7 @@ load_dirac()
         SetTitleMatchMode, 2
         run DiracDirectShowFilter-1.0.2.exe
         WinWait, Dirac, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, Button2
             WinWait, Dirac, License
             ControlClick, Button2
@@ -4227,8 +4305,7 @@ load_icodecs()
         SetTitleMatchMode, 2
         run codinstl.exe
         winwait, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button1  ; Next
             winwait, Software License Agreement
@@ -4236,7 +4313,7 @@ load_icodecs()
             controlclick, Button2  ; Yes
         }
         winwait, Setup Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button4  ; Finish
         }
@@ -4778,7 +4855,8 @@ w_metadata quicktime72 dlls \
 load_quicktime72()
 {
     # http://www.apple.com/support/downloads/quicktime72forwindows.html
-    w_download 'http://wsidecar.apple.com/cgi-bin/nph-reg3rdpty2.pl/product=14402&cat=59&platform=osx&method=sa/QuickTimeInstaller.exe' bb89981f10cf21de57b9453e53cf81b9194271a9
+    # http://www.oldapps.com/quicktime_player.php?old_quicktime=6
+    w_download http://download.oldapps.com/Quicktime/quicktimeplayer72.exe bb89981f10cf21de57b9453e53cf81b9194271a9
 
     unset QUICKTIME_QUIET
     if test "$W_UNATTENDED_SLASH_Q" != ""
@@ -5524,6 +5602,40 @@ load_xact()
       w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'xactengine*.dll' "$x"
       w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'xaudio*.dll' "$x"
       w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'x3daudio*.dll' "$x"
+      w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'xapofx*.dll' "$x"
+    done
+
+    # Register xactengine?_?.dll, xaudio?_?.dll
+    for x in "$W_SYSTEM32_DLLS"/xactengine* "$W_SYSTEM32_DLLS"/xaudio*
+    do
+      w_try_regsvr `basename "$x"`
+    done
+}
+
+#----------------------------------------------------------------
+
+w_metadata xact_jun2010 dlls \
+   title="MS XACT Engine" \
+   publisher="Microsoft" \
+   year="2010" \
+   media="download" \
+   file1="../directx9/directx_Jun2010_redist.exe" \
+   installed_file1="$W_SYSTEM32_DLLS_WIN/xactengine2_0.dll"
+
+load_xact_jun2010()
+{
+    helper_directx_Jun2010
+
+    # Extract xactengine?_?.dll, X3DAudio?_?.dll, xaudio?_?.dll, xapofx?_?.dll
+    w_try_cabextract -d "$W_TMP" -L -F '*_xact_*x86*' "$W_CACHE"/directx9/$DIRECTX_NAME
+    w_try_cabextract -d "$W_TMP" -L -F '*_x3daudio_*x86*' "$W_CACHE"/directx9/$DIRECTX_NAME
+    w_try_cabextract -d "$W_TMP" -L -F '*_xaudio_*x86*' "$W_CACHE"/directx9/$DIRECTX_NAME
+    for x in "$W_TMP"/*.cab
+    do
+      w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'xactengine*.dll' "$x"
+      w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'xaudio*.dll' "$x"
+      w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'x3daudio*.dll' "$x"
+      w_try_cabextract -d "$W_SYSTEM32_DLLS" -L -F 'xapofx*.dll' "$x"
     done
 
     # Register xactengine?_?.dll, xaudio?_?.dll
@@ -5583,7 +5695,7 @@ load_xmllite()
         # Put a dummy catalog file in place
         mkdir -p "$W_SYSTEM32_DLLS"/catroot/\{f750e6c3-38ee-11d1-85e5-00c04fc295ee\}
         w_try cp -f "$W_CACHE"/xmllite/winetest.cat "$W_SYSTEM32_DLLS"/catroot/\{f750e6c3-38ee-11d1-85e5-00c04fc295ee\}/oem0.cat
-        if test $W_OPT_UNATTENDED != 1
+        if test ! "$W_OPT_UNATTENDED"
         then
             w_warn "xmllite's interactive installer will hang at the end, but otherwise work."
         fi
@@ -6370,23 +6482,23 @@ load_dxdiag()
 
 #----------------------------------------------------------------
 
-w_metadata firefox apps \
-   title="Firefox 3.6.15" \
+w_metadata firefox3 apps \
+   title="Firefox 3.6.16" \
    publisher="Mozilla" \
-   year="2010" \
+   year="2011" \
    media="download" \
-   file1="Firefox Setup 3.6.15.exe" \
+   file1="Firefox Setup 3.6.16.exe" \
    installed_exe1="$W_PROGRAMS_X86_WIN/Mozilla Firefox/firefox.exe"
 
-load_firefox()
+load_firefox3()
 {
-    w_download "http://releases.mozilla.org/pub/mozilla.org/firefox/releases/3.6.15/win32/en-US/Firefox%20Setup%203.6.15.exe" b1282da22c99f017f6839e45e6197f9901653ef8 "Firefox Setup 3.6.15.exe"
-    cd "$W_CACHE"/firefox
-    if test $W_OPT_UNATTENDED = 1
+    w_download "http://releases.mozilla.org/pub/mozilla.org/firefox/releases/3.6.16/win32/en-US/Firefox%20Setup%203.6.16.exe" e5d943353556970fca7df08c6b81ec7015f54d7a "Firefox Setup 3.6.16.exe"
+    cd "$W_CACHE"/firefox3
+    if test $W_OPT_UNATTENDED
     then
-       w_try $WINE "Firefox Setup 3.6.15.exe" -ms
+       w_try $WINE "Firefox Setup 3.6.16.exe" -ms
     else
-       w_try $WINE "Firefox Setup 3.6.15.exe"
+       w_try $WINE "Firefox Setup 3.6.16.exe"
     fi
 
     w_declare_exe "$W_PROGRAMS_X86_WIN\\Mozilla Firefox" firefox.exe
@@ -6402,7 +6514,7 @@ load_firefox()
 
 #----------------------------------------------------------------
 
-w_metadata firefox4 apps \
+w_metadata firefox apps \
    title="Firefox 4.0" \
    publisher="Mozilla" \
    year="2011" \
@@ -6410,7 +6522,7 @@ w_metadata firefox4 apps \
    file1="Firefox Setup 4.0.exe" \
    installed_exe1="$W_PROGRAMS_X86_WIN/Mozilla Firefox/firefox.exe"
 
-load_firefox4()
+load_firefox()
 {
     if w_workaround_wine_bug 22972 "" 1.3.0,
     then
@@ -6418,8 +6530,8 @@ load_firefox4()
     fi
 
     w_download "http://mirror.metrocast.net/mozilla/firefox/releases/4.0/win32/en-US/Firefox%20Setup%204.0.exe" e76f9ae709f6e4fe1d046cf74ea69bc8380e7c55 "Firefox Setup 4.0.exe"
-    cd "$W_CACHE"/firefox4
-    if test $W_OPT_UNATTENDED = 1
+    cd "$W_CACHE"/firefox
+    if test $W_OPT_UNATTENDED
     then
        w_try $WINE "Firefox Setup 4.0.exe" -ms
     else
@@ -6841,15 +6953,14 @@ load_office2003pro()
     w_read_key
 
     w_ahk_do "
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             run ${W_ISO_MOUNT_LETTER}:setup.exe /EULA_ACCEPT=YES /PIDKEY=$W_KEY
         } else {
             run ${W_ISO_MOUNT_LETTER}:setup.exe
         }
         SetTitleMatchMode, 2
         WinWait,Microsoft Office 2003 Setup, Welcome
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             WinWait,Microsoft Office 2003 Setup,Key
             Sleep 500
@@ -6869,7 +6980,7 @@ load_office2003pro()
             ControlClick Button1 ; Install
         }
         WinWait,Microsoft Office 2003 Setup,Completed
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ; Finish
         }
@@ -6909,7 +7020,7 @@ load_office2007pro()
     w_mount OFFICE12
     w_read_key
 
-    if [ $W_OPT_UNATTENDED = 1 ]
+    if test $W_OPT_UNATTENDED
     then
         # See
         # http://blogs.technet.com/b/office_resource_kit/archive/2009/01/29/configure-a-silent-install-of-the-2007-office-system-with-config-xml.aspx
@@ -7045,8 +7156,7 @@ load_python26()
         SetTitleMatchMode, 2
         run pywin32-214.win32-py2.6.exe
         WinWait, Setup, Wizard will install pywin32
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
              ControlClick Button2   ; next
              WinWait, Setup, Python 2.6 is required
              ControlClick Button3   ; next
@@ -7102,8 +7212,7 @@ load_spotify()
         SetTitleMatchMode, 2
         run SpotifyInstaller.exe
         WinWait, Spotify 0.4.9 Setup, Location
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button7 ; Start after install
             Sleep 500
@@ -7149,7 +7258,7 @@ load_safari()
 _EOF_
     fi
 
-    if test $W_OPT_UNATTENDED = 1
+    if test $W_OPT_UNATTENDED
     then
         w_warn "Safari's silent install is broken under wine. See http://bugs.winehq.org/show_bug.cgi?id=23493. You should do a regular install if you want to use Safari."
         w_try $WINE SafariSetup.exe /qn
@@ -7179,8 +7288,7 @@ load_sketchup()
         SetTitleMatchMode, 2
         run GoogleSketchUpWEN.exe
         WinWait, SketchUp, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 2000
             Send {Enter}
             WinWait, SketchUp, License
@@ -7196,7 +7304,7 @@ load_sketchup()
             ControlClick Button1 ; Install
         }
         WinWait, SketchUp, Completed
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button1 ; Finish
         }
@@ -7256,8 +7364,8 @@ w_metadata utorrent apps \
    publisher="BitTorrent" \
    year="2011" \
    media="download" \
-   file1="utorrent-2.2.1-beta-beta-24649.upx.exe" \
-   installed_exe1="$W_PROGRAMS_X86_WIN/uTorrent/uTorrent.exe"
+   file1="utorrent.exe" \
+   installed_exe1="c:/windows/utorrent.exe"
 
 load_utorrent()
 {
@@ -7265,15 +7373,36 @@ load_utorrent()
     # Oct 2010 2.0.4 sha1sum 8382b8a7bc625d68b6efe18a7b9e5488dc0119ee
     # Nov 6 2010 2.0.4 sha1sum 263a91693d0976473cd321cd6f1b0103a814f3ad
     # Dev 17 2010 2.2 sha1sum 0c95bdfba07421fe706b30ee2ec6779217c5dce4, hangs, see wine bug 24946
-    # Feb 11 2011 2.2.1beta sha1sum utorrent-2.2.1-beta-beta-24649.upx.exe
-    w_download http://download.utorrent.com/beta/utorrent-2.2.1-beta-beta-24649.upx.exe 82e81e1484b4e8654b83908509f3777532c6fcb3
+    # Feb 11 2011 2.2.1beta sha1sum 82e81e1484b4e8654b83908509f3777532c6fcb3
+    # Mar 28 2011 2.2.1 sha1sum 7049109e4d3f72338d54b42ae37ecf38fafed46f
+    w_download http://download.utorrent.com/2.2.1/utorrent.exe 7049109e4d3f72338d54b42ae37ecf38fafed46f
+
+    w_try cp -f "$W_CACHE/utorrent/utorrent.exe" "$W_WINDIR_UNIX"/utorrent.exe
+
+    w_declare_exe "c:\\windows" "utorrent.exe"
+}
+
+#----------------------------------------------------------------
+
+w_metadata utorrent3 apps \
+   title="�Torrent 3.0" \
+   publisher="BitTorrent" \
+   year="2011" \
+   media="download" \
+   file1="utorrent-3.0-latest.exe" \
+   installed_exe1="$W_PROGRAMS_X86_WIN/uTorrent/uTorrent.exe"
+
+load_utorrent3()
+{
+    w_download http://download.utorrent.com/beta/utorrent-3.0-latest.exe db7d3cb8ab5849ce78cb15e2439646e1f0d73947
 
     case "$W_OPT_UNATTENDED" in
     0) _W_opt="" ;;
     *) _W_opt="/PERFORMINSTALL /NORUN" ;;
     esac
     cd "$W_CACHE/$W_PACKAGE"
-    $WINE utorrent-2.2.1-beta-beta-24649.upx.exe $_W_opt
+    $WINE utorrent-3.0-latest.exe $_W_opt
+
     # dang installer exits with status 1 on success
     status=$?
     case $status in
@@ -7384,8 +7513,7 @@ load_vc2005trial()
         SetTitleMatchMode 2
         run setup.exe
         winwait, Visual Studio, Setup is loading
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             winwait, Visual Studio, Loading completed
             controlclick, button2
             winwait, Visual Studio, Select features
@@ -7398,7 +7526,7 @@ load_vc2005trial()
         }
         ;this can take a while
         winwait, Finish Page
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick, button2
         winwaitclose, Finish Page
     "
@@ -7631,8 +7759,7 @@ load_3dmark2001()
         SetTitleMatchMode, 2
         run 3dmark2001se_330_100308.exe
         WinWait ahk_class #32770 ; welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button2  ; Next
             sleep 5000
             WinWait ahk_class #32770 ; License
@@ -7649,7 +7776,7 @@ load_3dmark2001()
             ControlClick Button2  ; Next
         }
         WinWait,, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick Button1  ; Unclick View Readme
             ControlClick Button4  ; Finish
@@ -7685,8 +7812,7 @@ load_3dmark03()
         SetTitleMatchMode, 2
         run 3DMark03_v360_1901.exe
         WinWait 3DMark03 - InstallShield Wizard, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             WinActivate
             Send {Enter}
             Sleep 2000
@@ -7709,7 +7835,7 @@ load_3dmark03()
             Send {Enter}
         }
         WinWait, 3DMark03 - InstallShield Wizard, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ; Uncheck readme
             Send {Space}
             Send {Tab}
@@ -7743,8 +7869,7 @@ load_3dmark05()
     w_ahk_do "
         run 3DMark05_v130_1901.exe
         WinWait ahk_class #32770, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Send {Enter}
             WinWait, ahk_class #32770, License
             ControlClick Button1 ; Accept
@@ -7757,7 +7882,7 @@ load_3dmark05()
             ControlClick Button4 ; Later
         }
         WinWait, ahk_class #32770, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button1 ; Uncheck view readme
             ControlClick Button3 ; Finish
         }
@@ -7796,8 +7921,7 @@ load_3dmark06()
     w_ahk_do "
         run 3DMark06_v120_1901.exe
         WinWait ahk_class #32770, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Send {Enter}
             WinWait, ahk_class #32770, License
             ControlClick Button1 ; Accept
@@ -7814,7 +7938,7 @@ load_3dmark06()
             ControlClick Button4 ; Later
         }
         WinWait, ahk_class #32770, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button1 ; Uncheck view readme
             ControlClick Button3 ; Finish
         }
@@ -7865,8 +7989,7 @@ load_algodoo_demo()
         run, Algodoo_1_7_1-Win32.exe
         SetTitleMatchMode, 2
         winwait, Algodoo, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, TNewButton1
             winwait, Algodoo, License
             ;send {Tab}a{Space}{Enter}
@@ -7886,7 +8009,7 @@ load_algodoo_demo()
             ControlClick, TNewButton4  ; Next
         }
         winwait, Algodoo, Completing
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             send {Space}{Tab}{Space}{Tab}{Space}{Enter}   ; decline to run app or view tutorials
         }
@@ -7922,8 +8045,7 @@ load_amnesia_tdd_demo()
         SetTitleMatchMode, 2
         run amnesia_tdd_demo_1.0.1.exe
         WinWait,Select Setup Language,language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 2000
             ;ControlClick TNewButton1 ; OK
             send {Enter}              ; button click fails on vista?
@@ -7952,7 +8074,7 @@ load_amnesia_tdd_demo()
             ControlClick TNewButton4 ; Install
         }
         WinWait,Setup - Amnesia - The Dark Descent Demo,finished
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick TNewButton4 ; Finish
         }
@@ -7989,8 +8111,7 @@ load_aoe3_demo()
         SetTitleMatchMode, 2
         run aoe3trial.exe
         WinWait,Empires,Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             winactivate          ; else next button click ignored on vista?
             Sleep 500
@@ -8048,8 +8169,7 @@ load_aoe_demo()
         run, MSAoE.exe
         SetTitleMatchMode, 2
         winwait, Microsoft Age of Empires Trial Version
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick, Button1
             winwait, End User License Agreement
@@ -8070,6 +8190,132 @@ load_aoe_demo()
 
 #----------------------------------------------------------------
 
+w_metadata acreedbro games \
+    title="Assassin's Creed Brotherhood" \
+    publisher="Ubisoft" \
+    year="2011" \
+    media="dvd" \
+    file1="ACB.iso" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Ubisoft/Assassin's Creed Brotherhood/AssassinsCreedBrotherhood.exe"
+
+load_acreedbro()
+{
+    w_mount ACB
+    w_read_key
+    w_ahk_do "
+        SetWinDelay 1000
+        SetTitleMatchMode, 2
+        run ${W_ISO_MOUNT_LETTER}:setup.exe
+        winwait, Brotherhood, Choose
+        if ( w_opt_unattended > 0 ) {
+            WinActivate
+            send {Enter}
+            ;ControlClick, Button3   ; Accept default (english)
+            winwait, Brotherhood, Welcome
+            WinActivate
+            send {Enter}   ; Next
+            winwait, Brotherhood, License
+            WinActivate
+            send a         ; Agree
+            sleep 500
+            send {Enter}   ; Next
+            winwait, Brotherhood, begin
+            send {Enter}   ; Install
+        }
+        winwait, Brotherhood, Finish
+        if ( w_opt_unattended > 0 ) {
+            ControlClick Button4
+            send {Enter}   ; Finish
+        }
+        WinWaitClose
+    "
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Ubisoft\\Assassin's Creed Brotherhood" AssassinsCreedBrotherhood.exe
+
+    w_download http://static3.cdn.ubi.com/ac_brotherhood/ac_brotherhood_1.01_ww.exe a2b76f16616709cc16537b0e98faa4181ca904ce
+
+    if w_workaround_wine_bug 26562 "Disabling glsl for smoother rendering"
+    then
+        w_call glsl=disabled
+
+        # And turn off after-effects to fix depth of field problem caused
+        # by disabling glsl...
+        cd "$W_DRIVE_C/users/$USERNAME/My Documents"
+        dir="Ubisoft/Assassin's Creed Brotherhood"
+        file="$dir/ACBrotherhood.ini"
+        if test -f "$file"
+        then
+            mv "$file" "$file.old"
+            sed 's,PostFX=[0-9]*,PostFX=0,' < "$file.old" > "$file"
+        else
+            mkdir -p "$dir"
+            echo "[Graphics]" > "$file"
+            echo "PostFX=0" >> "$file"
+        fi
+    fi
+
+    if w_workaround_wine_bug 26583 "Installing native d3dx9_36"
+    then
+        w_call d3dx9_36
+    fi
+
+    # FIXME: figure out why these executables don't exit, and do a proper workaround or fix
+    sleep 10
+    if ps augxw | grep -i exe | egrep 'winemenubuilder.exe|setup.exe|PnkBstrA.exe | egrep -v egrep'
+    then
+        w_warn "Killing processes so patcher does not complain about game still running"
+        wineserver -k
+        sleep 10
+    fi
+
+    w_info "Applying patch $W_CACHE/$W_PACKAGE/ac_brotherhood_1.01_ww.exe..."
+
+    cd "$W_CACHE/$W_PACKAGE"
+    w_ahk_do "
+        SetWinDelay 1000
+        SetTitleMatchMode, 2
+        run ac_brotherhood_1.01_ww.exe
+        WinWait, Choose Setup Language, Select
+        if ( w_opt_unattended > 0 ) {
+            send {Enter}
+            winwait, Brotherhood 1.01, License
+            WinActivate
+            send a         ; Agree
+            sleep 500
+            send {Enter}   ; Next
+            winwait, Brotherhood 1.01, Details
+            ControlClick Button1  ; Next
+        }
+        winwait, Brotherhood 1.01, Complete
+        if ( w_opt_unattended > 0 ) {
+            send {Enter}
+        }
+        WinWaitClose
+    "
+
+    if test `which wine-hotfix-6971` 2> /dev/null
+    then
+        if w_workaround_wine_bug 6971 "Pointing menu and icon at wine-hotfix-6971 to fix mouse problems"
+        then
+            myexec="Exec=env WINEPREFIX=\"$HOME/.local/share/wineprefixes/$W_PACKAGE\" wine-hotfix-6971 cmd /c 'C:\\\\\\Run-$W_PACKAGE.bat'"
+
+            mymenu="$HOME/Desktop/Assassin's Creed Brotherhood.desktop"
+            if test -f "$mymenu"
+            then
+                sed -i "s,Exec=.*,$myexec," "$mymenu"
+            fi
+            mymenu="$HOME/.local/share/applications/wine/Programs/Ubisoft/Assassin's Creed Brotherhood/Assassin's Creed Brotherhood.desktop"
+            if test -f "$mymenu"
+            then
+                sed -i "s,Exec=.*,$myexec," "$mymenu"
+            fi
+        fi
+    else
+        w_workaround_wine_bug 6971 "See http://wiki.winehq.org/Bug6971 for wine patch to fix mouse"
+    fi
+}
+
+#----------------------------------------------------------------
+
 w_metadata atmosphir games \
     title="Atmosphir" \
     publisher="Minor Studios" \
@@ -8086,8 +8332,7 @@ load_atmosphir()
     w_ahk_do "
         run Atmosphir Installer v1.0.0 fixed.exe
         winwait, Atmosphir Setup, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick Button2
             winwait, Atmosphir Setup, License Agreement
@@ -8101,7 +8346,7 @@ load_atmosphir()
             ControlClick Button2
         }
         winwait, Atmosphir Setup, Installation complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             send {Space}  ; ControlClick Button4    # start
             sleep 1000
@@ -8120,6 +8365,68 @@ load_atmosphir()
 }
 
 #----------------------------------------------------------------
+
+w_metadata avatar_demo games \
+    title="James Camerons Avatar: The Game Demo" \
+    publisher="Ubisoft" \
+    year="2009" \
+    media="download" \
+    file1="Avatar_The_Game_Demo.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Ubisoft/Demo/James Cameron's AVATAR - THE GAME (Demo)/bin/AvatarDemo.exe"
+
+load_avatar_demo()
+{
+    w_download http://gamedaily.newaol.com/pub/Avatar_The_Game_Demo.exe 8d8e4c82312962706bd2620406d592db4f0fa9c1
+
+    if w_workaround_wine_bug 23094 "Installing Visual C++ 2005 runtime to avoid installer crash"
+    then
+        w_call vcrun2005
+    fi
+
+    cd "$W_TMP"
+    w_try unrar x "$W_CACHE/$W_PACKAGE/Avatar_The_Game_Demo.exe"
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        SetWinDelay 500
+        run, setup.exe
+        winwait, Language
+        u = $W_OPT_UNATTENDED
+        if ( u > 0 ) {
+            controlclick, Button1
+            winwait, AVATAR, Welcome
+            controlclick, Button1
+            winwait, AVATAR, License
+            controlclick, Button5
+            controlclick, Button2
+            winwait, AVATAR, setup type
+            controlclick, Button2
+        }
+        winwait AVATAR
+        if ( u > 0 ) {
+            ; Strange CRC error workaround. Will check this out. Stay tuned.
+            loop
+            {
+                ifwinexist, CRC Error
+                {
+                    winactivate, CRC Error
+                    controlclick, Button3, CRC Error ; ignore
+                }
+                ifwinexist, AVATAR, Complete
+                {
+                    controlclick, Button4
+                    break
+                }
+                sleep 1000
+            }
+        }
+        winwaitclose AVATAR
+    "
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Ubisoft\\Demo\\James Cameron's AVATAR - THE GAME (Demo)\\bin" "AvatarDemo.exe"
+
+    w_workaround_wine_bug 24639 "If game is silent, try winetricks dsoundhw=Emulation"
+    w_workaround_wine_bug 26590 "If game seems slow, try winetricks glsl=disabled"
+}
+
 
 w_metadata bttf101 games \
     title="Back to the Future Episode 1" \
@@ -8144,8 +8451,7 @@ load_bttf101()
         SetTitleMatchMode, 2
         run, bttf_101_setup.exe
         winwait, Back to the Future, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, Button2   ; Next
             winwait, Back to the Future, Checking DirectX
             ControlClick, Button5   ; Don't check
@@ -8156,7 +8462,7 @@ load_bttf101()
             ControlClick, Button2   ; Install
         }
         winwait, Back to the Future, has been installed
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button4    ; Don't start now
             ControlClick Button2    ; Finish
         }
@@ -8188,8 +8494,7 @@ load_bioshock_demo()
         SetTitleMatchMode, 2
         run setup.exe
         winwait, BioShock Demo - InstallShield Wizard, Choose Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 2000
             ControlClick, Button3
             ControlClick, Button3
@@ -8208,7 +8513,7 @@ load_bioshock_demo()
             ControlClick, Button1
         }
         winwait, BioShock Demo - InstallShield Wizard, The InstallShield Wizard has successfully installed BioShock
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick, Button2     ; don't launch
             ControlClick, Button6     ; don't show readme
@@ -8340,8 +8645,7 @@ load_bladekitten_demo()
         ; This script always gives full window title, so no need to set a different title match mode
         run BladeKittenDemoInstall.exe
         WinWait Blade Kitten Demo Install Package
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ;  Install
             WinWait Blade Kitten Demo, Next
@@ -8357,7 +8661,7 @@ load_bladekitten_demo()
         }
         WinWaitClose
         WinWait Blade Kitten Demo, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button1 ;  Close
         }
@@ -8391,8 +8695,7 @@ load_cnc3_demo()
         SetTitleMatchMode, 2
         run, CnC3Demo.exe
         winwait, Conquer 3, free space to install
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, button1
             winwait, WinZip, After installation
             controlclick, button1
@@ -8409,7 +8712,7 @@ load_cnc3_demo()
             controlclick, button1
         }
         winwait, Conquer 3, Launch the program
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick, button1
 
         winwaitclose, Conquer 3, Launch the program
@@ -8451,6 +8754,25 @@ load_blobby_volley()
 
 #----------------------------------------------------------------
 
+w_metadata cim_demo games \
+    title="Cities In Motion Demo" \
+    publisher="Paradox Interactive" \
+    year="2010" \
+    media="download" \
+    file1="cim-demo-1-0-8.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Cities In Motion Demo/Cities In Motion.exe"
+
+load_cim_demo()
+{
+    # 29 Mar 2011 d40408b59bc0e6e33b564e9bbb55dbab6c44c630, Inno Setup installer
+    w_download http://www.pcgamestore.com/games/cities-in-motion-nbsp/trial/cim-demo-1-0-8.exe d40408b59bc0e6e33b564e9bbb55dbab6c44c630
+    cd "$W_CACHE/$W_PACKAGE"
+    w_try $WINE cim-demo-1-0-8.exe ${W_OPT_UNATTENDED:+ /sp- /silent /norestart}
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Cities In Motion Demo" "Cities In Motion.exe"
+}
+
+#----------------------------------------------------------------
+
 w_metadata cod_demo games \
     title="Call of Duty demo" \
     publisher="Activision" \
@@ -8468,8 +8790,7 @@ load_cod_demo()
         SetTitleMatchMode, 2
         run Call_Of_Duty_Demo.exe
         WinWait,Call of Duty Single Player Demo,Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick Button1 ; next
             WinWait,Call of Duty Single Player Demo,License
@@ -8493,7 +8814,7 @@ load_cod_demo()
             send n               ; No
         }
         WinWait,Call of Duty Single Player Demo, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             send {Enter}         ; Finish
         }
@@ -8537,8 +8858,7 @@ load_cod1()
         SetTitleMatchMode, 2
         run ${W_ISO_MOUNT_LETTER}:setup.exe
         WinWait, CD Key, enter
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Raw}$W_KEY
             ControlClick Button1
             WinWait, CD Key, valid
@@ -8564,8 +8884,7 @@ load_cod1()
 
     w_ahk_do "
         SetTitleMatchMode, 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Send {Enter}    ;continue installation
         }
         WinWait, Insert CD, Please insert the Call of Duty CD 1
@@ -8576,8 +8895,7 @@ load_cod1()
 
     w_ahk_do "
         SetTitleMatchMode, 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Send {Enter}    ;finalize install
             WinWait, Create Shortcut, Desktop
             ControlClick Button1
@@ -8589,7 +8907,7 @@ load_cod1()
         }
         ; handle crash here
         WinWait, Installation Complete, Congratulations!
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button1
         }
         WinWaitClose
@@ -8632,8 +8950,7 @@ load_cod4mw_demo()
         SetTitleMatchMode, 2
         run, CoD4MWDemoSetup_v2.exe
         WinWait,Modern Warfare,Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button1 ; Next
             WinWait,Modern Warfare, License
@@ -8687,8 +9004,7 @@ load_cojbib_demo()
         SetWinDelay 500
         run CoJ2PC_20090713_DEMO_16_buy_now_INSTALLER.exe
         winwait Setup, language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button1 ; next
             winwait Call of Juarez, Welcome
             controlclick button1 ; next
@@ -8700,7 +9016,7 @@ load_cojbib_demo()
             controlclick button1 ; next
         }
         winwait Call of Juarez, Complete
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick button2 ; next
 
         winwaitclose Call of Juarez
@@ -8736,8 +9052,7 @@ load_civ4_demo()
         SetTitleMatchMode, 2
         run, setup.exe
         winwait, Choose Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             Send {enter}
             winwait, Civilization 4, Welcome
@@ -8769,6 +9084,74 @@ load_civ4_demo()
 
 #----------------------------------------------------------------
 
+w_metadata crysis2 games \
+   title="Crysis 2" \
+   publisher="EA" \
+   year="2011" \
+   media="dvd" \
+   file1="Crysis2.exe" \
+   installed_file1="$W_PROGRAMS_X86_WIN/Electronic Arts/Crytek/Crysis 2/bin32/Crysis2.exe"
+
+load_crysis2()
+{
+    w_mount "Crysis 2"
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        SetWinDelay, 1000
+        run ${W_ISO_MOUNT_LETTER}:EASetup.exe
+        if ( w_opt_unattended > 0 ) {
+            Loop {
+                ; On Windows, this window does not pop up
+                ifWinExist, Microsoft Visual C++ 2008 Redistributable Setup
+                {
+                    winwait, Microsoft Visual C++ 2008 Redistributable Setup
+                    controlclick, Button12 ; Next
+                    winwait, Visual C++, License
+                    controlclick, Button11 ; Agree
+                    controlclick, Button8 ; Install
+                    winwait, Setup, configuring
+                    winwaitclose
+                    winwait, Visual C++, Complete
+                    controlclick, Button2 ; Finish
+                    break
+                }
+                ifWinExist, Setup, Please read the End User
+                {
+                    break
+                }
+                sleep 1000
+            }
+            winwait, Setup, Please read the End User
+            controlclick, Button1     ; accept
+            sleep 500
+            ;controlclick, Button3     ; next
+            send {Enter}
+            ; Again for DirectX
+            winwait, Setup, Please read the following End
+            ;controlclick, Button1     ; accept
+            send a
+            sleep 1000
+            ;controlclick, Button3     ; next
+            send {Enter}
+            winwait,Setup, Ready to install
+            controlclick, Button1
+        }
+        winwait, Setup, Click the Finish button
+        if ( w_opt_unattended > 0 ) {
+            controlclick, Button5     ; Don't install EA Download Manager
+            controlclick, Button1     ; Finish
+        }
+        winwaitclose
+    "
+    
+    if w_workaround_wine_bug 26283
+    then
+        w_warn "The game has some nasty flickering, see http://bugs.winehq.org/show_bug.cgi?id=26283"
+    fi
+}
+
+#----------------------------------------------------------------
+
 w_metadata crysis2_demo_mp games \
    title="Crysis 2: Multiplayer Demo" \
    publisher="EA" \
@@ -8779,6 +9162,8 @@ w_metadata crysis2_demo_mp games \
 
 load_crysis2_demo_mp()
 {
+    w_info "The demo was not downloadable as of 31 Mar 2010"
+
     w_download "http://static.cdn.ea.com/crytek/u/f/crysis2/Crysis_2_Multiplayer_Demo.exe" 58b135f7fe74dfa367edafd2f2bcc0af094be77e
 
     cd "$W_CACHE/$W_PACKAGE"
@@ -8788,8 +9173,7 @@ load_crysis2_demo_mp()
         SetWinDelay, 500
         run, Crysis_2_Multiplayer_Demo.exe
         winwait, Microsoft Visual C++ 2008 Redistributable Setup
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, Button12 ; Next
             winwait, Visual C++, License
             controlclick, Button11 ; Agree
@@ -8809,7 +9193,7 @@ load_crysis2_demo_mp()
             controlclick, Button1, Demo Setup, Ready to install
         }
         winwait, Demo Setup, Click the Finish button
-        if ( u > 0 ) 
+        if ( w_opt_unattended > 0 ) 
             controlclick, Button1, Demo Setup, Click the Finish button
 
         winwaitclose, Demo Setup, Click the Finish button
@@ -8841,8 +9225,7 @@ load_csi6_demo()
         SetTitleMatchMode, 2
         run, CSI6_PC_Demo_05.exe
         winwait, Installer Language, Please select
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, Button1   ; Accept default (english)
             ;send {Enter}   ; Accept default (english)
             winwait, CSI - Fatal Conspiracy Demo Setup
@@ -8853,7 +9236,7 @@ load_csi6_demo()
             send {Enter}   ; Install
         }
         winwait, CSI - Fatal Conspiracy Demo Setup, Finish
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button4
             send {Enter}   ; Finish
             WinWaitClose
@@ -8882,8 +9265,7 @@ load_darknesswithin2_demo()
         SetTitleMatchMode, 2
         run, DarknessWithin2Demo.exe
         winwait, Darkness Within, will install
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, TNewButton1
             winwait, Darkness, License
             ControlClick, TNewRadioButton1
@@ -8903,7 +9285,7 @@ load_darknesswithin2_demo()
             ControlClick, Button1
         }
         winwait, Darkness, Setup has finished
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, TNewListBoxButton1
             ControlClick, TNewButton4
         }
@@ -8967,8 +9349,7 @@ load_deadspace2()
     then
       w_ahk_do "
         run easetup.exe
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             SetTitleMatchMode, 2
             ; Not all systems need the Visual C++ runtime
             loop
@@ -9009,7 +9390,7 @@ load_deadspace2()
             controlclick Button1  ; Install
         }
         winwait, Setup, Completed
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick Button5  ; (Don't) install EA Download Manager
             controlclick Button1  ; Finish
         }
@@ -9021,8 +9402,7 @@ load_deadspace2()
     cd "$W_PROGRAMS_X86/EA Games/Dead Space 2"
     w_ahk_do "
         run activation.exe
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             SetTitleMatchMode, 2
             WinWait, Product activation
             sleep 500
@@ -9072,8 +9452,7 @@ load_deusex2_demo()
         SetWinDelay 500
         run setup.exe
         winwait Deus Ex, Launch
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button2
             winwait Deus Ex, Welcome
             controlclick button1
@@ -9090,7 +9469,7 @@ load_deusex2_demo()
             controlclick button2
         }
         winwait Deus Ex, Complete
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick button4
         winwaitclose Deus Ex, Complete
     "
@@ -9203,8 +9582,7 @@ load_dirt2_demo()
     w_ahk_do "
         Run, "Setup.exe"
         WinWait, Choose Setup Language, Select
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick Button1    ;next
             WinWait, DiRT2 Demo - InstallShield Wizard, Welcome
@@ -9226,7 +9604,7 @@ load_dirt2_demo()
             ControlClick Button1    ;next
         }
         WinWait, DiRT2 Demo - InstallShield Wizard, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick Button4    ;finish
         }
@@ -9257,8 +9635,7 @@ load_divinity2_demo()
         Run, Divinity2_DEMO_EN.exe
         SetTitleMatchMode, 2
         WinWait,Setup - Divinity II - Ego Draconis - Demo
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick TNewButton1 ; Next
             WinWait,Setup - Divinity II - Ego Draconis - Demo, read
@@ -9345,8 +9722,7 @@ load_dc2ba_demo()
         SetTitleMatchMode, 2
         run InstallDorasCarnival2BoardwalkAdventure.exe
         winwait, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button1, Welcome
             sleep 1000
@@ -9366,7 +9742,7 @@ load_dc2ba_demo()
             controlclick, Button1, Start Installation
         }
         winwait, Installation Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button1, Installation Complete
         }
@@ -9406,8 +9782,7 @@ load_demolition_company_demo()
         SetTitleMatchMode, 2
         run, DemolitionCompanyDemoENv2.exe
         winwait, Setup - Demolition, This will install
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, TNewButton1, Setup - Demolition, This will install
             winwait, Setup - Demolition, License Agreement
@@ -9469,8 +9844,7 @@ load_dragonage()
         Run, ${W_ISO_MOUNT_LETTER}:Setup.exe
         SetTitleMatchMode, 2
         winwait, Installer Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             winwait, Dragon Age: Origins Setup
             ControlClick Next, Dragon Age: Origins Setup
@@ -9485,7 +9859,7 @@ load_dragonage()
             send {Enter}
         }
         winwait, Dragon Age: Origins Setup, Install Type
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             send {Enter}
         winwaitclose
     "
@@ -9550,8 +9924,7 @@ load_dragonage2_demo()
         SetTitleMatchMode, 2
         run, DragonAge2Demo_F93M2qCj_EnEsItPlRu.exe
         winwait, Installer Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             winwait, Dragon Age II Demo Setup
             send {Enter}
@@ -9562,7 +9935,7 @@ load_dragonage2_demo()
             send {Enter}
         }
         winwait, Dragon Age II Demo Setup, Completed
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             winwait, Dragon Age II Demo Setup, Completing
             send {Enter}
@@ -9588,12 +9961,12 @@ w_metadata eve games \
     publisher="CCP Games" \
     year="2010" \
     media="download" \
-    file1="EVE_Premium_Setup_177290_m.exe" \
+    file1="EVE_Premium_Setup_237081_m.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/CCP/EVE/eve.exe"
 
 load_eve()
 {
-    w_download "http://content.eveonline.com/EVE_Premium_Setup_177290_m.exe" 92624334ed5a431c1b516161ecf7280882b388f6
+    w_download "http://content.eveonline.com/EVE_Premium_Setup_237081_m.exe" 37934c14d4cdcccf36da35ed4562e1b2fa2a1cd5
 
     if w_workaround_wine_bug 18221
     then
@@ -9602,10 +9975,9 @@ load_eve()
 
     cd "$W_CACHE/$W_PACKAGE"
     w_ahk_do "
-        run, EVE_Premium_Setup_177290_m.exe
+        run, EVE_Premium_Setup_237081_m.exe
         WinWait, EVE Online Installer
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             WinActivate
             send {Enter}         ; Next
             WinWait, EVE,License Agreement
@@ -9614,14 +9986,12 @@ load_eve()
             WinWait, EVE,Choose Install
             WinActivate
             send {Enter}         ; Install
-            WinWait, EVE,Installation Complete
+            WinWait, EVE,has been installed
             WinActivate
-            send {Enter}         ; next
-            WinWait, EVE,Installation Complete
-            WinActivate
-            Send {Tab}{Tab}{Tab} ; select Launch
-            Send {Space}         ; untick Launch
-            Send {Enter}         ; Finish
+            ;Send {Tab}{Tab}{Tab} ; select Launch
+            ;Send {Space}         ; untick Launch
+            ControlClick Button4  ; untick Launch
+            Send {Enter}         ; Finish (Button2)
         }
         WinWaitClose, EVE Online Installer
     "
@@ -9661,8 +10031,7 @@ load_fable_tlc()
         SetTitleMatchMode, 2
         run, ${W_ISO_MOUNT_LETTER}:setup.exe
         WinWait,Fable,Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button1 ; Next
             WinWait,Fable,Please
@@ -9679,8 +10048,7 @@ load_fable_tlc()
     w_ahk_do "
         SetTitleMatchMode, 2
         WinWait,Fable,Disk 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ; Retry
         }
@@ -9691,8 +10059,7 @@ load_fable_tlc()
     w_ahk_do "
         SetTitleMatchMode, 2
         WinWait,Fable,Disk 3
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ; Retry
         }
@@ -9703,8 +10070,7 @@ load_fable_tlc()
     w_ahk_do "
         SetTitleMatchMode, 2
         WinWait,Fable,Disk 4
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ; Retry
         }
@@ -9779,8 +10145,7 @@ load_farmsim2011_demo()
         SetWinDelay 500
         SetTitleMatchMode, 2
         run, FarmingSimulator2011DemoEN.exe
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             WinWait, Setup - Farming Simulator 2011 Demo
             ControlClick TNewButton1   ; Next
             WinWait, Setup - Farming Simulator 2011 Demo, License Agreement
@@ -9792,7 +10157,7 @@ load_farmsim2011_demo()
             ControlClick TNewButton2   ; Install
         }
         WinWait, Setup - Farming Simulator 2011 Demo, finished
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             ControlClick TNewButton2   ; Finish
         WinWaitClose
     "
@@ -9821,8 +10186,7 @@ load_fifa11_demo()
         SetTitleMatchMode, 2
         run, EASetup.exe
         winwait, Microsoft Visual C++ 2008, wizard
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button12, Microsoft Visual C++ 2008, wizard
             winwait, Microsoft Visual C++ 2008, License Terms
@@ -9852,7 +10216,7 @@ load_fifa11_demo()
             controlclick, Button1, FIFA 11, Ready to install FIFA 11
         }
         winwait, FIFA 11, Click the Finish button to exit the Setup Wizard.
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button5, FIFA 11, Click the Finish button to exit the Setup Wizard.
             sleep 1000
@@ -9875,7 +10239,7 @@ w_metadata hordesoforcs2_demo games \
     title="Hordes of Orcs 2 Demo" \
     publisher="Freeverse" \
     year="2010" \
-    media="download" \
+    media="manual_download" \
     file1="HoO2Demo.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Hordes of Orcs 2 Demo/HoO2.exe"
 
@@ -9890,8 +10254,7 @@ load_hordesoforcs2_demo()
         SetTitleMatchMode, slow
         run HoO2Demo.exe
         WinWait,Orcs
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             WinActivate
             ControlFocus, Button1, Hordes ; Next
             sleep 500
@@ -9908,7 +10271,7 @@ load_hordesoforcs2_demo()
             Send {Enter}  ; Start
         }
         WinWait,Orcs,successfully
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Send {Space}  ; Finish
         }
         winwaitclose Orcs
@@ -10075,8 +10438,7 @@ load_gothic4_demo()
     w_ahk_do "
         Settitlematchmode, 2
         run, ArcaniA_Gothic4_Demo_Setup.exe
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             winwait, Select Setup Language
             sleep 1000
             controlclick, TNewButton1, Select Setup Language
@@ -10108,7 +10470,7 @@ load_gothic4_demo()
             controlclick, TNewButton4, Setup - ArcaniA, Information
         }
         winwait, Setup - ArcaniA, Completing
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ; The two checkboxes share the same button id. App/Wine bug?
             mousemove, 190, 155
@@ -10154,8 +10516,7 @@ load_gta_vc()
         SetTitleMatchMode, 2
         Run, ${W_ISO_MOUNT_LETTER}:Setup.exe
         winwait, Choose Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Send {enter}
             winwait, Grand Theft Auto Vice City, Welcome to the InstallShield Wizard
             Send {enter}
@@ -10182,12 +10543,11 @@ load_gta_vc()
         SetWinDelay 1000
         SetTitleMatchMode, 2
         winwait, Setup Needs The Next Disk, Please insert disk 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, Button2
         }
         winwait, Grand Theft Auto Vice City, InstallShield Wizard Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {enter}
         }
         winwaitclose
@@ -10228,8 +10588,7 @@ load_guildwars()
     w_ahk_do "
         Run, GwSetup.exe
         WinWait, ahk_class ArenaNet_Dialog_Class
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ; Wait for network connection to finish.  This might need to be longer.  Can we detect this better?
             Sleep 6000
             ; For some reason, the OK doesn't take for me unless I activate the window first
@@ -10273,8 +10632,7 @@ load_hegemonygold_demo()
         SetTitleMatchMode, 2
         Run, HegemonyGoldInstaller.exe
         WinWait,Hegemony
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ; Next
             WinWait,Hegemony, License
@@ -10332,9 +10690,8 @@ load_hegemony_demo()
     w_ahk_do "
         SetTitleMatchMode, 2
         run, Hegemony_Philip_of_Macedon_Installer.exe
-        u = $W_OPT_UNATTENDED
         winwait, Hegemony, installation
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, Button2
             Sleep 500
             winwait, Hegemony, License
@@ -10394,8 +10751,7 @@ load_hon()
         SetTitleMatchMode, 2
         run, HoNClient-2.0.17.exe
         winwait, Heroes of Newerth
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, Button2, Heroes of Newerth
             winwait, Heroes of Newerth, License
             controlclick, Button2, Heroes of Newerth, License
@@ -10437,8 +10793,7 @@ load_hphbp_demo()
         SetTitleMatchMode, 2
         run, Release_HBP_demo_PC_DD_DEMO_FINAL_348428.exe
         winwait, Harry Potter, Install
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, Button1, Harry Potter
             winwait, Setup, License
             controlclick, Button1
@@ -10452,7 +10807,7 @@ load_hphbp_demo()
             controlclick, Button1
         }
         winwait, Setup, Finish
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick, Button1
         winwaitclose
     "
@@ -10484,8 +10839,7 @@ load_imvu()
     w_ahk_do "
         Run, InstallIMVU_453.0.exe
         SetTitleMatchMode, 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             WinWait,IMVU Setup, Welcome
             Sleep 500
             ControlClick Button2 ; Install
@@ -10531,8 +10885,7 @@ load_kotor1()
         SetWinDelay 500
         run ${W_ISO_MOUNT_LETTER}:setup.exe
         winwait Star Wars, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button1
             winwait Star Wars, Licensing Agreement
             controlclick button2
@@ -10558,8 +10911,7 @@ load_kotor1()
     w_mount "KOTOR_2"
     w_ahk_do "
         SetTitleMatchMode 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             winwait Next Disk
             controlclick button2
         }
@@ -10568,8 +10920,7 @@ load_kotor1()
     w_mount "KOTOR_3"
     w_ahk_do "
         SetTitleMatchMode 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             winwait Next Disk
             controlclick button2
         }
@@ -10578,8 +10929,7 @@ load_kotor1()
     w_mount "KOTOR_4"
     w_ahk_do "
         SetTitleMatchMode 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             winwait Next Disk
             controlclick button2
             winwait Question, Desktop
@@ -10588,7 +10938,7 @@ load_kotor1()
             controlclick button2 ;don't install directx
         }
         winwait Star Wars, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button1 ;don't launch game
             controlclick button4
         }
@@ -10621,8 +10971,7 @@ load_kotor2()
         SetWinDelay 500
         run ${W_ISO_MOUNT_LETTER}:setup.exe
         winwait Star Wars, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button1
             winwait Star Wars, License Agreement
             controlclick button2
@@ -10640,8 +10989,7 @@ load_kotor2()
     w_ahk_do "
         SetTitleMatchMode 2
         winwait Next Disk, disk 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick button2
         winwait Next Disk, disk 3
     "
@@ -10650,8 +10998,7 @@ load_kotor2()
     w_ahk_do "
         SetTitleMatchMode 2
         winwait Next Disk, disk 3
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick button2
         winwait Next Disk, disk 4
     "
@@ -10660,8 +11007,7 @@ load_kotor2()
     w_ahk_do "
         SetTitleMatchMode 2
         winwait Next Disk, disk 4
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick button2
         winwait Next Disk, Play disc
     "
@@ -10671,8 +11017,7 @@ load_kotor2()
         SetTitleMatchMode 2
         SetWinDelay 500
         winwait Next Disk, Play disc
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button2
             winwait Question, shortcut
             controlclick button1
@@ -10680,7 +11025,7 @@ load_kotor2()
             controlclick button2
         }
         winwait Star Wars, Wizard Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button1
             controlclick button2
             controlclick button4
@@ -10700,8 +11045,7 @@ load_kotor2()
         SetWinDelay 500
         run KotOR2 Patch v201420 UK.exe
         winwait RTPatch Software, 1.0a
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button1
             winwait RTPatch Software, updated
             controlclick button1
@@ -10715,8 +11059,7 @@ load_kotor2()
         SetWinDelay 500
         run sw_pc_uk_from201420_to211427.exe
         winwait RTPatch Software, 1.0b
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button1
             winwait Update1_0b.txt
             winclose Update1_0b.txt ;close readme that pops up
@@ -10749,8 +11092,7 @@ load_losthorizon_demo()
         SetTitleMatchMode, 2
         run Lost_Horizon_Demo_EN.exe
         WinWait,Lost Horizon Demo, Destination
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             Send {RAW}"$W_TMP"
             ControlClick Button2 ;Install
@@ -10777,7 +11119,7 @@ load_losthorizon_demo()
         }
         WinWaitClose
         WinWait,Lost Horizon Demo - InstallShield Wizard,Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlFocus,Button2,Lost Horizon
             Sleep 500
             Send {Space}
@@ -10817,8 +11159,7 @@ load_lhp_demo()
         SetTitleMatchMode, 2
         run, LEGOHarryPotterDEMO.exe
         winwait, LEGO, language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, Button1
             winwait, LEGO, License
             controlclick, Button1
@@ -10827,7 +11168,7 @@ load_lhp_demo()
             controlclick, Button2
         }
         winwait, LEGO, Finish
-        if ( u > 0 )
+        if ( w_opt_unattended > 0 )
             controlclick, Button1
 
         winwaitclose, LEGO, Finish
@@ -10862,14 +11203,13 @@ load_lswcs()
         run ${W_ISO_MOUNT_LETTER}:setup.exe
         SetTitleMatchMode, 2
         winwait, Choose Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             winwait, LEGO, License Agreement
             send a{Enter}
         }
         winwait, LEGO, method
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Easy Installation
             sleep 1000
         }
@@ -10900,8 +11240,7 @@ load_lemonysnicket()
         SetTitleMatchMode, 2
         Run, ${W_ISO_MOUNT_LETTER}:setup.exe
         WinWait, Lemony, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick, Button1 ; Next
             WinWait, Lemony, License
@@ -10963,8 +11302,7 @@ load_luxor_ar()
         SetTitleMatchMode, 2
         run, ${W_ISO_MOUNT_LETTER}:Luxor_AR_Setup.exe
         winwait, Luxor
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, Button2   ; Agree
             winwait, Folder
             ControlClick, Button2   ; Install
@@ -10972,7 +11310,7 @@ load_luxor_ar()
             ControlClick, Button2   ; Next
         }
         winwait, Success
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, Button6   ; Uncheck Play
             ControlClick, Button2   ; Close
         }
@@ -11024,8 +11362,7 @@ load_masseffect2()
         SetTitleMatchMode, 2
         run, ${W_ISO_MOUNT_LETTER}:Setup.exe
         winwait, Installer Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             winwait, Mass Effect
             send {Enter}
@@ -11044,8 +11381,7 @@ load_masseffect2()
     w_mount ME2_Disc2
     w_ahk_do "
         SetTitleMatchMode, 2
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             winwait, Insert Disc
             ControlClick, Button4
             ; on windows, the first click doesn't seem to do it, so press enter, too
@@ -11058,7 +11394,7 @@ load_masseffect2()
         {
             ifwinexist, Mass Effect, Finish
             {
-                if ( u > 0 ) {
+                if ( w_opt_unattended > 0 ) {
                     winkill, Mass Effect
                 }
                 break
@@ -11128,8 +11464,7 @@ load_masseffect2_demo()
         SetTitleMatchMode, 2
         run, MassEffect2DemoEN.exe
         winwait, Mass Effect 2 Demo
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             winwait, Mass Effect 2 Demo, conflicts
             send {Enter}
@@ -11146,7 +11481,7 @@ load_masseffect2_demo()
         {
             ifwinexist, Mass Effect, Finish
             {
-                if ( u > 0 ) {
+                if ( w_opt_unattended > 0 ) {
                     winkill, Mass Effect
                 }
                 break
@@ -11239,8 +11574,7 @@ load_menofwar()
         SetTitleMatchMode, slow
         run ${W_ISO_MOUNT_LETTER}:setup.exe
         winwait, Select Setup Language, Select the language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick, TNewButton1, Select Setup Language, Select the language
             winwait, Men of War
@@ -11252,7 +11586,7 @@ load_menofwar()
             ControlClick, TNewButton1, Setup - Men of War, ACCEPTANCE OF AGREEMENT
         }
         winwait, Setup - Men of War, Setup has finished installing
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick, x242 y254
             ControlClick, x242 y278
@@ -11292,8 +11626,7 @@ load_mb_warband_demo()
         SetTitleMatchMode 2
         run mb_warband_setup_1134.exe
         winwait Warband
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button2
             winwait Warband
             controlclick button2
@@ -11329,8 +11662,7 @@ load_nfsshift_demo()
         SetTitleMatchMode, slow
         run, SHIFTDemo_0018_alpha_18_PC-DVD_DEMO.exe
         winwait, WinRAR
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick, Button2
             winwait, SHIFT, View the readme
             controlclick, Button1
@@ -11366,7 +11698,7 @@ load_nfsshift_demo()
             controlclick, Button1
         }
         winwait, Setup, Finish
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 1000
             controlclick, Button5
             controlclick, Button1
@@ -11375,6 +11707,58 @@ load_nfsshift_demo()
     "
 
     w_declare_exe "$W_PROGRAMS_X86_WIN\\Electronic Arts\\Need for Speed SHIFT Demo" "shiftdemo.exe"
+}
+
+#----------------------------------------------------------------
+
+w_metadata oblivion games \
+    title="Elder Scrolls: Oblivion" \
+    publisher="Bethesda Game Studios" \
+    year="2006" \
+    media="dvd" \
+    file1="Oblivion.iso" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Bethesda Softworks/Oblivion/Oblivion.exe"
+
+load_oblivion()
+{
+    w_mount "Oblivion"
+
+    cd "$W_ISO_MOUNT_ROOT"
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        run, Setup.exe
+        winwait, Oblivion, Welcome to the
+        if ( w_opt_unattended > 0 ) {
+            sleep 500
+            controlclick, Button1
+            winwait, Oblivion, License Agreement
+            sleep 500
+            controlclick, Button3
+            sleep 500
+            controlclick, Button1
+            winwait, Oblivion, Choose Destination
+            sleep 500
+            controlclick, Button1
+            winwait, Oblivion, Ready to Install
+            sleep 500
+            controlclick, Button1
+            winwait, Oblivion, Complete
+            sleep 500
+            controlclick, Button1
+            sleep 500
+            controlclick, Button2
+            sleep 500
+            controlclick, Button3
+        }
+        winwaitclose, Oblivion, Complete
+    "
+
+    if w_workaround_wine_bug 20074 "Installing native d3dx9_36"
+    then
+        w_call d3dx9_36
+    fi
+
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Bethesda Softworks\\Oblivion" "Oblivion.exe"
 }
 
 #----------------------------------------------------------------
@@ -11396,8 +11780,7 @@ load_osmos_demo()
         SetTitleMatchMode, 2
         run OsmosDemo_Installer_1.5.6.exe
         winwait, Osmos, License
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button2, Osmos Demo Setup, License Agreement
             winwait, Osmos Demo Setup, Choose Install Location
@@ -11459,15 +11842,14 @@ load_plantsvszombies()
     w_ahk_do "
         run PlantsVsZombiesSetup.exe
         winwait, Plants vs. Zombies Installer
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             send {Enter}
             winwait, Plants vs. Zombies License Agreement
             ControlClick Button1
         }
         winwait, Plants vs. Zombies Installation Complete!
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             send {Space}{Enter}
             ControlClick, x309 y278, Plants vs. Zombies Installation Complete!,,,, Pos
@@ -11498,8 +11880,7 @@ load_puzzleagent_demo()
         Run, PuzzleAgent_PC_Setup.exe
         SetTitleMatchMode, 2
         WinWait,Puzzle Agent Setup, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ; Next
             WinWait,Puzzle Agent Setup, properly
@@ -11562,8 +11943,7 @@ load_rct3deluxe()
         SetWinDelay 500
         SetTitleMatchMode, 2
         run ${W_ISO_MOUNT_LETTER}:setup-rtc3.exe
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             WinWait, Select Setup Language
             controlclick, TButton1   ; accept
             WinWait Setup - RollerCoaster Tycoon 3, Welcome
@@ -11586,7 +11966,7 @@ load_rct3deluxe()
             controlclick, Button2   ; Yes, skip
         }
         WinWait Setup - RollerCoaster Tycoon 3, finished
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick, TNewCheckListBox1   ; uncheck Launch
             controlclick, TButton4   ; Finish
         }
@@ -11628,8 +12008,7 @@ load_rayman2_demo()
         SetTitleMatchMode, 3
         Run, SETUP.EXE
         WinWaitActive, UBI Soft Installer - Language Choice
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick button1 ; OK
             WinWait, Ubi Soft Installer - Rayman 2 Demo
             ControlClick button1 ; Install
@@ -11643,7 +12022,7 @@ load_rayman2_demo()
             ControlClick button2 ; No
         }
         WinWait, Ubi Soft Installer - Rayman 2 Demo
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick button4 ; Quit
         }
         WinWaitClose
@@ -11686,8 +12065,7 @@ load_riseofnations_demo()
         SetTitleMatchMode, 2
         run RiseOfNationsTrial.exe
         WinWait,Rise Of Nations Trial Setup
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 2500
             ControlClick CButtonClassName2
             WinWait,Rise Of Nations Trial Setup, installed
@@ -11723,15 +12101,14 @@ load_secondlife()
     w_ahk_do "
         SetTitleMatchMode, 2
         run, Second_Life_2-5-0-220251_Setup.exe
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             winwait, Installer Language
             send {Enter}
             winwait, Installation Folder
             send {Enter}
         }
         winwait, Second Life, Start Second Life now
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Tab}{Enter}
         }
         winwaitclose
@@ -11770,8 +12147,7 @@ load_sims3()
     w_ahk_do "
         run ${W_ISO_MOUNT_LETTER}:Sims3Setup.exe
         winwait, Choose Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             SetTitleMatchMode, 2
             winwait, - InstallShield Wizard
@@ -11793,7 +12169,7 @@ load_sims3()
             send {Enter}
         }
         winwait, - InstallShield Wizard, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick View the readme file, - InstallShield Wizard
             ControlClick Finish, - InstallShield Wizard
         }
@@ -11810,8 +12186,7 @@ load_sims3()
         run TS3_1.19.44.010001_Update.exe
         SetTitleMatchMode, 2
         winwait, - InstallShield Wizard, Complete
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Finish, - InstallShield Wizard
         }
         winwaitclose
@@ -11846,8 +12221,7 @@ load_simsmed()
         SetTitleMatchMode, 2
         run ${W_ISO_MOUNT_LETTER}:SimsMedievalSetup.exe
         winwait, Choose Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
             SetTitleMatchMode, 2
             winwait, - InstallShield Wizard
@@ -11875,7 +12249,7 @@ load_simsmed()
             send {Enter}           ; Next
         }
         winwait, - InstallShield Wizard, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button1   ; Don't view readme
             send {Enter}           ; Finish
         }
@@ -11894,12 +12268,11 @@ load_simsmed()
         winwait, Medieval, will reset any in-progress quests
         send {Enter}
         winwait, Medieval, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             send {Enter}
         }
         winwait, - InstallShield Wizard, Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Finish, - InstallShield Wizard
         }
         winwaitclose
@@ -11909,11 +12282,15 @@ load_simsmed()
     then
         myexec="Exec=env WINEPREFIX=\"$HOME/.local/share/wineprefixes/$W_PACKAGE\" wine cmd /c 'C:\\\\\\Run-$W_PACKAGE.bat'"
         mymenu="$HOME/.local/share/applications/wine/Programs/Electronic Arts/The Sims Medieval/The Sims™ Medieval.desktop"
-        if test -f "$mymenu" && w_workaround_wine_bug 26487 "Fixing system menu"
+        if test -f "$mymenu"
         then
             sed -i "s,Exec=.*,$myexec," "$mymenu"
         fi
-        echo FIXME: fix icon, too
+        mymenu="$HOME/Desktop/The Sims™ Medieval.desktop"
+        if test -f "$mymenu"
+        then
+            sed -i "s,Exec=.*,$myexec," "$mymenu"
+        fi
     fi
 
     w_declare_exe "$W_PROGRAMS_X86_WIN\\Electronic Arts\\The Sims Medieval\\Game\\Bin" "TSM.exe"
@@ -11940,8 +12317,7 @@ load_starcraft2_demo()
         SetTitleMatchMode, 2
         Run, Installer.exe
         WinWait, StarCraft II Installer
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick, x300 y200
             winwait, End User License Agreement
@@ -12017,8 +12393,7 @@ load_theundergarden_demo()
         SetTitleMatchMode, 2
         Run, TheUnderGarden_PC_B34_SRTB.30_28OCT10.exe
         WinWait,WinRAR
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick Button2 ; Install
             WinWait,Select Setup Language, during
@@ -12068,7 +12443,7 @@ load_theundergarden_demo()
             ControlClick Button6 ;Cancel
         }
         WinWait,Setup,launched
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 500
             ControlClick TNewButton4 ;Finish
         }
@@ -12104,8 +12479,7 @@ load_tmnationsforever()
         SetTitleMatchMode, 2
         Run, tmnationsforever_setup.exe
         WinWait,Select Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 1000
             ControlClick TNewButton1 ; OK
             WinWait,Setup - TmNationsForever,Welcome
@@ -12130,7 +12504,7 @@ load_tmnationsforever()
             ControlClick TNewButton4 ; Install
         }
         WinWait,Setup - TmNationsForever,finished
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             Sleep 1000
             ControlFocus, TNewCheckListBox1, TmNationsForever, finished
             Sleep 1000
@@ -12141,6 +12515,81 @@ load_tmnationsforever()
     "
 
     w_declare_exe "$W_PROGRAMS_X86_WIN\\TmNationsForever" "TmForever.exe"
+}
+
+#----------------------------------------------------------------
+
+w_metadata trainztcc_2004 games \
+    title="Trainz: The Complete Collection: TRS2004" \
+    publisher="Paradox Interactive" \
+    year="2008" \
+    media="dvd" \
+    file1="TRS2006DVD.iso" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Auran/TRS2004/TRS2004.exe"
+
+load_trainztcc_2004()
+{
+    w_call mfc42
+
+    w_read_key
+    # yup, they got the volume name wrong
+    w_mount TRS2006DVD
+    cd ${W_ISO_MOUNT_ROOT}/TRS2004_SP4_DVD_Installer_BUILD_2370/Installer/Disk1
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        SetWinDelay 500
+        run setup.exe
+        if ( w_opt_unattended > 0 ) {
+            winwait TRS2004 Setup, Please install the latest drivers
+            send {Enter}
+            winwait TRS2004, Welcome
+            send {Enter}
+            winwait TRS2004, License
+            ControlClick Button2
+            winwait TRS2004, serial
+            winactivate
+            send ${W_RAW_KEY}{Enter}
+            winwait TRS2004, Destination
+            send {Enter}
+            winwait Install DirectX
+            send n
+            winwait Windows Update, Your computer already
+            send {Enter}
+        }
+        winwait TRS2004, Complete
+        if ( w_opt_unattended > 0 ) {
+            send {Space}     ; uncheck View Readme
+            send {Enter}     ; Finish
+        }
+        winwaitclose
+    "
+
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Auran\\TRS2004" "TRS2004.exe"
+
+    # And, while we're at it, also install the accompanying paint shed app
+    cd ${W_ISO_MOUNT_ROOT}/TRAINZ_PAINTSHED
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        SetWinDelay 500
+        run Trainz_Paint_Shed_Setup.exe
+        if ( w_opt_unattended > 0 ) {
+            winwait Trainz Paint Shed, Welcome
+            send {Enter}
+            winwait Trainz Paint Shed, License
+            send a           ; accept
+            send {Enter}     ; Next
+            winwait Trainz Paint Shed, Destination
+            send {Enter}
+            winwait Trainz Paint Shed, Install
+            send {Enter}
+        }
+        winwait Trainz Paint Shed, Complete
+        if ( w_opt_unattended > 0 ) {
+            send {Enter}     ; Finish
+        }
+        winwaitclose
+    "
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Auran\\Trainz Paint Shed" "Trainz Paint Shed.exe" paintshed
 }
 
 #----------------------------------------------------------------
@@ -12163,8 +12612,7 @@ load_sammax301_demo()
         SetWinDelay 500
         run SamMax301_PC_setup.exe
         winwait Sam and Max The Penal Zone Setup, Welcome
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             controlclick button2 ; Next
             winwait Sam and Max The Penal Zone Setup, DirectX
             controlclick button5 ; Uncheck check directx
@@ -12208,8 +12656,7 @@ load_sammax304_demo()
         SetTitleMatchMode, 2
         Run, SamMax304_v02.18_unlockable_securom_pa_BigDownload.exe
         WinWait,Sam and Max Beyond the Alley of the Dolls Setup
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ControlClick Button2 ; Next
             WinWait,Sam and Max Beyond the Alley of the Dolls Setup,DirectX
             ControlClick Button2 ; Next - Directx check defaulted
@@ -12249,8 +12696,7 @@ load_singularity()
     w_ahk_do "
         run ${W_ISO_MOUNT_LETTER}:setup.exe
         winwait, Activision(R) - InstallShield, Select the language for the installation from the choices below.
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button1, Activision(R) - InstallShield, Select the language for the installation from the choices below.
             sleep 1000
@@ -12362,8 +12808,7 @@ load_stalker_pripyat_bench()
         SetTitleMatchMode, 2
         run stkcop-bench-setup.exe
         WinWait,Setup - Call Of Pripyat Benchmark
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick TNewButton1 ; Next
             WinWait,Setup - Call Of Pripyat Benchmark,License
@@ -12385,7 +12830,7 @@ load_stalker_pripyat_bench()
             ControlClick, TNewButton4 ; Next  (nah, who reads doc?)
         }
         WinWait,Setup - Call Of Pripyat Benchmark,finished
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             Send {Space}  ; uncheck launch
             sleep 1000
@@ -12419,8 +12864,7 @@ load_torchlight()
         SetTitleMatchMode, 2
         Run, ${W_ISO_MOUNT_LETTER}:Torchlight.exe
         WinWait, Torchlight Setup, This wizard will guide
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             ControlClick, Button2, Torchlight Setup, This wizard will guide
             WinWait, Torchlight Setup, Please review the license terms
@@ -12461,8 +12905,7 @@ load_twfc()
         run ${W_ISO_MOUNT_LETTER}:setup.exe
         SetTitleMatchMode, 2
         winwait, Activision, Select the language for the installation
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, Button1, Activision, Select the language for the installation
             winwait, Transformers, Press NEXT to verify your key
@@ -12536,8 +12979,7 @@ load_ut3()
         run ${W_ISO_MOUNT_LETTER}:SetupUT3.exe
         SetTitleMatchMode, 2
         WinWait, Choose Setup Language
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick Button1   ; OK
             WinWait, Unreal Tournament 3, GAMESPY ; License Agreement
@@ -12559,7 +13001,7 @@ load_ut3()
             ; game now begins installing
         }
         WinWait, , InstallShield Wizard Complete
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick Button4   ; Finish
         }
@@ -12572,8 +13014,7 @@ load_ut3()
         SetTitleMatchMode, 2
         run UT3Patch5.exe
         WinWait, License
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick Button1   ; Accept
             WinWait, End User License Agreement
@@ -12584,7 +13025,7 @@ load_ut3()
             ControlClick Button1   ; Yes
         }
         WinWait, , UT3 was successfully patched!
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 500
             ControlClick Button1   ; OK
         }
@@ -12628,8 +13069,7 @@ load_wog()
     w_ahk_do "
         run WorldOfGooDemo.1.0.exe
         winwait, World of Goo Setup, License Agreement
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             WinActivate
             send {Enter}
@@ -12667,8 +13107,7 @@ load_wowtrial()
         SetTitleMatchMode, 2
         run WOW-4.0.0.12911-enUS-Trial.exe
         winwait, World of Warcraft Installer
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ; Wait for it to find servers
             sleep 6000
             controlclick, x400 y440 ; Install
@@ -12680,7 +13119,7 @@ load_wowtrial()
             controlclick, x680 y560 ; OK
         }
         winwait, World of Warcraft v4, Play
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             ; Wait until left side of progress bar is green; that means the game is playable.
             ;Loop
             ;{
@@ -12733,8 +13172,7 @@ load_zootycoon2_demo()
         run Zoo2Trial.exe
         winwaitclose, APPMESSAGE
         winwaitactive, Zoo Tycoon 2 Trial, AUTORUN
-        u = $W_OPT_UNATTENDED
-        if ( u > 0 ) {
+        if ( w_opt_unattended > 0 ) {
             sleep 1000
             controlclick, CButtonClassName1, Zoo Tycoon 2 Trial, AUTORUN
             winwaitclose, APPMESSAGE
@@ -12833,6 +13271,48 @@ load_supermeatboy_steam()
 
 #----------------------------------------------------------------
 
+w_metadata trine_steam games \
+    title="Trine (Steam)" \
+    publisher="Frozenbyte" \
+    year="2009" \
+    media="download" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Steam/steamapps/common/trine/trine_launcher.exe"
+
+load_trine_steam()
+{
+    w_steam_install_game 35700 "Trine"
+
+    if w_workaround_wine_bug 21939 "Installing Windows Media Player so game can start"
+    then
+        w_call wmp9
+    fi
+
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Steam\\steamapps\\common\\trine" "trine_launcher.exe"
+}
+
+#----------------------------------------------------------------
+
+w_metadata trine_demo_steam games \
+    title="Trine Demo (Steam)" \
+    publisher="Frozenbyte" \
+    year="2009" \
+    media="download" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Steam/steamapps/common/trine demo/trine_launcher.exe"
+
+load_trine_demo_steam()
+{
+    w_steam_install_game 35710 "Trine Demo"
+
+    if w_workaround_wine_bug 21939 "Installing Windows Media Player so game can start"
+    then
+        w_call wmp9
+    fi
+
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Steam\\steamapps\\common\\trine demo" "trine_launcher.exe"
+}
+
+#----------------------------------------------------------------
+
 w_metadata wormsreloaded_demo_steam games \
     title="Worms Reloaded Demo (Steam)" \
     publisher="Team17" \
@@ -12852,12 +13332,20 @@ load_wormsreloaded_demo_steam()
 
 winetricks_set_dsound_var()
 {
-    echo "Setting DirectSound $1 to $2"
+    arg=$2
+    case $2 in
+    [Ff]*) arg=Full;;
+    [Ss]*) arg=Standard;;
+    [Bb]*) arg=Basic;;
+    [Ee]*) arg=Emulation;;
+    esac
+
+    echo "Setting DirectSound $1 to $arg"
     cat > "$W_TMP"/set-dsound.reg <<_EOF_
 REGEDIT4
 
 [HKEY_CURRENT_USER\Software\Wine\DirectSound]
-"$1"="$2"
+"$1"="$arg"
 
 _EOF_
     w_try_regedit "$W_TMP_WIN"\\set-dsound.reg
@@ -12874,13 +13362,13 @@ load_dsoundbug9612()
     fi
 }
 
-w_metadata dsoundhw=full settings \
+w_metadata dsoundhw=Full settings \
     title="Set DirectSound hardware acceleration to Full (default)"
-w_metadata dsoundhw=standard settings \
+w_metadata dsoundhw=Standard settings \
     title="Set DirectSound hardware acceleration to Standard"
-w_metadata dsoundhw=basic settings \
+w_metadata dsoundhw=Basic settings \
     title="Set DirectSound hardware acceleration to Basic"
-w_metadata dsoundhw=emulation settings \
+w_metadata dsoundhw=Emulation settings \
     title="Set DirectSound hardware acceleration to Emulation"
 
 load_dsoundhw()
@@ -12907,12 +13395,12 @@ winetricks_set_wined3d_var()
     *) w_die "illegal value $2 for $1";;
     esac
 
-    echo "Setting Direct3D/$1 to $2"
+    echo "Setting Direct3D/$1 to $arg"
     cat > "$W_TMP"/set-wined3d.reg <<_EOF_
 REGEDIT4
 
 [HKEY_CURRENT_USER\Software\Wine\Direct3D]
-"$1"="$2"
+"$1"="$arg"
 
 _EOF_
     w_try_regedit "$W_TMP_WIN"\\set-wined3d.reg
@@ -13048,7 +13536,7 @@ load_mwo()
 REGEDIT4
 
 [HKEY_CURRENT_USER\Software\Wine\DirectInput]
-"MouseWarpOverride"="$1"
+"MouseWarpOverride"="$arg"
 
 _EOF_
     w_try_regedit "$W_TMP"/set-mwo.reg
@@ -13097,10 +13585,10 @@ load_fontsmooth()
 REGEDIT4
 
 [HKEY_CURRENT_USER\Control Panel\Desktop]
-"FontSmoothing"="0"
+"FontSmoothing"="$FontSmoothing"
 "FontSmoothingGamma"=dword:00000578
-"FontSmoothingOrientation"=dword:00000001
-"FontSmoothingType"=dword:00000000
+"FontSmoothingOrientation"=dword:0000000$FontSmoothingOrientation
+"FontSmoothingType"=dword:0000000$FontSmoothingType
 
 _EOF_
     w_try_regedit "$W_TMP_WIN"\\fontsmooth.reg
@@ -13504,6 +13992,7 @@ for data in \
     corefonts:size_MB=52,time_sec=4 \
     corefonts:size_MB=62,time_sec=2 \
     crypt32:size_MB=178,time_sec=71 \
+    crysis2:size_MB=8259,time_sec=1200 \
     crysis2_demo_mp:size_MB=5259,time_sec=1473 \
     d3dcompiler_43:size_MB=138,time_sec=51 \
     d3dx10:size_MB=50,time_sec=4 \
@@ -13717,12 +14206,12 @@ winetricks_stats_init()
                 declined="OK, winetricks will *not* report statistics.  You won't be asked this question again."
                 ;;
             esac
-            if zenity --question --text "$question" --title "$title"
+            if $WINETRICKS_GUI --question --text "$question" --title "$title"
             then
-                zenity --info --text "$thanks"
+                $WINETRICKS_GUI --info --text "$thanks"
                 WINETRICKS_STATS_REPORT=1
             else
-                zenity --info --text "$declined"
+                $WINETRICKS_GUI --info --text "$declined"
                 WINETRICKS_STATS_REPORT=0
             fi
             echo $WINETRICKS_STATS_REPORT > "$W_CACHE"/track_usage
@@ -13855,6 +14344,23 @@ execute_command()
     taskmgr) $WINE taskmgr & ;;
     shell) winetricks_shell ;;
 
+    # These have to come before *=disabled to avoid looking like dlls
+    fontsmooth=disable*) w_call fontsmooth=disable ;;
+    glsl=disable*) w_call glsl=disabled ;;
+    multisampling=disable*) w_call multisampling=disabled ;;
+    mwo=disable*) w_call mwo=disable ;;   # FIXME: relax matching so we can handle these spelling differences in verb instead of here
+    psm=disable*) w_call psm=disabled ;;
+    rtlm=disable*) w_call rtlm=disabled ;;
+    sound=disable*) w_call sound=disabled ;;
+    strictdrawordering=disable*) w_call strictdrawordering=disabled ;;
+
+    # For convenience, allow users to use lower case and abbreviate.
+    # FIXME: expand this?
+    dsoundhw=f*) w_call dsoundhw=Full ;;
+    dsoundhw=s*) w_call dsoundhw=Standard ;;
+    dsoundhw=b*) w_call dsoundhw=Basic ;;
+    dsoundhw=e*) w_call dsoundhw=Emulation ;;
+
     # Use winecfg if you want a gui for plain old dll overrides
     alldlls=*) w_call $1 ;;
     *=native) w_do_call native $cmd;;
@@ -13866,6 +14372,7 @@ execute_command()
     comdlg32.ocx) w_call comdlg32ocx ;;
     dotnet1) w_call dotnet11 ;;
     dotnet2) w_call dotnet20 ;;
+    firefox4) w_call firefox ;;
     fm20) w_call controlpad ;;   # art2kmin also comes with fm20.dll
     fontsmooth-bgr) w_call fontsmooth=bgr ;;
     fontsmooth-disable) w_call fontsmooth=disable ;;
@@ -13875,7 +14382,6 @@ execute_command()
     glsl-enable) w_call glsl=enabled ;;
     ie6_full) w_call ie6 ;;
     jscript) w_call wsh56js ;;            # FIXME: use wsh57 instead?
-    mwo=disabled) w_call mwo=disable ;;   # FIXME: relax matching so we can handle these spelling differences in verb instead of here
     npm-repack) w_call npm=repack ;;
     oss) w_call sound=oss ;;
     psm=off) w_call psm=disabled ;;

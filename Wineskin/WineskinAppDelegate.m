@@ -1010,10 +1010,10 @@
 	[busyWindow  makeKeyAndOrderFront:self];
 	//hide Winetricks window
 	[winetricksWindow orderOut:self];
-	//download newest version to NSString
-	NSString *newVersion = [NSString stringWithContentsOfURL:[NSURL URLWithString:urlWhereWinetricksIs] encoding:NSUTF8StringEncoding error:nil];
+	//Use downloader to download
+	NSData *newVersion = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlWhereWinetricksIs]];
 	//if new version looks messed up, prompt the download failed, and exit.
-	if (newVersion == nil)
+	if ([newVersion length] < 50)
 	{
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert addButtonWithTitle:@"OK"];
@@ -1029,7 +1029,7 @@
 	//delete old version
 	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] error:nil];
 	//write new version to correct spot
-	[newVersion writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+	[newVersion writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] atomically:YES];
 	//chmod 755 new version
 	[self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]],nil]];
 	//make new list of packages and descriptions
@@ -1042,7 +1042,13 @@
 		if (item.length == 0) continue;
 		//run winetricks to get list of packages in current verb into winetricksTempList
 		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",item,@"list",nil]];
-		NSArray *winetricksTempList = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+		//before reading in the log, we need to find out if its iso-8859-1 which happens with some weird symbols Winetricks uses
+		NSString *logContents;
+		if ([[self systemCommandWithOutputReturned:[NSString stringWithFormat:@"file --mime-encoding \"%@/Contents/Resources/Logs/Winetricks.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]] hasSuffix:@"iso-8859-1"]) //need to convert to UTF8
+			logContents = [self systemCommandWithOutputReturned:[NSString stringWithFormat:@"iconv -f iso-8859-1 -t utf-8 \"%@/Contents/Resources/Logs/Winetricks.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+		else
+			logContents = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] usedEncoding:nil error:nil];
+		NSArray *winetricksTempList = [logContents componentsSeparatedByString:@"\n"];
 		//add Verb name to winetricksHelpList
 		[winetricksHelpList addObject:@""];
 		[winetricksHelpList addObject:[NSString stringWithFormat:@"***************** %@ *****************",item]];
