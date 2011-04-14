@@ -263,7 +263,10 @@
 				fullScreenOption = NO;
 				sleepNumber = 0;
 				//should only use this line for winecfg regedit and taskmgr, other 2 do nonstandard runs and wont use this line
-				programNameAndPath = [NSString stringWithFormat:@"/../WineskinEngine.bundle/Wine/lib/wine/%@.exe.so",[wssCommand stringByReplacingOccurrencesOfString:@"WSS-" withString:@""]];
+				if ([wssCommand isEqualToString:@"WSS-regedit"])
+					programNameAndPath = @"/windows/regedit.exe";
+				else
+					programNameAndPath = [NSString stringWithFormat:@"/windows/system32/%@.exe",[wssCommand stringByReplacingOccurrencesOfString:@"WSS-" withString:@""]];
 				programFlags = @""; // just in case there were some flags... don't use on these.
 				if ([wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-winetricks"])
 					nonStandardRun=YES; // handle Wine differently if its one of these 2
