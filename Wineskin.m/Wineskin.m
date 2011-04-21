@@ -150,9 +150,18 @@
 	NSLog(@"Starting up...");
 	NSLog(@"reading all configuration information...");
 	//open Info.plist to read all needed info
-	NSDictionary *plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	NSDictionary *cexePlistDictionary;
 	NSString *resolutionTemp = @"";
+	//check to make sure CFBundleName is not WineskinWineskinDefault3345, if it is, change it to current wrapper name, and CFBundleIdentifier to it.wineskin.prefs
+	if ([[plistDictionary valueForKey:@"CFBundleName"] isEqualToString:@"WineskinWineskinDefault3345"])
+	{
+		NSString *tempWrapperName = [[appNameWithPath substringFromIndex:[appNameWithPath rangeOfString:@"/" options:NSBackwardsSearch].location+1] stringByReplacingOccurrencesOfString:@".app" withString:@""];
+		[plistDictionary setValue:tempWrapperName forKey:@"CFBundleName"];
+		[plistDictionary setValue:[NSString stringWithFormat:@"%@.wineskin.prefs",tempWrapperName] forKey:@"CFBundleIdentifier"];
+		[plistDictionary writeToFile:infoPlistFile atomically:YES];
+	}
+	//need to handle it different if its a cexe
 	if (!cexeRun)
 	{
 		programNameAndPath = [plistDictionary valueForKey:@"Program Name and Path"];
@@ -172,7 +181,7 @@
 		runWithStartExe = [[cexePlistDictionary valueForKey:@"use start.exe"] intValue];
 		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
-	}
+	}	
 	gammaCorrection = [plistDictionary valueForKey:@"Gamma Correction"];
 	x11PrefFileName = [plistDictionary valueForKey:@"CFBundleIdentifier"];
 	uLimitNumber=@"10000"; // run as 10000 for now.. I don't think this needs to be edited.  If peoples launchctl limit report less than 10000, they need to fix their machine, or reboot
