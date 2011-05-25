@@ -119,6 +119,7 @@
 @implementation Wineskin
 - (void)mainRun:(NSArray *)argv
 {
+	filesToRun = [[NSMutableArray alloc] init];
 	runWithStartExe = NO;
 	fullScreenOption = NO;
 	useRandR = NO;
@@ -329,9 +330,11 @@
 	x11PID = [self startX11];
 	NSLog(@"WineskinX11 running on PID %@",x11PID);
 	//**********set user folders
-	NSLog(@"Fixing user folders in Drive C to current user");
 	if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
+	{
+		NSLog(@"Fixing user folders in Drive C to current user");
 		[self setUserFolders:YES];
+	}
 	else
 		[self setUserFolders:NO];
 	
