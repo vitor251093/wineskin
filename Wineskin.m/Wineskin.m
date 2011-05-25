@@ -682,15 +682,8 @@
 	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/WSX11Prefs.plist",winePrefix];
 	NSArray *tempArray = [self readFileToStringArray:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/WSConfig.txt",winePrefix]];
 	NSString *engineVersion = [tempArray objectAtIndex:0];
+	NSLog(@"Using Engine %@",engineVersion);
 	NSString *x11InstallPath = [tempArray objectAtIndex:1];
-	NSString *x11Version = [engineVersion substringToIndex:[engineVersion rangeOfString:@"Wine"].location];
-	//list error if using an old incompatible engine
-	if ([x11Version isEqualToString:@"WS1"] || [x11Version isEqualToString:@"WS2"] || [x11Version isEqualToString:@"WS3"] || [x11Version isEqualToString:@"WS4"])
-	{
-		NSLog(@"Error! old engine in use! Old WS1 through WS4 engines will not run in Wineskin 2.0+ correctly! There may be major problems!");
-		CFUserNotificationDisplayNotice(5.0, 0, NULL, NULL, NULL, CFSTR("WARNING!"), (CFStringRef)@"Warning! Old engine in use! Old WS1 through WS4 engines will not run in Wineskin 2.0+ correctly! There may be major problems!", NULL);
-		usleep(5000000);
-	}
 	//set up quartz-wm launch correctly
 	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"%@/bin/quartz-wm\"",x11InstallPath];
 	//copy the plist over
