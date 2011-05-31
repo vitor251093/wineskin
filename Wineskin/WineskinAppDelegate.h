@@ -54,6 +54,8 @@
 	IBOutlet NSProgressIndicator *toolRunningPI;
 	IBOutlet NSTextField *toolRunningPIText;
 	IBOutlet NSTabView *tab;
+	IBOutlet NSTextField *wrapperVersionText;
+	IBOutlet NSTextField *engineVersionText;
 	
 	//advanced menu - Configuration Tab
 	IBOutlet NSTextField *windowsExeTextField;

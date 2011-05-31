@@ -630,6 +630,44 @@
 }
 - (void)loadAllData
 {
+	//get wrapper version and put on Advanced Page wrapperVersionText
+	NSDictionary* plistDictionaryWV = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[NSBundle mainBundle] bundlePath]]];
+	[wrapperVersionText setStringValue:[NSString stringWithFormat:@"Wineskin %@",[plistDictionaryWV valueForKey:@"CFBundleVersion"]]];
+	[plistDictionaryWV release];
+	//get current engine and put it on Advanced Page engineVersionText
+	NSString *testResults1 = [[NSFileManager defaultManager] destinationOfSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	NSString *testResults2 = [[NSFileManager defaultManager] destinationOfSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/Wine",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	if ([testResults1 length] > 0 || [testResults2 length] > 0) isIce = YES;
+	NSString *finalEngineName = @"error";
+	NSString *wineVersion = @"error";
+	NSString *engineBaseVersion = @"error";
+	if (isIce)
+	{
+		NSMutableArray *wineskinEngineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
+		NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+		for (NSString *file in files)
+			if ([file hasSuffix:@".bundle.tar.7z"]) [wineskinEngineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
+		for (NSString *item in wineskinEngineBundleContentsList)
+		{
+			if ([item hasPrefix:@"WSWine"] && [item hasSuffix:@"ICE.bundle"])
+			{
+				wineVersion = [item stringByReplacingOccurrencesOfString:@"WS" withString:@""];
+				wineVersion = [wineVersion stringByReplacingOccurrencesOfString:@".bundle" withString:@""];
+			}
+			if ([item hasPrefix:@"WS"] && [item hasSuffix:@"X11ICE.bundle"])
+			{
+				engineBaseVersion = [item stringByReplacingOccurrencesOfString:@"X11ICE.bundle" withString:@""];
+			}
+		}
+		finalEngineName = [NSString stringWithFormat:@"%@%@",engineBaseVersion,wineVersion];
+	}
+	else
+	{
+		NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSConfig.txt",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
+		NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
+		finalEngineName = [currentEngineVersionArray objectAtIndex:0];
+	}
+	[engineVersionText setStringValue:finalEngineName];
 	//set info from Info.plist
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	[windowsExeTextField setStringValue:[plistDictionary valueForKey:@"Program Name and Path"]];
@@ -1552,6 +1590,7 @@
 	[self installEngine];
 	//refresh wrapper
 	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineboot",nil]];
+	[self loadAllData];
 	//order in advanced window
 	[advancedWindow makeKeyAndOrderFront:self];
 	//hide busy window
