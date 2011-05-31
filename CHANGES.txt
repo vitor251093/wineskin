@@ -1,5 +1,12 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
 
+Release 2.3 - 05/31/2011
+• File associations are fixed, including just running a .exe straight from Finder
+• Custom Engines should now work fine using any name you want to use
+• Confirm quit dialog option available
+• The default Menubar name should now be the original wrapper name when its created instead of just "Wineskin Wrapper"
+• The Wrapper version and current engine being used show up as text on the Wineskin.app Advanced window
+
 Release 2.2
 • Option to add GPU info automatically to Wine registry on run.
 • Custom EXE Launchers should have Icons again.
