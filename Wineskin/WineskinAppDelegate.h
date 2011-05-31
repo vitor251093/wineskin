@@ -85,6 +85,7 @@
 	//advanced menu - Options Tab
 	IBOutlet NSButton *optSendsAltCheckBoxButton;
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
+	IBOutlet NSButton *confirmQuitCheckBoxButton;
 	
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -209,9 +210,10 @@
 - (IBAction)updateWrapperButtonPressed:(id)sender;
 - (IBAction)logsButtonPressed:(id)sender;
 
-//advanced menu - Tools Tab
+//advanced menu - Options Tab
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
+- (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;

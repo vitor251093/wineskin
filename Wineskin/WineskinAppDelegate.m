@@ -653,6 +653,7 @@
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
 	[optSendsAltCheckBoxButton setState:[[plistDictionary2 valueForKey:@"option_sends_alt"] intValue]];
+	[confirmQuitCheckBoxButton setState:![[plistDictionary2 valueForKey:@"no_quit_alert"] intValue]];
 	[plistDictionary2 release];
 }
 - (IBAction)windowsExeBrowseButtonPressed:(id)sender
@@ -837,6 +838,16 @@
 	else
 		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Symlinks In User Folder"];
 	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+	[plistDictionary release];
+}
+- (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender
+{
+	NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	if ([confirmQuitCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"no_quit_alert"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"no_quit_alert"];
+	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
 	[plistDictionary release];
 }
 
