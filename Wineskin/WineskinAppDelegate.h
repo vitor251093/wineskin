@@ -88,6 +88,7 @@
 	IBOutlet NSButton *optSendsAltCheckBoxButton;
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
+	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
 	
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -216,6 +217,7 @@
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
+- (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;

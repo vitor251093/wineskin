@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J4138</string>
+		<string key="IBDocument.SystemVersion">10J869</string>
 		<string key="IBDocument.InterfaceBuilderVersion">823</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
@@ -3810,6 +3810,28 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 													<string key="NSContents">Option key works as Alt (disabling this will prevent Alt key usage in Windows programs)</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="221768544"/>
+													<int key="NSButtonFlags">1211912703</int>
+													<int key="NSButtonFlags2">2</int>
+													<reference key="NSNormalImage" ref="967317943"/>
+													<reference key="NSAlternateImage" ref="434002165"/>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">200</int>
+													<int key="NSPeriodicInterval">25</int>
+												</object>
+											</object>
+											<object class="NSButton" id="733270802">
+												<reference key="NSNextResponder" ref="840827725"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{14, 113}, {620, 23}}</string>
+												<reference key="NSSuperview" ref="840827725"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="1059413898">
+													<int key="NSCellFlags">-2080244224</int>
+													<int key="NSCellFlags2">131072</int>
+													<string key="NSContents">Focus follows mouse (enabling this will make the window focus follow the mouse pointer within the wrapper)</string>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="733270802"/>
 													<int key="NSButtonFlags">1211912703</int>
 													<int key="NSButtonFlags2">2</int>
 													<reference key="NSNormalImage" ref="967317943"/>
@@ -9505,6 +9527,22 @@ LmRvaDEyMy5jb20vA</bytes>
 					</object>
 					<int key="connectionID">1570</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">focusFollowsMouseCheckBoxButtonPressed:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="733270802"/>
+					</object>
+					<int key="connectionID">1575</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">focusFollowsMouseCheckBoxButton</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="733270802"/>
+					</object>
+					<int key="connectionID">1576</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -13888,6 +13926,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<reference ref="221768544"/>
 							<reference ref="665341970"/>
 							<reference ref="563303649"/>
+							<reference ref="733270802"/>
 						</object>
 						<reference key="parent" ref="133644344"/>
 					</object>
@@ -14005,6 +14044,20 @@ LmRvaDEyMy5jb20vA</bytes>
 						<int key="objectID">1564</int>
 						<reference key="object" ref="619190397"/>
 						<reference key="parent" ref="545036629"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1572</int>
+						<reference key="object" ref="733270802"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="1059413898"/>
+						</object>
+						<reference key="parent" ref="840827725"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1573</int>
+						<reference key="object" ref="1059413898"/>
+						<reference key="parent" ref="733270802"/>
 					</object>
 				</object>
 			</object>
@@ -14489,6 +14542,9 @@ LmRvaDEyMy5jb20vA</bytes>
 					<string>1567.IBPluginDependency</string>
 					<string>1571.IBPluginDependency</string>
 					<string>1571.IBViewBoundsToFrameTransform</string>
+					<string>1572.IBPluginDependency</string>
+					<string>1572.IBViewBoundsToFrameTransform</string>
+					<string>1573.IBPluginDependency</string>
 					<string>19.IBPluginDependency</string>
 					<string>19.ImportedFromIB2</string>
 					<string>195.IBPluginDependency</string>
@@ -15662,7 +15718,7 @@ LmRvaDEyMy5jb20vA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABBcAAAw1EAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABBYAAAw1EAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -15704,6 +15760,11 @@ LmRvaDEyMy5jb20vA</bytes>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">AUMjAABCTAAAA</bytes>
 					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBmAAAw0wAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -15998,9 +16059,9 @@ LmRvaDEyMy5jb20vA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{273, 748}, {702, 340}}</string>
+					<string>{{329, 748}, {702, 340}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{273, 748}, {702, 340}}</string>
+					<string>{{329, 748}, {702, 340}}</string>
 					<boolean value="NO"/>
 					<boolean value="NO"/>
 					<boolean value="YES"/>
@@ -16387,7 +16448,7 @@ LmRvaDEyMy5jb20vA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1571</int>
+			<int key="maxID">1576</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -16425,6 +16486,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>extMinusButtonPressed:</string>
 							<string>extPlusButtonPressed:</string>
 							<string>extSaveButtonPressed:</string>
+							<string>focusFollowsMouseCheckBoxButtonPressed:</string>
 							<string>fullscreenClicked:</string>
 							<string>gammaChanged:</string>
 							<string>iconToUseBrowseButtonPressed:</string>
@@ -16516,6 +16578,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -16548,6 +16611,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>extMinusButtonPressed:</string>
 							<string>extPlusButtonPressed:</string>
 							<string>extSaveButtonPressed:</string>
+							<string>focusFollowsMouseCheckBoxButtonPressed:</string>
 							<string>fullscreenClicked:</string>
 							<string>gammaChanged:</string>
 							<string>iconToUseBrowseButtonPressed:</string>
@@ -16684,6 +16748,10 @@ LmRvaDEyMy5jb20vA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">extSaveButtonPressed:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">focusFollowsMouseCheckBoxButtonPressed:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -16865,6 +16933,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>extEditButton</string>
 							<string>extExtensionTextField</string>
 							<string>extPopUpButton</string>
+							<string>focusFollowsMouseCheckBoxButton</string>
 							<string>forceNormalWindowsUseTheseSettingsToggle</string>
 							<string>forceNormalWindowsUseTheseSettingsToggleForceButton</string>
 							<string>forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton</string>
@@ -16969,6 +17038,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
+							<string>NSButton</string>
 							<string>NSMatrix</string>
 							<string>NSButtonCell</string>
 							<string>NSButtonCell</string>
@@ -17076,6 +17146,7 @@ LmRvaDEyMy5jb20vA</bytes>
 							<string>extEditButton</string>
 							<string>extExtensionTextField</string>
 							<string>extPopUpButton</string>
+							<string>focusFollowsMouseCheckBoxButton</string>
 							<string>forceNormalWindowsUseTheseSettingsToggle</string>
 							<string>forceNormalWindowsUseTheseSettingsToggleForceButton</string>
 							<string>forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton</string>
@@ -17326,6 +17397,10 @@ LmRvaDEyMy5jb20vA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">extPopUpButton</string>
 								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">focusFollowsMouseCheckBoxButton</string>
+								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">forceNormalWindowsUseTheseSettingsToggle</string>

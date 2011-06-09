@@ -692,6 +692,7 @@
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
 	[optSendsAltCheckBoxButton setState:[[plistDictionary2 valueForKey:@"option_sends_alt"] intValue]];
 	[confirmQuitCheckBoxButton setState:![[plistDictionary2 valueForKey:@"no_quit_alert"] intValue]];
+	[focusFollowsMouseCheckBoxButton setState:[[plistDictionary2 valueForKey:@"wm_ffm"] intValue]];
 	[plistDictionary2 release];
 }
 - (IBAction)windowsExeBrowseButtonPressed:(id)sender
@@ -886,6 +887,17 @@
 	else
 		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"no_quit_alert"];
 	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+	[plistDictionary release];
+}
+- (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
+{
+	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:x11PlistFile];
+	if ([focusFollowsMouseCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"wm_ffm"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"wm_ffm"];
+	[plistDictionary writeToFile:x11PlistFile atomically:YES];
 	[plistDictionary release];
 }
 

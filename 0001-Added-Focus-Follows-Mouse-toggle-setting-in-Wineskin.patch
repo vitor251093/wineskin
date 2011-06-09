@@ -1,0 +1,281 @@
+From dc11a0aa606307b6b97a21506fd6a270134838e5 Mon Sep 17 00:00:00 2001
+From: Syao <syao@dotalux.com>
+Date: Thu, 9 Jun 2011 11:38:02 +0200
+Subject: [PATCH] Added 'Focus Follows Mouse' toggle setting in Wineskin.app
+
+Signed-off-by: Syao <syao@dotalux.com>
+---
+ Wineskin/English.lproj/MainMenu.xib |   85 ++++++++++++++++++++++++++++++++--
+ Wineskin/WineskinAppDelegate.h      |    2 +
+ Wineskin/WineskinAppDelegate.m      |   12 +++++
+ 3 files changed, 94 insertions(+), 5 deletions(-)
+
+diff --git a/Wineskin/English.lproj/MainMenu.xib b/Wineskin/English.lproj/MainMenu.xib
+index 8349e74..e565b31 100644
+--- a/Wineskin/English.lproj/MainMenu.xib
++++ b/Wineskin/English.lproj/MainMenu.xib
+@@ -2,7 +2,7 @@
+ <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
+ 	<data>
+ 		<int key="IBDocument.SystemTarget">1050</int>
+-		<string key="IBDocument.SystemVersion">10J4138</string>
++		<string key="IBDocument.SystemVersion">10J869</string>
+ 		<string key="IBDocument.InterfaceBuilderVersion">823</string>
+ 		<string key="IBDocument.AppKitVersion">1038.35</string>
+ 		<string key="IBDocument.HIToolboxVersion">461.00</string>
+@@ -3820,6 +3820,28 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
+ 													<int key="NSPeriodicInterval">25</int>
+ 												</object>
+ 											</object>
++											<object class="NSButton" id="733270802">
++												<reference key="NSNextResponder" ref="840827725"/>
++												<int key="NSvFlags">268</int>
++												<string key="NSFrame">{{14, 113}, {620, 23}}</string>
++												<reference key="NSSuperview" ref="840827725"/>
++												<bool key="NSEnabled">YES</bool>
++												<object class="NSButtonCell" key="NSCell" id="1059413898">
++													<int key="NSCellFlags">-2080244224</int>
++													<int key="NSCellFlags2">131072</int>
++													<string key="NSContents">Focus follows mouse (enabling this will make the window focus follow the mouse pointer within the wrapper)</string>
++													<reference key="NSSupport" ref="26"/>
++													<reference key="NSControlView" ref="733270802"/>
++													<int key="NSButtonFlags">1211912703</int>
++													<int key="NSButtonFlags2">2</int>
++													<reference key="NSNormalImage" ref="967317943"/>
++													<reference key="NSAlternateImage" ref="434002165"/>
++													<string key="NSAlternateContents"/>
++													<string key="NSKeyEquivalent"/>
++													<int key="NSPeriodicDelay">200</int>
++													<int key="NSPeriodicInterval">25</int>
++												</object>
++											</object>
+ 											<object class="NSButton" id="665341970">
+ 												<reference key="NSNextResponder" ref="840827725"/>
+ 												<int key="NSvFlags">268</int>
+@@ -9505,6 +9527,22 @@ LmRvaDEyMy5jb20vA</bytes>
+ 					</object>
+ 					<int key="connectionID">1570</int>
+ 				</object>
++				<object class="IBConnectionRecord">
++					<object class="IBActionConnection" key="connection">
++						<string key="label">focusFollowsMouseCheckBoxButtonPressed:</string>
++						<reference key="source" ref="976324537"/>
++						<reference key="destination" ref="733270802"/>
++					</object>
++					<int key="connectionID">1575</int>
++				</object>
++				<object class="IBConnectionRecord">
++					<object class="IBOutletConnection" key="connection">
++						<string key="label">focusFollowsMouseCheckBoxButton</string>
++						<reference key="source" ref="976324537"/>
++						<reference key="destination" ref="733270802"/>
++					</object>
++					<int key="connectionID">1576</int>
++				</object>
+ 			</object>
+ 			<object class="IBMutableOrderedSet" key="objectRecords">
+ 				<object class="NSArray" key="orderedObjects">
+@@ -13888,6 +13926,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 							<reference ref="221768544"/>
+ 							<reference ref="665341970"/>
+ 							<reference ref="563303649"/>
++							<reference ref="733270802"/>
+ 						</object>
+ 						<reference key="parent" ref="133644344"/>
+ 					</object>
+@@ -14006,6 +14045,20 @@ LmRvaDEyMy5jb20vA</bytes>
+ 						<reference key="object" ref="619190397"/>
+ 						<reference key="parent" ref="545036629"/>
+ 					</object>
++					<object class="IBObjectRecord">
++						<int key="objectID">1572</int>
++						<reference key="object" ref="733270802"/>
++						<object class="NSMutableArray" key="children">
++							<bool key="EncodedWithXMLCoder">YES</bool>
++							<reference ref="1059413898"/>
++						</object>
++						<reference key="parent" ref="840827725"/>
++					</object>
++					<object class="IBObjectRecord">
++						<int key="objectID">1573</int>
++						<reference key="object" ref="1059413898"/>
++						<reference key="parent" ref="733270802"/>
++					</object>
+ 				</object>
+ 			</object>
+ 			<object class="NSMutableDictionary" key="flattenedProperties">
+@@ -14489,6 +14542,9 @@ LmRvaDEyMy5jb20vA</bytes>
+ 					<string>1567.IBPluginDependency</string>
+ 					<string>1571.IBPluginDependency</string>
+ 					<string>1571.IBViewBoundsToFrameTransform</string>
++					<string>1572.IBPluginDependency</string>
++					<string>1572.IBViewBoundsToFrameTransform</string>
++					<string>1573.IBPluginDependency</string>
+ 					<string>19.IBPluginDependency</string>
+ 					<string>19.ImportedFromIB2</string>
+ 					<string>195.IBPluginDependency</string>
+@@ -15662,7 +15718,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+ 					<object class="NSAffineTransform">
+-						<bytes key="NSTransformStruct">P4AAAL+AAABBcAAAw1EAAA</bytes>
++						<bytes key="NSTransformStruct">P4AAAL+AAABBYAAAw1EAAA</bytes>
+ 					</object>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+@@ -15705,6 +15761,11 @@ LmRvaDEyMy5jb20vA</bytes>
+ 						<bytes key="NSTransformStruct">AUMjAABCTAAAA</bytes>
+ 					</object>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
++					<object class="NSAffineTransform">
++						<bytes key="NSTransformStruct">P4AAAL+AAABBmAAAw0wAAA</bytes>
++					</object>
++					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
++					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+ 					<integer value="1"/>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+ 					<integer value="1"/>
+@@ -15998,9 +16059,9 @@ LmRvaDEyMy5jb20vA</bytes>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+-					<string>{{273, 748}, {702, 340}}</string>
++					<string>{{329, 748}, {702, 340}}</string>
+ 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+-					<string>{{273, 748}, {702, 340}}</string>
++					<string>{{329, 748}, {702, 340}}</string>
+ 					<boolean value="NO"/>
+ 					<boolean value="NO"/>
+ 					<boolean value="YES"/>
+@@ -16387,7 +16448,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 				</object>
+ 			</object>
+ 			<nil key="sourceID"/>
+-			<int key="maxID">1571</int>
++			<int key="maxID">1576</int>
+ 		</object>
+ 		<object class="IBClassDescriber" key="IBDocument.Classes">
+ 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
+@@ -16425,6 +16486,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 							<string>extMinusButtonPressed:</string>
+ 							<string>extPlusButtonPressed:</string>
+ 							<string>extSaveButtonPressed:</string>
++							<string>focusFollowsMouseCheckBoxButtonPressed:</string>
+ 							<string>fullscreenClicked:</string>
+ 							<string>gammaChanged:</string>
+ 							<string>iconToUseBrowseButtonPressed:</string>
+@@ -16516,6 +16578,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 							<string>id</string>
+ 							<string>id</string>
+ 							<string>id</string>
++							<string>id</string>
+ 						</object>
+ 					</object>
+ 					<object class="NSMutableDictionary" key="actionInfosByName">
+@@ -16548,6 +16611,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 							<string>extMinusButtonPressed:</string>
+ 							<string>extPlusButtonPressed:</string>
+ 							<string>extSaveButtonPressed:</string>
++							<string>focusFollowsMouseCheckBoxButtonPressed:</string>
+ 							<string>fullscreenClicked:</string>
+ 							<string>gammaChanged:</string>
+ 							<string>iconToUseBrowseButtonPressed:</string>
+@@ -16687,6 +16751,10 @@ LmRvaDEyMy5jb20vA</bytes>
+ 								<string key="candidateClassName">id</string>
+ 							</object>
+ 							<object class="IBActionInfo">
++								<string key="name">focusFollowsMouseCheckBoxButtonPressed:</string>
++								<string key="candidateClassName">id</string>
++							</object>
++							<object class="IBActionInfo">
+ 								<string key="name">fullscreenClicked:</string>
+ 								<string key="candidateClassName">id</string>
+ 							</object>
+@@ -16865,6 +16933,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 							<string>extEditButton</string>
+ 							<string>extExtensionTextField</string>
+ 							<string>extPopUpButton</string>
++							<string>focusFollowsMouseCheckBoxButton</string>
+ 							<string>forceNormalWindowsUseTheseSettingsToggle</string>
+ 							<string>forceNormalWindowsUseTheseSettingsToggleForceButton</string>
+ 							<string>forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton</string>
+@@ -16969,6 +17038,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 							<string>NSButton</string>
+ 							<string>NSTextField</string>
+ 							<string>NSPopUpButton</string>
++							<string>NSButton</string>
+ 							<string>NSMatrix</string>
+ 							<string>NSButtonCell</string>
+ 							<string>NSButtonCell</string>
+@@ -17076,6 +17146,7 @@ LmRvaDEyMy5jb20vA</bytes>
+ 							<string>extEditButton</string>
+ 							<string>extExtensionTextField</string>
+ 							<string>extPopUpButton</string>
++							<string>focusFollowsMouseCheckBoxButton</string>
+ 							<string>forceNormalWindowsUseTheseSettingsToggle</string>
+ 							<string>forceNormalWindowsUseTheseSettingsToggleForceButton</string>
+ 							<string>forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton</string>
+@@ -17328,6 +17399,10 @@ LmRvaDEyMy5jb20vA</bytes>
+ 								<string key="candidateClassName">NSPopUpButton</string>
+ 							</object>
+ 							<object class="IBToOneOutletInfo">
++								<string key="name">focusFollowsMouseCheckBoxButton</string>
++								<string key="candidateClassName">NSButton</string>
++							</object>
++							<object class="IBToOneOutletInfo">
+ 								<string key="name">forceNormalWindowsUseTheseSettingsToggle</string>
+ 								<string key="candidateClassName">NSMatrix</string>
+ 							</object>
+diff --git a/Wineskin/WineskinAppDelegate.h b/Wineskin/WineskinAppDelegate.h
+index c5c206c..229ca52 100644
+--- a/Wineskin/WineskinAppDelegate.h
++++ b/Wineskin/WineskinAppDelegate.h
+@@ -88,6 +88,7 @@
+ 	IBOutlet NSButton *optSendsAltCheckBoxButton;
+ 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
+ 	IBOutlet NSButton *confirmQuitCheckBoxButton;
++	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
+ 	
+ 	//change engine window
+ 	IBOutlet NSWindow *changeEngineWindow;
+@@ -216,6 +217,7 @@
+ - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
+ - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
+ - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
++- (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
+ 
+ //Winetricks
+ - (IBAction)winetricksButtonPressed:(id)sender;
+diff --git a/Wineskin/WineskinAppDelegate.m b/Wineskin/WineskinAppDelegate.m
+index 2aa1dc0..7ce0539 100644
+--- a/Wineskin/WineskinAppDelegate.m
++++ b/Wineskin/WineskinAppDelegate.m
+@@ -692,6 +692,7 @@
+ 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
+ 	[optSendsAltCheckBoxButton setState:[[plistDictionary2 valueForKey:@"option_sends_alt"] intValue]];
+ 	[confirmQuitCheckBoxButton setState:![[plistDictionary2 valueForKey:@"no_quit_alert"] intValue]];
++	[focusFollowsMouseCheckBoxButton setState:[[plistDictionary2 valueForKey:@"wm_ffm"] intValue]];
+ 	[plistDictionary2 release];
+ }
+ - (IBAction)windowsExeBrowseButtonPressed:(id)sender
+@@ -888,6 +889,17 @@
+ 	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+ 	[plistDictionary release];
+ }
++- (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
++{
++	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
++	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:x11PlistFile];
++	if ([focusFollowsMouseCheckBoxButton state] == 0)
++		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"wm_ffm"];
++	else
++		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"wm_ffm"];
++	[plistDictionary writeToFile:x11PlistFile atomically:YES];
++	[plistDictionary release];
++}
+ 
+ //*************************************************************
+ //**************** Advanced Menu - Tools Tab ******************
+-- 
+1.7.3.1
+
