@@ -686,6 +686,7 @@
 	NSString *x11InstallPath = [tempArray objectAtIndex:1];
 	//set up quartz-wm launch correctly
 	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"%@/bin/quartz-wm\"",x11InstallPath];
+	if (fullScreenOption) quartzwmLine=@"";
 	//copy the plist over
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
 	[fm copyItemAtPath:wsX11PlistFile toPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
