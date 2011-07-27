@@ -87,6 +87,7 @@
 	//advanced menu - Options Tab
 	IBOutlet NSButton *optSendsAltCheckBoxButton;
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
+	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
 	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
 	
@@ -139,6 +140,14 @@
 	IBOutlet NSWindow *extAddEditWindow;
 	IBOutlet NSTextField *extExtensionTextField;
 	IBOutlet NSTextField *extCommandTextField;
+	
+	//Modify Mappings Window
+	IBOutlet NSWindow *modifyMappingsWindow;
+	IBOutlet NSTextField *modifyMappingsMyDocumentsTextField;
+	IBOutlet NSTextField *modifyMappingsDesktopTextField;
+	IBOutlet NSTextField *modifyMappingsMyVideosTextField;
+	IBOutlet NSTextField *modifyMappingsMyMusicTextField;
+	IBOutlet NSTextField *modifyMappingsMyPicturesTextField;
 	
 	//ICE
 	BOOL isIce;
@@ -218,6 +227,7 @@
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 - (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
+- (IBAction)modifyMappingsButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;
@@ -245,6 +255,15 @@
 //extensions window
 - (IBAction)extSaveButtonPressed:(id)sender;
 - (IBAction)extCancelButtonPressed:(id)sender;
+//modify mappings window
+- (IBAction)modifyMappingsSaveButtonPressed:(id)sender;
+- (IBAction)modifyMappingsCancelButtonPressed:(id)sender;
+- (IBAction)modifyMappingsResetButtonPressed:(id)sender;
+- (IBAction)modifyMappingsMyDocumentsBrowseButtonPressed:(id)sender;
+- (IBAction)modifyMappingsMyDesktopBrowseButtonPressed:(id)sender;
+- (IBAction)modifyMappingsMyVideosBrowseButtonPressed:(id)sender;
+- (IBAction)modifyMappingsMyMusicBrowseButtonPressed:(id)sender;
+- (IBAction)modifyMappingsMyPicturesBrowseButtonPressed:(id)sender;
 //ICE
 - (void)installEngine;
 // TESTS
