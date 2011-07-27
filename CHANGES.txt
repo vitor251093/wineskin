@@ -1,6 +1,6 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
 
-Release 2.4 - IN DEVELOPMENT
+Release 2.4 - 07/26/2011
 • Mapping user folders is much more customizable now
 • Fixed the but where Override->Fullscreen pushed the picture down slightly
 • Option added to set "Focus Follows Mouse" for WineskinX11, instead of always being on
