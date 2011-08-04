@@ -1242,8 +1242,19 @@
 			//if changed, read to get resolution to change to
 			if (stat_p.st_mtime > oldTimeStamp)
 			{
-				//get previous wineserver
 				NSArray *tempArray = [self readFileToStringArray:[NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix]];
+				//if not in debug mode blank the log
+				if (!debugEnabled)
+				{
+					//remaking the file causes problems... need to open and blank it without re-writing it.
+					FILE *file; 
+					file = fopen([[NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix] UTF8String],"w");
+					fclose(file);
+				}
+				//set new time stamp
+				stat ([[NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix] UTF8String], &stat_p);
+				oldTimeStamp = stat_p.st_mtime;
+				//now find resolution, and change it
 				for (NSString *item in tempArray)
 				{
 					if ([item hasPrefix:@"trace:x11settings:X11DRV_ChangeDisplaySettingsEx width="])
@@ -1258,17 +1269,6 @@
 					}
 				}
 			}
-			//if not in debug mode blank the log
-			if (!debugEnabled)
-			{
-				//remaking the file causes problems... need to open and blank it without re-writing it.
-				FILE *file; 
-				file = fopen([[NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix] UTF8String],"w");
-				fclose(file);
-			}
-			//set new time stamp
-			stat ([[NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix] UTF8String], &stat_p);
-			oldTimeStamp = stat_p.st_mtime;
 		}
 		if (fixGamma)
 		{
