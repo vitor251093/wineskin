@@ -103,6 +103,9 @@
 //returns true if pid is running
 - (BOOL)pidRunning:(NSString *)pid;
 
+//returns true if running PID has the specified name
+- (BOOL)isPID:(NSString *)pid named:(NSString *)name;
+
 //start wine, return wineserver PID;
 - (NSString *)startWine;
 
@@ -1014,6 +1017,11 @@
 	if (kill((pid_t)xmax, 0) == 0) answer = YES;
 	return answer;
 }
+- (BOOL)isPID:(NSString *)pid named:(NSString *)name
+{
+	if ([[self systemCommand:[NSString stringWithFormat:@"ps -p %@ | grep %@",pid,name]] length] < 1) return NO;
+	return YES;
+}
 
 - (NSString *)startWine
 {
@@ -1102,7 +1110,8 @@
 		else [self setToVirtualDesktop:vdResolution named:virtualDesktopName];
 		// wineserver check to see if this is a multirun customexe
 		NSArray *wineserverPIDCheckArray = [self readFileToStringArray:wineserverPIDFile];
-		if ([self pidRunning:[wineserverPIDCheckArray objectAtIndex:0]]) returnPID = [wineserverPIDCheckArray objectAtIndex:0];
+		if ([self isPID:[wineserverPIDCheckArray objectAtIndex:0] named:@"wineserver"])
+				returnPID = [wineserverPIDCheckArray objectAtIndex:0];
 		//do not run if wineserver already running.
 		if ([returnPID isEqualToString:@"-1"])
 		{
@@ -1110,10 +1119,10 @@
 			NSArray *firstPIDlist = [self makePIDArray:@"wineserver"];
 			//start wineserver
 			[self systemCommand:[NSString stringWithFormat:@"%@export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver > /dev/null 2>&1",cliCustomCommands,winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,theDisplayNumber,winePrefix,winePrefix,winePrefix,winePrefix]];
-			//do loop compare to find correct PID, only try 3 times, then fail
+			//do loop compare to find correct PID, only try 3 times, then try again slower 5 times over 5 seconds
 			BOOL match = YES;
 			int i = 0;
-			for (i=0;i<3;i++)
+			for (i=0;i<9;i++)
 			{
 				NSArray *secondPIDlist = [self makePIDArray:@"wineserver"];
 				for(NSString *secondPIDlistItem in secondPIDlist)
@@ -1128,6 +1137,7 @@
 					}
 				}
 				if (!match) break;
+				if (i>2) usleep(1000000);
 			}
 			//if no PID found, do error
 			if ([returnPID isEqualToString:@"-1"])
