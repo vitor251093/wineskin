@@ -804,6 +804,8 @@
 		logFileLocation=[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
 	else
 		logFileLocation = @"/dev/null";
+	//make sure the X11 lock files is gone before starting X11
+	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	//Start WineskinX11
 	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/WineskinEngine.bundle/X11/share/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,winePrefix,winePrefix,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,winePrefix,quartzwmLine,logFileLocation]];
 	//fix Info.plist back
@@ -814,6 +816,8 @@
 	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
 	[quickEdit2 writeToFile:infoPlistFile atomically:YES];
 	[quickEdit2 release];
+	//get rid of X11 lock folder that shouldnt be needed
+	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	[fm release];
 	return thePidToReturn;
 }
@@ -1293,6 +1297,7 @@
 
 - (void)cleanUpAndShutDown
 {
+	NSFileManager *fm = [NSFileManager defaultManager];
 	//fix screen resolution back to original if fullscreen
 	if (fullScreenOption)
 	{
@@ -1302,8 +1307,10 @@
 	//kill the X server
 	char *tmp;
 	kill((pid_t)(strtoimax([x11PID UTF8String], &tmp, 10)), 9);
+	//delete the Display lock file in /tmp
+	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
 	//fix user folders back
-	NSFileManager *fm = [NSFileManager defaultManager];
 	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()]])
 	{
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];
