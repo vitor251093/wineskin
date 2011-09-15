@@ -761,6 +761,17 @@
 	NSString *engineVersion = [tempArray objectAtIndex:0];
 	NSLog(@"Using Engine %@",engineVersion);
 	NSString *x11InstallPath = [tempArray objectAtIndex:1];
+	//fix to have the right libXplugin for the OS version
+	SInt32 majorVersion,minorVersion;
+	Gestalt(gestaltSystemVersionMajor, &majorVersion);
+	Gestalt(gestaltSystemVersionMinor, &minorVersion);
+	NSString *copyFrom = [NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/lib/libXplugin.1.%d.%d.dylib",winePrefix,majorVersion,minorVersion];
+	NSString *copyTo = [NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/lib/libXplugin.1.dylib",winePrefix];
+	if ([fm fileExistsAtPath:copyFrom]) //only exists on WS8+, do not break WS7 engines.
+	{
+		[fm removeItemAtPath:copyTo error:nil];
+		[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
+	}
 	//set up quartz-wm launch correctly
 	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"%@/bin/quartz-wm\"",x11InstallPath];
 	if (fullScreenOption) quartzwmLine=@"";
@@ -1211,21 +1222,15 @@
 	while ([self pidRunning:wineServerPID])
 	{
 		//check for xrandr made files in /tmp
-		// /tmp/WineskinXrandrTempFile line 1 will be fullscreen X res, and line 2 is fullscreen y res.
-		// /tmp/WineskinXrandrTempFileSwitch file existence means need to toggle back to fullscreen with xrandr to above X,Y gotten earlier
 		if ([fm fileExistsAtPath:@"/tmp/WineskinXrandrTempFile"])
 		{
 			NSArray *tempArray = [self readFileToStringArray:@"/tmp/WineskinXrandrTempFile"];
 			[fm removeItemAtPath:@"/tmp/WineskinXrandrTempFile" error:nil];
-			if ([[tempArray objectAtIndex:0] isEqualToString:@"rootless"])
+			if (!([[tempArray objectAtIndex:0] isEqualToString:@"WS8+"]) && ([tempArray count] > 1))
 			{
-				NSLog(@"stub: Read rootless in file");
-				//need to do rootless start quartz-wm if WS8+
-				
-				// TODO
-			}
-			else if ([tempArray count] > 1)
-			{
+				//only used in WS5+ engines to get last fullscreen resolution for Cmd+Opt+A toggle
+				//WS8+ the toggle is all built into WineskinX11, so it just writes "WS8+" in the file
+				//The file is still written so Wineskin knows resolutions changes happened to try to fix gamma in WS8+
 				randrXres = [tempArray objectAtIndex:0];
 				randrYres = [tempArray objectAtIndex:1];
 				NSLog(@"Setting X and Y res to %@,%@",randrXres,randrYres);
@@ -1240,6 +1245,8 @@
 		}
 		if ([fm fileExistsAtPath:@"/tmp/WineskinXrandrTempFileSwitch"])
 		{
+			//only used in WS7 engines to toggle correctly back to fullscreen with Cmd+Opt+A
+			//WS8+ the toggle is all built into WineskinX11
 			//need to call xrandr for the last fullscreen res
 			[fm removeItemAtPath:@"/tmp/WineskinXrandrTempFileSwitch" error:nil];
 			if (!([randrXres isEqualToString:@"0"]) && !([randrYres isEqualToString:@"0"]))
