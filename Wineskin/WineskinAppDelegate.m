@@ -1723,6 +1723,18 @@
 	[self systemCommand:@"/usr/bin/open" withArgs:[NSArray arrayWithObjects:@"-e",[NSString stringWithFormat:@"%@/Contents/Resources/Logs/LastRunX11.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 	[self systemCommand:@"/usr/bin/open" withArgs:[NSArray arrayWithObjects:@"-e",[NSString stringWithFormat:@"%@/Contents/Resources/Logs/LastRunWine.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 }
+- (IBAction)commandLineShellButtonPressed:(id)sender
+{
+	[NSThread detachNewThreadSelector:@selector(runCmd) toTarget:self withObject:nil];
+}
+- (void)runCmd
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	[self disableButtons];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-cmd",nil]];
+	[self enableButtons];
+	[pool release];
+}
 //*************************************************************
 //*********************** OVERRIDES ***************************
 //*************************************************************

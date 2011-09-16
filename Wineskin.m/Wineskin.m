@@ -219,6 +219,7 @@
 	//list of possile options
 	//WSS-installer {path/file}	- Installer is calling the program
 	//WSS-winecfg 				- need to run winecfg
+	//WSS-cmd					- need to run cmd
 	//WSS-regedit 				- need to run regedit
 	//WSS-taskmgr 				- need to run taskmgr
 	//WSS-uninstall				- run uninstaller
@@ -275,11 +276,14 @@
 				vdResolution = @"novd";
 				fullScreenOption = NO;
 				sleepNumber = 0;
-				//should only use this line for winecfg regedit and taskmgr, other 2 do nonstandard runs and wont use this line
+				//should only use this line for winecfg cmd regedit and taskmgr, other 2 do nonstandard runs and wont use this line
 				if ([wssCommand isEqualToString:@"WSS-regedit"])
 					programNameAndPath = @"/windows/regedit.exe";
 				else
+				{
+					if ([wssCommand isEqualToString:@"WSS-cmd"]) runWithStartExe=YES;
 					programNameAndPath = [NSString stringWithFormat:@"/windows/system32/%@.exe",[wssCommand stringByReplacingOccurrencesOfString:@"WSS-" withString:@""]];
+				}
 				programFlags = @""; // just in case there were some flags... don't use on these.
 				if ([wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-winetricks"])
 					nonStandardRun=YES; // handle Wine differently if its one of these 2

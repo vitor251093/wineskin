@@ -221,6 +221,8 @@
 - (IBAction)changeEngineUsedCancelButtonPressed:(id)sender;
 - (IBAction)updateWrapperButtonPressed:(id)sender;
 - (IBAction)logsButtonPressed:(id)sender;
+- (IBAction)commandLineShellButtonPressed:(id)sender;
+- (void)runCmd;
 
 //advanced menu - Options Tab
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;

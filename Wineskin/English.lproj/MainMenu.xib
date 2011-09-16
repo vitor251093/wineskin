@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11A511</string>
+    <string key="IBDocument.SystemVersion">11B26</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
     <string key="IBDocument.AppKitVersion">1138</string>
     <string key="IBDocument.HIToolboxVersion">566.00</string>
@@ -1203,7 +1203,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                           <int key="NSPeriodicDelay">400</int>
                           <int key="NSPeriodicInterval">75</int>
                         </object>
-                        <reference key="NSSelectedCell" ref="233604520"/>
+                        <int key="NSSelectedRow">-1</int>
+                        <int key="NSSelectedCol">-1</int>
                         <reference key="NSBackgroundColor" ref="384442021"/>
                         <reference key="NSCellBackgroundColor" ref="222988942"/>
                         <reference key="NSFont" ref="66818554"/>
@@ -2064,7 +2065,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                         <int key="NSPeriodicDelay">400</int>
                         <int key="NSPeriodicInterval">75</int>
                       </object>
-                      <reference key="NSSelectedCell" ref="928861607"/>
+                      <int key="NSSelectedRow">-1</int>
+                      <int key="NSSelectedCol">-1</int>
                       <reference key="NSBackgroundColor" ref="384442021"/>
                       <reference key="NSCellBackgroundColor" ref="222988942"/>
                       <reference key="NSFont" ref="66818554"/>
@@ -2198,7 +2200,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                         <int key="NSPeriodicDelay">400</int>
                         <int key="NSPeriodicInterval">75</int>
                       </object>
-                      <reference key="NSSelectedCell" ref="493748751"/>
+                      <int key="NSSelectedRow">-1</int>
+                      <int key="NSSelectedCol">-1</int>
                       <reference key="NSBackgroundColor" ref="384442021"/>
                       <reference key="NSCellBackgroundColor" ref="222988942"/>
                       <reference key="NSFont" ref="66818554"/>
@@ -3508,7 +3511,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <object class="NSButton" id="115003017">
                         <reference key="NSNextResponder" ref="659283400"/>
                         <int key="NSvFlags">268</int>
-                        <string key="NSFrame">{{222, 118}, {194, 41}}</string>
+                        <string key="NSFrame">{{222, 75}, {194, 41}}</string>
                         <reference key="NSSuperview" ref="659283400"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSButtonCell" key="NSCell" id="477773839">
@@ -3517,6 +3520,27 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                           <string key="NSContents">Custom EXE Creator</string>
                           <reference key="NSSupport" ref="66818554"/>
                           <reference key="NSControlView" ref="115003017"/>
+                          <int key="NSButtonFlags">-2038021889</int>
+                          <int key="NSButtonFlags2">130</int>
+                          <reference key="NSAlternateImage" ref="66818554"/>
+                          <string key="NSAlternateContents"/>
+                          <string key="NSKeyEquivalent"/>
+                          <int key="NSPeriodicDelay">400</int>
+                          <int key="NSPeriodicInterval">75</int>
+                        </object>
+                      </object>
+                      <object class="NSButton" id="960948842">
+                        <reference key="NSNextResponder" ref="659283400"/>
+                        <int key="NSvFlags">268</int>
+                        <string key="NSFrame">{{222, 118}, {194, 41}}</string>
+                        <reference key="NSSuperview" ref="659283400"/>
+                        <bool key="NSEnabled">YES</bool>
+                        <object class="NSButtonCell" key="NSCell" id="564288079">
+                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags2">134217728</int>
+                          <string key="NSContents">Command Line Shell</string>
+                          <reference key="NSSupport" ref="66818554"/>
+                          <reference key="NSControlView" ref="960948842"/>
                           <int key="NSButtonFlags">-2038021889</int>
                           <int key="NSButtonFlags2">130</int>
                           <reference key="NSAlternateImage" ref="66818554"/>
@@ -3676,7 +3700,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <object class="NSButton" id="583526182">
                         <reference key="NSNextResponder" ref="659283400"/>
                         <int key="NSvFlags">268</int>
-                        <string key="NSFrame">{{222, 75}, {194, 41}}</string>
+                        <string key="NSFrame">{{222, 32}, {194, 41}}</string>
                         <reference key="NSSuperview" ref="659283400"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSButtonCell" key="NSCell" id="278921211">
@@ -10206,6 +10230,14 @@ LmRvaDEyMy5jb20vA</bytes>
           </object>
           <int key="connectionID">1643</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">commandLineShellButtonPressed:</string>
+            <reference key="source" ref="976324537"/>
+            <reference key="destination" ref="960948842"/>
+          </object>
+          <int key="connectionID">1647</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -11398,7 +11430,6 @@ LmRvaDEyMy5jb20vA</bytes>
               <reference ref="463331385"/>
               <reference ref="228205133"/>
               <reference ref="904032289"/>
-              <reference ref="115003017"/>
               <reference ref="949868659"/>
               <reference ref="633284608"/>
               <reference ref="937701024"/>
@@ -11406,7 +11437,9 @@ LmRvaDEyMy5jb20vA</bytes>
               <reference ref="50968592"/>
               <reference ref="455045619"/>
               <reference ref="865786885"/>
+              <reference ref="115003017"/>
               <reference ref="583526182"/>
+              <reference ref="960948842"/>
             </object>
             <reference key="parent" ref="925309505"/>
           </object>
@@ -15081,6 +15114,20 @@ LmRvaDEyMy5jb20vA</bytes>
             <reference key="object" ref="557323300"/>
             <reference key="parent" ref="504100160"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">1644</int>
+            <reference key="object" ref="960948842"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="564288079"/>
+            </object>
+            <reference key="parent" ref="659283400"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">1645</int>
+            <reference key="object" ref="564288079"/>
+            <reference key="parent" ref="960948842"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -15642,6 +15689,9 @@ LmRvaDEyMy5jb20vA</bytes>
           <string>1626.IBPluginDependency</string>
           <string>1627.IBPluginDependency</string>
           <string>1627.IBViewBoundsToFrameTransform</string>
+          <string>1644.IBPluginDependency</string>
+          <string>1644.IBViewBoundsToFrameTransform</string>
+          <string>1645.IBPluginDependency</string>
           <string>19.IBPluginDependency</string>
           <string>19.ImportedFromIB2</string>
           <string>195.IBPluginDependency</string>
@@ -16986,6 +17036,11 @@ LmRvaDEyMy5jb20vA</bytes>
             <bytes key="NSTransformStruct">AUOFgABCzAAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDYwAAwtoAAA</bytes>
+          </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <integer value="1"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <integer value="1"/>
@@ -17279,9 +17334,9 @@ LmRvaDEyMy5jb20vA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{397, 538}, {702, 340}}</string>
+          <string>{{841, 687}, {702, 340}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{397, 538}, {702, 340}}</string>
+          <string>{{841, 687}, {702, 340}}</string>
           <boolean value="NO"/>
           <boolean value="NO"/>
           <boolean value="YES"/>
@@ -17413,7 +17468,7 @@ LmRvaDEyMy5jb20vA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDXgAAwx8AAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDXgAAwuQAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -17438,7 +17493,7 @@ LmRvaDEyMy5jb20vA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDXgAAwugAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDXgAAwuQAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{407, 650}, {115, 23}}</string>
@@ -17668,7 +17723,7 @@ LmRvaDEyMy5jb20vA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">1643</int>
+      <int key="maxID">1647</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -17698,6 +17753,7 @@ LmRvaDEyMy5jb20vA</bytes>
               <string>changeEngineUsedCancelButtonPressed:</string>
               <string>changeEngineUsedOkButtonPressed:</string>
               <string>chooseExeOKButtonPressed:</string>
+              <string>commandLineShellButtonPressed:</string>
               <string>confirmQuitCheckBoxButtonPressed:</string>
               <string>createCustomExeLauncherButtonPressed:</string>
               <string>doneButtonPressed:</string>
@@ -17817,6 +17873,7 @@ LmRvaDEyMy5jb20vA</bytes>
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="actionInfosByName">
@@ -17841,6 +17898,7 @@ LmRvaDEyMy5jb20vA</bytes>
               <string>changeEngineUsedCancelButtonPressed:</string>
               <string>changeEngineUsedOkButtonPressed:</string>
               <string>chooseExeOKButtonPressed:</string>
+              <string>commandLineShellButtonPressed:</string>
               <string>confirmQuitCheckBoxButtonPressed:</string>
               <string>createCustomExeLauncherButtonPressed:</string>
               <string>doneButtonPressed:</string>
@@ -17963,6 +18021,10 @@ LmRvaDEyMy5jb20vA</bytes>
               </object>
               <object class="IBActionInfo">
                 <string key="name">chooseExeOKButtonPressed:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">commandLineShellButtonPressed:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
