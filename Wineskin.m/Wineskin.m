@@ -783,6 +783,8 @@
 	[fm removeItemAtPath:x11InstallPath error:nil];
 	//symlink X11 straight to x11InstallPath
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@",x11InstallPath] withDestinationPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",winePrefix] error:nil];
+	//make sure the new symlink is full read/write so other users can run wrappers too. Task List bug 3406451
+	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",x11InstallPath]];
 	NSArray *winePidCheck = [self readFileToStringArray:wineserverPIDFile];
 	if ([self pidRunning:[winePidCheck objectAtIndex:0]])
 	{
