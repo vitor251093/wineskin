@@ -87,6 +87,7 @@
 	
 	//advanced menu - Options Tab
 	IBOutlet NSButton *optSendsAltCheckBoxButton;
+	IBOutlet NSButton *emulateThreeButtonMouseCheckBoxButton;
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
 	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
@@ -227,6 +228,7 @@
 
 //advanced menu - Options Tab
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
+- (IBAction)emulateThreeButtonMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 - (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
