@@ -1,2 +1,3 @@
 Release 1.2 - in development
 • Downloaded Engines, and Engines you ignore will never prompt as new again
+• If your downloaded engine is corrupted, Winery will prompt you instead of still trying to build and making a broken wrapper.
