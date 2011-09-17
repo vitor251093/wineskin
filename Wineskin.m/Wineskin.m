@@ -1046,19 +1046,19 @@
 			NSString *wineLogFile = @"/dev/null";
 			[self systemCommand:[NSString stringWithFormat:@"export WINEDLLOVERRIDES=\"mshtml=\";export WINEDEBUG=%@;export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine wineboot > \"%@\" 2>&1",wineDebugLine,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,wineLogFile]];
 			usleep(3000000);
-			//fix user name entires over to public
+			//fix user name entires over to Wineskin
 			NSArray *userReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 			NSMutableArray *newUserReg = [NSMutableArray arrayWithCapacity:[userReg count]];
 			for (NSString *item in userReg)
-				[newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Public"]];
+				[newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
 			[self writeStringArray:[NSArray arrayWithArray:newUserReg] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 			NSArray *userDefReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
 			NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:[userDefReg count]];
 			for (NSString *item in userDefReg)
-				[newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Public"]];
+				[newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
 			[self writeStringArray:[NSArray arrayWithArray:newUserDefReg] toFile:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
-			// need Temp folder in Public folder
-			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Public/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
+			// need Temp folder in Wineskin folder
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
 		}
 		else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"])
 		{
@@ -1074,19 +1074,19 @@
 				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"%@\" 2>&1",wineDebugLine,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,contentsFold,wineLogFile]];
 				usleep(5000000);
 			}
-			//fix user name entires over to public
+			//fix user name entires over to Wineskin
 			NSArray *userReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 			NSMutableArray *newUserReg = [NSMutableArray arrayWithCapacity:[userReg count]];
 			for (NSString *item in userReg)
-				[newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Public"]];
+				[newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
 			[self writeStringArray:[NSArray arrayWithArray:newUserReg] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 			NSArray *userDefReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
 			NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:[userDefReg count]];
 			for (NSString *item in userDefReg)
-				[newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Public"]];
+				[newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
 			[self writeStringArray:[NSArray arrayWithArray:newUserDefReg] toFile:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
-			// need Temp folder in Public folder
-			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Public/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
+			// need Temp folder in Wineskin folder
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
 			// do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
 			// Task Number 3221715 Fix Wrapper Permissions
 			//cocoa command don't seem to be working right, but chmod system command works fine.
