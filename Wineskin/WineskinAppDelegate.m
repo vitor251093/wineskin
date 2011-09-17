@@ -683,9 +683,15 @@
 	for (NSString *item in assArray)
 		[extPopUpButton addItemWithTitle:item];
 	if ([[[extPopUpButton selectedItem] title] isEqualToString:@""])
+	{
+		[extMinusButton setEnabled:NO];
 		[extEditButton setEnabled:NO];
+	}
 	else
+	{
+		[extMinusButton setEnabled:YES];
 		[extEditButton setEnabled:YES];
+	}
 	[mapUserFoldersCheckBoxButton setState:[[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue]];
 	if ([mapUserFoldersCheckBoxButton state] == 0)
 		[modifyMappingsButton setEnabled:NO];
@@ -770,7 +776,7 @@
 {
 	[self saveAllData];
 	[extExtensionTextField setStringValue:@""];
-	[extCommandTextField setStringValue:[NSString stringWithFormat:@"C:%@ %%1",[[windowsExeTextField stringValue] stringByReplacingOccurrencesOfString:@"/" withString:@"\\\\"]]];
+	[extCommandTextField setStringValue:[NSString stringWithFormat:@"C:%@ \"%%1\"",[[windowsExeTextField stringValue] stringByReplacingOccurrencesOfString:@"/" withString:@"\\"]]];
 	[extAddEditWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
@@ -851,7 +857,12 @@
 	{
 		if ([lastLine hasPrefix:[NSString stringWithFormat:@"[Software\\\\Classes\\\\%@file\\\\shell\\\\open\\\\command]",[extExtensionTextField stringValue]]])
 		{
-			[extCommandTextField setStringValue:[[item stringByReplacingOccurrencesOfString:@"@=\"" withString:@""] stringByReplacingOccurrencesOfString:@"\"" withString:@""]];
+			NSString *temp1 = [item stringByReplacingOccurrencesOfString:@"\\\"" withString:@"WINESKINTEMPBACKSLASHQUOTE"];
+			temp1 = [temp1 stringByReplacingOccurrencesOfString:@"@=\"" withString:@""];
+			temp1 = [temp1 stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+			temp1 = [temp1 stringByReplacingOccurrencesOfString:@"WINESKINTEMPBACKSLASHQUOTE" withString:@"\""];
+			temp1 = [temp1 stringByReplacingOccurrencesOfString:@"\\\\" withString:@"\\"];
+			[extCommandTextField setStringValue:temp1];
 			break;
 		}
 		lastLine = item;
@@ -1798,6 +1809,10 @@
 	[extExtensionTextField setStringValue:[[extExtensionTextField stringValue] stringByReplacingOccurrencesOfString:@"." withString:@""]];
 	NSArray *arrayToSearch = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/system.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
 	NSMutableArray *finalArray =  [NSMutableArray arrayWithCapacity:[arrayToSearch count]];
+	NSString *stringToWrite = [extCommandTextField stringValue];
+	//fix stringToWrite to escape quotes and backslashes before writing
+	stringToWrite = [stringToWrite stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
+	stringToWrite = [stringToWrite stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
 	BOOL matchMaker1 = NO;
 	BOOL matchMaker2 = NO;
 	BOOL waitUntilNextKey = NO;
@@ -1817,7 +1832,7 @@
 			matchMaker2 = YES;
 			waitUntilNextKey = YES;
 			[finalArray addObject:item];
-			[finalArray addObject:[NSString stringWithFormat:@"@=\"%@\"",[extCommandTextField stringValue]]];
+			[finalArray addObject:[NSString stringWithFormat:@"@=\"%@\"",stringToWrite]];
 			[finalArray addObject:@""];
 			continue;
 		}
@@ -1835,7 +1850,7 @@
 	{
 		//entry didn't exist, just add at end
 		[finalArray addObject:[NSString stringWithFormat:@"[Software\\\\Classes\\\\%@file\\\\shell\\\\open\\\\command]",[extExtensionTextField stringValue]]];
-		[finalArray addObject:[NSString stringWithFormat:@"@=\"%@\"",[extCommandTextField stringValue]]];
+		[finalArray addObject:[NSString stringWithFormat:@"@=\"%@\"",stringToWrite]];
 		[finalArray addObject:@""];
 	}
 	//write file back out to .reg file

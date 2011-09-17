@@ -4245,7 +4245,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <object class="NSTextFieldCell" key="NSCell" id="237227888">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">138544128</int>
-                        <string key="NSContents">A standard command is entered for you. %1 specifies the full path and file that is being passed to it.</string>
+                        <string key="NSContents">A standard command is entered for you. "%1" specifies the full path and file that is being passed to it.</string>
                         <reference key="NSSupport" ref="26"/>
                         <reference key="NSControlView" ref="238620801"/>
                         <reference key="NSBackgroundColor" ref="384442021"/>
@@ -4261,7 +4261,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                       <object class="NSTextFieldCell" key="NSCell" id="272464780">
                         <int key="NSCellFlags">68288064</int>
                         <int key="NSCellFlags2">138544128</int>
-                        <string key="NSContents">Example:    C:\\windows\\notepad.exe %1</string>
+                        <string key="NSContents">Example:    C:\windows\notepad.exe "%1"</string>
                         <reference key="NSSupport" ref="26"/>
                         <reference key="NSControlView" ref="674964938"/>
                         <reference key="NSBackgroundColor" ref="384442021"/>
@@ -10237,6 +10237,14 @@ LmRvaDEyMy5jb20vA</bytes>
             <reference key="destination" ref="960948842"/>
           </object>
           <int key="connectionID">1647</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">extMinusButton</string>
+            <reference key="source" ref="976324537"/>
+            <reference key="destination" ref="831749671"/>
+          </object>
+          <int key="connectionID">1648</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -17723,7 +17731,7 @@ LmRvaDEyMy5jb20vA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">1647</int>
+      <int key="maxID">1648</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -18277,6 +18285,7 @@ LmRvaDEyMy5jb20vA</bytes>
               <string>extCommandTextField</string>
               <string>extEditButton</string>
               <string>extExtensionTextField</string>
+              <string>extMinusButton</string>
               <string>extPopUpButton</string>
               <string>focusFollowsMouseCheckBoxButton</string>
               <string>forceNormalWindowsUseTheseSettingsToggle</string>
@@ -18389,6 +18398,7 @@ LmRvaDEyMy5jb20vA</bytes>
               <string>NSTextField</string>
               <string>NSButton</string>
               <string>NSTextField</string>
+              <string>NSButton</string>
               <string>NSPopUpButton</string>
               <string>NSButton</string>
               <string>NSMatrix</string>
@@ -18504,6 +18514,7 @@ LmRvaDEyMy5jb20vA</bytes>
               <string>extCommandTextField</string>
               <string>extEditButton</string>
               <string>extExtensionTextField</string>
+              <string>extMinusButton</string>
               <string>extPopUpButton</string>
               <string>focusFollowsMouseCheckBoxButton</string>
               <string>forceNormalWindowsUseTheseSettingsToggle</string>
@@ -18759,6 +18770,10 @@ LmRvaDEyMy5jb20vA</bytes>
               <object class="IBToOneOutletInfo">
                 <string key="name">extExtensionTextField</string>
                 <string key="candidateClassName">NSTextField</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">extMinusButton</string>
+                <string key="candidateClassName">NSButton</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">extPopUpButton</string>

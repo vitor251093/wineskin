@@ -70,6 +70,7 @@
 	IBOutlet NSButton *iconBrowseButton;
 	IBOutlet NSPopUpButton *extPopUpButton;
 	IBOutlet NSButton *extEditButton;
+	IBOutlet NSButton *extMinusButton;
 	
 	//advanced menu - Tools Tab
 	IBOutlet NSButton *winecfgButton;
