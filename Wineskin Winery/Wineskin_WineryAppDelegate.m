@@ -799,21 +799,45 @@
 	system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/Library/Application Support/Wineskin/Engines\" -xf \"%@/Library/Application Support/Wineskin/Engines/%@.tar\"",NSHomeDirectory(),NSHomeDirectory(),[createWrapperEngine stringValue]] UTF8String]);
 	//remove tar
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),[createWrapperEngine stringValue]] error:nil];
-	//put engine in wrapper
-	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Resources/WineskinEngine.bundle",[createWrapperName stringValue]] error:nil];
-	//refresh wrapper
-	system([[NSString stringWithFormat:@"\"/tmp/%@.app/Contents/MacOS/Wineskin\" WSS-wineprefixcreate",[createWrapperName stringValue]] UTF8String]);
-	//move wrapper to ~/Applications/Wineskin
-	[fm moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] toPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]] error:nil];
-	//put ending message
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert addButtonWithTitle:@"View wrapper in Finder"];
-	[alert addButtonWithTitle:@"OK"];
-	[alert setMessageText:@"Wrapper Creation Finished"];
-	[alert setInformativeText:[NSString stringWithFormat:@"Created File: %@.app\n\nCreated In:%@/Applications/Wineskin\n",[createWrapperName stringValue],NSHomeDirectory()]];
-	[alert setAlertStyle:NSInformationalAlertStyle];
-	if ([alert runModal] == NSAlertFirstButtonReturn)
-		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Applications/Wineskin/",NSHomeDirectory()]]];
+	//test a couple of file sint he engine just to make sure it isn't corrupted
+	BOOL engineError=NO;
+	if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()]]) engineError=YES;
+	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/bin/wineserver",NSHomeDirectory()]]) engineError=YES;
+	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/bin/wine",NSHomeDirectory()]]) engineError=YES;
+	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/X11",NSHomeDirectory()]]) engineError=YES;
+	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/X11/WSConfig.txt",NSHomeDirectory()]]) engineError=YES;
+	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/X11/bin/WineskinX11",NSHomeDirectory()]]) engineError=YES;
+	if (engineError)
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert addButtonWithTitle:@"OH NO!!"];
+		[alert setMessageText:@"ERROR!"];
+		[alert setInformativeText:[NSString stringWithFormat:@"The engine %@ is corrupted or opened incorrectly. If this error continues next time you try, reinstall the selected engine",[createWrapperEngine stringValue]]];
+		[alert setAlertStyle:NSCriticalAlertStyle];
+		[alert runModal];
+		//get rid of junk in /tmp
+		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),[createWrapperEngine stringValue]] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] error:nil];
+	}
+	else
+	{
+		//put engine in wrapper
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Resources/WineskinEngine.bundle",[createWrapperName stringValue]] error:nil];
+		//refresh wrapper
+		system([[NSString stringWithFormat:@"\"/tmp/%@.app/Contents/MacOS/Wineskin\" WSS-wineprefixcreate",[createWrapperName stringValue]] UTF8String]);
+		//move wrapper to ~/Applications/Wineskin
+		[fm moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] toPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]] error:nil];
+		//put ending message
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert addButtonWithTitle:@"View wrapper in Finder"];
+		[alert addButtonWithTitle:@"OK"];
+		[alert setMessageText:@"Wrapper Creation Finished"];
+		[alert setInformativeText:[NSString stringWithFormat:@"Created File: %@.app\n\nCreated In:%@/Applications/Wineskin\n",[createWrapperName stringValue],NSHomeDirectory()]];
+		[alert setAlertStyle:NSInformationalAlertStyle];
+		if ([alert runModal] == NSAlertFirstButtonReturn)
+			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Applications/Wineskin/",NSHomeDirectory()]]];
+	}
 	// bring main window back
 	[window makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
