@@ -1,5 +1,11 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
 
+Release 2.5 - in development
+• Wineskin wrappers will no longer prevent other users from using Wineskin wrappers on the system.  If a pre-2.5 one was run, it will still break them running for other users until you reboot, or remove the /tmp/Wineskin symlink.
+• Custom Commands now run after setting of main variables like wineprefix.
+• Command Line Shell button added to Wineskin.app to get a command prompt for running any tools you need, like regsrv32
+• Wineskin will clean up a bit better after WineskinX11, to prevent problems with crashes when running Xquartz later.  If Xquartz crashes after a Wineskin wrapper has run, the /tmp/.X11-unix folder needs to be deleted and it will work, or just reboot.
+
 Release 2.4 - 07/26/2011
 • Mapping user folders is much more customizable now
 • Fixed the but where Override->Fullscreen pushed the picture down slightly
