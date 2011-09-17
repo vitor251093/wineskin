@@ -183,10 +183,6 @@
 	NSArray *filenamesArray = [NSArray arrayWithObject:[NSString stringWithFormat:@"%@.tar.7z",selectedEngine]];
 	[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()] destination:@"" files:filenamesArray tag:nil];
 	[self refreshButtonPressed:self];
-	//remove engine from ignored list
-	NSString *ignoreList = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/IgnoredEngines.txt",NSHomeDirectory()] encoding:NSUTF8StringEncoding error:nil];
-	ignoreList = [ignoreList stringByReplacingOccurrencesOfString:selectedEngine withString:@""];
-	[ignoreList writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	[selectedEngine release];
 }
 
@@ -671,10 +667,24 @@
 		//move download into place
 		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.tar.7z",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
 		[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.tar.7z",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
-		//remove engine from ignored list
-		NSString *ignoreList = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/IgnoredEngines.txt",NSHomeDirectory()] encoding:NSUTF8StringEncoding error:nil];
-		ignoreList = [ignoreList stringByReplacingOccurrencesOfString:[fileName stringValue] withString:@""];
-		[ignoreList writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+		//Add engine to ignored list
+		NSArray *ignoredEngines = [self getEnginesToIgnore];
+		NSString *ignoredEnginesString = @"";
+		BOOL fixTheList=YES;
+		for (NSString *item in ignoredEngines)
+		{
+			if ([item isEqualToString:[fileName stringValue]])
+			{
+				fixTheList=NO;
+				break;
+			}
+			ignoredEnginesString = [ignoredEnginesString stringByAppendingString:[item stringByAppendingString:@"\n"]];	
+		}
+		if (fixTheList)
+		{
+			ignoredEnginesString = [NSString stringWithFormat:@"%@\n%@",ignoredEnginesString,[fileName stringValue]];
+			[ignoredEnginesString writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+		}		
 		[window makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
 	}

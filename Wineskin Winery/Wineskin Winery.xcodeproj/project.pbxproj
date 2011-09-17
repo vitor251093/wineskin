@@ -32,9 +32,9 @@
 		8D1107310486CEB800E47090 /* Wineskin_Winery-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Wineskin_Winery-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Wineskin Winery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wineskin Winery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A852C514133BF63E00143814 /* WineskinBanner.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner.jpg; sourceTree = "<group>"; };
-		A89936DD127B283A006A7581 /* WineskinWineryUpdater */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = WineskinWineryUpdater; path = "Wineskin Winery/WineskinWineryUpdater"; sourceTree = DEVELOPER_DIR; };
+		A89936DD127B283A006A7581 /* WineskinWineryUpdater */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = WineskinWineryUpdater; sourceTree = SOURCE_ROOT; };
 		A8C39E9E133BF58F001B3110 /* Wineskin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Wineskin.icns; sourceTree = "<group>"; };
-		A8EBE81A1274E83500CC9815 /* 7za */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = 7za; path = "Wineskin Winery/7za"; sourceTree = DEVELOPER_DIR; };
+		A8EBE81A1274E83500CC9815 /* 7za */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7za; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

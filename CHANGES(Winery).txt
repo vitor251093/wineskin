@@ -1,0 +1,2 @@
+Release 1.2 - in development
+• Downloaded Engines, and Engines you ignore will never prompt as new again
