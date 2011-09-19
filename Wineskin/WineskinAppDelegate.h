@@ -150,9 +150,6 @@
 	IBOutlet NSTextField *modifyMappingsMyVideosTextField;
 	IBOutlet NSTextField *modifyMappingsMyMusicTextField;
 	IBOutlet NSTextField *modifyMappingsMyPicturesTextField;
-	
-	//ICE
-	BOOL isIce;
 }
 
 @property (assign) IBOutlet NSWindow *window;

@@ -3,16 +3,14 @@
 //  Licensed for use under the LGPL <http://www.gnu.org/licenses/lgpl-2.1.txt>
 
 #import <Cocoa/Cocoa.h>
-//#include <signal.h>
-//#include <inttypes.h>
 #include <sys/stat.h>
-//#include <ApplicationServices/ApplicationServices.h>
 
 @interface Wineskin : NSObject
 {
-	NSString *contentsFold;					//contents folder in the wrapper
+	NSString *contentsFold;					//Contents folder in the wrapper
+	NSString *frameworksFold;				//Frameworks folder in the wrapper
 	NSString *appNameWithPath;				//full path to and including the app name
-	NSString *engineVersion;					//engine being used
+	NSString *engineVersion;				//engine being used
 	NSString *firstPIDFile;					//pid file used to find wineserver pid
 	NSString *secondPIDFile;				//pid file used to find wineserver pid
 	NSString *wineserverPIDFile;			//pid files holding wineserver of current/last run
@@ -144,6 +142,7 @@
 	if ([wssCommand isEqualToString:@"CustomEXE"]) cexeRun = YES;
 	//if wssCommand is WSS-InstallICE, then just run ICE install and quit!
 	contentsFold=[NSString stringWithFormat:@"%@/Contents",[[NSBundle mainBundle] bundlePath]];
+	frameworksFold=[NSString stringWithFormat:@"%@/Frameworks",contentsFold];
 	appNameWithPath=[[NSBundle mainBundle] bundlePath];
 	firstPIDFile = [NSString stringWithFormat:@"%@/.firstpidfile",contentsFold];
 	secondPIDFile = [NSString stringWithFormat:@"%@/.secondpidfile",contentsFold];
@@ -410,7 +409,7 @@
 	NSString *yRes = [reso stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@ ",xRes] withString:@""];
 	//if XxY doesn't exist, we will ignore for now... in the future maybe add way to find the closest reso that is available.
 	//change the resolution using Xrandr
-	system([[NSString stringWithFormat:@"export PATH=\"%@/Resources/WineskinEngine.bundle/Wine/bin:%@/Resources/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/Resources/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/Resources/WineskinEngine.bundle/X11/lib:%@/Resources/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" xrandr -s %@x%@ > /dev/null 2>&1",contentsFold,contentsFold,theDisplayNumber,winePrefix,contentsFold,contentsFold,contentsFold,xRes,yRes] UTF8String]);
+	system([[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" xrandr -s %@x%@ > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,frameworksFold,xRes,yRes] UTF8String]);
 }
 
 - (NSString *)getResolution
@@ -725,60 +724,35 @@
 		return @"Winetricks Listing, no X server needed";
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/WSX11Prefs.plist",winePrefix];
-	NSArray *tempArray = [self readFileToStringArray:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/WSConfig.txt",winePrefix]];
+	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold];
 	//get current engine
-	engineVersion = @"error";
-	NSString *wineVersion = @"error";
-	NSString *engineBaseVersion = @"error";
-	if (isIce)
-	{
-		NSMutableArray *wineskinEngineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
-		NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/",winePrefix] error:nil];
-		for (NSString *file in files)
-			if ([file hasSuffix:@".bundle.tar.7z"]) [wineskinEngineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
-		for (NSString *item in wineskinEngineBundleContentsList)
-		{
-			if ([item hasPrefix:@"WSWine"] && [item hasSuffix:@"ICE.bundle"])
-			{
-				wineVersion = [item stringByReplacingOccurrencesOfString:@"WS" withString:@""];
-				wineVersion = [wineVersion stringByReplacingOccurrencesOfString:@".bundle" withString:@""];
-			}
-			if ([item hasPrefix:@"WS"] && [item hasSuffix:@"X11ICE.bundle"])
-			{
-				engineBaseVersion = [item stringByReplacingOccurrencesOfString:@"X11ICE.bundle" withString:@""];
-			}
-		}
-		engineVersion = [NSString stringWithFormat:@"%@%@",engineBaseVersion,wineVersion];
-	}
-	else
-		engineVersion = [tempArray objectAtIndex:0];
+	NSArray *tempArray = [self readFileToStringArray:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold]];
+	engineVersion = [tempArray objectAtIndex:0];
 	NSLog(@"Using Engine %@",engineVersion);
-	NSString *x11InstallPath = [tempArray objectAtIndex:1];
 	//fix to have the right libXplugin for the OS version
 	SInt32 majorVersion,minorVersion;
 	Gestalt(gestaltSystemVersionMajor, &majorVersion);
 	Gestalt(gestaltSystemVersionMinor, &minorVersion);
-	NSString *copyFrom = [NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/lib/libXplugin.1.%d.%d.dylib",winePrefix,majorVersion,minorVersion];
-	NSString *copyTo = [NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11/lib/libXplugin.1.dylib",winePrefix];
+	NSString *copyFrom = [NSString stringWithFormat:@"%@/libXplugin.1.%d.%d.dylib",frameworksFold,majorVersion,minorVersion];
+	NSString *copyTo = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
 	if ([fm fileExistsAtPath:copyFrom]) //only exists on WS8+, do not break WS7 engines.
 	{
 		[fm removeItemAtPath:copyTo error:nil];
 		[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
 	}
 	//set up quartz-wm launch correctly
-	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"%@/bin/quartz-wm\"",x11InstallPath];
+	NSString *quartzwmLine = @" +extension \"/tmp/Wineskin/bin/quartz-wm\"";
 	if (fullScreenOption) quartzwmLine=@"";
 	//copy the plist over
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
 	[fm copyItemAtPath:wsX11PlistFile toPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
-	//make proper files and symlinks in x11InstallPath
+	//make proper files and symlinks in /tmp/Wineskin
 	//remove for files just in case some other version had made symlinks here, will cause a failure
-	[fm removeItemAtPath:x11InstallPath error:nil];
-	//symlink X11 straight to x11InstallPath
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@",x11InstallPath] withDestinationPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",winePrefix] error:nil];
+	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil];
+	//symlink X11 straight to /tmp/Wineskin
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin" withDestinationPath:frameworksFold error:nil];
 	//make sure the new symlink is full read/write so other users can run wrappers too. Task List bug 3406451
-	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",x11InstallPath]];
+	[self systemCommand:@"chmod 777 /tmp/Wineskin"];
 	NSArray *winePidCheck = [self readFileToStringArray:wineserverPIDFile];
 	if ([self pidRunning:[winePidCheck objectAtIndex:0]])
 	{
@@ -814,7 +788,7 @@
 	//make sure the X11 lock files is gone before starting X11
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	//Start WineskinX11
-	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/WineskinEngine.bundle/X11/share/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,winePrefix,winePrefix,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,winePrefix,quartzwmLine,logFileLocation]];
+	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/share/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
 	//fix Info.plist back
 	usleep(500000);
 	[self systemCommand:[NSString stringWithFormat:@"/usr/bin/arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
@@ -832,86 +806,63 @@
 - (void)installEngine
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSMutableArray *wineskinEngineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
-	//get directory contents of WineskinEngine.bundle
-	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/",winePrefix] error:nil];
+	NSMutableArray *wswineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
+	//get directory contents of wswine.bundle
+	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/",frameworksFold] error:nil];
 	for (NSString *file in files)
-		if ([file hasSuffix:@".bundle.tar.7z"]) [wineskinEngineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
+		if ([file hasSuffix:@".bundle.tar.7z"]) [wswineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
 	//if the .tar.7z files exist, continue with this
 	BOOL doError = NO;
-	//test if Wine and X11 are symlinks or folders, if symlink isIce is YES
-	NSString *testResults1 = [fm destinationOfSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",winePrefix] error:nil];
-	NSString *testResults2 = [fm destinationOfSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine",winePrefix] error:nil];
-	if ([testResults1 length] > 0 || [testResults2 length] > 0) isIce = YES;
-	if ([wineskinEngineBundleContentsList count] > 0) isIce = YES;
+	if ([wswineBundleContentsList count] > 0) isIce = YES;
 	if (!isIce)
 	{
 		[fm release];
 		return;
 	}
-	if ([wineskinEngineBundleContentsList count] != 2) doError = YES;
+	//install Wine on the system
 	NSString *wineFile = @"OOPS";
-	NSString *x11File = @"OOPS";
-	for (NSString *item in wineskinEngineBundleContentsList)
-	{
+	for (NSString *item in wswineBundleContentsList)
 		if ([item hasPrefix:@"WSWine"] && [item hasSuffix:@"ICE.bundle"]) wineFile = [NSString stringWithFormat:@"%@",item];
-		if ([item hasPrefix:@"WS"] && [item hasSuffix:@"X11ICE.bundle"]) x11File = [NSString stringWithFormat:@"%@",item];
-	}
-	if (wineFile == @"OOPS" || x11File == @"OOPS") doError = YES;
+	if (wineFile == @"OOPS") doError = YES;
 	if (doError)
 	{
 		NSLog(@"Warning! This appears to be Wineskin ICE, but there is a problem in the Engine files in the wrapper.  They are either corrupted or missing.  The program may fail to launch!");
 		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("WARNING!"), (CFStringRef)@"Warning! This appears to be Wineskin ICE, but there is a problem in the Engine files in the wrapper.\n\nThey are either corrupted or missing.\n\nThe program may fail to launch!", NULL);
 		usleep(3000000);
 	}
-	//get md5 of wineFile and x11File
-	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/WineskinEngine.bundle/%@.tar.7z\"",winePrefix,wineFile]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/WineskinEngine.bundle/%@.tar.7z",winePrefix,wineFile] withString:@""];
-	NSString *x11FileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/WineskinEngine.bundle/%@.tar.7z\"",winePrefix,x11File]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/WineskinEngine.bundle/%@.tar.7z",winePrefix,x11File] withString:@""];
+	//get md5
+	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/wswine.bundle/%@.tar.7z\"",frameworksFold,wineFile]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/wswine.bundle/%@.tar.7z",frameworksFold,wineFile] withString:@""];
 	NSString *wineFileInstalledName = [NSString stringWithFormat:@"%@%@.bundle",[wineFile stringByReplacingOccurrencesOfString:@"bundle" withString:@""],wineFileMd5];
-	NSString *x11FileInstalledName = [NSString stringWithFormat:@"%@%@.bundle",[x11File stringByReplacingOccurrencesOfString:@"bundle" withString:@""],x11FileMd5];
 	//make ICE folder if it doesn't exist
 	[fm createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/Engines/ICE"] withIntermediateDirectories:YES attributes:nil error:nil];
 	// delete out extra bundles or tars in engine bundle first
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@.tar",winePrefix,wineFile] error:nil];
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@.tar",winePrefix,x11File] error:nil];
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@",winePrefix,wineFile] error:nil];
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@",winePrefix,x11File] error:nil];	
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@.tar",frameworksFold,wineFile] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,wineFile] error:nil];
 	//get directory contents of NSHomeDirectory()/Library/Application Support/Wineskin/Engines/ICE
 	NSArray *iceFiles = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE",NSHomeDirectory()] error:nil];
-	//if either Wine or X11 version is not installed...
+	//if Wine version is not installed...
 	BOOL wineInstalled = NO;
-	BOOL x11Installed = NO;
 	for (NSString *file in iceFiles)
-	{
 		if ([file isEqualToString:wineFileInstalledName]) wineInstalled = YES;
-		if ([file isEqualToString:x11FileInstalledName]) x11Installed = YES;
-	}
-	if (!wineInstalled || !x11Installed)
+	if (!wineInstalled)
 	{
 		//if the Wine bundle is not located in the install folder, then uncompress it and move it over there.
 		if (!wineInstalled)
 		{
-			system([[NSString stringWithFormat:@"\"%@/WineskinEngine.bundle/7za\" x \"%@/WineskinEngine.bundle/%@.tar.7z\" \"-o/%@/WineskinEngine.bundle\"",winePrefix,winePrefix,wineFile,winePrefix] UTF8String]);
-			system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/WineskinEngine.bundle\" -xf \"%@/WineskinEngine.bundle/%@.tar\"",winePrefix,winePrefix,wineFile] UTF8String]);
-			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@.tar",winePrefix,wineFile] error:nil];
+			system([[NSString stringWithFormat:@"\"%@/wswine.bundle/7za\" x \"%@/wswine.bundle/%@.tar.7z\" \"-o/%@/wswine.bundle\"",frameworksFold,frameworksFold,wineFile,frameworksFold] UTF8String]);
+			system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/wswine.bundle\" -xf \"%@/wswine.bundle/%@.tar\"",frameworksFold,frameworksFold,wineFile] UTF8String]);
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@.tar",frameworksFold,wineFile] error:nil];
 			//have uncompressed version now, move it to ICE folder.
-			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@",winePrefix,wineFile] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),wineFileInstalledName] error:nil];
-		}
-		//if the X11 bundle is not located in the install folder, then uncompress it and move it over there.
-		if (!x11Installed)
-		{
-			system([[NSString stringWithFormat:@"\"%@/WineskinEngine.bundle/7za\" x \"%@/WineskinEngine.bundle/%@.tar.7z\" \"-o/%@/WineskinEngine.bundle\"",winePrefix,winePrefix,x11File,winePrefix] UTF8String]);
-			system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/WineskinEngine.bundle\" -xf \"%@/WineskinEngine.bundle/%@.tar\"",winePrefix,winePrefix,x11File] UTF8String]);
-			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@.tar",winePrefix,x11File] error:nil];
-			//have uncompressed version now, move it to ICE folder.
-			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/%@",winePrefix,x11File] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),x11FileInstalledName] error:nil];
+			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,wineFile] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),wineFileInstalledName] error:nil];
 		}
 	}
-	//make/remake the symlinks in WineskinEngine.bundle to point to the correct locations
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine",winePrefix] error:nil];
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",winePrefix] error:nil];
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),wineFileInstalledName] error:nil];
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),x11FileInstalledName] error:nil];
+	//make/remake the symlink in wswine.bundle to point to the correct location
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",frameworksFold] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",frameworksFold] error:nil];
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/bin",NSHomeDirectory(),wineFileInstalledName] error:nil];
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/lib",NSHomeDirectory(),wineFileInstalledName] error:nil];
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/share",NSHomeDirectory(),wineFileInstalledName] error:nil];
 	[fm release];
 }
 
@@ -1044,7 +995,7 @@
 		{
 			NSString *wineDebugLine = @"err-all,warn-all,fixme-all,trace-all";
 			NSString *wineLogFile = @"/dev/null";
-			[self systemCommand:[NSString stringWithFormat:@"export WINEDLLOVERRIDES=\"mshtml=\";export WINEDEBUG=%@;export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine wineboot > \"%@\" 2>&1",wineDebugLine,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,wineLogFile]];
+			[self systemCommand:[NSString stringWithFormat:@"export WINEDLLOVERRIDES=\"mshtml=\";export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine wineboot > \"%@\" 2>&1",wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,wineLogFile]];
 			usleep(3000000);
 			//fix user name entires over to Wineskin
 			NSArray *userReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
@@ -1066,12 +1017,12 @@
 			NSString *wineLogFile = @"/dev/null";
 			//remove the .update-timestamp file... so we will get Gecko prompt with a refresh.
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/.update-timestamp",winePrefix] error:nil];
-			[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine wineboot > \"%@\" 2>&1",wineDebugLine,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,wineLogFile]];
+			[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine wineboot > \"%@\" 2>&1",wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,wineLogFile]];
 			usleep(3000000);
 			if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"])
 			{
 				//load Wineskin default reg entries
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"%@\" 2>&1",wineDebugLine,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,contentsFold,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"%@\" 2>&1",wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,contentsFold,wineLogFile]];
 				usleep(5000000);
 			}
 			//fix user name entires over to Wineskin
@@ -1103,11 +1054,11 @@
 			NSString *wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
 			NSString *wineLogFile = [NSString stringWithFormat:@"%@/Logs/Winetricks.log",winePrefix];
 			if ([winetricksCommand2 isEqualToString:@"list"]) //just getting a list of packages... X should NOT be running.
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate %@ > \"%@\"",wineDebugLine,contentsFold,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,winetrickCommandsList,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate %@ > \"%@\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,winetrickCommandsList,wineLogFile]];
 			else if ([winetricksCommand isEqualToString:@"list"])
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\"",wineDebugLine,contentsFold,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,winetricksCommand,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,winetricksCommand,wineLogFile]];
 			else
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\" 2>&1",wineDebugLine,contentsFold,winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,winetricksCommand,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,winetricksCommand,wineLogFile]];
 			usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
 		}
 	}
@@ -1128,7 +1079,7 @@
 			//make first pid array
 			NSArray *firstPIDlist = [self makePIDArray:@"wineserver"];
 			//start wineserver
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver > /dev/null 2>&1",winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,theDisplayNumber,winePrefix,cliCustomCommands,winePrefix,winePrefix,winePrefix]];
+			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver > /dev/null 2>&1",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,frameworksFold,frameworksFold]];
 			//do loop compare to find correct PID, only try 3 times, then try again slower 5 times over 5 seconds
 			BOOL match = YES;
 			int i = 0;
@@ -1195,9 +1146,9 @@
 		//Wine start section... if opening files handle differently.
 		if (openingFiles)
 			for (NSString *item in filesToRun) //start wine with files
-				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine start /unix \"%@\" > \"%@\" 2>&1 &",winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,winePrefix,winePrefix,winePrefix,item,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,frameworksFold,frameworksFold,item,wineLogFile]];
 		else  //launch Wine normally
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",winePrefix,winePrefix,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,winePrefix,winePrefix,startExeLine,wineRunFile,programFlags,wineLogFile]];
+			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,frameworksFold,frameworksFold,startExeLine,wineRunFile,programFlags,wineLogFile]];
 		vdResolution = [vdResolution stringByReplacingOccurrencesOfString:@"x" withString:@" "];
 	}
 	[fm release];
@@ -1249,7 +1200,7 @@
 		}
 		//if WineskinX11 is not longer running, tell wineserver to close
 		if (![self pidRunning:x11PID])
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/WineskinEngine.bundle/Wine/bin:%@/WineskinEngine.bundle/X11/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/WineskinEngine.bundle/Wine/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@/WineskinEngine.bundle/X11/lib:%@/WineskinEngine.bundle/Wine/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver -k > /dev/null 2>&1",winePrefix,winePrefix,theDisplayNumber,winePrefix,winePrefix,winePrefix,winePrefix]];
+			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver -k > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,frameworksFold]];
 		//if running in override fullscreen, need to handle resolution changes
 		if(fullScreenOption)
 		{
