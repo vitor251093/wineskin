@@ -673,6 +673,7 @@
 	}
 	//write array back to file
 	[self writeStringArray:[NSArray arrayWithArray:newUserRegContents] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 }
 
 - (void)removeGPUInfo
@@ -715,6 +716,7 @@
 	}
 	//write array back to file
 	[self writeStringArray:[NSArray arrayWithArray:newUserRegContents] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 }
 
 - (NSString *)startX11
@@ -752,7 +754,7 @@
 	//symlink X11 straight to /tmp/Wineskin
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin" withDestinationPath:frameworksFold error:nil];
 	//make sure the new symlink is full read/write so other users can run wrappers too. Task List bug 3406451
-	[self systemCommand:@"chmod 777 /tmp/Wineskin"];
+	[self systemCommand:@"chmod -h 777 /tmp/Wineskin"];
 	NSArray *winePidCheck = [self readFileToStringArray:wineserverPIDFile];
 	if ([self pidRunning:[winePidCheck objectAtIndex:0]])
 	{
@@ -918,6 +920,7 @@
 	}
 	//write array back to file
 	[self writeStringArray:[NSArray arrayWithArray:newUserRegContents] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 }
 
 - (void)setToNoVirtualDesktop
@@ -956,6 +959,7 @@
 	}
 	//write array back to file
 	[self writeStringArray:[NSArray arrayWithArray:newUserRegContents] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 }
 
 - (NSArray *)readFileToStringArray:(NSString *)theFile
@@ -967,6 +971,7 @@
 {
 	[[NSFileManager defaultManager] removeItemAtPath:theFile error:nil];
 	[[theArray componentsJoinedByString:@"\n"] writeToFile:theFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,theFile]];
 }
 
 - (BOOL)pidRunning:(NSString *)pid
@@ -1003,6 +1008,7 @@
 			for (NSString *item in userReg)
 				[newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
 			[self writeStringArray:[NSArray arrayWithArray:newUserReg] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+			[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 			NSArray *userDefReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
 			NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:[userDefReg count]];
 			for (NSString *item in userDefReg)
@@ -1031,6 +1037,7 @@
 			for (NSString *item in userReg)
 				[newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
 			[self writeStringArray:[NSArray arrayWithArray:newUserReg] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+			[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 			NSArray *userDefReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
 			NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:[userDefReg count]];
 			for (NSString *item in userDefReg)
@@ -1048,6 +1055,9 @@
 			NSArray *tmpy2 = [fm contentsOfDirectoryAtPath:winePrefix error:nil];
 			for (NSString *item in tmpy2)
 				[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,item]];
+			NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix] error:nil];
+			for (NSString *item in tmpy3)
+				[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/dosdevices/%@\"",winePrefix,item]];
 		}
 		else if ([wssCommand isEqualToString:@"WSS-winetricks"])
 		{
@@ -1297,6 +1307,13 @@
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/Winetricks.log",winePrefix] error:nil];
 	}
+	//fixes for multi-user use
+	NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix] error:nil];
+	for (NSString *item in tmpy3)
+		[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/dosdevices/%@\"",winePrefix,item]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/userdef.reg\"",winePrefix]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/system.reg\"",winePrefix]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 	[fm release];
 }
 - (void)ds:(NSString *)input
