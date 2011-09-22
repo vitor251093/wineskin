@@ -55,6 +55,7 @@
 	IBOutlet NSTextField *engineBuildWineSource;
 	IBOutlet NSTextField *engineBuildConfigurationOptions;
 	IBOutlet NSTextField *engineBuildEngineName;
+	IBOutlet NSPopUpButton *engineBuildOSVersionToBuildEngineFor;
 	IBOutlet NSTextField *engineBuildCurrentEngineBase;
 	IBOutlet NSTextField *engineBuildUpdateAvailable;
 	IBOutlet NSButton *engineBuildChooseButton;

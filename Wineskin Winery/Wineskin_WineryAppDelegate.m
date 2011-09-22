@@ -352,12 +352,23 @@
 }
 - (IBAction)engineBuildBuildButtonPressed:(id)sender
 {
-	if ([[engineBuildWineSource stringValue] isEqualToString:@""] || [[engineBuildEngineName stringValue] isEqualToString:@""])
+	if ([[engineBuildWineSource stringValue] isEqualToString:@""])
 	{
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert addButtonWithTitle:@"OK"];
 		[alert setMessageText:@"Oops!"];
 		[alert setInformativeText:@"You must select a folder with the Wine source code and a valid engine name"];
+		[alert setAlertStyle:NSInformationalAlertStyle];
+		[alert runModal];
+		[alert release];
+		return;
+	}
+	if ([[engineBuildEngineName stringValue] isEqualToString:@""])
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert addButtonWithTitle:@"OK"];
+		[alert setMessageText:@"Oops!"];
+		[alert setInformativeText:@"You must enter a name for the Engine"];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
 		[alert release];
@@ -376,7 +387,7 @@
 	}
 	
 	//write out the config file
-	NSString *configFileContents = [NSString stringWithFormat:@"%@\n%@\n%@\n%@\n%@\n",[engineBuildWineSource stringValue],[engineBuildEngineName stringValue],[engineBuildConfigurationOptions stringValue],[engineBuildCurrentEngineBase stringValue],[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/7za", NSHomeDirectory()]];
+	NSString *configFileContents = [NSString stringWithFormat:@"%@\n%@\n%@\n%@\n%@\n%@\n",[engineBuildWineSource stringValue],[engineBuildEngineName stringValue],[engineBuildConfigurationOptions stringValue],[engineBuildCurrentEngineBase stringValue],[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/7za", NSHomeDirectory()],[[engineBuildOSVersionToBuildEngineFor selectedItem] title]];
 	[configFileContents writeToFile:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/EngineBase/%@/config.txt",NSHomeDirectory(),[engineBuildCurrentEngineBase stringValue]] atomically:NO encoding:NSUTF8StringEncoding error:nil];
 	//launch terminal with the script
 	system([[NSString stringWithFormat:@"open -a Terminal.app \"%@/Library/Application Support/Wineskin/EngineBase/%@/WineskinEngineBuild\"", NSHomeDirectory(),[engineBuildCurrentEngineBase stringValue]] UTF8String]);
@@ -521,8 +532,6 @@
 	NSString *currentEngineBuild = [self currentEngineBuildVersion];
 	[engineBuildCurrentEngineBase setStringValue:currentEngineBuild];
 	NSString *availableEngineBase = [self availableEngineBuildVersion];
-	//set default engine name
-	[engineBuildEngineName setStringValue:[NSString stringWithFormat:@"%@-MyCustomEngine",[currentEngineBuild stringByReplacingOccurrencesOfString:@"EngineBase" withString:@""]]];
 	//set update button and label
 	if ([availableEngineBase isEqualToString:currentEngineBuild] || [availableEngineBase isEqualToString:@"ERROR"])
 	{
@@ -705,8 +714,6 @@
 		NSString *currentEngineBuild = [self currentEngineBuildVersion];
 		[engineBuildCurrentEngineBase setStringValue:currentEngineBuild];
 		NSString *availableEngineBase = [self availableEngineBuildVersion];
-		//set default engine name
-		[engineBuildEngineName setStringValue:[NSString stringWithFormat:@"%@-MyCustomEngine",[currentEngineBuild stringByReplacingOccurrencesOfString:@"EngineBase" withString:@""]]];
 		//set update button and label
 		if ([availableEngineBase isEqualToString:currentEngineBuild])
 		{
