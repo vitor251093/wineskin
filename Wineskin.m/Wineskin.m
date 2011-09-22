@@ -833,7 +833,6 @@
 	for (NSString *file in files)
 		if ([file hasSuffix:@".bundle.tar.7z"]) [wswineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
 	//if the .tar.7z files exist, continue with this
-	BOOL doError = NO;
 	if ([wswineBundleContentsList count] > 0) isIce = YES;
 	if (!isIce)
 	{
@@ -844,8 +843,7 @@
 	NSString *wineFile = @"OOPS";
 	for (NSString *item in wswineBundleContentsList)
 		if ([item hasPrefix:@"WSWine"] && [item hasSuffix:@"ICE.bundle"]) wineFile = [NSString stringWithFormat:@"%@",item];
-	if (wineFile == @"OOPS") doError = YES;
-	if (doError)
+	if (wineFile == @"OOPS")
 	{
 		NSLog(@"Warning! This appears to be Wineskin ICE, but there is a problem in the Engine files in the wrapper.  They are either corrupted or missing.  The program may fail to launch!");
 		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("WARNING!"), (CFStringRef)@"Warning! This appears to be Wineskin ICE, but there is a problem in the Engine files in the wrapper.\n\nThey are either corrupted or missing.\n\nThe program may fail to launch!", NULL);
@@ -881,9 +879,9 @@
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold] error:nil];
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",frameworksFold] error:nil];
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",frameworksFold] error:nil];
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/bin",NSHomeDirectory(),wineFileInstalledName] error:nil];
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/lib",NSHomeDirectory(),wineFileInstalledName] error:nil];
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/share",NSHomeDirectory(),wineFileInstalledName] error:nil];
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/bin",NSHomeDirectory(),wineFileInstalledName] error:nil];
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",frameworksFold] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/lib",NSHomeDirectory(),wineFileInstalledName] error:nil];
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",frameworksFold] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/share",NSHomeDirectory(),wineFileInstalledName] error:nil];
 	[fm release];
 }
 

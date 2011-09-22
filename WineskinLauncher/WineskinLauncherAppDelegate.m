@@ -58,46 +58,33 @@
 - (void)installEngine
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSMutableArray *wineskinEngineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
+	NSMutableArray *wswineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
 	//get directory contents of WineskinEngine.bundle
-	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/",[[NSBundle mainBundle] bundlePath]] error:nil];
+	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/",[[NSBundle mainBundle] bundlePath]] error:nil];
 	for (NSString *file in files)
-		if ([file hasSuffix:@".bundle.tar.7z"]) [wineskinEngineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
+		if ([file hasSuffix:@".bundle.tar.7z"]) [wswineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
 	
 	//exit if not ICE. if Wine or X11 folders are a symlink, need to do ICE.
 	BOOL isIce = NO;
-	NSString *testResults1 = [[NSFileManager defaultManager] destinationOfSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11",[[NSBundle mainBundle] bundlePath]] error:nil];
-	NSString *testResults2 = [[NSFileManager defaultManager] destinationOfSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/Wine",[[NSBundle mainBundle] bundlePath]] error:nil];
-	if ([testResults1 length] > 0 || [testResults2 length] > 0) isIce = YES;
-	if ([wineskinEngineBundleContentsList count] > 0) isIce = YES;
+	if ([wswineBundleContentsList count] > 0) isIce = YES;
 	if (!isIce)
 	{
 		[fm release];
 		return;
 	}
-	//test if both parts already installed... if not call install
+	//install Wine on the system
 	NSString *wineFile = @"OOPS";
-	NSString *x11File = @"OOPS";
-	for (NSString *item in wineskinEngineBundleContentsList)
-	{
+	for (NSString *item in wswineBundleContentsList)
 		if ([item hasPrefix:@"WSWine"] && [item hasSuffix:@"ICE.bundle"]) wineFile = [NSString stringWithFormat:@"%@",item];
-		if ([item hasPrefix:@"WS"] && [item hasSuffix:@"X11ICE.bundle"]) x11File = [NSString stringWithFormat:@"%@",item];
-	}
 	//get md5 of wineFile and x11File
-	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/Contents/Resources/WineskinEngine.bundle/%@.tar.7z\"",[[NSBundle mainBundle] bundlePath],wineFile]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/Contents/Resources/WineskinEngine.bundle/%@.tar.7z",[[NSBundle mainBundle] bundlePath],wineFile] withString:@""];
-	NSString *x11FileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/Contents/Resources/WineskinEngine.bundle/%@.tar.7z\"",[[NSBundle mainBundle] bundlePath],x11File]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/Contents/Resources/WineskinEngine.bundle/%@.tar.7z",[[NSBundle mainBundle] bundlePath],x11File] withString:@""];
+	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/Contents/Frameworks/wswine.bundle/%@.tar.7z\"",[[NSBundle mainBundle] bundlePath],wineFile]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/Contents/Frameworks/wswine.bundle/%@.tar.7z",[[NSBundle mainBundle] bundlePath],wineFile] withString:@""];
 	NSString *wineFileInstalledName = [NSString stringWithFormat:@"%@%@.bundle",[wineFile stringByReplacingOccurrencesOfString:@"bundle" withString:@""],wineFileMd5];
-	NSString *x11FileInstalledName = [NSString stringWithFormat:@"%@%@.bundle",[x11File stringByReplacingOccurrencesOfString:@"bundle" withString:@""],x11FileMd5];
 	NSArray *iceFiles = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE",NSHomeDirectory()] error:nil];
 	//if either Wine or X11 version is not installed...
 	BOOL wineInstalled = NO;
-	BOOL x11Installed = NO;
 	for (NSString *file in iceFiles)
-	{
 		if ([file isEqualToString:wineFileInstalledName]) wineInstalled = YES;
-		if ([file isEqualToString:x11FileInstalledName]) x11Installed = YES;
-	}
-	if (!wineInstalled || !x11Installed)
+	if (!wineInstalled)
 	{
 		[window makeKeyAndOrderFront:self];
 		NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/MacOS/Wineskin\" WSS-InstallICE", [[NSBundle mainBundle] bundlePath]];
