@@ -19,6 +19,73 @@
 	[busyWindow makeKeyAndOrderFront:self];
 	[self refreshButtonPressed:self];
 	[self checkForUpdates];
+	[self runConverter];
+}
+- (void)runConverter
+{
+	//check wrapper version is 2.5+, if not then exit
+	int numToCheckMajor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(9,1)] intValue];
+	int numToCheckMinor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(11,1)] intValue];
+	if (numToCheckMajor < 3 && numToCheckMinor < 5) return;
+	//check if any engines are WS5 - WS7, if not then exit
+	NSMutableArray *enginesToConvert = [NSMutableArray arrayWithCapacity:1];
+	for (NSString *item in installedEnginesList)
+		if (([[item substringWithRange:NSMakeRange(0,3)] isEqualToString:@"WS5"]) || ([[item substringWithRange:NSMakeRange(0,3)] isEqualToString:@"WS6"]) || ([[item substringWithRange:NSMakeRange(0,3)] isEqualToString:@"WS7"]))
+			if (![item isEqualToString:@"WS7Wine1.2.2ICE"]) [enginesToConvert addObject:item];
+	if ([enginesToConvert count] < 1) return;
+	//offer to convert all engines to WS8
+	NSAlert *alert = [[NSAlert alloc] init];
+	[alert addButtonWithTitle:@"Convert!"];
+	[alert addButtonWithTitle:@"Not Now"];
+	[alert setMessageText:@"Convert Older Engines?"];
+	[alert setInformativeText:@"Wineskin 2.5+ will only use WS8+ engines.\nYou have some WS5/WS6/WS7 engines installed.\n\nWould you like to convert these into WS8 Engines?\n(this could take a while if you have many)"];
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	if ([alert runModal] != NSAlertFirstButtonReturn)
+	{
+		[alert release];
+		return;
+	}
+	//if convert, do convert	
+	[busyWindow makeKeyAndOrderFront:self];
+	[window orderOut:self];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	for (NSString *item in enginesToConvert)
+	{
+		//remove extra left over junk that might mess things up
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),item] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WS8%@.tar",NSHomeDirectory(),[item substringFromIndex:3]] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] error:nil];
+		//decompress engine
+		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z\" \"-o/%@/Library/Application Support/Wineskin/Engines\"", NSHomeDirectory(),NSHomeDirectory(),item,NSHomeDirectory()] UTF8String]);
+		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/Library/Application Support/Wineskin/Engines\" -xf \"%@/Library/Application Support/Wineskin/Engines/%@.tar\"",NSHomeDirectory(),NSHomeDirectory(),item] UTF8String]);
+		//remove tar
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),item] error:nil];
+		//trash X11 folder
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/X11",NSHomeDirectory()] error:nil];
+		//make wswine.bundle
+		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] withIntermediateDirectories:YES attributes:nil error:nil];
+		//move contents of Wine to wswine.bundle
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/bin",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/bin",NSHomeDirectory()] error:nil];
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/lib",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/lib",NSHomeDirectory()] error:nil];
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/share",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/share",NSHomeDirectory()] error:nil];
+		//put engine version in wswine.bundle
+		system([[NSString stringWithFormat:@"echo \"WS8%@\" > \"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/version\"",[item substringFromIndex:3],NSHomeDirectory()] UTF8String]);
+		//trash WineskinEngine.bundle
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] error:nil];
+		//compress wswine.bundle to engine.tar.7z
+		system([[NSString stringWithFormat:@"cd \"%@/Library/Application Support/Wineskin/Engines\";tar -cf WS8%@.tar wswine.bundle",NSHomeDirectory(),[item substringFromIndex:3]] UTF8String]);
+		system([[NSString stringWithFormat:@"cd \"%@/Library/Application Support/Wineskin/Engines\";\"%@/Library/Application Support/Wineskin/7za\" a -mx9 WS8%@.tar.7z WS8%@.tar", NSHomeDirectory(),NSHomeDirectory(),[item substringFromIndex:3],[item substringFromIndex:3]] UTF8String]);
+		//clean up engine junk now that its in a .tar.7z
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WS8%@.tar",NSHomeDirectory(),[item substringFromIndex:3]] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] error:nil];
+		//trash the old engine
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),item] error:nil];
+	}
+	[fm release];
+	[window makeKeyAndOrderFront:self];
+	[busyWindow orderOut:self];
+	[self refreshButtonPressed:self];
 }
 - (IBAction)aboutWindow:(id)sender
 {
@@ -670,6 +737,7 @@
 		[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.app",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
 		[window makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
+		[self runConverter];
 	}
 	else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
 	{

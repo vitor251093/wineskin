@@ -75,6 +75,7 @@
 @property (assign) IBOutlet NSWindow *window;
 
 //main stuff
+- (void)runConverter;
 - (IBAction)aboutWindow:(id)sender;
 - (IBAction)helpWindow:(id)sender;
 - (void)makeFoldersAndFiles;
