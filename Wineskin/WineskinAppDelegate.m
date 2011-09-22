@@ -666,6 +666,7 @@
 		[modifyMappingsButton setEnabled:NO];
 	else
 		[modifyMappingsButton setEnabled:YES];
+	[disableCPUsCheckBoxButton setState:[[plistDictionary valueForKey:@"Disable CPUs"] intValue]];
 	[plistDictionary release];
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
@@ -913,6 +914,17 @@
 	[modifyMappingsMyPicturesTextField setStringValue:[plistDictionary valueForKey:@"Symlink My Pictures"]];
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
+	[plistDictionary release];
+}
+- (IBAction)disableCPUsButtonPressed:(id)sender
+{
+	NSString *plistFile = [NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:plistFile];
+	if ([disableCPUsCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"Disable CPUs"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Disable CPUs"];
+	[plistDictionary writeToFile:plistFile atomically:YES];
 	[plistDictionary release];
 }
 
@@ -1635,21 +1647,24 @@
 	if ([currentWrapperVersion isEqualToString:masterWrapperName])
 	{
 		NSAlert *alert = [[NSAlert alloc] init];
-		[alert addButtonWithTitle:@"OK"];
+		[alert addButtonWithTitle:@"Do Not Update"];
+		[alert addButtonWithTitle:@"Update"];
 		[alert setMessageText:@"No update needed"];
-		[alert setInformativeText:@"Your wrapper version matches the master wrapper version... no update needed."];
+		[alert setInformativeText:@"Your wrapper version matches the master wrapper version... no update needed.  Do you want to force and update?"];
 		[alert setAlertStyle:NSInformationalAlertStyle];
-		[alert runModal];
-		[alert release];
-		[plistDictionary release];
-		return;
+		if ([alert runModal] != NSAlertSecondButtonReturn)
+		{
+			[alert release];
+			[plistDictionary release];
+			return;
+		}
 	}
 	//confirm wrapper change
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"OK"];
 	[alert addButtonWithTitle:@"Cancel"];
 	[alert setMessageText:@"Please confirm..."];
-	[alert setInformativeText:@"Are you sure you want to do this update?  It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery.  The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Resources/WineskinLauncher.nib"];
+	[alert setInformativeText:@"Are you sure you want to do this update?  It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery.  The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Frameworks\nContents/Resources/WineskinLauncher.nib"];
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	if ([alert runModal] == NSAlertSecondButtonReturn)
 	{
@@ -1679,6 +1694,13 @@
 	//force delete Wineskin.app and copy in new
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Wineskin.app",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	//move wswine.bundle out of Frameworks
+	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:[NSString stringWithFormat:@"%@/Contents",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	//replace Frameworks
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Frameworks",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Contents/Frameworks",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	//move wswine.bundle back into Frameworks
+	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Contents/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:[NSString stringWithFormat:@"%@/Contents/Frameworks",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	//open new Wineskin.app
 	[self systemCommand:@"/usr/bin/open" withArgs:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 	//close program

@@ -333,7 +333,17 @@
 	int randomint = 5+(int)(rand()%9994);
 	if (randomint<0){randomint=randomint*(-1);}
 	theDisplayNumber = [NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]];
-	
+
+	//****** if CPUs Disabled, disable all but 1 CPU
+	NSString *cpuCountInput;
+	if ([[plistDictionary valueForKey:@"Disable CPUs"] intValue] == 1)
+	{
+		cpuCountInput = [self systemCommand:@"hwprefs cpu_count 2>/dev/null"];
+		int i, cpuCount = [cpuCountInput intValue];
+		for (i=2;i<=cpuCount;i++)
+			[self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_disable %d",i]];
+	}
+
 	//**********start the X server
 	NSLog(@"Starting up WineskinX11");
 	x11PID = [self startX11];
@@ -372,6 +382,14 @@
 	NSLog(@"Sleeping and monitoring from the background while app runs...");
 	[self sleepAndMonitor];
 	
+	//****** if CPUs Disabled, re-enable them
+	if ([[plistDictionary valueForKey:@"Disable CPUs"] intValue] == 1)
+	{
+		int i, cpuCount = [cpuCountInput intValue];
+		for (i=2;i<=cpuCount;i++)
+			[self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_enable %d",i]];
+	}
+
 	//********** Wineskin Customizer shut down script
 	system([[NSString stringWithFormat:@"\"%@/WineskinShutdownScript\"",winePrefix] UTF8String]);
 	
@@ -737,6 +755,7 @@
 	Gestalt(gestaltSystemVersionMinor, &minorVersion);
 	NSString *copyFrom = [NSString stringWithFormat:@"%@/libXplugin.1.%d.%d.dylib",frameworksFold,majorVersion,minorVersion];
 	NSString *copyTo = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/libXplugin.1.dylib\"",frameworksFold]];
 	if ([fm fileExistsAtPath:copyFrom]) //only exists on WS8+, do not break WS7 engines.
 	{
 		[fm removeItemAtPath:copyTo error:nil];
@@ -971,7 +990,7 @@
 {
 	[[NSFileManager defaultManager] removeItemAtPath:theFile error:nil];
 	[[theArray componentsJoinedByString:@"\n"] writeToFile:theFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
-	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,theFile]];
+	//[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",theFile]];
 }
 
 - (BOOL)pidRunning:(NSString *)pid
@@ -1314,6 +1333,7 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/userdef.reg\"",winePrefix]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/system.reg\"",winePrefix]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/Info.plist\"",contentsFold]];
 	[fm release];
 }
 - (void)ds:(NSString *)input

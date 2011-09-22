@@ -92,6 +92,7 @@
 	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
 	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
+	IBOutlet NSButton *disableCPUsCheckBoxButton;
 	
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -230,6 +231,7 @@
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 - (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
+- (IBAction)disableCPUsButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;
