@@ -14,6 +14,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	[waitWheel startAnimation:self];
+	[busyWindow makeKeyAndOrderFront:self];
 	shPIDs = [[NSMutableArray alloc] init];
 	[winetricksCancelButton setEnabled:NO];
 	disableButtonCounter=0;
@@ -25,14 +27,12 @@
 	[normalWindowsVirtualDesktopToggleVirtualDesktopButton setIntegerValue:0];
 	[forceNormalWindowsUseTheseSettingsToggleForceButton setIntegerValue:0];
 	[forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton setIntegerValue:0];	
-	[waitWheel startAnimation:self];
-	[busyWindow makeKeyAndOrderFront:self];
+	[self installEngine];
 	[self loadAllData];
 	[self loadScreenOptionsData];
 	NSImage *theImage = [[NSImage alloc] initByReferencingFile:[NSString stringWithFormat:@"%@/Contents/Resources/Wineskin.icns",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	[iconImageView setImage:theImage];
 	[theImage release];
-	[self installEngine];
 	[window makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
 }

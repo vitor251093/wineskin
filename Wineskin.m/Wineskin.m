@@ -746,9 +746,12 @@
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold];
 	//get current engine
-	NSArray *tempArray = [self readFileToStringArray:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold]];
-	engineVersion = [tempArray objectAtIndex:0];
-	NSLog(@"Using Engine %@",engineVersion);
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold]])
+	{
+		NSArray *tempArray = [self readFileToStringArray:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold]];
+		engineVersion = [tempArray objectAtIndex:0];
+		NSLog(@"Using Engine %@",engineVersion);
+	}
 	//fix to have the right libXplugin for the OS version
 	SInt32 majorVersion,minorVersion;
 	Gestalt(gestaltSystemVersionMajor, &majorVersion);
@@ -879,9 +882,11 @@
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold] error:nil];
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",frameworksFold] error:nil];
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",frameworksFold] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold] error:nil];
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/bin",NSHomeDirectory(),wineFileInstalledName] error:nil];
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",frameworksFold] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/lib",NSHomeDirectory(),wineFileInstalledName] error:nil];
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",frameworksFold] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/share",NSHomeDirectory(),wineFileInstalledName] error:nil];
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold] withDestinationPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@/version",NSHomeDirectory(),wineFileInstalledName] error:nil];
 	[fm release];
 }
 
