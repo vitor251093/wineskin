@@ -14,6 +14,13 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	NSAlert *alert = [[NSAlert alloc] init];
+	[alert addButtonWithTitle:@"Ok, I got it!"];
+	[alert setMessageText:@"BETA warning"];
+	[alert setInformativeText:@"This build of Wineskin Winery is a Beta, and only downloading Beta files.\nThere are no manually installed versions of Engines and Wrappers during Beta\n\nWineskin 2.5 wrapper and WS8 engines are also still in Beta and SUBJECT TO CHANGE\n\nIt will INTERACT WITH YOUR REAL FILES and stuff from the current Release Version\n\nIf you convert your WS7 to WS8, it will convert them, and if you try to use non-Beta Wineskin Winery with Wineskin 2.4, WS8 engines will not work.\n\nWS7 and older engines WILL NOT WORK with Wineskin 2.5!\n\nYou may be best off waiting until beta is over to convert, unless you want to just test the function.\n\nIf you get a Wineskin Winery Update that no longer displays this Beta message, you will know Beta is over!\n\n Please report any problems to the News posting about this, or to the Wineskin Support Forums!"];
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	[alert runModal];
+	[alert release];
 	srand(time(NULL));
 	[waitWheel startAnimation:self];
 	[busyWindow makeKeyAndOrderFront:self];
@@ -114,7 +121,7 @@
 	//get current version number
 	NSString *currentVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinWinery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Winery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (!([newVersion hasPrefix:@"Wineskin"]) || ([currentVersion isEqualToString:newVersion]))
@@ -151,7 +158,7 @@
 	[fm removeItemAtPath:@"/tmp/WineskinWinery.app.tar" error:nil];
 	[fm removeItemAtPath:@"/tmp/WineskinWinery.app" error:nil];
 	//update selected, download update
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinWinery/WineskinWinery.app.tar.7z?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/Winery/WineskinWinery.app.tar.7z?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:@"file:///tmp/WineskinWinery.app.tar.7z"];
 	[fileName setStringValue:@"Wineskin Winery Update"];
 	[downloadingWindow makeKeyAndOrderFront:self];
@@ -187,6 +194,10 @@
 		[createWrapperButton setEnabled:NO];
 	else
 		[createWrapperButton setEnabled:YES];
+	//check wrapper version is 2.5+, if not then do not enable button
+	int numToCheckMajor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(9,1)] intValue];
+	int numToCheckMinor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(11,1)] intValue];
+	if (numToCheckMajor < 3 && numToCheckMinor < 5) [createWrapperButton setEnabled:NO];
 }
 
 - (IBAction)downloadPackagesManuallyButtonPressed:(id)sender;
@@ -256,7 +267,7 @@
 - (IBAction)updateButtonPressed:(id)sender
 {
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinWrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![[newVersion substringToIndex:8] isEqualToString:@"Wineskin"])
@@ -271,7 +282,7 @@
 		return;
 	}
 	//download new wrapper to /tmp
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinWrapper/%@.app.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/Wrapper/%@.app.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.app.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"Wrapper"];
@@ -312,7 +323,7 @@
 
 - (NSMutableArray *)getAvailableEngines
 {
-	NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinEngines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
+	NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Engines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
 	if ([fileString hasSuffix:@"\n"])
 	{
 		fileString = [fileString stringByAppendingString:@":!:!:"];
@@ -378,7 +389,7 @@
 - (void)setWrapperAvailablePrompt
 {
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinWrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![[newVersion substringToIndex:8] isEqualToString:@"Wineskin"]) return;
@@ -520,7 +531,7 @@
 //************ Engine Window (+ button) methods *******************
 - (IBAction)engineWindowDownloadAndInstallButtonPressed:(id)sender
 {
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinEngines/%@.tar.7z?%@",[[engineWindowEngineList selectedItem] title],[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/Engines/%@.tar.7z?%@",[[engineWindowEngineList selectedItem] title],[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",[[engineWindowEngineList selectedItem] title]]];
 	[fileName setStringValue:[[engineWindowEngineList selectedItem] title]];
 	[fileNameDestination setStringValue:@"Engines"];

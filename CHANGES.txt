@@ -1,7 +1,7 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
 
 Release 2.5 - in development
-• Wineskin internal user folders should always use English words now, so folder linking and such will always work on any language/locale and when ports/wrappers change between languages/locales.  Older wrappers will not update 100% right, and require a 'Rebuild Wrapper' to take advantage of this.
+• Wineskin internal user folders should always use English words now, so folder linking and such will always work on any language/locale and when ports/wrappers change between languages/locales.  Older wrappers may not update 100% right, and require a 'Rebuild Wrapper' to take advantage of this.
 • Wineskin wrappers will no longer prevent other users from using Wineskin wrappers on the system.  If a pre-2.5 one was run, it will still break them running for other users until you reboot, or remove the /tmp/Wineskin symlink.
 • Custom Commands now run after setting of main variables like wineprefix.
 • Command Line Shell button added to Wineskin.app to get a command prompt for running any tools you need, like regsrv32
@@ -9,12 +9,13 @@ Release 2.5 - in development
 • Extension window adding and editing fixed to display better and correctly when it comes to quotes and backslashes.
 • Option to emulate 3 button mouse added to Wineskin.app Options. It used to always be on.  This will allow fixes to games that Alt+Click in game didn't work, like Diablo 2.
 • Several additions and changes to support WS8 based engines
-• WineskinEngine.bundle is no more… everything
+• WineskinEngine.bundle is no more… everything is in Contents/Frameworks
 • WineskinX11 is now part of the wrapper and will be updated/changed with wrapper versions, and is no longer part of the engine.  This means updates to engines bases will be ultra rare, as they will mainly just be a Wine build and nothing more.
 • WS8 Engines are Wine versions that should keep 10.5+ compatibility
 • WS7 engines are not compatible directly with Wineskin 2.5, however Wineskin Winery 1.3+ will offer to convert your WS7 engines to WS8 engines when it starts up.  This will save you from having to download new engines for the same old Wine versions.
 • Option in Wineskin.app to have all but 1 CPU Core disabled while running.  This will affect your whole system, but some old games only work right with 1 CPU.
 • Update Wrapper fixed to work with new structure.  If you are trying to update a 2.0 to 2.4 wrapper, you need to do an update, then do the update again and tell it to Force the update when asked, then you need to Change Engine to a WS8 and it should work.
+• There is a WineskinMenuScripts folder in the wrapper with a help.txt file explaining about how to set them up.  This allows you to add custom menu entires to the top drop down menus of a running wrapper.
 
 Release 2.4 - 07/26/2011
 • Mapping user folders is much more customizable now

@@ -634,9 +634,13 @@
 	[wrapperVersionText setStringValue:[NSString stringWithFormat:@"Wineskin %@",[plistDictionaryWV valueForKey:@"CFBundleVersion"]]];
 	[plistDictionaryWV release];
 	//get current engine and put it on Advanced Page engineVersionText
-	NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
-	NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
-	[engineVersionText setStringValue:[currentEngineVersionArray objectAtIndex:0]];
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
+	{
+		NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
+		NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
+		//change engineVersionText to engine name
+		[engineVersionText setStringValue:[currentEngineVersionArray objectAtIndex:0]];
+	}
 	//set info from Info.plist
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	[windowsExeTextField setStringValue:[plistDictionary valueForKey:@"Program Name and Path"]];
@@ -1556,10 +1560,13 @@
 		[engineWindowOkButton setEnabled:YES];
 	//** Show current installed engine version
 	// read in current engine name from first line of version file in wswine.bundle
-	NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
-	NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
-	//change currentVersionTextField to engine name
-	[currentVersionTextField setStringValue:[currentEngineVersionArray objectAtIndex:0]];
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
+	{
+		NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
+		NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
+		//change currentVersionTextField to engine name
+		[currentVersionTextField setStringValue:[currentEngineVersionArray objectAtIndex:0]];
+	}
 	//show Change Engine Window
 	[changeEngineWindow makeKeyAndOrderFront:self];
 	//order out advanced window

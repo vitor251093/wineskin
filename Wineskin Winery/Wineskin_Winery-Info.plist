@@ -19,7 +19,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleShortVersionString</key>
-	<string>Wineskin-Winery-1.2</string>
+	<string>Wineskin-Winery-1.3Beta</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>LSMinimumSystemVersionByArchitecture</key>
@@ -30,7 +30,7 @@
 		<string>10.6</string>
 	</dict>
 	<key>CFBundleVersion</key>
-	<string>Wineskin-Winery-1.2</string>
+	<string>Wineskin-Winery-1.3Beta</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
