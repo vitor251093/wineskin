@@ -485,7 +485,7 @@
 	//get latest available version number
 	NSString *newVersion = [self availableEngineBuildVersion];
 	//download new wrapper to /tmp
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinEngineBase/%@.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/EngineBase/%@.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"EngineBase"];
@@ -521,10 +521,10 @@
 }
 - (NSString *)availableEngineBuildVersion
 {
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinEngineBase/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/EngineBase/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
-	if (newVersion == nil || ![[newVersion substringToIndex:2] isEqualToString:@"WS"]) return @"ERROR";
+	if (newVersion == nil || ![newVersion hasSuffix:@"EngineBase"]) return @"ERROR";
 	return newVersion;
 }
 

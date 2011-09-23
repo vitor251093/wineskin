@@ -777,8 +777,7 @@
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin" withDestinationPath:frameworksFold error:nil];
 	//make sure the new symlink is full read/write so other users can run wrappers too. Task List bug 3406451
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin"];
-	NSArray *winePidCheck = [self readFileToStringArray:wineserverPIDFile];
-	if ([self pidRunning:[winePidCheck objectAtIndex:0]])
+	if ([self pidRunning:wineserverPIDToCheck])
 	{
 		[fm release];
 		return [winePidCheck objectAtIndex:0];
