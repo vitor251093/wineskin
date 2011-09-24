@@ -383,11 +383,14 @@
 	//for xorg1.11.0+, log files are put in ~/Library/Logs.  Need to move to correct place if in Debug
 	if (debugEnabled)
 	{
-		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11.%@.Wineskin.p.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
-		NSString *logFileLocation=[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
 		NSFileManager *fm = [NSFileManager defaultManager];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
-		[fm copyItemAtPath:logName toPath:logFileLocation error:nil];
+		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11.%@.Wineskin.p.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
+		if ([fm fileExistsAtPath:logName])
+		{
+			NSString *logFileLocation=[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
+			[fm copyItemAtPath:logName toPath:logFileLocation error:nil];
+		}
 		[fm release];
 	}
 	
