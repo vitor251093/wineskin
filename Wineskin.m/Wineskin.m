@@ -13,7 +13,8 @@
 	NSString *engineVersion;				//engine being used
 	NSString *firstPIDFile;					//pid file used to find wineserver pid
 	NSString *secondPIDFile;				//pid file used to find wineserver pid
-	NSString *wineserverPIDFile;			//pid files holding wineserver of current/last run
+	NSString *wineserverPIDFile;			//pid file holding wineserver pid of current/last run
+	NSString *wineskinX11PIDFile;			//pid file holding wineskinx11 pid of current/last run
 	NSString *displayNumberFile;			//pid file holding display number of current/last run
 	NSString *infoPlistFile;				//the Info.plist file in the wrapper
 	NSString *winePrefix;					//the $WINEPREFIX
@@ -147,6 +148,7 @@
 	firstPIDFile = [NSString stringWithFormat:@"%@/.firstpidfile",contentsFold];
 	secondPIDFile = [NSString stringWithFormat:@"%@/.secondpidfile",contentsFold];
 	wineserverPIDFile = [NSString stringWithFormat:@"%@/.wineserverpidfile",contentsFold];
+	wineskinX11PIDFile = [NSString stringWithFormat:@"%@/.x11pidfile",contentsFold];
 	displayNumberFile = [NSString stringWithFormat:@"%@/.currentuseddisplay",contentsFold];
 	infoPlistFile = [NSString stringWithFormat:@"%@/Info.plist",contentsFold];
 	winePrefix=[NSString stringWithFormat:@"%@/Resources",contentsFold];
@@ -777,10 +779,11 @@
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin" withDestinationPath:frameworksFold error:nil];
 	//make sure the new symlink is full read/write so other users can run wrappers too. Task List bug 3406451
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin"];
-	if ([self pidRunning:wineserverPIDToCheck])
+	if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
 	{
+		//wineserver is still running, so this *should* be a custom exe launcher, so return the current pid
 		[fm release];
-		return [winePidCheck objectAtIndex:0];
+		return @"wineserver running from previous launch, not relaunching WineskinX11";
 	}
 	//change Info.plist to use main.nib (xquartz's nib) instead of MainMenu.nib (WineskinLauncher's nib)
 	NSMutableDictionary* quickEdit1 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
@@ -822,6 +825,8 @@
 	[quickEdit2 release];
 	//get rid of X11 lock folder that shouldnt be needed
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+	//write x pid out to a file, so other runs can tell if it is already running
+	[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",thePidToReturn],nil] toFile:wineskinX11PIDFile];
 	[fm release];
 	return thePidToReturn;
 }
@@ -1101,9 +1106,21 @@
 		if ([vdResolution isEqualToString:@"novd"]) [self setToNoVirtualDesktop];
 		else [self setToVirtualDesktop:vdResolution named:virtualDesktopName];
 		// wineserver check to see if this is a multirun customexe
-		NSArray *wineserverPIDCheckArray = [self readFileToStringArray:wineserverPIDFile];
-		if ([self isPID:[wineserverPIDCheckArray objectAtIndex:0] named:@"wineserver"])
-				returnPID = [wineserverPIDCheckArray objectAtIndex:0];
+		if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
+		{
+			returnPID = wineserverPIDToCheck;
+			//make sure X11 is still running too, or it might be shutting down
+			//if X isn't running, this isn't a custom EXE, its just running too many too fast...
+			//give error message asking to slow down
+			NSString *wineskinX11PIDToCheck = [[self readFileToStringArray:wineskinX11PIDFile] objectAtIndex:0];
+			if (![self isPID:wineskinX11PIDToCheck named:@"WineskinX11"])
+			{
+				//wrapper is shutting down... wineserver was running, but X11 is gone.
+				NSLog(@"ERROR: App was ran again while it was still shutting down, please wait a few seconds before running it again");
+				CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("Wineskin Error"), (CFStringRef)@"ERROR: App was ran again while it was still shutting down, please wait a few seconds before running it again", NULL);
+				killWineskin = YES;
+			}
+		}
 		//do not run if wineserver already running.
 		if ([returnPID isEqualToString:@"-1"])
 		{
