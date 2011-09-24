@@ -380,6 +380,17 @@
 		[self setResolution:vdResolution];
 	}
 	
+	//for xorg1.11.0+, log files are put in ~/Library/Logs.  Need to move to correct place if in Debug
+	if (debugEnabled)
+	{
+		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11.%@.Wineskin.p.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
+		NSString *logFileLocation=[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
+		NSFileManager *fm = [NSFileManager defaultManager];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
+		[fm copyItemAtPath:logName toPath:logFileLocation error:nil];
+		[fm release];
+	}
+	
 	//**********sleep and monitor in background while app is running
 	NSLog(@"Sleeping and monitoring from the background while app runs...");
 	[self sleepAndMonitor];
