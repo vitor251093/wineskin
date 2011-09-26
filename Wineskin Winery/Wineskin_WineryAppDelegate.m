@@ -302,7 +302,7 @@
 	//get files in folder and put in array
 	NSString *folder = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSArray *filesTEMP = [fm contentsOfDirectoryAtPath:folder error:nil];
+	NSArray *filesTEMP = [[fm contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
 	NSArray *files = [[filesTEMP reverseObjectEnumerator] allObjects];
 	for(NSString *file in files) // standard first
 		if ([file hasSuffix:@".tar.7z"] && (NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0)))) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
