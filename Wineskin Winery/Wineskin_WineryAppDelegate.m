@@ -12,6 +12,14 @@
 
 @synthesize window;
 
+// Comparator to replace @selector(localizedStandardCompare:) missing in 10.5
+static NSInteger localizedComparator(id a, id b, void* context)
+{
+	NSInteger compareOptions = NSCaseInsensitiveSearch|NSNumericSearch;
+	
+	return [(NSString*)a compare:b options:compareOptions range:NSMakeRange(0, [a length]) locale:nil]; // nil = current locale
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	NSAlert *alert = [[NSAlert alloc] init];
@@ -302,7 +310,7 @@
 	//get files in folder and put in array
 	NSString *folder = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSArray *filesTEMP = [[fm contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
+	NSArray *filesTEMP = [[fm contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingFunction:localizedComparator context:nil];
 	NSArray *files = [[filesTEMP reverseObjectEnumerator] allObjects];
 	for(NSString *file in files) // standard first
 		if ([file hasSuffix:@".tar.7z"] && (NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0)))) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
