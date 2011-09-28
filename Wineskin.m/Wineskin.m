@@ -781,7 +781,7 @@
 		[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
 	}
 	//set up quartz-wm launch correctly
-	NSString *quartzwmLine = @" +extension \"/tmp/Wineskin/bin/quartz-wm\"";
+	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"/tmp/Wineskin/bin/quartz-wm --prefs-domain %@.plist\"",x11PrefFileName];
 	if (fullScreenOption) quartzwmLine=@"";
 	//copy the plist over
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
