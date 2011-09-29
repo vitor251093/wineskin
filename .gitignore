@@ -1,14 +1,20 @@
-#Spotlight junk
+#Folder view settings
 .DS_Store
 
-#Xcode build folders
+#Xcode3 build folders
 build/
+
+#XCode4 build folders
+DerivedData/
 
 #user-specific project settings: breakpoints, custom executables, etc.; files are inside the .xcodeproj bundle
 *.mode1v3
 
 #user-specific xcode workspace settings; files are inside the .xcodeproj bundle
 *.pbxuser
+
+#user-specific xcode data
+*.xcuserdatad/
 
 #some merge tools or editors generate .bak files to store old versions backups
 *.bak

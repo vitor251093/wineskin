@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface WineskinAppDelegate : NSObject //<NSApplicationDelegate>
+@interface WineskinAppDelegate : NSObject // <NSOutlineViewDataSource> //<NSApplicationDelegate>
 {
 	int disableButtonCounter;
 	BOOL disableXButton;
@@ -127,17 +127,36 @@
 	
 	//Winetricks window
 	IBOutlet NSWindow *winetricksWindow;
-	IBOutlet NSPopUpButton *winetricksCommandList;
 	IBOutlet NSButton *winetricksRunButton;
 	IBOutlet NSButton *winetricksCancelButton;
 	IBOutlet NSButton *winetricksUpdateButton;
-	IBOutlet NSButton *winetricksShowPackageListButton;
+	IBOutlet NSButton *winetricksRefreshButton;
 	IBOutlet NSButton *winetricksDoneButton;
 	IBOutlet NSProgressIndicator *winetricksWaitWheel;
 	IBOutlet NSTextView *winetricksOutputText;
 	IBOutlet NSScrollView *winetricksOutputTextScrollView;
+	IBOutlet NSOutlineView *winetricksOutlineView;
+	IBOutlet NSTabView *winetricksTabView;
+	IBOutlet NSTabViewItem *winetricksTabList;
+	IBOutlet NSTabViewItem *winetricksTabLog;
 	NSMutableArray *shPIDs;
 	BOOL winetricksCanceled;
+	NSDictionary *winetricksList;
+	NSDictionary *winetricksFilteredList;
+	NSMutableDictionary *winetricksSelectedList;
+	NSArray *winetricksInstalledList;
+	NSArray *winetricksCachedList;
+	IBOutlet NSTableColumn *winetricksTableColumnRun;
+	IBOutlet NSTableColumn *winetricksTableColumnInstalled;
+	IBOutlet NSTableColumn *winetricksTableColumnDownloaded;
+	IBOutlet NSTableColumn *winetricksTableColumnName;
+	IBOutlet NSTableColumn *winetricksTableColumnDescription;
+	IBOutlet NSSearchField *winetricksSearchField;
+	IBOutlet NSButton *winetricksCustomCheckbox;
+	IBOutlet NSTextField *winetricksCustomLine;
+	IBOutlet NSTextField *winetricksCustomLineLabel;
+	IBOutlet NSMenuItem *winetricksShowDownloadedColumn;
+	IBOutlet NSMenuItem *winetricksShowInstalledColumn;
 	
 	//extensions window
 	IBOutlet NSWindow *extAddEditWindow;
@@ -154,6 +173,11 @@
 }
 
 @property (assign) IBOutlet NSWindow *window;
+@property (retain) NSDictionary *winetricksList;
+@property (retain) NSDictionary *winetricksFilteredList;
+@property (retain) NSMutableDictionary *winetricksSelectedList;
+@property (retain) NSArray *winetricksInstalledList;
+@property (retain) NSArray *winetricksCachedList;
 
 - (void)enableButtons;
 - (void)disableButtons;
@@ -236,10 +260,15 @@
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;
 - (IBAction)winetricksDoneButtonPressed:(id)sender;
-- (IBAction)winetricksShowPackageListButtonPressed:(id)sender;
+- (IBAction)winetricksRefreshButtonPressed:(id)sender;
 - (IBAction)winetricksUpdateButtonPressed:(id)sender;
 - (IBAction)winetricksRunButtonPressed:(id)sender;
 - (IBAction)winetricksCancelButtonPressed:(id)sender;
+- (IBAction)winetricksSelectAllButtonPressed:(id)sender;
+- (IBAction)winetricksSelectNoneButtonPressed:(id)sender;
+- (IBAction)winetricksSearchFilter:(id)sender;
+- (IBAction)winetricksCustomCommandToggled:(id)sender;
+- (IBAction)winetricksToggleColumn:(id)sender;
 - (void)runWinetrick;
 - (void)doTheDangUpdate;
 - (void)winetricksWriteFinished;

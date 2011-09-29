@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1627CA661434312E00847CD1 /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1627CA651434312E00847CD1 /* Defaults.plist */; };
+		16987CF3142873C2003AFFFF /* winetricksHelpList.plist in Resources */ = {isa = PBXBuildFile; fileRef = 16987CF2142873C2003AFFFF /* winetricksHelpList.plist */; };
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* WineskinAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -17,7 +19,6 @@
 		A82E5B8E133E73E1007AA611 /* AdvancedConfigHelp.png in Resources */ = {isa = PBXBuildFile; fileRef = A8B44CA712A4050D00DA8C3A /* AdvancedConfigHelp.png */; };
 		A82E5B8F133E73E8007AA611 /* AdvancedToolsHelp.png in Resources */ = {isa = PBXBuildFile; fileRef = A8B44CA812A4050D00DA8C3A /* AdvancedToolsHelp.png */; };
 		A82E5B90133E73EF007AA611 /* remakedefaults.reg in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2C12820230001EBA25 /* remakedefaults.reg */; };
-		A82E5B91133E73F6007AA611 /* winetricksHelpList in Resources */ = {isa = PBXBuildFile; fileRef = A8FB395F12E88C9700CC5DF1 /* winetricksHelpList */; };
 		A82E5B92133E73FB007AA611 /* cabextract in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2812820226001EBA25 /* cabextract */; };
 		A82E5B93133E7400007AA611 /* winetricks in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2912820226001EBA25 /* winetricks */; };
 		A82E5B94133E7407007AA611 /* WSGamma in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2512820212001EBA25 /* WSGamma */; };
@@ -29,6 +30,8 @@
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		1627CA651434312E00847CD1 /* Defaults.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = Defaults.plist; sourceTree = "<group>"; };
+		16987CF2142873C2003AFFFF /* winetricksHelpList.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = winetricksHelpList.plist; sourceTree = "<group>"; };
 		1DDD58150DA1D0A300B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		256AC3D80F4B6AC300CF3369 /* WineskinAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WineskinAppDelegate.h; sourceTree = "<group>"; };
 		256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WineskinAppDelegate.m; sourceTree = "<group>"; };
@@ -48,7 +51,6 @@
 		A8B44CA512A3FF2400DA8C3A /* ScreenOptionsHelp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ScreenOptionsHelp.png; sourceTree = "<group>"; };
 		A8B44CA712A4050D00DA8C3A /* AdvancedConfigHelp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AdvancedConfigHelp.png; sourceTree = "<group>"; };
 		A8B44CA812A4050D00DA8C3A /* AdvancedToolsHelp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AdvancedToolsHelp.png; sourceTree = "<group>"; };
-		A8FB395F12E88C9700CC5DF1 /* winetricksHelpList */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = winetricksHelpList; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +126,7 @@
 			children = (
 				A868FC2E12820240001EBA25 /* CustomEXE.app */,
 				A8B44CA512A3FF2400DA8C3A /* ScreenOptionsHelp.png */,
+				1627CA651434312E00847CD1 /* Defaults.plist */,
 				A8B44CA712A4050D00DA8C3A /* AdvancedConfigHelp.png */,
 				A8B44CA812A4050D00DA8C3A /* AdvancedToolsHelp.png */,
 				A868FC2C12820230001EBA25 /* remakedefaults.reg */,
@@ -150,7 +153,7 @@
 		A868FC2712820226001EBA25 /* Winetricks */ = {
 			isa = PBXGroup;
 			children = (
-				A8FB395F12E88C9700CC5DF1 /* winetricksHelpList */,
+				16987CF2142873C2003AFFFF /* winetricksHelpList.plist */,
 				A868FC2812820226001EBA25 /* cabextract */,
 				A868FC2912820226001EBA25 /* winetricks */,
 			);
@@ -219,7 +222,8 @@
 				A82E5B8D133E73D9007AA611 /* ScreenOptionsHelp.png in Resources */,
 				A82E5B8E133E73E1007AA611 /* AdvancedConfigHelp.png in Resources */,
 				A82E5B8F133E73E8007AA611 /* AdvancedToolsHelp.png in Resources */,
-				A82E5B91133E73F6007AA611 /* winetricksHelpList in Resources */,
+				16987CF3142873C2003AFFFF /* winetricksHelpList.plist in Resources */,
+				1627CA661434312E00847CD1 /* Defaults.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

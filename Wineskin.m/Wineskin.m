@@ -42,9 +42,7 @@
 	BOOL openingFiles;						//set if we are opening files instead of a program
 	BOOL isIce;								//YES if ICE engine being used
 	NSString *wssCommand;					//should be argv[1], if a special command
-	NSString *winetricksCommand;			//should be argv[2] if wssCommand is WSS-winetricks
-	NSString *winetricksCommand2;			//should be argv[3] if wssCommand is WSS-winetricks
-	NSString *winetrickCommandsList;		//string of commnads for "list" command
+	NSArray *winetricksCommands;			//should be argv[2]+ if wssCommand is WSS-winetricks
 	NSString *programNameAndPath;			//directly from the info.plist
 	NSString *uLimitNumber;					//read from "max open files" in Info.plist
 	NSString *wineDebugLineFromPlist;		//read from "WINEDEBUG=" in Info.plist
@@ -235,19 +233,9 @@
 	//CustomEXE {appname}		- running a custom EXE with appname
 	//starts with a"/" 			- will be 1+ path/filename to open
 	//no command line args		- normal run
-	if ([argv count] > 1) winetricksCommand = [argv objectAtIndex:1];
-	if ([argv count] > 2)
+	if ([argv count] > 1)
 	{
-		winetricksCommand2 = [argv objectAtIndex:2];
-		winetrickCommandsList = [argv objectAtIndex:1];
-		int i = 3;
-		for (NSString *item in argv)
-		{
-			if ([item isEqualToString:winetricksCommand]
-				|| [item isEqualToString:wssCommand])
-				continue;
-			winetrickCommandsList = [NSString stringWithFormat:@"%@ %@",winetrickCommandsList,item];
-		}		
+		winetricksCommands = [argv subarrayWithRange:NSMakeRange(1, [argv count]-1)];
 	}
 	if ([argv count] > 0)
 	{
@@ -756,8 +744,10 @@
 - (NSString *)startX11
 {
 	// do not start X server for Winetricks listings.. its a waste of time.
-	if ([wssCommand isEqualToString:@"WSS-winetricks"] && ([winetricksCommand isEqualToString:@"list"] || [winetricksCommand2 isEqualToString:@"list"]))
-		return @"Winetricks Listing, no X server needed";
+	if ([wssCommand isEqualToString:@"WSS-winetricks"])
+		if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
+		    || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"])))
+			return @"Winetricks Listing, no X server needed";
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold];
@@ -1103,12 +1093,11 @@
 		{
 			NSString *wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
 			NSString *wineLogFile = [NSString stringWithFormat:@"%@/Logs/Winetricks.log",winePrefix];
-			if ([winetricksCommand2 isEqualToString:@"list"]) //just getting a list of packages... X should NOT be running.
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate %@ > \"%@\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,winetrickCommandsList,wineLogFile]];
-			else if ([winetricksCommand isEqualToString:@"list"])
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,winetricksCommand,wineLogFile]];
+			if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
+			    || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"]))) //just getting a list of packages... X should NOT be running.
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate %@ > \"%@\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,[winetricksCommands componentsJoinedByString:@" "],wineLogFile]];
 			else
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,winetricksCommand,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,[winetricksCommands componentsJoinedByString:@"\" \""],wineLogFile]];
 			usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
 		}
 	}
