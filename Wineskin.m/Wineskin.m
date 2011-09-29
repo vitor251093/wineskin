@@ -762,16 +762,15 @@
 	SInt32 majorVersion,minorVersion;
 	Gestalt(gestaltSystemVersionMajor, &majorVersion);
 	Gestalt(gestaltSystemVersionMinor, &minorVersion);
-	NSString *copyFrom = [NSString stringWithFormat:@"%@/libXplugin.1.%d.%d.dylib",frameworksFold,majorVersion,minorVersion];
-	NSString *copyTo = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
-	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/libXplugin.1.dylib\"",frameworksFold]];
-	if ([fm fileExistsAtPath:copyFrom]) //only exists on WS8+, do not break WS7 engines.
-	{
-		[fm removeItemAtPath:copyTo error:nil];
-		[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
-	}
+	NSString *mainFile = [NSString stringWithFormat:@"%@/libXplugin.1.%d.%d.dylib",frameworksFold,majorVersion,minorVersion];
+	NSString *symlinkTo = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
+	//just create a symlink to the correct libXplugin, and delete the old one.
+	[fm removeItemAtPath:symlinkTo error:nil];
+	[fm createSymbolicLinkAtPath:symlinkTo withDestinationPath:mainFile error:nil];
+	//any user needs to be able to remove the symlink
+	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkTo]];
 	//set up quartz-wm launch correctly
-	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"/tmp/Wineskin/bin/quartz-wm --prefs-domain %@.plist\"",x11PrefFileName];
+	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"/tmp/Wineskin/bin/quartz-wm --prefs-domain '%@.plist'\"",x11PrefFileName];
 	if (fullScreenOption) quartzwmLine=@"";
 	//copy the plist over
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
@@ -1078,10 +1077,13 @@
 			// do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
 			// Task Number 3221715 Fix Wrapper Permissions
 			//cocoa command don't seem to be working right, but chmod system command works fine.
-			[self systemCommand:[NSString stringWithFormat:@"chmod -R 755 \"%@\"",appNameWithPath]];
+			// cannot 755 the whole wrapper and then change to 777s or this can break the wrapper for non-Admin users.
+			//[self systemCommand:[NSString stringWithFormat:@"chmod 755 \"%@\"",appNameWithPath]];
 			// need to chmod 777 on Contents, Resources, and Resources/* for multiuser fix on same machine
 			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",contentsFold]];
 			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
+			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",frameworksFold]];
+			[self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@/drive_c\"",winePrefix]];
 			NSArray *tmpy2 = [fm contentsOfDirectoryAtPath:winePrefix error:nil];
 			for (NSString *item in tmpy2)
 				[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,item]];
@@ -1209,6 +1211,7 @@
 - (void)sleepAndMonitor
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
+	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil];
 	int oldTimeStamp=0;
 	int oldInfoPlistTimeStamp=0;
 	struct stat stat_p;
@@ -1356,6 +1359,7 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/system.reg\"",winePrefix]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/Info.plist\"",contentsFold]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@/drive_c\"",winePrefix]];
 	[fm release];
 }
 - (void)ds:(NSString *)input

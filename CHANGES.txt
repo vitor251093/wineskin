@@ -16,6 +16,7 @@ Release 2.5 - in development
 • Option in Wineskin.app to have all but 1 CPU Core disabled while running.  This will affect your whole system, but some old games only work right with 1 CPU.
 • Update Wrapper fixed to work with new structure.  If you are trying to update a 2.0 to 2.4 wrapper, you need to do an update, then do the update again and tell it to Force the update when asked, then you need to Change Engine to a WS8 and it should work.
 • There is a WineskinMenuScripts folder in the wrapper with a help.txt file explaining about how to set them up.  This allows you to add custom menu entires to the top drop down menus of a running wrapper.
+• Major overhaul to the Winetricks interface done by Syao (Thanks Syao!).  Can search for packages, do multiple packages, do custom runs, and all types of great things now.
 
 Release 2.4 - 07/26/2011
 • Mapping user folders is much more customizable now
