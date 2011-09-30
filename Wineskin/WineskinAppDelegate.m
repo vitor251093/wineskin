@@ -44,6 +44,12 @@
 	[busyWindow orderOut:self];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Defaults" ofType:@"plist"]]];
 }
+- (void)sleepWithRunLoopForSeconds:(NSInteger)seconds
+{
+	// Sleep while still running the run loop
+	if (![[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:seconds]])
+		sleep(seconds); // Fallback, should never happen
+}
 - (void)enableButtons
 {
 	disableButtonCounter--;
@@ -1047,7 +1053,7 @@
 	}
 	 */
 	[self winetricksRefreshButtonPressed:self];
-	[winetricksTabView selectTabViewItem:winetricksTabList];
+	//[winetricksTabView selectTabViewItem:winetricksTabList];
 }
 - (IBAction)winetricksDoneButtonPressed:(id)sender
 {
@@ -1057,10 +1063,10 @@
 - (IBAction)winetricksRefreshButtonPressed:(id)sender
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSDictionary *list = nil;
-	[busyWindow makeKeyAndOrderFront:self];
+	winetricksDone = NO;
+	[winetricksWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
-	[winetricksWindow orderOut:self];
+	[busyWindow orderOut:self];
 	[winetricksCustomLine setStringValue:@""];
 	[winetricksCustomCheckbox setState:NO];
 	[self winetricksCustomCommandToggled:winetricksCustomCheckbox];
@@ -1071,111 +1077,18 @@
 	[winetricksShowDownloadedColumn setState:([defaults boolForKey:@"DownloadedColumnShown"] ? NSOnState : NSOffState)];
 	[winetricksShowInstalledColumn setState:([defaults boolForKey:@"InstalledColumnShown"] ? NSOnState : NSOffState)];
 	[winetricksOutlineView setOutlineTableColumn:winetricksTableColumnName];
+	
+	[self setWinetricksBusy:YES];
 
-	// List of all winetricks
-	list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]]];
-	BOOL needsListRebuild = NO;
-	if (list == nil)
-		needsListRebuild = YES;
-	for (NSString *eachCategory in [list allKeys])
-	{
-		if ([list valueForKey:eachCategory] == nil || ![[list valueForKey:eachCategory] isKindOfClass:[NSDictionary class]])
-		{
-			needsListRebuild = YES;
-			break;
-		}
-		NSDictionary *thisCategory = [list valueForKey:eachCategory];
-		for (NSString *eachPackage in [thisCategory allKeys])
-		{
-			if ([thisCategory valueForKey:eachPackage] == nil || ![[thisCategory valueForKey:eachPackage] isKindOfClass:[NSDictionary class]])
-			{
-				needsListRebuild = YES;
-				break;
-			}
-			NSDictionary *thisPackage = [thisCategory valueForKey:eachPackage];
-			if ([thisPackage valueForKey:@"WS-Name"] == nil || ![[thisPackage valueForKey:@"WS-Name"] isKindOfClass:[NSString class]]
-			    ||[thisPackage valueForKey:@"WS-Description"] == nil || ![[thisPackage valueForKey:@"WS-Description"] isKindOfClass:[NSString class]])
-			{
-				needsListRebuild = YES;
-				break;
-			}
-		}
-	}
-	if (needsListRebuild)
-	{ // Invalid or missing list.  Rebuild it
-		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",@"list",nil]];
-		NSArray *winetricksCategories = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-		list = [NSMutableDictionary dictionaryWithCapacity:[winetricksCategories count]];
-		for (NSString *eachCategory in winetricksCategories)
-		{
-			//skip if its not needed
-			if (eachCategory.length == 0)
-				continue;
-			//run winetricks to get list of packages in current verb into winetricksTempList
-			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", eachCategory, @"list", nil]];
-			//before reading in the log, we need to find out if its iso-8859-1 which happens with some weird symbols Winetricks uses
-			NSString *logContents;
-			if ([[self systemCommandWithOutputReturned:[NSString stringWithFormat:@"file --mime-encoding \"%@/Contents/Resources/Logs/Winetricks.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]] hasSuffix:@"iso-8859-1"]) //need to convert to UTF8
-				logContents = [self systemCommandWithOutputReturned:[NSString stringWithFormat:@"iconv -f iso-8859-1 -t utf-8 \"%@/Contents/Resources/Logs/Winetricks.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-			else
-				logContents = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] usedEncoding:nil error:nil];
-			NSArray *winetricksTempList = [[logContents componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-			NSMutableDictionary *winetricksThisCategoryList = [NSMutableDictionary dictionaryWithCapacity:20];
-			for (NSString *eachPackage in winetricksTempList)
-			{
-				NSRange position = [eachPackage rangeOfString:@" "];
-				if (position.location == NSNotFound) // Skip invalid entries
-					continue;
-				NSString *packageName = [eachPackage substringToIndex:position.location];
-				NSString *packageDescription = [[eachPackage substringFromIndex:position.location] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-				// Yes, we're inserting the name twice (as a key and as a value) on purpose, so that we won't have to do a nasty, slow allObjectsForKey when drawing the UI.
-				[winetricksThisCategoryList setValue:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"WS-Name", packageDescription, @"WS-Description", nil] forKey:packageName];
-			}
-			if ([winetricksThisCategoryList count] == 0)
-				continue;
-			[list setValue:winetricksThisCategoryList forKey:eachCategory];
-		}
-		[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]] atomically:YES];
-	}
-	[self setWinetricksList:list];
-	[self setWinetricksFilteredList:list];
-
-	if ([defaults boolForKey:@"InstalledColumnShown"])
-	{
-		// List of installed winetricks
-		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-		if ([list valueForKey:@"WS-Installed"] == nil || ![[list valueForKey:@"WS-Installed"] isKindOfClass:[NSArray class]])
-		{ // Invalid or missing list.  Rebuild it
-			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", @"list-installed", nil]];
-			NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-			list = [NSDictionary dictionaryWithObject:tempList forKey:@"WS-Installed"];
-			[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
-		}
-		[self setWinetricksInstalledList:[list valueForKey:@"WS-Installed"]];
-	}
-	else
-		[self setWinetricksInstalledList:[NSDictionary dictionary]];
-
-	if ([defaults boolForKey:@"DownloadedColumnShown"])
-	{
-		// List of downloaded winetricks
-		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]]];
-		if ([list valueForKey:@"WS-Cached"] == nil || ![[list valueForKey:@"WS-Cached"] isKindOfClass:[NSArray class]])
-		{ // Invalid or missing list.  Rebuild it
-			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",@"list-cached",nil]];
-			NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-			list = [NSDictionary dictionaryWithObject:tempList forKey:@"WS-Cached"];
-			[list writeToFile:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]] atomically:YES];
-		}
-		[self setWinetricksCachedList:[list valueForKey:@"WS-Cached"]];
-	}
-	else
-		[self setWinetricksCachedList:[NSDictionary dictionary]];
-
+	// Run the possibly lenghty operation in a separate thread so that it won't beachball
+	NSThread *thread = [[[NSThread alloc] initWithTarget:self selector:@selector(winetricksLoadPackageLists) object:nil] autorelease];
+	[thread start];
+	while (![thread isFinished]) // Wait in a non-locking mode until the thread finishes running
+		[self sleepWithRunLoopForSeconds:1];
+	
+	winetricksDone = YES;
+	[self setWinetricksBusy:NO];
 	[winetricksOutlineView reloadData];
-	//fix windows
-	[winetricksWindow makeKeyAndOrderFront:self];
-	[busyWindow orderOut:self];
 }
 - (IBAction)winetricksUpdateButtonPressed:(id)sender
 {
@@ -1198,7 +1111,7 @@
 	[alert release];
 	urlWhereWinetricksIs = [NSString stringWithFormat:@"%@?%@",urlWhereWinetricksIs,[[NSNumber numberWithLong:rand()] stringValue]]; //random added to force recheck
 	//show busy window
-	[busyWindow  makeKeyAndOrderFront:self];
+	[busyWindow makeKeyAndOrderFront:self];
 	//hide Winetricks window
 	[winetricksWindow orderOut:self];
 	//Use downloader to download
@@ -1264,20 +1177,9 @@
 
 	winetricksDone = NO;
 	winetricksCanceled = NO;
-	// disable X button
-	disableXButton = YES;
-	// disable all buttons on Winetricks window
-	[winetricksRunButton setEnabled:NO];
-	[winetricksUpdateButton setEnabled:NO];
-	[winetricksRefreshButton setEnabled:NO];
-	[winetricksDoneButton setEnabled:NO];
-	//enable cancel button
-	[winetricksCancelButton setHidden:NO];
-	[winetricksCancelButton setEnabled:YES];
-	// start prog wheel
-	[winetricksWaitWheel startAnimation:self];
+	[self setWinetricksBusy:YES];
 	// switch to the log tab
-	[winetricksTabView selectTabViewItem:winetricksTabLog];
+	//[winetricksTabView selectTabViewItem:winetricksTabLog];
 	// delete log file
 	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	//killing sh processes from Winetricks will cancel out Winetricks correctly
@@ -1320,14 +1222,14 @@
 		[alert release];
 		return;
 	}
-	[alert release];	
+	[alert release];
 	[winetricksCancelButton setHidden:YES];
 	[winetricksCancelButton setEnabled:NO];
 	//kill shPIDs
 	winetricksCanceled = YES;
 	char *tmp;
 	for (NSString *item in shPIDs)
-		kill((pid_t)(strtoimax([item UTF8String], &tmp, 10)), 9);	
+		kill((pid_t)(strtoimax([item UTF8String], &tmp, 10)), 9);
 }
 - (IBAction)winetricksSelectAllButtonPressed:(id)sender
 {
@@ -1407,6 +1309,145 @@
 	[defaults synchronize];
 	[self winetricksRefreshButtonPressed:self];
 }
+- (void)winetricksLoadPackageLists
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSDictionary *list = nil;
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	
+	// List of all winetricks
+	list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]]];
+	BOOL needsListRebuild = NO;
+	if (list == nil) // This only happens in case of a winetricks update
+		needsListRebuild = YES;
+	else
+	{
+		for (NSString *eachCategory in [list allKeys])
+		{
+			if ([list valueForKey:eachCategory] == nil || ![[list valueForKey:eachCategory] isKindOfClass:[NSDictionary class]])
+			{
+				needsListRebuild = YES;
+				break;
+			}
+			NSDictionary *thisCategory = [list valueForKey:eachCategory];
+			for (NSString *eachPackage in [thisCategory allKeys])
+			{
+				if ([thisCategory valueForKey:eachPackage] == nil || ![[thisCategory valueForKey:eachPackage] isKindOfClass:[NSDictionary class]])
+				{
+					needsListRebuild = YES;
+					break;
+				}
+				NSDictionary *thisPackage = [thisCategory valueForKey:eachPackage];
+				if ([thisPackage valueForKey:@"WS-Name"] == nil || ![[thisPackage valueForKey:@"WS-Name"] isKindOfClass:[NSString class]]
+				    ||[thisPackage valueForKey:@"WS-Description"] == nil || ![[thisPackage valueForKey:@"WS-Description"] isKindOfClass:[NSString class]])
+				{
+					needsListRebuild = YES;
+					break;
+				}
+			}
+		}
+	}
+	if (needsListRebuild)
+	{ // Invalid or missing list.  Rebuild it
+		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",@"list",nil]];
+		NSArray *winetricksCategories = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+		list = [NSMutableDictionary dictionaryWithCapacity:[winetricksCategories count]];
+		for (NSString *eachCategory in winetricksCategories)
+		{
+			//skip if its not needed
+			if (eachCategory.length == 0)
+				continue;
+			//run winetricks to get list of packages in current verb into winetricksTempList
+			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", eachCategory, @"list", nil]];
+			//before reading in the log, we need to find out if its iso-8859-1 which happens with some weird symbols Winetricks uses
+			NSString *logContents;
+			if ([[self systemCommandWithOutputReturned:[NSString stringWithFormat:@"file --mime-encoding \"%@/Contents/Resources/Logs/WinetricksTemp.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]] hasSuffix:@"iso-8859-1"]) //need to convert to UTF8
+				logContents = [self systemCommandWithOutputReturned:[NSString stringWithFormat:@"iconv -f iso-8859-1 -t utf-8 \"%@/Contents/Resources/Logs/WinetricksTemp.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+			else
+				logContents = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] usedEncoding:nil error:nil];
+			NSArray *winetricksTempList = [[logContents componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+			NSMutableDictionary *winetricksThisCategoryList = [NSMutableDictionary dictionaryWithCapacity:20];
+			for (NSString *eachPackage in winetricksTempList)
+			{
+				NSRange position = [eachPackage rangeOfString:@" "];
+				if (position.location == NSNotFound) // Skip invalid entries
+					continue;
+				NSString *packageName = [eachPackage substringToIndex:position.location];
+				NSString *packageDescription = [[eachPackage substringFromIndex:position.location] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				// Yes, we're inserting the name twice (as a key and as a value) on purpose, so that we won't have to do a nasty, slow allObjectsForKey when drawing the UI.
+				[winetricksThisCategoryList setValue:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"WS-Name", packageDescription, @"WS-Description", nil] forKey:packageName];
+			}
+			if ([winetricksThisCategoryList count] == 0)
+				continue;
+			[list setValue:winetricksThisCategoryList forKey:eachCategory];
+		}
+		[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]] atomically:YES];
+	}
+	[self setWinetricksList:list];
+	[self setWinetricksFilteredList:list];
+	
+	if ([defaults boolForKey:@"InstalledColumnShown"])
+	{
+		// List of installed winetricks
+		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+		if ([list valueForKey:@"WS-Installed"] == nil || ![[list valueForKey:@"WS-Installed"] isKindOfClass:[NSArray class]])
+		{ // Invalid or missing list.  Rebuild it (it only happens on a newly created wrapper or after a wrapper rebuild
+			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", @"list-installed", nil]];
+			NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+			list = [NSDictionary dictionaryWithObject:tempList forKey:@"WS-Installed"];
+			[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+		}
+		[self setWinetricksInstalledList:[list valueForKey:@"WS-Installed"]];
+	}
+	else
+		[self setWinetricksInstalledList:[NSDictionary dictionary]];
+	
+	if ([defaults boolForKey:@"DownloadedColumnShown"])
+	{
+		// List of downloaded winetricks
+		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]]];
+		if ([list valueForKey:@"WS-Cached"] == nil || ![[list valueForKey:@"WS-Cached"] isKindOfClass:[NSArray class]])
+		{ // Invalid or missing list.  Rebuild it (it only happens when the user first runs wineetricks on their system (from any wrapper) or after wiping ~/Caches/winetricks
+			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",@"list-cached",nil]];
+			NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+			list = [NSDictionary dictionaryWithObject:tempList forKey:@"WS-Cached"];
+			[list writeToFile:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]] atomically:YES];
+		}
+		[self setWinetricksCachedList:[list valueForKey:@"WS-Cached"]];
+	}
+	else
+		[self setWinetricksCachedList:[NSDictionary dictionary]];
+
+	[pool release];
+}
+- (void)setWinetricksBusy:(BOOL)isBusy;
+{
+	// disable X button
+	disableXButton = isBusy;
+	// disable all buttons on Winetricks window
+	[winetricksRunButton setEnabled:!isBusy];
+	[winetricksUpdateButton setEnabled:!isBusy];
+	[winetricksRefreshButton setEnabled:!isBusy];
+	[winetricksDoneButton setEnabled:!isBusy];
+	[winetricksSearchField setEnabled:!isBusy];
+	[winetricksCustomCheckbox setEnabled:!isBusy];
+	[winetricksActionPopup setEnabled:!isBusy];
+	//enable cancel button
+	[winetricksCancelButton setHidden:!isBusy];
+	[winetricksCancelButton setEnabled:isBusy];
+	if (isBusy)
+	{
+		[winetricksWaitWheel startAnimation:self];
+		[winetricksOutlineView setEnabled:NO];
+		[winetricksCustomLine setEnabled:NO];
+	}
+	else
+	{
+		[winetricksWaitWheel stopAnimation:self];
+		// Set the correct state for elements that depend on the Custom checkbox
+		[self winetricksCustomCommandToggled:winetricksCustomCheckbox];
+	}
+}
 - (void)runWinetrick
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -1444,7 +1485,7 @@
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[winetricksOutputText setEditable:YES];
 	if (winetricksCanceled) [winetricksOutputText insertText:@"\n\n Winetricks CANCELED!!\nIt is possible that there are now problems with the wrapper, or other shell processes may have accidently been affected as well.  Usually its best to not cancel Winetricks, but in many cases it will not hurt.  You may need to refresh the wrapper, or in bad cases do a rebuild.\n\n"];
-	[winetricksOutputText insertText:@"\n\n Winetricks Finished!!\n\n"];
+	[winetricksOutputText insertText:@"\n\n Winetricks Commands Finished!!\n\n"];
 	[winetricksOutputText setEditable:NO];
 	[pool release];
 }
@@ -1461,18 +1502,7 @@
 	[self performSelectorOnMainThread:@selector(doTheDangUpdate) withObject:self waitUntilDone:YES];
 	// Write a finished statement since Winetricks doesn't seem to want to
 	[self performSelectorOnMainThread:@selector(winetricksWriteFinished) withObject:self waitUntilDone:YES];
-	//stop prog wheel
-	[winetricksWaitWheel stopAnimation:self];
-	//enable buttons back
-	[winetricksRunButton setEnabled:YES];
-	[winetricksUpdateButton setEnabled:YES];
-	[winetricksRefreshButton setEnabled:YES];
-	[winetricksDoneButton setEnabled:YES];
-	//enable X button
-	disableXButton = NO;
-	//disable cancel button
-	[winetricksCancelButton setHidden:YES];
-	[winetricksCancelButton setEnabled:NO];
+	[self setWinetricksBusy:NO];
 	[pool release];
 }
 - (NSArray *)makePIDArray:(NSString *)processToLookFor
@@ -2204,6 +2234,8 @@
 //*************************************************************
 /* Required methods */
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)childIndex ofItem:(id)item {
+	if (!winetricksDone)
+		return nil;
 	if (outlineView != winetricksOutlineView)
 		return nil;
 	if (!item)
@@ -2214,6 +2246,8 @@
 	return [item objectForKey:[[[item allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)] objectAtIndex:childIndex]];
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item {
+	if (!winetricksDone)
+		return NO;
 	if (outlineView != winetricksOutlineView)
 		return NO;
 	if ([item valueForKey:@"WS-Name"] != nil)
@@ -2221,6 +2255,8 @@
 	return YES;
 }
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
+	if (!winetricksDone)
+		return 0;
 	if (outlineView != winetricksOutlineView)
 		return 0;
 	if ([item valueForKey:@"WS-Name"] != nil)
@@ -2228,6 +2264,8 @@
 	return [(item ? item : [self winetricksFilteredList]) count];
 }
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item {
+	if (!winetricksDone)
+		return nil;
 	if (outlineView != winetricksOutlineView)
 		return nil;
 	if ((tableColumn == winetricksTableColumnRun
@@ -2274,6 +2312,8 @@
 }
 /* Optional Methods */
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item {
+	if (!winetricksDone)
+		return;
 	if (outlineView != winetricksOutlineView)
 		return;
 	if (tableColumn != winetricksTableColumnRun)
@@ -2285,8 +2325,10 @@
 /* Delegate */
 - (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
+	if (!winetricksDone)
+		return nil;
 	if (tableColumn == winetricksTableColumnRun && [item valueForKey:@"WS-Name"] == nil)
-		return [NSTextFieldCell new];
+		return [[[NSTextFieldCell alloc] init] autorelease];
 	return [tableColumn dataCellForRow:[outlineView rowForItem:item]];
 }
 @end

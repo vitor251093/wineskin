@@ -155,6 +155,7 @@
 	IBOutlet NSButton *winetricksCustomCheckbox;
 	IBOutlet NSTextField *winetricksCustomLine;
 	IBOutlet NSTextField *winetricksCustomLineLabel;
+	IBOutlet NSButton *winetricksActionPopup;
 	IBOutlet NSMenuItem *winetricksShowDownloadedColumn;
 	IBOutlet NSMenuItem *winetricksShowInstalledColumn;
 	
@@ -179,6 +180,7 @@
 @property (retain) NSArray *winetricksInstalledList;
 @property (retain) NSArray *winetricksCachedList;
 
+- (void)sleepWithRunLoopForSeconds:(NSInteger)seconds;
 - (void)enableButtons;
 - (void)disableButtons;
 - (void)systemCommand:(NSString *)commandToRun withArgs:(NSArray *)args;
@@ -269,6 +271,8 @@
 - (IBAction)winetricksSearchFilter:(id)sender;
 - (IBAction)winetricksCustomCommandToggled:(id)sender;
 - (IBAction)winetricksToggleColumn:(id)sender;
+- (void)winetricksLoadPackageLists;
+- (void)setWinetricksBusy:(BOOL)busy;
 - (void)runWinetrick;
 - (void)doTheDangUpdate;
 - (void)winetricksWriteFinished;
