@@ -833,7 +833,7 @@
 	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/share/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
 	//fix Info.plist back
 	usleep(500000);
-	[self systemCommand:[NSString stringWithFormat:@"/usr/bin/arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
+	[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
 	NSMutableDictionary* quickEdit2 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
 	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
