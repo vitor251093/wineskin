@@ -552,7 +552,7 @@
 			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix] withIntermediateDirectories:NO attributes:nil error:nil];
 	}
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];	
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];	
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];
 	[fm release];
 }
 
@@ -762,13 +762,21 @@
 	SInt32 majorVersion,minorVersion;
 	Gestalt(gestaltSystemVersionMajor, &majorVersion);
 	Gestalt(gestaltSystemVersionMinor, &minorVersion);
-	NSString *mainFile = [NSString stringWithFormat:@"%@/libXplugin.1.%d.%d.dylib",frameworksFold,majorVersion,minorVersion];
-	NSString *symlinkTo = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
-	//just create a symlink to the correct libXplugin, and delete the old one.
-	[fm removeItemAtPath:symlinkTo error:nil];
-	[fm createSymbolicLinkAtPath:symlinkTo withDestinationPath:mainFile error:nil];
-	//any user needs to be able to remove the symlink
-	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkTo]];
+	NSString *mainFile = [NSString stringWithFormat:@"libXplugin.1.%d.%d.dylib",majorVersion,minorVersion];
+	NSString *symlinkName = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
+	[fm removeItemAtPath:symlinkName error:nil];
+	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
+	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
+	//fix to have the right libGL for the OS version
+	//should be able to build 1 libGL that will work fine on 10.5+, but its not working...
+	symlinkName = [NSString stringWithFormat:@"%@/libGL.1.dylib",frameworksFold];
+	if (minorVersion == 5)
+		mainFile = [NSString stringWithFormat:@"libGL.1.10.5.dylib"];
+	else
+		mainFile = [NSString stringWithFormat:@"libGL.1.10.6.dylib"];
+	[fm removeItemAtPath:symlinkName error:nil];
+	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
+	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
 	//set up quartz-wm launch correctly
 	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"/tmp/Wineskin/bin/quartz-wm --prefs-domain '%@.plist'\"",x11PrefFileName];
 	if (fullScreenOption) quartzwmLine=@"";
@@ -776,12 +784,17 @@
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
 	[fm copyItemAtPath:wsX11PlistFile toPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
 	//make proper files and symlinks in /tmp/Wineskin
-	//remove for files just in case some other version had made symlinks here, will cause a failure
-	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil];
-	//symlink X11 straight to /tmp/Wineskin
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin" withDestinationPath:frameworksFold error:nil];
-	//make sure the new symlink is full read/write so other users can run wrappers too. Task List bug 3406451
-	[self systemCommand:@"chmod -h 777 /tmp/Wineskin"];
+	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil]; // try to remove old folder if you can
+	//[fm createSymbolicLinkAtPath:@"/tmp/Wineskin" withDestinationPath:[NSString stringWithFormat:@"%@",frameworksFold] error:nil];
+	[fm createDirectoryAtPath:@"/tmp/Wineskin" withIntermediateDirectories:YES attributes:nil error:nil];
+	[self systemCommand:@"chmod 0777 /tmp/Wineskin"];
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/bin" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/share" withDestinationPath:[NSString stringWithFormat:@"%@/share",frameworksFold] error:nil];
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/lib" withDestinationPath:[NSString stringWithFormat:@"%@/lib",frameworksFold] error:nil];
+	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/bin"];
+	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/share"];
+	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/lib"];
+	//check if wineserverstill running	
 	if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
 	{
 		//wineserver is still running, so this *should* be a custom exe launcher, so return the current pid
@@ -1090,6 +1103,9 @@
 			NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix] error:nil];
 			for (NSString *item in tmpy3)
 				[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/dosdevices/%@\"",winePrefix,item]];
+			//make sure windows/profiles is using users folder
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix] error:nil];
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix] withDestinationPath:[NSString stringWithFormat:@"%@/drive_c/users",winePrefix] error:nil];
 		}
 		else if ([wssCommand isEqualToString:@"WSS-winetricks"])
 		{
@@ -1211,7 +1227,6 @@
 - (void)sleepAndMonitor
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
-	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil];
 	int oldTimeStamp=0;
 	int oldInfoPlistTimeStamp=0;
 	struct stat stat_p;
