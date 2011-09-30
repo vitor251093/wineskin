@@ -785,7 +785,7 @@
 	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
 	//set up quartz-wm launch correctly
-	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"/tmp/Wineskin/bin/quartz-wm --prefs-domain '%@.plist'\"",x11PrefFileName];
+	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm' --prefs-domain '%@.plist'\"",frameworksFold,x11PrefFileName];
 	if (fullScreenOption) quartzwmLine=@"";
 	//copy the plist over
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
