@@ -13,6 +13,14 @@
 @synthesize window;
 @synthesize winetricksList, winetricksFilteredList, winetricksSelectedList, winetricksInstalledList, winetricksCachedList;
 
+// Comparator to replace @selector(localizedStandardCompare:) missing in 10.5
+static NSInteger localizedComparator(id a, id b, void* context)
+{
+	NSInteger compareOptions = NSCaseInsensitiveSearch|NSNumericSearch;
+	
+	return [(NSString*)a compare:b options:compareOptions range:NSMakeRange(0, [a length]) locale:nil]; // nil = current locale
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	[self setWinetricksCachedList:[NSArray array]];
@@ -1761,7 +1769,7 @@
 	//get installed engines
 	NSMutableArray *installedEnginesList = [NSMutableArray arrayWithCapacity:10];
 	NSString *folder = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
-	NSArray *filesTEMP = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:folder error:nil];
+	NSArray *filesTEMP = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingFunction:localizedComparator context:nil];
 	NSArray *files = [[filesTEMP reverseObjectEnumerator] allObjects];
 	for(NSString *file in files) // standard first
 		if ([file hasSuffix:@".tar.7z"] && (NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0)))) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
