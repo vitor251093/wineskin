@@ -81,6 +81,9 @@
 //remove GPU info from Registry
 - (void)removeGPUInfo;
 
+//fixes whatever libraries in Frameworks needs to be set before launching X or Wine
+- (void)fixFrameworksLibraries;
+
 //starts up WineskinX11 and passes its PID back
 - (NSString *)startX11;
 
@@ -98,9 +101,6 @@
 
 //writes an array to a normal text file, each entry on a line.
 - (void)writeStringArray:(NSArray *)theArray toFile:(NSString *)theFile;
-
-//returns true if pid is running
-- (BOOL)pidRunning:(NSString *)pid;
 
 //returns true if running PID has the specified name
 - (BOOL)isPID:(NSString *)pid named:(NSString *)name;
@@ -747,6 +747,33 @@
 	[self writeStringArray:[NSArray arrayWithArray:newUserRegContents] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
 }
+- (void)fixFrameworksLibraries
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	//fix to have the right libXplugin for the OS version
+	SInt32 majorVersion,minorVersion;
+	Gestalt(gestaltSystemVersionMajor, &majorVersion);
+	Gestalt(gestaltSystemVersionMinor, &minorVersion);
+	NSString *mainFile = [NSString stringWithFormat:@"libXplugin.1.%d.%d.dylib",majorVersion,minorVersion];
+	NSString *symlinkName = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
+	[fm removeItemAtPath:symlinkName error:nil];
+	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
+	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
+	//fix to have the right libGL for the OS version, let older one work if its dropped in place
+	//should be able to build 1 libGL that will work fine on 10.5+, but its not working...
+	symlinkName = [NSString stringWithFormat:@"%@/libGL.1.dylib",frameworksFold];
+	if (minorVersion == 5)
+		mainFile = [NSString stringWithFormat:@"libGL.1.10.5.dylib"];
+	else
+		mainFile = [NSString stringWithFormat:@"libGL.1.10.6.dylib"];
+	[fm removeItemAtPath:symlinkName error:nil];
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/libGL.1.2.dylib",frameworksFold]])
+		[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:[NSString stringWithFormat:@"libGL.1.2.dylib"] error:nil];
+	else
+		[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
+	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
+	[fm release];
+}
 
 - (NSString *)startX11
 {
@@ -765,25 +792,8 @@
 		engineVersion = [tempArray objectAtIndex:0];
 		NSLog(@"Using Engine %@",engineVersion);
 	}
-	//fix to have the right libXplugin for the OS version
-	SInt32 majorVersion,minorVersion;
-	Gestalt(gestaltSystemVersionMajor, &majorVersion);
-	Gestalt(gestaltSystemVersionMinor, &minorVersion);
-	NSString *mainFile = [NSString stringWithFormat:@"libXplugin.1.%d.%d.dylib",majorVersion,minorVersion];
-	NSString *symlinkName = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
-	[fm removeItemAtPath:symlinkName error:nil];
-	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
-	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
-	//fix to have the right libGL for the OS version
-	//should be able to build 1 libGL that will work fine on 10.5+, but its not working...
-	symlinkName = [NSString stringWithFormat:@"%@/libGL.1.dylib",frameworksFold];
-	if (minorVersion == 5)
-		mainFile = [NSString stringWithFormat:@"libGL.1.10.5.dylib"];
-	else
-		mainFile = [NSString stringWithFormat:@"libGL.1.10.6.dylib"];
-	[fm removeItemAtPath:symlinkName error:nil];
-	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
-	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
+	//fix the Frameworks Libraires
+	[self fixFrameworksLibraries];	
 	//set up quartz-wm launch correctly
 	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm' --prefs-domain '%@.plist'\"",frameworksFold,x11PrefFileName];
 	if (fullScreenOption) quartzwmLine=@"";
@@ -840,7 +850,11 @@
 	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/share/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
 	//fix Info.plist back
 	usleep(500000);
-	[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
+	//need to "open" to bring it back to the front since it was launched in the background
+	//if it tries this and X failed and is not running, it can get stuck in and endless loop of trying to reopen.
+	//check to make sure the PID is still running before trying to Open again
+	if ([self isPID:thePidToReturn named:appNameWithPath])
+		[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
 	NSMutableDictionary* quickEdit2 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
 	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
@@ -1027,15 +1041,6 @@
 	//[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",theFile]];
 }
 
-- (BOOL)pidRunning:(NSString *)pid
-{
-	if ([pid isEqualToString:@"-1"]) return NO;
-	char *tmp;
-	BOOL answer = NO;
-	intmax_t xmax = strtoimax([pid UTF8String], &tmp, 10);
-	if (kill((pid_t)xmax, 0) == 0) answer = YES;
-	return answer;
-}
 - (BOOL)isPID:(NSString *)pid named:(NSString *)name
 {
 	if ([[self systemCommand:[NSString stringWithFormat:@"ps -p %@ | grep %@",pid,name]] length] < 1) return NO;
@@ -1224,7 +1229,7 @@
 		NSString *startExeLine = @"";
 		if (runWithStartExe) startExeLine = @" start /unix";		
 		//make sure correct wineserver is still running
-		if (![self pidRunning:returnPID])
+		if (![self isPID:returnPID named:@"wineserver"])
 		{
 			[fm release];
 			return @"-1";
@@ -1251,7 +1256,7 @@
 	NSString *newScreenReso;
 	BOOL fixGamma = NO;
 	int fixGammaCounter = 0;
-	while ([self pidRunning:wineServerPID])
+	while ([self isPID:wineServerPID named:@"wineserver"])
 	{
 		//check for xrandr made files in /tmp
 		if ([fm fileExistsAtPath:@"/tmp/WineskinXrandrTempFile"])
@@ -1284,8 +1289,8 @@
 			if (!([randrXres isEqualToString:@"0"]) && !([randrYres isEqualToString:@"0"]))
 				[self setResolution:[NSString stringWithFormat:@"%@ %@",randrXres,randrYres]];
 		}
-		//if WineskinX11 is not longer running, tell wineserver to close
-		if (![self pidRunning:x11PID])
+		//if WineskinX11 is no longer running, tell wineserver to close
+		if (![self isPID:x11PID named:@"WineskinX11"])
 			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver -k > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,frameworksFold]];
 		//if running in override fullscreen, need to handle resolution changes
 		if(fullScreenOption)
