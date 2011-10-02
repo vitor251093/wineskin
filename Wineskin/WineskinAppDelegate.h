@@ -47,8 +47,6 @@
 	
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
-	IBOutlet NSWindow *configHelpWindow;
-	IBOutlet NSWindow *toolsHelpWindow;
 	IBOutlet NSButton *testRunButton;
 	IBOutlet NSButton *advancedDoneButton;
 	IBOutlet NSProgressIndicator *toolRunningPI;
@@ -138,7 +136,6 @@
 	IBOutlet NSOutlineView *winetricksOutlineView;
 	IBOutlet NSTabView *winetricksTabView;
 	IBOutlet NSTabViewItem *winetricksTabList;
-	IBOutlet NSTabViewItem *winetricksTabLog;
 	NSMutableArray *shPIDs;
 	BOOL winetricksCanceled;
 	NSDictionary *winetricksList;
@@ -214,6 +211,7 @@
 - (IBAction)virtualDesktopClicked:(id)sender;
 - (IBAction)gammaChanged:(id)sender;
 - (IBAction)windowManagerCheckBoxClicked:(id)sender;
+- (IBAction)screenOptionsHelpButtonPressed:(id)sender;
 
 //advanced menu
 - (IBAction)advancedMenuDoneButtonPressed:(id)sender;
@@ -278,6 +276,7 @@
 - (void)winetricksWriteFinished;
 - (void)updateWinetrickOutput;
 - (NSArray *)makePIDArray:(NSString *)processToLookFor;
+- (IBAction)winetricksHelpButtonPressed:(id)sender;
 // cexe maker
 - (IBAction)createCustomExeLauncherButtonPressed:(id)sender;
 - (IBAction)cEXESaveButtonPressed:(id)sender;
