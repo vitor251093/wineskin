@@ -845,18 +845,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 //*********************** wrapper creation **********************
 - (IBAction)createWrapperOkButtonPressed:(id)sender
 {
-	//make sure wrapper name is unique
-	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]]])
-	{
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert addButtonWithTitle:@"OK"];
-		[alert setMessageText:@"Oops! File already exists!"];
-		[alert setInformativeText:[NSString stringWithFormat:@"A wrapper at \"%@/Applications/Wineskin\" with the name \"%@\" already exists!  Please choose a different name.",NSHomeDirectory(),[createWrapperName stringValue]]];
-		[alert setAlertStyle:NSInformationalAlertStyle];
-		[alert runModal];
-		[alert release];
-		return;
-	}
 	//replace common symbols...
 	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"&" withString:@"and"]];
 	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"!" withString:@""]];
@@ -877,6 +865,18 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@";" withString:@""]];
 	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@":" withString:@""]];
 	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"@" withString:@""]];
+	//make sure wrapper name is unique
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]]])
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert addButtonWithTitle:@"OK"];
+		[alert setMessageText:@"Oops! File already exists!"];
+		[alert setInformativeText:[NSString stringWithFormat:@"A wrapper at \"%@/Applications/Wineskin\" with the name \"%@\" already exists!  Please choose a different name.",NSHomeDirectory(),[createWrapperName stringValue]]];
+		[alert setAlertStyle:NSInformationalAlertStyle];
+		[alert runModal];
+		[alert release];
+		return;
+	}
 	//get rid of window
 	[busyWindow makeKeyAndOrderFront:self];
 	[createWrapperWindow orderOut:self];
