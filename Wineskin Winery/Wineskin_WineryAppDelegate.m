@@ -917,6 +917,8 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	{
 		//put engine in wrapper
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle",[createWrapperName stringValue]] error:nil];
+		// 777 the bundle
+		system([[NSString stringWithFormat:@"chmod 777 \"/tmp/%@.app/Contents/Frameworks/wswine.bundle\"",[createWrapperName stringValue]] UTF8String]);
 		//refresh wrapper
 		system([[NSString stringWithFormat:@"\"/tmp/%@.app/Contents/MacOS/Wineskin\" WSS-wineprefixcreate",[createWrapperName stringValue]] UTF8String]);
 		//move wrapper to ~/Applications/Wineskin
