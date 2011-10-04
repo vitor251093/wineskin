@@ -1843,6 +1843,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	//put engine in wrapper
 	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	[self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 	[self installEngine];
 	//refresh wrapper
 	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineboot",nil]];
@@ -1910,7 +1911,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[alert addButtonWithTitle:@"OK"];
 	[alert addButtonWithTitle:@"Cancel"];
 	[alert setMessageText:@"Please confirm..."];
-	[alert setInformativeText:@"Are you sure you want to do this update?  It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery.  The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Frameworks\nContents/Resources/WineskinLauncher.nib\nContents/Resources/English.lproj/main.nib"];
+	[alert setInformativeText:@"Are you sure you want to do this update?  It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery.  The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Frameworks\nContents/Resources/English.lproj/MainMenu.nib\nContents/Resources/English.lproj/main.nib"];
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	if ([alert runModal] == NSAlertSecondButtonReturn)
 	{
@@ -1924,11 +1925,16 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	//hide advanced window
 	[advancedWindow orderOut:self];
 	//delete old MacOS, and copy in new
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/MacOS",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/MacOS",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Contents/MacOS",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	NSString *copyFrom = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/MacOS",NSHomeDirectory(),masterWrapperName];
+	NSString *copyTo = [NSString stringWithFormat:@"%@/Contents/MacOS",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	[fm removeItemAtPath:copyTo error:nil];
+	[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
 	//delete old WineskinLauncher.nib, and copy in new
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinLauncher.nib",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Resources/WineskinLauncher.nib",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinLauncher.nib",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	copyFrom = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Resources/English.lproj/MainMenu.nib",NSHomeDirectory(),masterWrapperName];
+	copyTo = [NSString stringWithFormat:@"%@/Contents/Resources/English.lproj/MainMenu.nib",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	[fm removeItemAtPath:copyTo error:nil];
+	[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
 	//edit Info.plist to new wrapper version, replace - with spaces, and dump .app
 	[plistDictionary setValue:[[masterWrapperName stringByReplacingOccurrencesOfString:@".app" withString:@""] stringByReplacingOccurrencesOfString:@"-" withString:@" "] forKey:@"CFBundleVersion"];
 	//Make sure new keys are added to the old Info.plist
@@ -1937,19 +1943,26 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[newPlistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
 	[newPlistDictionary release];
 	[plistDictionary release];
+	[self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 	//force delete Wineskin.app and copy in new
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Wineskin.app",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	copyFrom = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Wineskin.app",NSHomeDirectory(),masterWrapperName];
+	copyTo = [NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	[fm removeItemAtPath:copyTo error:nil];
+	[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
 	//move wswine.bundle out of Frameworks
 	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:@"/tmp/wswineWSTEMP.bundle" error:nil];
 	//replace Frameworks
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Frameworks",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Contents/Frameworks",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	copyFrom = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Frameworks",NSHomeDirectory(),masterWrapperName];
+	copyTo = [NSString stringWithFormat:@"%@/Contents/Frameworks",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	[fm removeItemAtPath:copyTo error:nil];
+	[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
 	//move wswine.bundle back into Frameworks
 	[fm moveItemAtPath:@"/tmp/wswineWSTEMP.bundle" toPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	//change out main.nib
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/English.lproj/main.nib",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Resources/English.lproj/main.nib",NSHomeDirectory(),masterWrapperName] toPath:[NSString stringWithFormat:@"%@/Contents/Resources/English.lproj/main.nib",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	copyFrom = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/Resources/English.lproj/main.nib",NSHomeDirectory(),masterWrapperName];
+	copyTo = [NSString stringWithFormat:@"%@/Contents/Resources/English.lproj/main.nib",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	[fm removeItemAtPath:copyTo error:nil];
+	[fm copyItemAtPath:copyFrom toPath:copyTo error:nil];
 	//open new Wineskin.app
 	[self systemCommand:@"/usr/bin/open" withArgs:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 	//close program
