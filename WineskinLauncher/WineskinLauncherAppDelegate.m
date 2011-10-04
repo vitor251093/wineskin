@@ -18,8 +18,8 @@
 	// Normal run
 	if(openedByFile)
 	{
-		NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/MacOS/Wineskin\" &", [[NSBundle mainBundle] bundlePath]];
-		if (doFileStart) theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/MacOS/Wineskin\" \"%@\" &", [[NSBundle mainBundle] bundlePath], joinedString];
+		NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/Frameworks/bin/Wineskin\" &", [[NSBundle mainBundle] bundlePath]];
+		if (doFileStart) theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/Frameworks/bin/Wineskin\" \"%@\" &", [[NSBundle mainBundle] bundlePath], joinedString];
 		system([theSystemCommand UTF8String]);
 	}
 	[NSApp terminate: nil];
@@ -87,7 +87,7 @@
 	if (!wineInstalled)
 	{
 		[window makeKeyAndOrderFront:self];
-		NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/MacOS/Wineskin\" WSS-InstallICE", [[NSBundle mainBundle] bundlePath]];
+		NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/Frameworks/bin/Wineskin\" WSS-InstallICE", [[NSBundle mainBundle] bundlePath]];
 		system([theSystemCommand UTF8String]);
 		[window orderOut:self];
 	}

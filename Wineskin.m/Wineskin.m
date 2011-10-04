@@ -140,9 +140,9 @@
 	if ([argv count]>0) wssCommand = [argv objectAtIndex:0];
 	if ([wssCommand isEqualToString:@"CustomEXE"]) cexeRun = YES;
 	//if wssCommand is WSS-InstallICE, then just run ICE install and quit!
-	contentsFold=[NSString stringWithFormat:@"%@/Contents",[[NSBundle mainBundle] bundlePath]];
+	contentsFold=[[NSString stringWithFormat:@"%@",[[NSBundle mainBundle] bundlePath]] stringByReplacingOccurrencesOfString:@"/Frameworks/bin" withString:@""];
 	frameworksFold=[NSString stringWithFormat:@"%@/Frameworks",contentsFold];
-	appNameWithPath=[[NSBundle mainBundle] bundlePath];
+	appNameWithPath=[[NSString stringWithFormat:@"%@",contentsFold] stringByReplacingOccurrencesOfString:@"/Contents" withString:@""];
 	firstPIDFile = [NSString stringWithFormat:@"%@/.firstpidfile",contentsFold];
 	secondPIDFile = [NSString stringWithFormat:@"%@/.secondpidfile",contentsFold];
 	wineserverPIDFile = [NSString stringWithFormat:@"%@/.wineserverpidfile",contentsFold];
@@ -187,7 +187,7 @@
 		runWithStartExe = [[cexePlistDictionary valueForKey:@"use start.exe"] intValue];
 		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
-	}	
+	}
 	gammaCorrection = [plistDictionary valueForKey:@"Gamma Correction"];
 	x11PrefFileName = [plistDictionary valueForKey:@"CFBundleIdentifier"];
 	uLimitNumber=@"10000"; // run as 10000 for now.. I don't think this needs to be edited.  If peoples launchctl limit report less than 10000, they need to fix their machine, or reboot
@@ -851,10 +851,9 @@
 	//fix Info.plist back
 	usleep(500000);
 	//need to "open" to bring it back to the front since it was launched in the background
-	//if it tries this and X failed and is not running, it can get stuck in and endless loop of trying to reopen.
 	//check to make sure the PID is still running before trying to Open again
 	if ([self isPID:thePidToReturn named:appNameWithPath])
-		[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
+		[[NSWorkspace sharedWorkspace] launchApplication:appNameWithPath];
 	NSMutableDictionary* quickEdit2 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
 	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
