@@ -87,6 +87,9 @@
 //starts up WineskinX11 and passes its PID back
 - (NSString *)startX11;
 
+//bring the app to the front most
+- (void)bringToFront:(NSString *)thePid;
+
 //installs ICE files
 - (void)installEngine;
 
@@ -850,10 +853,8 @@
 	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/share/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
 	//fix Info.plist back
 	usleep(500000);
-	//need to "open" to bring it back to the front since it was launched in the background
-	//check to make sure the PID is still running before trying to Open again
-	if ([self isPID:thePidToReturn named:appNameWithPath])
-		[[NSWorkspace sharedWorkspace] launchApplication:appNameWithPath];
+	//bring X11 to front before any windows are drawn
+	[self bringToFront:thePidToReturn];
 	NSMutableDictionary* quickEdit2 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
 	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
@@ -865,6 +866,70 @@
 	[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",thePidToReturn],nil] toFile:wineskinX11PIDFile];
 	[fm release];
 	return thePidToReturn;
+}
+
+- (void)bringToFront:(NSString *)thePid
+{
+	/*this has been very problematic.  Need to detect front most app, and try to make WineskinX11 go frontmost
+	 *recheck and retry different ways until it is the frontmost, or just fail with a NSLog.
+	 *only attempt if WineskinX11 is still actually running
+	 */
+	if ([self isPID:thePid named:appNameWithPath])
+	{
+		NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
+		int i=0;
+		for (i=0;i<5;i++)
+		{
+			//get frontmost application information
+			NSDictionary* frontMostAppInfo = [workspace activeApplication];
+			//get the PSN of the frontmost app
+			UInt32 lowLong = [[frontMostAppInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] longValue];
+			UInt32 highLong = [[frontMostAppInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] longValue];
+			ProcessSerialNumber currentAppPSN = {highLong,lowLong};
+			//Get Apple Process for WineskinX11 PID
+			ProcessSerialNumber PSN = {kNoProcess, kNoProcess};
+			GetProcessForPID((pid_t)[thePid intValue], &PSN);
+			//check if we are in the front
+			if(PSN.lowLongOfPSN == currentAppPSN.lowLongOfPSN && PSN.highLongOfPSN == currentAppPSN.highLongOfPSN)
+			{
+				//WineskinX11 is frontmost
+				if (i==0)
+					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! No method used\nWSTEST\nWSTEST");
+				else if (i==1)
+					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! NSWorkSpace launchApplication method successful\nWSTEST\nWSTEST");
+				else if (i==2)
+					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! system open method successful\nWSTEST\nWSTEST");
+				else if (i==3)
+					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! NSAppleScript activate method successful\nWSTEST\nWSTEST");
+				else if (i==3)
+					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! osascript activate method successful\nWSTEST\nWSTEST");
+				break;
+			}
+			else
+			{
+				//need to bring to front
+				if (i==0)
+					[workspace launchApplication:appNameWithPath];
+				else if (i==1)
+					[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
+				else if (i==2)
+				{
+					NSString *theScript = [NSString stringWithFormat:@"tell Application \"%@\" to activate",appNameWithPath];
+					NSAppleScript *bringToFrontScript = [[NSAppleScript alloc] initWithSource:theScript];
+					[bringToFrontScript executeAndReturnError:nil];
+					[bringToFrontScript release];
+				}
+				else if (i==3)
+					[self systemCommand:[NSString stringWithFormat:@"arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
+				else
+				{
+					//only gets here if app never front most and breaks
+					NSLog(@"Application failed to ever become frontmost");
+					break;
+				}
+			}
+		}
+	}
 }
 
 - (void)installEngine
@@ -1042,7 +1107,7 @@
 
 - (BOOL)isPID:(NSString *)pid named:(NSString *)name
 {
-	if ([[self systemCommand:[NSString stringWithFormat:@"ps -p %@ | grep %@",pid,name]] length] < 1) return NO;
+	if ([[self systemCommand:[NSString stringWithFormat:@"ps -p %@ | grep \"%@\"",pid,name]] length] < 1) return NO;
 	return YES;
 }
 
