@@ -1,9 +1,9 @@
 #!/bin/bash
 ###################################################
-#  CustomEXE code for Wineskin and WineskinSC wrappers
+#  CustomEXE code for Wineskin wrappers
 #  Made by doh123@doh123.com
 #
-#  Version 4.0
+#  Version 5.0
 #
 #  This code is Open Source and licensed under the
 #  terms of the GNU Lesser General Public License.
@@ -13,15 +13,16 @@
 #  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 #
 #  For Wineskin information, see the project website at
-#  http://wineskin.sourceforge.net
+#  http://wineskin.doh123.com
 #
 ####################################################
 # Set all variables
-CMACOSFOLD="$(dirname "$0")"
-MACOSFOLD="$CMACOSFOLD/../../../Contents/MacOS"
-cd "$MACOSFOLD"
-MACOSFOLD="$(echo "$PWD")"
-CEXENAME="${CMACOSFOLD%/Contents/MacOS}"
+CFRAMEBINFOLD="$(dirname "$0")"
+FRAMEBINFOLD="$CFRAMEBINFOLD/../../../Contents/Frameworks/bin"
+cd "$FRAMEBINFOLD"
+FRAMEBINFOLD="$(echo "$PWD")"
+CEXENAME="${CFRAMEBINFOLD%/Contents/MacOS}"
 CEXENAME="${CEXENAME#${CEXENAME%/*}/}"
+
 # Launch wrapper
-"$MACOSFOLD/Wineskin" "CustomEXE" "$CEXENAME"
+"$FRAMEBINFOLD/Wineskin" "CustomEXE" "$CEXENAME"
