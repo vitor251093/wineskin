@@ -340,7 +340,9 @@
 	//**********start the X server
 	NSLog(@"Starting up WineskinX11");
 	x11PID = [self startX11];
+	if ([x11PID isEqualToString:@"ERROR"]) return;
 	NSLog(@"WineskinX11 running on PID %@",x11PID);
+	
 	//**********set user folders
 	if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
 	{
@@ -825,8 +827,15 @@
 	NSMutableDictionary* quickEdit1 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit1 setValue:@"X11Application" forKey:@"NSPrincipalClass"];
 	[quickEdit1 setValue:@"main.nib" forKey:@"NSMainNibFile"];
-	[quickEdit1 writeToFile:infoPlistFile atomically:YES];
+	BOOL fileWriteWorked = [quickEdit1 writeToFile:infoPlistFile atomically:YES];
 	[quickEdit1 release];
+	if (!fileWriteWorked)
+	{
+		//error!  read only volume or other permissions problem, cannot run.
+		NSLog(@"Error, cannot write to Info.plist, there are permission problems, or you are on a read-only volume. This cannot run from within a read-only dmg file.");
+		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)@"ERROR! cannot write to Info.plist, there are permission problems, or you are on a read-only volume.\n\nThis cannot run from within a read-only dmg file.", NULL);
+		return @"ERROR";
+	}
 	//set up fontpath variable for server depending where X11 fonts are on the system
 	NSString *wineskinX11FontPathPrefix = @"/usr/X11/lib/X11/fonts";
 	if (![fm fileExistsAtPath:wineskinX11FontPathPrefix])
@@ -893,6 +902,7 @@
 			if(PSN.lowLongOfPSN == currentAppPSN.lowLongOfPSN && PSN.highLongOfPSN == currentAppPSN.highLongOfPSN)
 			{
 				//WineskinX11 is frontmost
+				/* Testing Data
 				if (i==0)
 					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! No method used\nWSTEST\nWSTEST");
 				else if (i==1)
@@ -903,6 +913,7 @@
 					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! NSAppleScript activate method successful\nWSTEST\nWSTEST");
 				else if (i==3)
 					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! osascript activate method successful\nWSTEST\nWSTEST");
+				 */
 				break;
 			}
 			else

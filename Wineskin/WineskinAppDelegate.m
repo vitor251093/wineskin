@@ -1897,7 +1897,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert addButtonWithTitle:@"Do Not Update"];
 		[alert addButtonWithTitle:@"Update"];
 		[alert setMessageText:@"No update needed"];
-		[alert setInformativeText:@"Your wrapper version matches the master wrapper version... no update needed.  Do you want to force and update?"];
+		[alert setInformativeText:@"Your wrapper version matches the master wrapper version... no update needed.  Do you want to force an update?"];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		if ([alert runModal] != NSAlertSecondButtonReturn)
 		{
@@ -1924,6 +1924,48 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[busyWindow makeKeyAndOrderFront:self];
 	//hide advanced window
 	[advancedWindow orderOut:self];
+	//if WineskinEngine.bundle exists, convert it to WS8 and update wrapper
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
+	{
+		//if ICE give warning message that you'll need to install an engine yourself
+		if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]]
+			|| [[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
+		{
+			//delete WineskinEngine.bundle
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert addButtonWithTitle:@"OK"];
+			[alert setMessageText:@"Warning"];
+			[alert setInformativeText:@"Warning, ICE engine detected.  Engine will not be converted, you must choose a new WS8+ engine manually later (Change Engine in Wineskin.app)"];
+			[alert setAlertStyle:NSInformationalAlertStyle];
+			[alert runModal];
+			[alert release];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+		}
+		//if wswine.bundle already exists, just remove WineskinEngine.bundle
+		if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
+		{
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+		}
+		else
+		{
+			NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSConfig.txt",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
+			NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
+			if ([currentEngineVersionArray count] > 0)
+				currentEngineVersion = [currentEngineVersionArray objectAtIndex:0];
+			else
+				currentEngineVersion = @"Unknown";
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+			[self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/Wine",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
+			//put version in version file
+			if ([currentEngineVersion hasPrefix:@"WS5"] || [currentEngineVersion hasPrefix:@"WS6"] || [currentEngineVersion hasPrefix:@"WS7"])
+				system([[NSString stringWithFormat:@"echo \"WS8%@\" > \"%@/Contents/Resources/WineskinEngine.bundle/Wine/version\"",[currentEngineVersion substringFromIndex:3],[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] UTF8String]);
+			else
+				system([[NSString stringWithFormat:@"echo \"WS8%@\" > \"%@/Contents/Resources/WineskinEngine.bundle/Wine/version\"",currentEngineVersion,[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] UTF8String]);
+			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withIntermediateDirectories:YES attributes:nil error:nil];
+			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/Wine",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+		}
+	}
 	//delete old MacOS, and copy in new
 	NSString *copyFrom = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@/Contents/MacOS",NSHomeDirectory(),masterWrapperName];
 	NSString *copyTo = [NSString stringWithFormat:@"%@/Contents/MacOS",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];

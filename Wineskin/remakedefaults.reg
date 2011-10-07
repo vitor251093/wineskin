@@ -8,10 +8,6 @@ REGEDIT4
 
 [HKEY_CURRENT_USER\Software\Wine\Direct3D]
 
-[HKEY_CURRENT_USER\Software\Wine\X11 Driver]
-"Decorated"="N"
-"Managed"="N"
-
 [HKEY_CURRENT_USER\Software\Wine\Drivers]
 "Audio"="coreaudio"
 
