@@ -22,6 +22,8 @@ static NSInteger localizedComparator(id a, id b, void* context)
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	/*
+	//Beta Alert
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"Ok, I got it!"];
 	[alert setMessageText:@"BETA warning"];
@@ -29,6 +31,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	[alert runModal];
 	[alert release];
+	 */
 	srand(time(NULL));
 	[waitWheel startAnimation:self];
 	[busyWindow makeKeyAndOrderFront:self];

@@ -1,7 +1,8 @@
-Release 1.3 - In Development
+Release 1.3 - Released October 7th 2011
 • Updated for Wineskin 2.5 and WS8 engine changes. Wineskin Winery no longer supports using WS7 and older engines, due to the engine changes in WS8, sorry. Stick with an old version if you want to use old engines and old wrappers, but I see no point in that.
 • Will prompt at start up and after wrapper updates to convert WS5 - WS7 engines to WS8, if you have Wrapper 2.5+ installed.  The conversion can take a long time for many engines, but may be better than downloading new versions.
 • Engine build lets you choose an OS version to build for.  This lets you easily select 10.6 so you can do builds with Xcode 4, but the engines will not run on 10.5 like standard engines.
+• Engines display in a better order, with newer Wine versions near the top.
 
 Release 1.2 - Released Sept 17th 2011
 • Downloaded Engines, and Engines you ignore will never prompt as new again
