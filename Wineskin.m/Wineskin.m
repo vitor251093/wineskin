@@ -807,15 +807,16 @@
 	[fm copyItemAtPath:wsX11PlistFile toPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
 	//make proper files and symlinks in /tmp/Wineskin
 	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil]; // try to remove old folder if you can
-	//[fm createSymbolicLinkAtPath:@"/tmp/Wineskin" withDestinationPath:[NSString stringWithFormat:@"%@",frameworksFold] error:nil];
 	[fm createDirectoryAtPath:@"/tmp/Wineskin" withIntermediateDirectories:YES attributes:nil error:nil];
 	[self systemCommand:@"chmod 0777 /tmp/Wineskin"];
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/bin" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/share" withDestinationPath:[NSString stringWithFormat:@"%@/share",frameworksFold] error:nil];
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/lib" withDestinationPath:[NSString stringWithFormat:@"%@/lib",frameworksFold] error:nil];
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/.Xmodmap" withDestinationPath:[NSString stringWithFormat:@"%@/.Xmodmap",frameworksFold] error:nil];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/bin"];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/share"];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/lib"];
+	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/.Xmodmap"];
 	//check if wineserverstill running	
 	if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
 	{

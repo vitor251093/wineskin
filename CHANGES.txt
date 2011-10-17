@@ -1,6 +1,11 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
+Release 2.5.2 - Development
+• symlink .Xmodmap so it'll work
 
-Release 2.5 - in development
+Release 2.5.1 - Released October 8, 2011
+• cabextract set to executable
+
+Release 2.5 - Released October 7, 2011
 • Wineskin internal user folders should always use English words now, so folder linking and such will always work on any language/locale and when ports/wrappers change between languages/locales.  Older wrappers may not update 100% right, and require a 'Rebuild Wrapper' to take advantage of this.
 • Wineskin wrappers will no longer prevent other users from using Wineskin wrappers on the system.  If a pre-2.5 one was run, it will still break them running for other users until you reboot, or remove the /tmp/Wineskin symlink.
 • Custom Commands now run after setting of main variables like wineprefix.
