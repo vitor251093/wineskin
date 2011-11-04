@@ -1,6 +1,11 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
-Release 2.5.2 - Development
+
+Release 2.5.3 - Released November 4, 2011
+• Decorated windows should allow click through and focus follows mouse
+
+Release 2.5.2 - Released October 18, 2011
 • symlink .Xmodmap so it'll work
+• set libGL back to Mesa 7.8 for now since its not so crashy on many titles
 
 Release 2.5.1 - Released October 8, 2011
 • cabextract set to executable

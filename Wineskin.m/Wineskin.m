@@ -800,7 +800,8 @@
 	//fix the Frameworks Libraires
 	[self fixFrameworksLibraries];	
 	//set up quartz-wm launch correctly
-	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm' --prefs-domain '%@.plist'\"",frameworksFold,x11PrefFileName];
+	//NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm' --prefs-domain '%@.plist'\"",frameworksFold,x11PrefFileName];
+	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold,x11PrefFileName];
 	if (fullScreenOption) quartzwmLine=@"";
 	//copy the plist over
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
