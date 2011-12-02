@@ -1231,13 +1231,14 @@
 			returnPID = wineserverPIDToCheck;
 			//make sure X11 is still running too, or it might be shutting down
 			//if X isn't running, this isn't a custom EXE, its just running too many too fast...
-			//give error message asking to slow down
+			//this gets called when opening a file with an app already running as well, so no error message can be displayed.
+			//Still kill Wineskin as another one will already be running monitoring this wineserver and WineskinX11
 			NSString *wineskinX11PIDToCheck = [[self readFileToStringArray:wineskinX11PIDFile] objectAtIndex:0];
 			if (![self isPID:wineskinX11PIDToCheck named:@"WineskinX11"])
 			{
 				//wrapper is shutting down... wineserver was running, but X11 is gone.
-				NSLog(@"ERROR: App was ran again while it was still shutting down, please wait a few seconds before running it again");
-				CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("Wineskin Error"), (CFStringRef)@"ERROR: App was ran again while it was still shutting down, please wait a few seconds before running it again", NULL);
+				//NSLog(@"ERROR: App was ran again while it was still shutting down, please wait a few seconds before running it again");
+				//CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("Wineskin Error"), (CFStringRef)@"ERROR: App was ran again while it was still shutting down, please wait a few seconds before running it again", NULL);
 				killWineskin = YES;
 			}
 		}
@@ -1268,11 +1269,11 @@
 				if (!match) break;
 				if (i>2) usleep(1000000);
 			}
-			//if no PID found, do error
+			//if no PID found, log message and quit
 			if ([returnPID isEqualToString:@"-1"])
 			{
-				NSLog(@"Error! launching wineserver failed! no new wineserver PID found!\n");
-				CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("Wineskin Error"), (CFStringRef)@"ERROR! Launching wineserver failed! No new wineserver PID found!", NULL);
+				//NSLog(@"Error! launching wineserver failed! no new wineserver PID found!\n");
+				//CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("Wineskin Error"), (CFStringRef)@"ERROR! Launching wineserver failed! No new wineserver PID found!", NULL);
 				[fm release];
 				return @"-1";
 			}
