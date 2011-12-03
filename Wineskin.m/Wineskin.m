@@ -377,7 +377,7 @@
 	if (debugEnabled)
 	{
 		NSFileManager *fm = [NSFileManager defaultManager];
-		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11.%@.Wineskin.p.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
+		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/%@.Wineskin.p.X11.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
 		if ([fm fileExistsAtPath:logName])
 		{
 			NSString *logFileLocation=[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
@@ -810,13 +810,20 @@
 	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil]; // try to remove old folder if you can
 	[fm createDirectoryAtPath:@"/tmp/Wineskin" withIntermediateDirectories:YES attributes:nil error:nil];
 	[self systemCommand:@"chmod 0777 /tmp/Wineskin"];
+	//stuff for /tmp/Wineskin/bin
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/bin" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/share" withDestinationPath:[NSString stringWithFormat:@"%@/share",frameworksFold] error:nil];
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/lib" withDestinationPath:[NSString stringWithFormat:@"%@/lib",frameworksFold] error:nil];
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/.Xmodmap" withDestinationPath:[NSString stringWithFormat:@"%@/.Xmodmap",frameworksFold] error:nil];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/bin"];
-	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/share"];
+	//stuff for /tmp/Wineskin/etc
+	//[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/etc" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
+	//[self systemCommand:@"chmod -h 777 /tmp/Wineskin/etc"];
+	//stuff for /tmp/Wineskin/lib
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/lib" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/lib"];
+	//stuff for /tmp/Wineskin/share
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/share" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
+	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/share"];
+	//stuff for Xmodmap
+	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/.Xmodmap" withDestinationPath:[NSString stringWithFormat:@"%@/.Xmodmap",frameworksFold] error:nil];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/.Xmodmap"];
 	//check if wineserverstill running	
 	if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
@@ -850,8 +857,14 @@
 			wineskinX11FontPathPrefix=@"/opt/local/share/fonts";
 		else if ([fm fileExistsAtPath:@"/usr/X11R6/lib/X11/fonts"])
 			wineskinX11FontPathPrefix=@"/usr/X11R6/lib/X11/fonts";
+		else
+			wineskinX11FontPathPrefix=@"MISSING";
 	}
-	NSString *wineskinX11FontPath = [NSString stringWithFormat:@"-fp %@/75dpi,%@/100dpi,%@/cyrillic,%@/encodings,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
+	NSString *wineskinX11FontPath;
+	if ([wineskinX11FontPathPrefix isEqualToString:@"MISSING"])
+		wineskinX11FontPath = @"";
+	else
+		wineskinX11FontPath = [NSString stringWithFormat:@"-fp %@/75dpi,%@/100dpi,%@/cyrillic,%@/encodings,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
 	// set log variable
 	NSString *logFileLocation;
 	if (debugEnabled)
@@ -861,7 +874,7 @@
 	//make sure the X11 lock files is gone before starting X11
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	//Start WineskinX11
-	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/share/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
+	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
 	//fix Info.plist back
 	usleep(500000);
 	//bring X11 to front before any windows are drawn
@@ -1275,6 +1288,7 @@
 				//NSLog(@"Error! launching wineserver failed! no new wineserver PID found!\n");
 				//CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("Wineskin Error"), (CFStringRef)@"ERROR! Launching wineserver failed! No new wineserver PID found!", NULL);
 				[fm release];
+				killWineskin = YES;
 				return @"-1";
 			}
 			//write out new pid file
