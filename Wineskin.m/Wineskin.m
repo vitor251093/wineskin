@@ -85,6 +85,9 @@
 //fixes whatever libraries in Frameworks needs to be set before launching X or Wine
 - (void)fixFrameworksLibraries;
 
+//returns the correct line needed for startX11 to get the right quartz-wm started
+- (NSString *)setWindowManager;
+
 //starts up WineskinX11 and passes its PID back
 - (NSString *)startX11;
 
