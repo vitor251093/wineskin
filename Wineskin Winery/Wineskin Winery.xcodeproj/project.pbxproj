@@ -14,7 +14,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A852C515133BF63E00143814 /* WineskinBanner.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A852C514133BF63E00143814 /* WineskinBanner.jpg */; };
 		A89936DE127B283A006A7581 /* WineskinWineryUpdater in Resources */ = {isa = PBXBuildFile; fileRef = A89936DD127B283A006A7581 /* WineskinWineryUpdater */; };
-		A8C39E9F133BF58F001B3110 /* Wineskin.icns in Resources */ = {isa = PBXBuildFile; fileRef = A8C39E9E133BF58F001B3110 /* Wineskin.icns */; };
+		A8A76BB114E46AB700F2C8D0 /* Winery.icns in Resources */ = {isa = PBXBuildFile; fileRef = A8A76BB014E46AB700F2C8D0 /* Winery.icns */; };
 		A8EBE81B1274E83500CC9815 /* 7za in Resources */ = {isa = PBXBuildFile; fileRef = A8EBE81A1274E83500CC9815 /* 7za */; };
 /* End PBXBuildFile section */
 
@@ -33,7 +33,7 @@
 		8D1107320486CEB800E47090 /* Wineskin Winery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wineskin Winery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A852C514133BF63E00143814 /* WineskinBanner.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner.jpg; sourceTree = "<group>"; };
 		A89936DD127B283A006A7581 /* WineskinWineryUpdater */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = WineskinWineryUpdater; sourceTree = SOURCE_ROOT; };
-		A8C39E9E133BF58F001B3110 /* Wineskin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Wineskin.icns; sourceTree = "<group>"; };
+		A8A76BB014E46AB700F2C8D0 /* Winery.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Winery.icns; sourceTree = "<group>"; };
 		A8EBE81A1274E83500CC9815 /* 7za */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7za; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -108,7 +108,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A8C39E9E133BF58F001B3110 /* Wineskin.icns */,
+				A8A76BB014E46AB700F2C8D0 /* Winery.icns */,
 				A852C514133BF63E00143814 /* WineskinBanner.jpg */,
 				A8EBE81A1274E83500CC9815 /* 7za */,
 				A89936DD127B283A006A7581 /* WineskinWineryUpdater */,
@@ -182,8 +182,8 @@
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
 				A8EBE81B1274E83500CC9815 /* 7za in Resources */,
 				A89936DE127B283A006A7581 /* WineskinWineryUpdater in Resources */,
-				A8C39E9F133BF58F001B3110 /* Wineskin.icns in Resources */,
 				A852C515133BF63E00143814 /* WineskinBanner.jpg in Resources */,
+				A8A76BB114E46AB700F2C8D0 /* Winery.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

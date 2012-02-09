@@ -12,7 +12,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="683"/>
+      <integer value="681"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2377,7 +2377,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                     <object class="NSTextField" id="817983510">
                       <reference key="NSNextResponder" ref="666200154"/>
                       <int key="NSvFlags">268</int>
-                      <string key="NSFrame">{{19, 1}, {47, 11}}</string>
+                      <string key="NSFrame">{{5, 1}, {47, 11}}</string>
                       <reference key="NSSuperview" ref="666200154"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSTextFieldCell" key="NSCell" id="690862654">
@@ -2393,7 +2393,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                     <object class="NSTextField" id="375719460">
                       <reference key="NSNextResponder" ref="666200154"/>
                       <int key="NSvFlags">268</int>
-                      <string key="NSFrame">{{60, 1}, {57, 11}}</string>
+                      <string key="NSFrame">{{46, 1}, {91, 11}}</string>
                       <reference key="NSSuperview" ref="666200154"/>
                       <bool key="NSEnabled">YES</bool>
                       <object class="NSTextFieldCell" key="NSCell" id="610014771">
@@ -13478,8 +13478,8 @@ LmNvbS8</bytes>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <reference ref="545036629"/>
               <reference ref="405876708"/>
-              <reference ref="375719460"/>
               <reference ref="817983510"/>
+              <reference ref="375719460"/>
             </object>
             <reference key="parent" ref="532560588"/>
           </object>
@@ -14620,7 +14620,9 @@ LmNvbS8</bytes>
           <string>1546.IBPluginDependency</string>
           <string>1547.IBPluginDependency</string>
           <string>1560.IBPluginDependency</string>
+          <string>1560.IBViewBoundsToFrameTransform</string>
           <string>1561.IBPluginDependency</string>
+          <string>1561.IBViewBoundsToFrameTransform</string>
           <string>1562.IBPluginDependency</string>
           <string>1563.IBPluginDependency</string>
           <string>1564.IBPluginDependency</string>
@@ -15317,7 +15319,13 @@ LmNvbS8</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBmAAAwSAAAA</bytes>
+          </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABCcAAAwSAAAA</bytes>
+          </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
