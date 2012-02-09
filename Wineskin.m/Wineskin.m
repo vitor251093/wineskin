@@ -28,6 +28,7 @@
 	BOOL fullScreenOption;					//wether running fullscreen or rootless (RandR is rootless)
 	BOOL useRandR;							//if "Autoamatic" is set in Wineskin.app
 	BOOL useGamma;							//wether or not gamma correction will be checked for
+	BOOL forceWrapperQuartzWM;				//YES if forced to use wrapper quartz-wm and not newest version on the system
 	NSString *vdResolution; 				//virtual desktop resolution to be used for rootless or fullscreen
 	NSString *gammaCorrection;				//added in gamma correction
 	NSString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
@@ -205,6 +206,7 @@
 		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
 	}
+	forceWrapperQuartzWM = [[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue];
 	gammaCorrection = [plistDictionary valueForKey:@"Gamma Correction"];
 	x11PrefFileName = [plistDictionary valueForKey:@"CFBundleIdentifier"];
 	uLimitNumber=@"10000"; // run as 10000 for now.. I don't think this needs to be edited.  If peoples launchctl limit report less than 10000, they need to fix their machine, or reboot
@@ -804,11 +806,12 @@
 - (NSString *)setWindowManager
 {
 	if (fullScreenOption) return @"";//do not run quartz-wm in override->fullscreen
+	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold];
+	if (forceWrapperQuartzWM) return quartzwmLine;
 	NSFileManager *fm = [NSFileManager defaultManager];
 	//look for quartz-wm in all locations, if not found default to backup
 	//should be in /usr/bin/quartz-wm or /opt/X11/bin/quartz-wm or /opt/local/bin/quartz-wm
 	//find the newest version
-	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold];
 	NSMutableArray *pathsToCheck = [NSMutableArray arrayWithCapacity:1];
 	if ([fm fileExistsAtPath:@"/usr/bin/quartz-wm"])
 		[pathsToCheck addObject:@"/usr/bin/quartz-wm"];

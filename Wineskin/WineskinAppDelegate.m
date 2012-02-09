@@ -703,6 +703,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	else
 		[modifyMappingsButton setEnabled:YES];
 	[disableCPUsCheckBoxButton setState:[[plistDictionary valueForKey:@"Disable CPUs"] intValue]];
+	[forceWrapperQuartzWMButton setState:[[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue]];
 	[plistDictionary release];
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
@@ -960,6 +961,17 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"Disable CPUs"];
 	else
 		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Disable CPUs"];
+	[plistDictionary writeToFile:plistFile atomically:YES];
+	[plistDictionary release];
+}
+- (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender
+{
+	NSString *plistFile = [NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:plistFile];
+	if ([forceWrapperQuartzWMButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"force wrapper quartz-wm"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"force wrapper quartz-wm"];
 	[plistDictionary writeToFile:plistFile atomically:YES];
 	[plistDictionary release];
 }
