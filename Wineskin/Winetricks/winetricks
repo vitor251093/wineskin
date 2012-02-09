@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Name of this version of winetricks (YYYYMMDD)
-WINETRICKS_VERSION=20110629
+WINETRICKS_VERSION=20111115
 
 # This is a utf-8 file
 # You should see an o with two dots over it here [ö]
@@ -58,6 +58,7 @@ WINETRICKS_VERSION=20110629
 #   Copyright (C) 2011 Matthew Bauer <mjbauer95>
 #   Copyright (C) 2011 Giuseppe Dia
 #   Copyright (C) 2011 Łukasz Wojniłowicz
+#   Copyright (C) 2011 Matthew Bozarth
 #
 # License
 #   This program is free software; you can redistribute it and/or
@@ -80,7 +81,7 @@ WINETRICKS_VERSION=20110629
 # - No bash, zsh, or csh extensions; only use features from
 #   the Posix standard shell and utilities; see
 #   http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html
-# - 'checkbashism -p -x winetricks' should show no warnings (per Debian policy)
+# - 'checkbashisms -p -x winetricks' should show no warnings (per Debian policy)
 # - Prefer classic sh idioms as described in e.g.
 #   "Portable Shell Programming" by Bruce Blinn, ISBN: 0-13-451494-7
 # - If there is no universally available program for a needed function,
@@ -573,10 +574,10 @@ w_download_to()
             w_die "Downloading $_W_url failed"
         fi
         # Need to decompress .exe's that are compressed, else cygwin fails
-        # Only affects cygwin, so don't barf if 'file' not installed
-        _W_filetype=`which file 2>/dev/null`
+        # Also affects ttf files on github
+	_W_filetype=`which file 2>/dev/null`
         case $_W_filetype-$_W_file in
-        /*-*.exe)
+        /*-*.exe|/*-*.ttf)
             case `file "$_W_file"` in
             *gzip*) mv "$_W_file" "$_W_file.gz"; gunzip < "$_W_file.gz" > "$_W_file";;
             esac
@@ -735,7 +736,7 @@ w_download_manual()
 # Run from inside c:\Program Files\Steam
 w_steam_safemode()
 {
-    cat > "$W_CACHE/steamconfig.pl" <<"_EOF_"
+    cat > "$W_TMP/steamconfig.pl" <<"_EOF_"
 #!/usr/bin/perl
 # Parse steam's localconfig.vcf, add settings to it, and write it out again
 # The file is a recursive dictionary
@@ -791,7 +792,7 @@ sub dump_container{
 # Disable anything unsafe or annoying
 sub disable_notifications{
     my( $pcontainer ) = @_;
-    ${$pcontainer}{"friends"}{"PersonaStateDesired"} = 	"1";
+    ${$pcontainer}{"friends"}{"PersonaStateDesired"} = "1";
     ${$pcontainer}{"friends"}{"Notifications_ShowIngame"} = "0";
     ${$pcontainer}{"friends"}{"Sounds_PlayIngame"} = "0";
     ${$pcontainer}{"friends"}{"Notifications_ShowOnline"} = "0";
@@ -824,7 +825,7 @@ _EOF_
 for file in userdata/*/config/localconfig.vdf
 do
     cp "$file" "$file.old"
-    perl "$W_CACHE"/steamconfig.pl "$file.old" > "$file"
+    perl "$W_TMP"/steamconfig.pl "$file.old" > "$file"
 done
 }
 
@@ -898,19 +899,31 @@ w_steam_install_game()
         SetWinDelay 500
         ; Run steam once until it finishes its initial update.  
         ; For me, this exits at 26%.
-        run, Steam.exe
-        winwait, Steam - Updating
-        winwaitclose, Steam
-        process close, Steam.exe
-        ; Run a second time; let it finish updating, then kill it.
-        run steam.exe
-        winwait Steam - Updating
-        winwaitclose
-        process close, Steam.exe
-        ; Run a third time, have it log in, wait until it has finished connecting
         run steam.exe -applaunch $_W_steamid -login $W_STEAM_ID $W_STEAM_PASSWORD 
-        winwait Steam  ; wait for login window
+        Loop
+        {
+            ifWinExist, Steam - Updating
+            {
+                winwaitclose, Steam
+                process close, Steam.exe
+                sleep 1000
+                ; Run a second time; let it finish updating, then kill it.
+                run steam.exe
+                winwait Steam - Updating
+                winwaitclose
+                process close, Steam.exe
+                ; Run a third time, have it log in, wait until it has finished connecting
+                run steam.exe -applaunch $_W_steamid -login $W_STEAM_ID $W_STEAM_PASSWORD 
+            }
+            ifWinExist, Steam Login
+            {
+                break
+            }
+            sleep 500
+        }
+        ; wait for login window to close
         winwaitclose
+
         winwait Steam  ; wait for small <<connecting>> window
         winwaitclose
     "
@@ -1076,15 +1089,16 @@ winetricks_load_gog()
         if ! test -s "$file_path" || test `stat -Lc%s "$file_path"` -lt $minsize
         then
             # FIXME: bring back automated download
+            w_info "You have to be logged in to gog, and you have to own the game, for the following URL to work.  Otherwise it gets a 404."
             w_download_manual "https://www.gog.com/en/download/game/$download_id/$file_id" "$file"
             check_sha1=1
             filesize=`stat -Lc%s "$file_path"`
-            if test $minsize -gt 1 -a $filesize -ne $minsize
+            if test $minsize -gt 1 && test $filesize -ne $minsize
             then
                 check_sha1=""
                 w_warn "Expected file size $minsize, please report new size $filesize."
             fi
-            if test "$check_sha1" != "" -a "$sha1sum"x != ""x
+            if test "$check_sha1" != "" && test "$sha1sum"x != ""x
             then
                 w_verify_sha1sum "$sha1sum" "$file_path"
             fi
@@ -1413,6 +1427,22 @@ _EOF_
         w_try_regedit "$W_TMP_WIN"\\set-winver.reg
         return
         ;;
+    win95)
+        # This key is only used for win 95/98:
+
+        echo "Setting Windows version to $1"
+        cat > "$W_TMP"/set-winver.reg <<_EOF_
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion]
+"ProductName"="Microsoft Windows 95"
+"SubVersionNumber"=""
+"VersionNumber"="4.0.950"
+
+_EOF_
+        w_try_regedit "$W_TMP_WIN"\\set-winver.reg
+        return
+        ;;
     win98)
         # This key is only used for win 95/98:
 
@@ -1421,6 +1451,7 @@ _EOF_
 REGEDIT4
 
 [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion]
+"ProductName"="Microsoft Windows 98"
 "SubVersionNumber"=" A "
 "VersionNumber"="4.10.2222"
 
@@ -3557,7 +3588,7 @@ helper_d3dx9_xx()
 #----------------------------------------------------------------
 
 w_metadata  adobeair dlls \
-    title="Adobe AIR 2.6" \
+    title="Adobe AIR 2.7" \
     publisher="Adobe" \
     year="2011" \
     media="download" \
@@ -3572,7 +3603,8 @@ load_adobeair()
     # 2010-07-29: 2.0.2 sha1sum 7b93aedaf48ad7854940e7a4e7d9394a255e888b
     # 2010-12-08: 2.5.1 sha1sum 2664207ca8e836f5070ee356064829a39785a92e
     # 2011-04-13: 2.6   sha1sum 3d9c2f9d8f3533424cfea84d61fcb9464278d9fc
-    w_download http://airdownload.adobe.com/air/win/download/2.6/AdobeAIRInstaller.exe 3d9c2f9d8f3533424cfea84d61fcb9464278d9fc
+    # 2011-10-26: 2.7   sha1sum dfa337d4b53e9d924356febc116450190fa183dd
+    w_download http://airdownload.adobe.com/air/win/download/2.7/AdobeAIRInstaller.exe dfa337d4b53e9d924356febc116450190fa183dd
     cd "$W_CACHE"/adobeair
     w_try $WINE AdobeAIRInstaller.exe $W_UNATTENDED_DASH_SILENT
 }
@@ -4284,14 +4316,13 @@ load_dotnet20()
     # Hans' workaround to avoid winehq nonbug 26464, crash in servicemodelreg.exe
     rm -rf "$W_WINDIR_UNIX"/Microsoft.NET/Framework/v2.0.50727
 
+    # Delete registry keys used to indicate .net 2.x's presence
+    # Breaks .net 3.5 install, leave it out until we figure that out
+    #$WINE reg delete "HKLM\\Software\Microsoft\NET Framework Setup\NDP\v2.0.50727"
+
     # http://www.microsoft.com/downloads/details.aspx?FamilyID=0856eacb-4362-4b0d-8edd-aab15c5e04f5
     w_download http://download.microsoft.com/download/5/6/7/567758a3-759e-473e-bf8f-52154438565a/dotnetfx.exe a3625c59d7a2995fb60877b5f5324892a1693b2a
-    if [ "$W_UNATTENDED_SLASH_Q"x = ""x ]
-    then
-        w_try $WINE dotnetfx.exe
-    else
-        w_try $WINE dotnetfx.exe /q /c:"install.exe /q"
-    fi
+    w_try $WINE dotnetfx.exe ${W_OPT_UNATTENDED:+/q /c:"install.exe /q"}
     w_unset_winver
 
     # We can't stop installing dotnet20 in win2K mode until wine supports
@@ -4301,6 +4332,62 @@ load_dotnet20()
     # See also http://bugs.winehq.org/show_bug.cgi?id=16577
     # This affects Victoria 2 demo, see http://forum.paradoxplaza.com/forum/showthread.php?p=11523967
     rm -f "$W_SYSTEM32_DLLS"/msvc?80.dll
+}
+
+#----------------------------------------------------------------
+
+w_metadata dotnet20sp1 dlls \
+    title="MS .NET 2.0 SP1 (experimental)" \
+    publisher="Microsoft" \
+    year="2008" \
+    media="download" \
+    file1="NetFx20SP1_x86.exe" \
+    installed_file1="c:/windows/assembly/NativeImages_v2.0.50727_32/indexb.dat"
+
+load_dotnet20sp1()
+{
+    if w_workaround_wine_bug 16956 "wine version too old" 1.3.22,
+    then
+        w_die "wine-1.3.22 or later required to install dotnet20sp1 properly"
+    fi
+
+    w_call dotnet20
+
+    WINEDLLOVERRIDES=
+    if w_workaround_wine_bug 16956 "Setting windows version so installer works"
+    then
+        # Stop services
+        # Recipe from http://bugs.winehq.org/show_bug.cgi?id=16956
+        # FIXME: use a wrapper function for this
+        wineserver -k
+        # Fight a race condition, see bug 16956 comment 43
+        w_set_winver win2k
+        wineserver -w
+        WINEDLLOVERRIDES=ngen.exe,regsvcs.exe,mscorsvw.exe=b 
+        export WINEDLLOVERRIDES
+    fi
+
+    w_download http://download.microsoft.com/download/0/8/c/08c19fa4-4c4f-4ffb-9d6c-150906578c9e/NetFx20SP1_x86.exe eef5a36924cdf0c02598ccf96aa4f60887a49840
+    cd "$W_CACHE"/dotnet20sp1
+    $WINE NetFx20SP1_x86.exe ${W_OPT_UNATTENDED:+/q} 
+    status=$?
+
+    case $status in
+    0) ;;
+    105) echo "exit status $status - normal, user selected 'restart now'" ;;
+    194) echo "exit status $status - normal, user selected 'restart later'" ;;
+    *) w_die "exit status $status - $W_PACKAGE installation failed" ;;
+    esac
+
+    # We can't stop installing dotnet20sp1 in win2K mode until wine supports
+    # reparse/junction points
+    # (see http://bugs.winehq.org/show_bug.cgi?id=10467#c57 )
+    # so for now just remove the bogus msvc*80.dll files it installs.
+    # See also http://bugs.winehq.org/show_bug.cgi?id=16577
+    # This affects Victoria 2 demo, see http://forum.paradoxplaza.com/forum/showthread.php?p=11523967
+    rm -f "$W_SYSTEM32_DLLS"/msvc?80.dll
+
+    w_unset_winver
 }
 
 #----------------------------------------------------------------
@@ -4327,16 +4414,29 @@ load_dotnet20sp2()
     then
         # Recipe from http://bugs.winehq.org/show_bug.cgi?id=22521
         $WINE reg add "HKLM\Software\Microsoft\Net Framework Setup\NDP\v2.0.50727" /v Version /d "2.0.50727" /f
+        # Stop services
+        # Recipe from http://bugs.winehq.org/show_bug.cgi?id=16956
+        # FIXME: use a wrapper function for this
+        wineserver -k
+        # Fight a race condition, see bug 16956 comment 43
         w_set_winver win2k
+        wineserver -w
         WINEDLLOVERRIDES=regsvcs.exe,mscorsvw.exe=b 
         export WINEDLLOVERRIDES
     fi
 
     # http://www.microsoft.com/downloads/details.aspx?familyid=5B2C0358-915B-4EB5-9B1D-10E506DA9D0F
     w_download http://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x86.exe 22d776d4d204863105a5db99e8b8888be23c61a7
-    w_try $WINE "$W_CACHE"/dotnet20sp2/NetFx20SP2_x86.exe 
-    # FIXME: add ${W_OPT_UNATTENDED:+ /q /c:"install.exe /q"}
-    # once we fix the exit status 67, or if that turns out to be harmless.
+    cd "$W_CACHE"/dotnet20sp2
+    $WINE NetFx20SP2_x86.exe ${W_OPT_UNATTENDED:+ /q /c:"install.exe /q"}
+    status=$?
+
+    case $status in
+    0) ;;
+    105) echo "exit status $status - normal, user selected 'restart now'" ;;
+    194) echo "exit status $status - normal, user selected 'restart later'" ;;
+    *) w_die "exit status $status - $W_PACKAGE installation failed" ;;
+    esac
 
     w_unset_winver
 }
@@ -4364,6 +4464,11 @@ load_dotnet30()
 
     w_call dotnet20
 
+    # Delete files and registry keys related to .net 3.x
+    # Breaks .net 3.5 installation, so don't do this yet
+    #rm -rf "$W_WINDIR_UNIX"/Microsoft.NET/Framework/v3.0
+    #$WINE reg delete "HKLM\\Software\Microsoft\NET Framework Setup\NDP\v3.0"
+
     w_warn "Installing .net 3.0 runtime takes 3 minutes on a very fast machine, and the Finished dialog may hide in the taskbar."
     # http://msdn.microsoft.com/en-us/netframework/bb264589.aspx
     w_download http://download.microsoft.com/download/3/F/0/3F0A922C-F239-4B9B-9CB0-DF53621C57D9/dotnetfx3.exe f3d2c3c7e4c0c35450cf6dab1f9f2e9e7ff50039
@@ -4379,13 +4484,42 @@ load_dotnet30()
 
     w_set_winver winxp
 
+    # Delete FontCache 3.0 service, it's in Wine for Mono, breaks native .NET
+    w_try $WINE sc delete "FontCache3.0.0.0"
     cd "$W_CACHE"/dotnet30
-    if [ "$W_UNATTENDED_SLASH_Q"x = ""x ]
-    then
-        w_try $WINE dotnetfx3.exe
-    else
-        w_try $WINE dotnetfx3.exe /q /c:"install.exe /q"
-    fi
+    w_try $WINE $file1 ${W_OPT_UNATTENDED:+ /q /c:"install.exe /q"}
+}
+
+#----------------------------------------------------------------
+
+w_metadata dotnet30sp1 dlls \
+    title="MS .NET 3.0 SP1" \
+    publisher="Microsoft" \
+    year="2007" \
+    media="download" \
+    file1="NetFx30SP1_x86.exe" \
+    installed_file1="c:/windows/system32/XpsFilt.dll"    # we're cheating a bit here
+
+load_dotnet30sp1()
+{
+    case "$OS" in
+    "Windows_NT") ;;
+    *) w_warn "dotnet30sp1 does not yet fully work or install on wine.  Caveat emptor." ;;
+    esac
+
+    w_call dotnet30
+
+    w_download http://download.microsoft.com/download/8/F/E/8FEEE89D-9E4F-4BA3-993E-0FFEA8E21E1B/NetFx30SP1_x86.exe 8d779e337920b097aa0c01859912950606e9fc12
+    cd "$W_CACHE/$W_PACKAGE"
+
+    # Recipe from http://bugs.winehq.org/show_bug.cgi?id=25060#c10
+    w_download http://download.microsoft.com/download/2/5/2/2526f55d-32bc-410f-be18-164ba67ae07d/"XPSEP XP and Server 2003 32 bit.msi" 5d332ebd1025e294adafe72030fe33db707b2c82
+    w_try $WINE msiexec /i "XPSEP XP and Server 2003 32 bit.msi" # ${W_OPT_UNATTENDED:+/q} broken?
+    $WINE sc delete FontCache3.0.0.0
+
+    $WINE $file1 ${W_OPT_UNATTENDED:+/q}
+    status=$?
+    w_info $file1 exited with status $status
 }
 
 #----------------------------------------------------------------
@@ -4409,7 +4543,7 @@ load_dotnet35()
     w_call dotnet30
 
     # http://www.microsoft.com/downloads/details.aspx?FamilyId=333325FD-AE52-4E35-B531-508D977D32A6
-    w_download http://download.microsoft.com/download/6/0/f/60fc5854-3cb8-4892-b6db-bd4f42510f28/dotnetfx35.exe
+    w_download http://download.microsoft.com/download/6/0/f/60fc5854-3cb8-4892-b6db-bd4f42510f28/dotnetfx35.exe 0a271bb44531aadef902829f98dfad66e4a57586
 
     # See also http://blogs.msdn.com/astebner/archive/2008/07/17/8745415.aspx
     cd "$W_TMP"
@@ -4485,10 +4619,10 @@ w_metadata flash dlls \
     publisher="Adobe" \
     year="2011" \
     media="download" \
-    file1="install_flash_player.exe" \
-    file2="install_flash_player_ax.exe" \
-    installed_file1="$W_SYSTEM32_DLLS_WIN/Macromed/Flash/FlashUtil10u_Plugin.exe" \
-    installed_file2="$W_SYSTEM32_DLLS_WIN/Macromed/Flash/FlashUtil10u_ActiveX.exe" \
+    file1="install_flash_player_10.exe" \
+    file2="install_flash_player_10_active_x.exe" \
+    installed_file1="$W_SYSTEM32_DLLS_WIN/Macromed/Flash/FlashUtil10y_Plugin.exe" \
+    installed_file2="$W_SYSTEM32_DLLS_WIN/Macromed/Flash/FlashUtil10y_ActiveX.exe" \
     homepage="http://www.adobe.com/products/flashplayer/"
 
 load_flash()
@@ -4504,10 +4638,12 @@ load_flash()
     # 2011-05-13: sha1sum ae401aa3ba54ebe12c2fb3b94cd1bb5881074169
     # 2011-06-13: sha1sum 2c1ae9cf04f67ca611af7df695d3ea4337fb73fc
     # 2011-06-23: sha1sum da3f4b28f77a44b25cfb1453278683b888904714
-    w_download http://fpdownload.macromedia.com/get/flashplayer/current/install_flash_player_ax.exe da3f4b28f77a44b25cfb1453278683b888904714
+    # 2011-10-26: sha1sum 964199abcbaa9f42273ed5030d039ead03407b76
+    # 2011-11-12: sha1sum 1b84a14b4325a6ae17c590b7c9de749daeca7b6f
+    w_download http://fpdownload.macromedia.com/get/flashplayer/current/licensing/win/install_flash_player_10_active_x.exe 1b84a14b4325a6ae17c590b7c9de749daeca7b6f
     cd "$W_CACHE"/flash
 
-    w_try $WINE install_flash_player_ax.exe ${W_OPT_UNATTENDED:+ /install}
+    w_try $WINE install_flash_player_10_active_x.exe ${W_OPT_UNATTENDED:+ /install}
 
     # Mozilla / Firefox plugin
     # 2010-11-04: sha1sum 09f2491c5bec7286155234f4e6e1af70c7cef78f
@@ -4519,9 +4655,41 @@ load_flash()
     # 3aefb5132f7c326b046e4bc82e41bf399fc7cf5f
     # 2011-06-13: sha1sum f6248cdda8c5b3d36bb414d67d2373f205e257c7
     # 2011-06-23: sha1sum 8c14f60fa625d26698afceb1e234eaae4637389e
-    w_download http://fpdownload.macromedia.com/get/flashplayer/current/install_flash_player.exe 8c14f60fa625d26698afceb1e234eaae4637389e
+    # 2011-10-26: sha1sum a04d5ecc27dbc439d9ca0c994ac7db39a0d3d081
+    # 2011-11-12: sha1sum 2e834f95880fd0b96a9db93ff48f1e4178ee0913
+    w_download http://fpdownload.macromedia.com/get/flashplayer/current/licensing/win/install_flash_player_10.exe 2e834f95880fd0b96a9db93ff48f1e4178ee0913
 
-    w_try $WINE install_flash_player.exe ${W_OPT_UNATTENDED:+ /install}
+    w_try $WINE install_flash_player_10.exe ${W_OPT_UNATTENDED:+ /install}
+}
+
+#----------------------------------------------------------------
+
+# FIXME: update winetricks_is_installed to look at installed_file2
+w_metadata flash11 dlls \
+    title="Flash Player 11" \
+    publisher="Adobe" \
+    year="2011" \
+    media="download" \
+    file1="install_flash_player_32bit.exe" \
+    file2="install_flash_player_ax_32bit.exe" \
+    installed_file1="$W_SYSTEM32_DLLS_WIN/Macromed/Flash/FlashUtil11e_Plugin.exe" \
+    installed_file2="$W_SYSTEM32_DLLS_WIN/Macromed/Flash/FlashUtil11e_ActiveX.exe" \
+    homepage="http://www.adobe.com/products/flashplayer/"
+
+load_flash11()
+{
+    # Active X plugin
+    # 2011-11-12: sha1sum 8314061c4d73c9957dfb4da525d77437ee6abf0e
+    w_download http://fpdownload.macromedia.com/get/flashplayer/pdc/11.1.102.55/install_flash_player_ax_32bit.exe 8314061c4d73c9957dfb4da525d77437ee6abf0e
+    cd "$W_CACHE"/flash11
+
+    w_try $WINE install_flash_player_ax_32bit.exe ${W_OPT_UNATTENDED:+ /install}
+
+    # Mozilla / Firefox plugin
+    # 2011-11-12: sha1sum f1f76c35564c9f842a7e005d97f5008173466d46
+    w_download http://fpdownload.macromedia.com/get/flashplayer/pdc/11.1.102.55/install_flash_player_32bit.exe f1f76c35564c9f842a7e005d97f5008173466d46
+
+    w_try $WINE install_flash_player_32bit.exe ${W_OPT_UNATTENDED:+ /install}
 }
 
 #----------------------------------------------------------------
@@ -4821,10 +4989,12 @@ w_metadata jet40 dlls \
     year="2003" \
     media="download" \
     file1="jet40sp8_9xnt.exe" \
-    installed_file1="$W_COMMONFILES_X86_WIN/Microsoft shared/dao/dao360.dll"
+    installed_file1="$W_COMMONFILES_X86_WIN/Microsoft Shared/dao/dao360.dll"
 
 load_jet40()
 {
+    w_call mdac27
+    w_call wsh57
     # http://support.microsoft.com/kb/239114
     # See also http://bugs.winehq.org/show_bug.cgi?id=6085
     # FIXME: "failed with error 2"
@@ -4865,16 +5035,15 @@ w_metadata kindle apps \
     year="2011" \
     media="download" \
     file1="KindleForPC-installer.exe" \
-    installed_exe1="$W_PROGRAMS_WIN/Amazon/Kindle For PC/Kindle.exe" \
+    installed_exe1="$W_PROGRAMS_WIN/Amazon/Kindle/Kindle.exe" \
     homepage="http://www.amazon.com/gp/feature.html/?docId=1000426311"
 
 load_kindle()
 {
-    w_download http://kindleforpc.amazon.com/32337/KindleForPC-installer.exe \
-        2ad916877f418ceb8bdc4ae13b0c5e9099ffb8d7
+    w_download http://kindleforpc.amazon.com/36154/KindleForPC-installer.exe aca576086de7abd1d82c211dbeeb810387e046f5
     cd "$W_CACHE"/kindle
     w_try $WINE $file1 ${W_OPT_UNATTENDED:+ /S}
-    w_declare_exe "$W_PROGRAMS_WIN\\Amazon\\Kindle For PC" Kindle.exe
+    w_declare_exe "$W_PROGRAMS_WIN\\Amazon\\Kindle" Kindle.exe
 }
 
 #----------------------------------------------------------------
@@ -4916,7 +5085,7 @@ load_mdac27()
     # http://www.microsoft.com/downloads/en/details.aspx?FamilyId=9AD000F2-CAE7-493D-B0F3-AE36C570ADE8&displaylang=en
     w_download_manual http://download.cnet.com/Microsoft-Data-Access-Components-MDAC-2-7-Service-Pack-1-Refresh/3000-10250_4-10729498.html mdac_typ.exe f68594d1f578c3b47bf0639c46c11c5da161feee
     load_native_mdac
-    w_set_winver win2k
+    w_set_winver nt40
     w_try $WINE "$W_CACHE"/mdac27/mdac_typ.exe ${W_OPT_UNATTENDED:+ /q /C:"setup /QNT"}
     w_unset_winver
 }
@@ -5006,14 +5175,14 @@ w_metadata mono210 dlls \
     publisher="Novell" \
     year="2011" \
     media="download" \
-    file1="mono-2.10.2-gtksharp-2.12.10-win32-5.exe" \
-    installed_file1="$W_PROGRAMS_X86_WIN/Mono-2.10.2/bin/mono-2.0.dll"
+    file1="mono-2.10.6-gtksharp-2.12.11-win32-1.exe" \
+    installed_file1="$W_PROGRAMS_X86_WIN/Mono-2.10.6/bin/mono-2.0.dll"
 
 load_mono210()
 {
-    w_download http://ftp.novell.com/pub/mono/archive/2.10.2/windows-installer/5/mono-2.10.2-gtksharp-2.12.10-win32-5.exe 630769a5bf70d025308c994920d3826dbadb03f5
+    w_download http://download.mono-project.com/archive/2.10.6/windows-installer/1/mono-2.10.6-gtksharp-2.12.11-win32-1.exe da2126bdee1b6424533fb2d94c5fa295e2f15b74
     cd "$W_CACHE"/mono210
-    w_try $WINE mono-2.10.2-gtksharp-2.12.10-win32-5.exe $W_UNATTENDED_SLASH_SILENT
+    w_try $WINE $file1 $W_UNATTENDED_SLASH_SILENT
 }
 
 #----------------------------------------------------------------
@@ -5618,10 +5787,37 @@ load_shockwave() {
     # 2010-11-03 sha1sum: 2ff28665543e80f3bd4ff1933ac05ec9314aaac6
     # 2011-02-03 sha1sum: e71ddc4fa42662208b2f52c1bd34a40e7775ad75
     # 2011-06-13 sha1sum: 7fd6cc61bb20d0bef654a44f4501a5a65b55b0c9
+    # 2011-11-10 sha1sum: b55974b471c516f13fb032424247c07390baf380
 
-    w_download http://fpdownload.macromedia.com/get/shockwave/default/english/win95nt/latest/sw_lic_full_installer.msi 7fd6cc61bb20d0bef654a44f4501a5a65b55b0c9
+    w_download http://fpdownload.macromedia.com/get/shockwave/default/english/win95nt/latest/sw_lic_full_installer.msi b55974b471c516f13fb032424247c07390baf380
     cd "$W_CACHE"/shockwave
     w_try $WINE msiexec /i sw_lic_full_installer.msi $W_UNATTENDED_SLASH_Q
+}
+
+#----------------------------------------------------------------
+
+w_metadata speechsdk dlls \
+    title="MS Speech SDK 5.1" \
+    publisher="Microsoft" \
+    year="2009" \
+    media="download" \
+    file1="SpeechSDK51.exe" \
+    installed_file1="$W_PROGRAMS_X86_WIN/Microsoft Speech SDK 5.1/Bin/SAPI51SampleApp.exe"
+
+load_speechsdk()
+{
+    # http://www.microsoft.com/download/en/details.aspx?id=10121
+    w_download http://download.microsoft.com/download/B/4/3/B4314928-7B71-4336-9DE7-6FA4CF00B7B3/SpeechSDK51.exe f69efaee8eb47f8c7863693e8b8265a3c12c4f51
+
+    w_try_unzip -d "$W_TMP" "$W_CACHE"/speechsdk/SpeechSDK51.exe
+
+    # Otherwise it only installs the SDK and not the redistributable:
+    w_set_winver win2k
+    
+    cd "$W_TMP"
+    w_try $WINE msiexec /i "Microsoft Speech SDK 5.1.msi" $W_UNATTENDED_SLASH_Q
+
+    w_unset_winver
 }
 
 #----------------------------------------------------------------
@@ -6075,7 +6271,7 @@ load_wmi()
     w_download http://download.microsoft.com/download/platformsdk/wmi9x/1.5/W9X/EN-US/wmi9x.exe 62752e9c1b879688c26f205eebf07d3783906c3e
 
     w_set_winver win98
-    w_override_dlls native,builtin wbemprox.dll wmiutils.dll
+    w_override_dlls native,builtin wbemprox wmiutils
     # Note: there is a crash in the background towards the end, doesn't seem to hurt; see http://bugs.winehq.org/show_bug.cgi?id=7920
     cd "$W_CACHE"/wmi
     w_try $WINE wmi9x.exe $W_UNATTENDED_SLASH_S
@@ -6099,6 +6295,9 @@ load_wsh56js()
     w_download http://download.microsoft.com/download/b/c/3/bc3a0c36-fada-497d-a3de-8b0139766f3b/Windows2000-KB917344-56-x86-enu.exe add5f74c5bd4da6cfae47f8306de213ec6ed52c8
 
     cd "$W_CACHE/$W_PACKAGE"
+    w_override_dlls native,builtin jscript
+    # setupapi looks at the versions in new and original jscript.dll, and wine's original is newer than wsh56js's, so have to nuke the original
+    w_try rm "$W_SYSTEM32_DLLS/jscript.dll"
     w_try $WINE Windows2000-KB917344-56-x86-enu.exe $W_UNATTENDED_SLASH_Q
 }
 
@@ -6119,6 +6318,9 @@ load_wsh56vb()
     w_download http://download.microsoft.com/download/IE60/Patch/Q318089/W9XNT4Me/EN-US/vbs56men.exe 48f14a93db33caff271da0c93f334971f9d7cb22
 
     cd "$W_CACHE"/wsh56vb
+    w_override_dlls native,builtin vbscript
+    # setupapi looks at the versions in new and original vbscript.dll, and wine's original is newer than wsh56vb's, so have to nuke the original
+    w_try rm "$W_SYSTEM32_DLLS/vbscript.dll"
     w_try $WINE vbs56men.exe $W_UNATTENDED_SLASH_Q
 }
 
@@ -6140,7 +6342,7 @@ load_wsh57()
     w_try_cabextract -d "$W_SYSTEM32_DLLS" "$W_CACHE"/wsh57/scripten.exe
 
     # Wine doesn't provide the other dll's (yet?)
-    w_override_dlls native,builtin jscript.dll
+    w_override_dlls native,builtin jscript
     w_try_regsvr dispex.dll jscript.dll scrobj.dll scrrun.dll vbscript.dll wshcon.dll wshext.dll
 }
 
@@ -6276,6 +6478,24 @@ load_xmllite()
     en*) w_try $WINE WindowsXP-KB915865-v11-x86-ENU.exe $W_UNATTENDED_SLASH_Q ;;
     fr*) w_try $WINE WindowsXP-KB915865-v11-x86-FRA.exe $W_UNATTENDED_SLASH_Q ;;
     esac
+}
+
+#----------------------------------------------------------------
+
+w_metadata xna31 dlls \
+    title="MS XNA Framework Redistributable 3.1" \
+    publisher="Microsoft" \
+    year="2009" \
+    media="download" \
+    file1="xnafx31_redist.msi" \
+    installed_file1="C:/windows/assembly/GAC_32/Microsoft.Xna.Framework.Game/3.1.0.0__6d5c3888ef60e27d/Microsoft.Xna.Framework.Game.dll"
+
+load_xna31()
+{
+    w_call dotnet20sp2
+    w_download http://download.microsoft.com/download/5/9/1/5912526C-B950-4662-99B6-119A83E60E5C/xnafx31_redist.msi bdd33b677c9576a63ff2a6f65e12c0563cc116e6
+    cd "$W_CACHE"/xna31
+    w_try $WINE msiexec ${W_OPT_UNATTENDED:+/quiet} /i $file1 
 }
 
 #----------------------------------------------------------------
@@ -6456,7 +6676,7 @@ w_metadata droid fonts \
     installed_file1="$W_FONTSDIR_WIN/DroidSans-Bold.ttf"
 
 do_droid() {
-    w_download ${DROID_URL}$1';hb=HEAD'   $3  $1
+    w_download ${DROID_URL}$1'?raw=true'   $3  $1
     w_try cp -f "$W_CACHE"/droid/$1 "$W_FONTSDIR_UNIX"
     w_register_font $1 "$2"
 }
@@ -6464,7 +6684,8 @@ do_droid() {
 load_droid()
 {
     # See http://en.wikipedia.org/wiki/Droid_(font)
-    DROID_URL='http://android.git.kernel.org/?p=platform/frameworks/base.git;a=blob_plain;f=data/fonts/'
+    # Old url was http://android.git.kernel.org/?p=platform/frameworks/base.git;a=blob_plain;f=data/fonts/'
+    DROID_URL='https://github.com/android/platform_frameworks_base/blob/master/data/fonts/'
 
     do_droid DroidSans-Bold.ttf        "Droid Sans Bold"         560e4bcafdebaf29645fbf92633a2ae0d2f9801f
     do_droid DroidSansFallback.ttf     "Droid Sans Fallback"     64de2fde75868ab8d4c6714add08c8f08b3fae1e
@@ -6930,15 +7151,17 @@ load_audible()
 {
     w_download http://download.audible.com/AM50/ActiveSetupN.exe 49f501471912ccca442bcc1c8f2c69160579f712
     cd "$W_CACHE/$W_PACKAGE"
+    # Use exact title match!
     w_ahk_do "
         SetWinDelay 500
-        SetTitleMatchMode, 2
+        SetTitleMatchMode, 3
         Run, $file1
         WinWait, AudibleManager Setup
         ControlClick, Button3  ; accept
         WinWait, AudibleManager Setup, Start by
         ControlClick, Button6 ; OK
         WinWaitClose
+        ; many windows come and go, quite a few of them starting with AudibleManager, so use exact match to get the real mccoy
         WinWait, AudibleManager  ; the dang thing starts up
         WinKill
     "
@@ -6999,21 +7222,21 @@ load_autohotkey()
 
 #----------------------------------------------------------------
 
-w_metadata borders apps \
-    title="Borders Desktop (Kobo e-book reader)" \
+w_metadata kobo apps \
+    title="Kobo e-book reader" \
     publisher="Kobo" \
     year="2011" \
     media="download" \
     file1="KoboSetup.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/Borders Desktop/Borders Desktop.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Kobo/Kobo.exe" \
     homepage="http://www.borders.com/online/store/MediaView_ereaderapps"
 
-load_borders()
+load_kobo()
 {
-    w_download http://download.kobobooks.com/desktop/1/KoboSetup.exe
-    cd "$W_CACHE"/borders
+    w_download http://download.kobobooks.com/desktop/1/KoboSetup.exe 31a5f5583edf4b716b9feacb857d2170104cabd9
+    cd "$W_CACHE"/kobo
     w_try $WINE $file1 ${W_OPT_UNATTENDED:+ /S}
-    w_declare_exe "$W_PROGRAMS_X86_WIN\\Borders Desktop" "Borders Desktop.exe"
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Kobo" "Kobo.exe"
 }
 
 #----------------------------------------------------------------
@@ -7189,18 +7412,23 @@ load_firefox35()
 #----------------------------------------------------------------
 
 w_metadata firefox36 apps \
-    title="Firefox 3.6 (broken in wine)" \
+    title="Firefox 3.6" \
     publisher="Mozilla" \
     year="2011" \
     media="download" \
-    file1="Firefox Setup 3.6.18.exe" \
+    file1="Firefox Setup 3.6.24.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Mozilla Firefox/firefox.exe"
 
 load_firefox36()
 {
-    w_download "http://download.mozilla.org/?product=firefox-3.6.18&os=win&lang=en-US" c6673047eec8b909fad67f387e3ef8f8f43d54e3 "$file1"
+    w_download "http://download.mozilla.org/?product=firefox-3.6.24&os=win&lang=en-US" 7d149a9a45fd7cdd9b31b1a966650466b7111f1f "$file1"
     cd "$W_CACHE"/firefox36
     w_try $WINE "$file1" ${W_OPT_UNATTENDED:+ -ms}
+
+    if w_workaround_wine_bug 29077
+    then
+        w_warn "Visit about:config, search for dom.ipc, and set those booleans false if you want to use flash."
+    fi
 
     w_declare_exe "$W_PROGRAMS_X86_WIN\\Mozilla Firefox" firefox.exe
 
@@ -7215,12 +7443,41 @@ load_firefox36()
 
 #----------------------------------------------------------------
 
-w_metadata firefox apps \
-    title="Firefox 5 (broken in wine)" \
+w_metadata firefox5 apps \
+    title="Firefox 5" \
     publisher="Mozilla" \
     year="2011" \
     media="download" \
     file1="Firefox Setup 5.0.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Mozilla Firefox/firefox.exe"
+
+load_firefox5()
+{
+    if w_workaround_wine_bug 22972 "" 1.3.0,
+    then
+        w_die  "Requires wine-1.3.0 or later to install"
+    fi
+
+    if w_workaround_wine_bug 29077
+    then
+        w_warn "Visit about:config, search for dom.ipc, and set those booleans false if you want to use flash."
+    fi
+
+    w_download "http://download.mozilla.org/?product=firefox-5.0&os=win&lang=en-US" 288895db0a58b91801c5c1dfc0017131300dba00 "$file1"
+    cd "$W_CACHE"/firefox5
+    w_try $WINE "$file1" ${W_OPT_UNATTENDED:+ -ms}
+
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Mozilla Firefox" firefox.exe
+}
+
+#----------------------------------------------------------------
+
+w_metadata firefox apps \
+    title="Firefox 8" \
+    publisher="Mozilla" \
+    year="2011" \
+    media="download" \
+    file1="Firefox Setup 8.0.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Mozilla Firefox/firefox.exe"
 
 load_firefox()
@@ -7230,7 +7487,12 @@ load_firefox()
         w_die  "Requires wine-1.3.0 or later to install"
     fi
 
-    w_download "http://download.mozilla.org/?product=firefox-5.0&os=win&lang=en-US" 288895db0a58b91801c5c1dfc0017131300dba00 "$file1"
+    if w_workaround_wine_bug 29077
+    then
+        w_warn "Visit about:config, search for dom.ipc, and set those booleans false if you want to use flash."
+    fi
+
+    w_download "http://download.mozilla.org/?product=firefox-8.0&os=win&lang=en-US" dbbc497e639cae401dd9e6db6b61018ea0d2b689 "$file1"
     cd "$W_CACHE"/firefox
     w_try $WINE "$file1" ${W_OPT_UNATTENDED:+ -ms}
 
@@ -7329,6 +7591,46 @@ load_irfanview()
 
 #----------------------------------------------------------------
 
+w_metadata ie3 dlls \
+    title="Internet Explorer 3" \
+    publisher="Microsoft" \
+    year="1996" \
+    media="download" \
+    file1="msie302m95.exe" \
+    installed_file1="c:/Program Files/Internet Explorer/INST32.DLL"
+    
+load_ie3()
+{
+    w_warn "This is for debugging purposes only, DO NOT INSTALL."
+
+    w_set_winver win95
+
+    # FIXME: /q is quiet, but still has some promps..
+    w_download http://www.mirrorservice.org/sites/browsers.evolt.org/browsers/ie/win32/3.02/win95full/msie302m95.exe a55c3834860347342c0b91e0f572124b440eb195
+    
+    cat > "$W_TMP"/override-dll.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Wine\AppDefaults\infinst2.exe\DllOverrides]
+"shell32"="native"
+   
+_EOF_
+    w_try_regedit "$W_TMP_WIN"\\override-dll.reg
+
+    cd "$W_CACHE/$W_PACKAGE"
+    $WINE msie302m95.exe
+    # IE3 exits with 194 to signal a reboot
+    status=$?
+    case $status in
+        0|194) ;;
+        *) w_die ie6 installation failed
+    esac
+
+    # FIXME: installer reboots and has a failure, not sure how to detect that cleanly.
+}
+
+#----------------------------------------------------------------
+
 # FIXME: ie6 always installs to C:/Program Files even if LANG is de_DE.utf-8,
 # so we have to hard code that, but that breaks on 64 bit windows.
 w_metadata ie6 dlls \
@@ -7347,7 +7649,7 @@ load_ie6()
         w_die "This package does not work on a 64-bit installation"
     fi
 
-    w_download http://browsers-us.mirrors.zensoft.net/ie/win32/6.0/ie60.exe 8e483db28ff01a7cabd39147ab6c59753ea1f533
+    w_download http://download.oldapps.com/Internet_Explorer/ie60.exe 8e483db28ff01a7cabd39147ab6c59753ea1f533
 
     cd "$W_TMP"
     $WINE "$W_CACHE"/ie6/ie60.exe
@@ -7384,7 +7686,7 @@ load_ie6()
     # Work around http://bugs.winehq.org/show_bug.cgi?id=25432
     w_try_cabextract -F inseng.dll "$W_TMP/IE 6.0 Full/ACTSETUP.CAB"
     mv inseng.dll "$W_SYSTEM32_DLLS"
-    w_override_dlls native inseng.dll
+    w_override_dlls native inseng
 
     cd "$W_TMP/IE 6.0 Full"
     if [ $W_UNATTENDED_SLASH_Q ]
@@ -7723,9 +8025,8 @@ load_nook()
 {
     # dates from curl --head
     # 10 Feb 2011 sha1sum 4a06a529b93ed33c3518326d874b40d8d7b70e7a
-    w_download \
-        http://images.barnesandnoble.com/PResources/download/eReader2/bndr2_setup_latest.exe \
-        4a06a529b93ed33c3518326d874b40d8d7b70e7a
+    # 7 Oct 2011 sha1sum 3b0301bd55471cc47cced44501547411fac9fcea
+    w_download http://images.barnesandnoble.com/PResources/download/eReader2/bndr2_setup_latest.exe 3b0301bd55471cc47cced44501547411fac9fcea
     cd "$W_CACHE"/nook
     $WINE $file1 ${W_OPT_UNATTENDED:+ /S}
     # normally has exit status 199?
@@ -7861,12 +8162,12 @@ w_metadata opera apps \
     publisher="Opera Software" \
     year="2011" \
     media="download" \
-    file1="Opera_1111_en_Setup.exe" \
+    file1="Opera_1150_en_Setup.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Opera/opera.exe"
 
 load_opera()
 {
-    w_download ftp://ftp.opera.com/pub/opera/win/1111/en/Opera_1111_en_Setup.exe 36c34feb0fa7e4611bb0480a38d51a16bc9443d8
+    w_download ftp://ftp.opera.com/pub/opera/win/1150/en/Opera_1150_en_Setup.exe df50c7aed50e92af858e8834f833dd0543014b46
     cd "$W_CACHE"/$W_PACKAGE
     w_try $WINE $file1 ${W_OPT_UNATTENDED:+ /silent /launchopera 0 /allusers}
     w_declare_exe "$W_PROGRAMS_X86_WIN\\Opera" opera.exe
@@ -8013,7 +8314,7 @@ w_metadata spotify apps \
     year="2011" \
     media="download" \
     file1="SpotifyInstaller.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/Spotify/spotify.exe"
+    installed_exe1="c:/users/$LOGNAME/Application Data/Spotify/spotify.exe"
 
 load_spotify()
 {
@@ -8031,23 +8332,24 @@ load_spotify()
         cp Spotify%20Installer.exe SpotifyInstaller.exe
     fi
 
+    # Install is silent by default, and always starts app
+    # So all we have to do here is close app if we want unattended install
     w_ahk_do "
         SetTitleMatchMode, 2
         run SpotifyInstaller.exe
-        WinWait, Spotify, Location
+        WinWait, ahk_class SpotifyMainWindow
         if ( w_opt_unattended > 0 ) {
-            Sleep 500
-            ControlClick Button7 ; Start after install
-            Sleep 500
-            ControlClick Button2 ; Install
-            WinWait, Spotify, Complete
-            Sleep 500
-            ControlClick Button2 ; Close
+            WinClose
         }
         WinWaitClose
         "
 
-    w_declare_exe "$W_PROGRAMS_X86_WIN\\Spotify" "spotify.exe"
+    if w_workaround_wine_bug 27476 "Installing winhttp to work around a facebook integration crash on login"
+    then
+        w_call winhttp
+    fi
+
+    w_declare_exe "c:\\users\\$LOGNAME\\Application Data\\Spotify" spotify.exe
 }
 
 #----------------------------------------------------------------
@@ -8156,16 +8458,16 @@ w_metadata songbird apps \
     title="Songbird" \
     publisher="POTI" \
     year="2010" \
-    media="download" \
-    file1="Songbird_1.9.3-1959_windows-i686-msvc8.exe" \
+    media="manual_download" \
+    file1="Songbird_1.10.1-2160_windows-i686-msvc8.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Songbird/songbird.exe" \
     homepage="http://getsongbird.com"
 
 load_songbird()
 {
-    w_download \
-        http://download.songbirdnest.com/installer/windows/i686-msvc8/Songbird_1.9.3-1959_windows-i686-msvc8.exe \
-        1e6bdc9d5681f44320987cc73cde66f85b3e8032
+    w_download_manual \
+        http://getsongbird.com/system-requirements.php Songbird_1.10.1-2160_windows-i686-msvc8.exe \
+        3939988180e1bfba3f28ff5720942cbbc20b7fbf
     cd "$W_CACHE/songbird"
     w_try $WINE $file1 ${W_OPT_UNATTENDED:+ /S}
     w_declare_exe "$W_PROGRAMS_X86_WIN\\Songbird" songbird.exe
@@ -8186,12 +8488,17 @@ load_steam()
     # 18 Mar 2011 7f2fee9ffeaba8424a6c76d6c95b794735ac9959
     w_download http://storefront.steampowered.com/download/SteamInstall.msi 7f2fee9ffeaba8424a6c76d6c95b794735ac9959
     cd "$W_CACHE"/steam
-    w_try $WINE msiexec /i SteamInstall.msi $W_UNATTENDED_SLASH_Q
+    
+    # Install corefonts first, so if the user doesn't have cabextract/Wine with cab support, we abort before installing Steam.
+    # FIXME: support using Wine's cab support
     if ! test -f "$W_FONTSDIR_UNIX/Times.TTF" && \
         w_workaround_wine_bug 22751 "Installing corefonts to prevent a Steam crash"
     then
         w_call corefonts
     fi
+
+    w_try $WINE msiexec /i SteamInstall.msi $W_UNATTENDED_SLASH_Q
+
     # Not all users need this disabled, but let's play it safe for now
     if w_workaround_wine_bug 22053 "Disabling gameoverlayrenderer to prevent game crashes on some machines."
     then
@@ -8411,7 +8718,7 @@ w_metadata winamp apps \
     publisher="AOL (Nullsoft)" \
     year="2011" \
     media="download" \
-    file1="winamp561_full_emusic-7plus_en-us.exe" \
+    file1="winamp5621_full_emusic-7plus_en-us.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Winamp/winamp.exe" \
     homepage="http://www.winamp.com"
 
@@ -8419,7 +8726,7 @@ load_winamp()
 {
     w_info "may send information while installing, see http://www.microsoft.com/security/portal/Threat/Encyclopedia/Entry.aspx?threatid=159633"
     w_download \
-        http://download.nullsoft.com/winamp/client/winamp561_full_emusic-7plus_en-us.exe 21eeab7c68beba0acd59ec452b772641ae784d0a
+        http://download.nullsoft.com/winamp/client/winamp5621_full_emusic-7plus_en-us.exe afc172039db52fdc202114bec7bcf8b5bf2468bb
     cd "$W_CACHE/$W_PACKAGE"
     if test $W_OPT_UNATTENDED
     then
@@ -8535,6 +8842,11 @@ load_wmp9()
     if [ $W_ARCH = win64 ]
     then
         w_die "Installer doesn't support 64-bit architecture."
+    fi
+
+    if w_workaround_wine_bug 28994 "virtualprotect problem" -1.3.31
+    then
+        w_die "Sorry, wine-1.3.32 has a bug that keeps wmp9 from installing."
     fi
 
     w_call wsh57
@@ -8885,6 +9197,63 @@ load_3dmark06()
     fi
 
     w_declare_exe "$W_PROGRAMS_X86_WIN\\Futuremark\\3DMark06" "3DMark06 $ARGS"
+}
+
+#----------------------------------------------------------------
+
+w_metadata unigine_heaven benchmarks \
+    title="Unigen Heaven 2.1 Benchmark" \
+    publisher="Unigen" \
+    year="2010" \
+    media="manual_download" \
+    file1="Unigine_Heaven-2.1.msi" 
+
+load_unigine_heaven()
+{
+    # FIXME: use w_download_torrent()
+    w_download_manual http://unigine.com/download/torrents/Unigine_Heaven-2.1.msi.torrent Unigine_Heaven-2.1.msi 3d7b94a3734cdae85f98032b61668e743979c444
+
+    cd "$W_CACHE/$W_PACKAGE"
+    w_ahk_do "
+        SetWinDelay 1000
+        SetTitleMatchMode, 2
+        run msiexec /i $file1
+        if ( w_opt_unattended > 0 ) {
+	    WinWait ahk_class MsiDialogCloseClass
+	    Send {Enter}
+	    WinWait ahk_class MsiDialogCloseClass, License
+	    ControlClick Button1 ; Accept
+	    ControlClick Button3 ; Accept
+	    WinWait ahk_class MsiDialogCloseClass, Choose
+	    ControlClick Button1 ; Typical
+	    WinWait ahk_class MsiDialogCloseClass, Ready
+	    ControlClick Button2 ; Install
+	    ; FIXME: on systems with OpenAL already (Win7?), the next four lines
+	    ; are not needed.  We should somehow wait for either OpenAL window
+	    ; *or* Completed window.
+	    WinWait ahk_class OpenAL Installer
+	    ControlClick Button2 ; OK
+	    WinWait ahk_class #32770
+	    ControlClick Button1 ; OK
+        }
+        WinWait ahk_class MsiDialogCloseClass, Completed
+        if ( w_opt_unattended > 0 ) {
+            ControlClick Button1 ; Finish
+            Send {Enter}
+        }
+        winwaitclose
+    "
+
+    if w_workaround_wine_bug 22614 "setting video memory to 1024M" 1.3.23,
+    then
+        # hope your card actually has 1GB of RAM
+        w_call videomemorysize=1024
+    fi
+
+    # Should start Heaven.exe, but that doesn't run in Wine
+    # Should give option to run Heaven_gl.bat (even works in Wine)
+    # or the dx10 or dx11 versions (doesn't).
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Unigine\\Heaven" "cmd /c Heaven_d3d9.bat"
 }
 
 #----------------------------------------------------------------
@@ -9595,16 +9964,13 @@ w_metadata bladekitten_demo games \
     title="Blade Kitten Demo" \
     publisher="Krome Studios" \
     year="2010" \
-    media="download" \
+    media="manual_download" \
     file1="BladeKittenDemoInstall.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Krome Studios/Blade Kitten Demo/BladeKitten_Demo.exe"
 
 load_bladekitten_demo()
 {
-    if ! test -f "$W_CACHE/$W_PACKAGE/BladeKittenDemoInstall.exe"
-    then
-        w_download "http://downloads.megagames.com/download.php?file=BladeKittenDemoInstall.exe" 8c41706ff3ad029317e5eb6853c34732498d97c7 BladeKittenDemoInstall.exe
-    fi
+    w_download_manual http://news.bigdownload.com/2010/09/23/download-blade-kitten-demo BladeKittenDemoInstall.exe d3568f94c1ce284b7381e457e9497065bd45001d
 
     cp "$W_CACHE/$W_PACKAGE"/BladeKittenDemoInstall.exe "$W_TMP"
     cd "$W_TMP"
@@ -10568,6 +10934,109 @@ load_darkspore()
 
 #----------------------------------------------------------------
 
+w_metadata dcuo games \
+    title="DC Universe Online" \
+    publisher="EA" \
+    year="2011" \
+    media="dvd" \
+    file1="DCUO - Disc 1.iso" \
+    file2="DCUO - Disc 2.iso" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Sony Online Entertainment/Installed Games/DC Universe Online Live/LaunchPad.exe"
+
+load_dcuo()
+{
+    # The installer would take care of this, but let's do it first
+    w_call flash
+    if w_workaround_wine_bug 26298 "Installing microsoft runtime libraries"
+    then
+        w_call vcrun2005
+    fi
+    if w_workaround_wine_bug 27279 "Installing microsoft XAct audio"
+    then
+        w_call xact
+    fi
+    if w_workaround_wine_bug 25906 "Installing ie8"
+    then
+        w_call ie8
+    fi
+
+    w_mount "DCUO - Disc 1"
+    w_ahk_do "
+        SetWinDelay 1000
+        SetTitleMatchMode, 2
+        run, ${W_ISO_MOUNT_LETTER}:setup.exe
+        if ( w_opt_unattended > 0 ) {
+	    winwait, DC Universe, Anti-virus
+	    ControlClick, Button1   ; next
+	    winwait, DC Universe, License
+	    ControlClick, Button5   ; accept
+	    sleep 500
+	    ControlClick, Button2   ; next
+	    winwait, DC Universe, Shortcut
+	    ControlClick, Button3   ; next
+	    Loop
+	    {
+		IfWinExist, DC Universe, not enough space
+		{
+		    exit 1          ; dang, have to quit
+		}
+		IfWinExist, DC Universe, Ready
+		{
+		    break
+		}
+		Sleep 1000
+	    }
+	    winwait, DC Universe, Ready
+	    ControlClick, Button1   ; next
+        }
+        winwait, Setup Needs The Next Disk, Please insert disk 2
+    "
+
+    w_mount "DCUO - Disc 2"
+    w_ahk_do "
+        SetWinDelay 1000
+        SetTitleMatchMode, 2
+        winwait, Setup Needs The Next Disk, Please insert disk 2
+        if ( w_opt_unattended > 0 ) {
+	    ControlClick, Button2   ; next
+	    winwaitclose
+	    Loop
+	    {
+		IfWinExist, DirectX, Welcome
+		{
+		    ControlClick, Button1   ; accept
+		    Sleep 1000
+		    ControlClick, Button4   ; next
+		    WinWait, DirectX, Runtime Install
+		    ControlClick, Button4   ; next
+		    WinWait, DirectX, Complete
+		    ControlClick, Button4   ; next
+                    sleep 1000
+                    process, close, dxsetup.exe   ; work around strange 'next button does nothing' bug
+		}
+		IfWinExist, Flash   ; a newer version of flash is already installed
+		{
+		    ControlClick, Button3   ; quit
+		}
+		IfWinExist, DC Universe, Complete
+		{
+		    break
+		}
+		Sleep 1000
+	    }
+        }
+	WinWait, DC Universe, Complete
+        if ( w_opt_unattended > 0 ) {
+	    ControlClick, Button4   ; finish
+        }
+        winwaitclose
+    "
+    w_warn "Now let the wookie install itself, and then quit."
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Sony Online Entertainment\\Installed Games\\DC Universe Online Live" LaunchPad.exe
+}
+
+#----------------------------------------------------------------
+
 w_metadata deadspace games \
     title="Dead Space" \
     publisher="EA" \
@@ -10887,21 +11356,21 @@ w_metadata digitanks_demo games \
     year="2011" \
     media="download" \
     file1="digitanks.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/Digitanks/digitanks.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Digitanks/digitanksdemo.exe" \
     homepage="http://www.digitanks.com"
 
 load_digitanks_demo()
 {
     # 8 june 2011: f204b13dc64c1a54fb1aaf27187c6083ebb16acf
-    w_download "http://static.digitanks.com/files/digitanks.exe" \
-        f204b13dc64c1a54fb1aaf27187c6083ebb16acf
+    # 11 Nov 2011: e54ffb07232f434bcfaf7b3d43ddf9affa93ef15
+    w_download "http://static.digitanks.com/files/digitanks.exe" e54ffb07232f434bcfaf7b3d43ddf9affa93ef15
     cd "$W_CACHE/$W_PACKAGE"
     w_try "$WINE" $file1 ${W_OPT_UNATTENDED:+ /S}
     if w_workaround_wine_bug 26915 "installing corefonts"
     then
         w_call corefonts
     fi
-    w_declare_exe "$W_PROGRAMS_X86_WIN\\Digitanks" digitanks.exe
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\Digitanks" digitanksdemo.exe
 }
 
 w_metadata dirt2_demo games \
@@ -11306,7 +11775,7 @@ load_dragonage2_demo()
             winwait, Dragon Age II Demo Setup, Select
             send {Enter}
         }
-        winwait, Dragon Age II Demo Setup, Completed
+        winwait, Dragon Age II Demo Setup, Complete, completed
         if ( w_opt_unattended > 0 ) {
             send {Enter}
             winwait, Dragon Age II Demo Setup, Completing
@@ -11613,13 +12082,12 @@ w_metadata hon games \
     publisher="S2 Games" \
     year="2010" \
     media="download" \
-    file1="HoNClient-2.0.36v2.exe" \
+    file1="HoNClient-2.2.8.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Heroes of Newerth/hon.exe"
 
 load_hon()
 {
-    w_download http://dl.heroesofnewerth.com/HoNClient-2.0.36v2.exe \
-               0e1889279dc07179eeb59e29f803b64d75b688c4
+    w_download http://dl.heroesofnewerth.com/HoNClient-2.2.8.exe 15eb6fc4b5da5b2316e52d955dbfb0797496789c
 
     cd "$W_CACHE/$W_PACKAGE"
     w_ahk_do "
@@ -12020,7 +12488,7 @@ load_guildwars()
 #----------------------------------------------------------------
  
 w_metadata hegemonygold_demo games \
-    title="Hegemony Gold beta 13" \
+    title="Hegemony Gold" \
     publisher="Longbow Games" \
     year="2011" \
     media="download" \
@@ -12039,7 +12507,9 @@ load_hegemonygold_demo()
     # 6 Mar 2011: 8c4d8aa8f997b106c78b065a4b200e5e1ab846a8
     # 28 Apr 2011: 93677013fc17f014b1640bed070e8bb1b2a17445
     # 25 Jun 2011: 4069656ea3c3760b67d1c5adff37de7472955f72
-    w_download "http://www.longbowgames.com/downloads/Hegemony%20Gold%20Installer.exe" 4069656ea3c3760b67d1c5adff37de7472955f72 HegemonyGoldInstaller.exe
+    # 5 Nov 2011: 723c575ff5fff77941a1c786e28f46c094b8159c
+
+    w_download "http://www.longbowgames.com/downloads/Hegemony%20Gold%20Installer.exe" 723c575ff5fff77941a1c786e28f46c094b8159c HegemonyGoldInstaller.exe
 
     cd "$W_CACHE/$W_PACKAGE"
 
@@ -12062,7 +12532,7 @@ load_hegemonygold_demo()
             ControlClick Button2 ; Install
             WinWait,Hegemony, Completing
             ControlFocus,Button4,launch
-            Sleep 500
+            Sleep 1000
             Send {Space}
             Sleep 500
             ControlClick Button2 ; finish
@@ -12199,12 +12669,17 @@ w_metadata imvu games \
     publisher="IMVU" \
     year="2004" \
     media="download" \
-    file1="InstallIMVU_460.0_st_c.exe" \
+    file1="InstallIMVU_465.0_st_c.exe" \
     installed_exe1="c:/users/$LOGNAME/Application Data/IMVUClient/IMVUClient.exe"
 
 load_imvu()
 {
-    w_download http://static-akm.imvu.com/imvufiles/installers/InstallIMVU_460.0_st_c.exe
+    w_download http://static-akm.imvu.com/imvufiles/installers/InstallIMVU_465.0_st_c.exe 3a5c6c335227a5709c5772f91d8407edd07d4012
+
+    if w_workaround_wine_bug 28541 "Installing Visual C++ 2008 runtime to avoid crash on startup"
+    then
+        w_call vcrun2008
+    fi
 
     cd "$W_CACHE/$W_PACKAGE"
 
@@ -13103,7 +13578,7 @@ w_metadata mb_warband_demo games \
     publisher="Taleworlds" \
     year="2010" \
     media="download" \
-    file1="mb_warband_setup_1134.exe" \
+    file1="mb_warband_setup_1143.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Mount&Blade Warband/mb_warband.exe" \
     homepage="http://www.taleworlds.com"
 
@@ -13116,12 +13591,12 @@ load_mb_warband_demo()
     w_workaround_wine_bug 6971 "Please upgrade to wine-1.3.23 or later; see http://wiki.winehq.org/Bug6971" 1.3.23,
     # Mouse still doesn't work quite right after picking menu, see bug 25705.
 
-    w_download "http://download.taleworlds.com/mb_warband_setup_1134.exe" 1aac92b6c97869350b80fe7a08f559719deb37d7
+    w_download "http://download.taleworlds.com/mb_warband_setup_1143.exe" 94fb829068678e27bcd67d9e0fde7f08c51a23af 
 
     cd "$W_CACHE/$W_PACKAGE"
     w_ahk_do "
         SetTitleMatchMode 2
-        run mb_warband_setup_1134.exe
+        run mb_warband_setup_1143.exe
         winwait Warband
         if ( w_opt_unattended > 0 ) {
             controlclick button2
@@ -13287,7 +13762,8 @@ w_metadata nfsshift_demo games \
 
 load_nfsshift_demo()
 {
-    w_download http://cdn.needforspeed.com/data/downloads/shift/NFSSHIFTPCDEMO.exe 7b267654d08c54f15813f2917d9d74ec40905db7
+    #w_download http://cdn.needforspeed.com/data/downloads/shift/NFSSHIFTPCDEMO.exe 7b267654d08c54f15813f2917d9d74ec40905db7
+    w_download http://www.legendaryreviews.com/download-center/demos/NFSSHIFTPCDEMO.exe 7b267654d08c54f15813f2917d9d74ec40905db7
 
     w_try cp "$W_CACHE/$W_PACKAGE/$file1" "$W_TMP"
 
@@ -13351,7 +13827,7 @@ w_metadata nfsworld games \
     publisher="EA" \
     year="2011" \
     media="download" \
-    file1="setup_441.exe" \
+    file1="setup_659.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Electronic Arts/Need For Speed World/GameLauncher.exe"
 
 load_nfsworld()
@@ -13360,13 +13836,18 @@ load_nfsworld()
 
     # This changes frequently, I'm afraid
     # Be careful to update $file1 when you update the url
-    w_download http://static.cdn.ea.com/blackbox/u/f/NFSWO/Launcher/weblaunch_1.8.35.441/setup_441.exe 0f75ea12fc3fe40dd97bf0b6556ed146de435edf
+    w_download http://static.cdn.ea.com/blackbox/u/f/NFSWO/Launcher/weblaunch_1.8.40.659/akamai/setup_659.exe b1f10af09350e2b3f5ccbc679dbea628e9f432d0
 
     w_workaround_wine_bug 27048 "The patcher hangs a lot.  When it does, retry the patch (you may need to kill it first).  After five or ten tries, it should work."
 
     # FIXME: file bugs for these
     w_call ie7
     w_call dotnet20
+
+    if test "$W_OPT_UNATTENDED" && w_workaround_wine_bug 25961
+    then
+        w_call vcrun2008
+    fi
 
     if w_workaround_wine_bug 26915 "installing corefonts so help works"
     then
@@ -13401,6 +13882,7 @@ load_nfsworld()
             send {Space}                    ; uncheck readme
             send {Tab}
             send {Space}                    ; uncheck launch
+            sleep 1000                      ; let launch uncheck take effect?
             ControlClick TNewButton5        ; Finish
         }
         winwaitclose
@@ -13415,12 +13897,12 @@ w_metadata nfsworld_mono games \
     publisher="EA" \
     year="2011" \
     media="download" \
-    file1="setup_441.exe" \
+    file1="setup_659.exe" \
     installed_exe1="$W_PROGRAMS_X86_WIN/Electronic Arts/Need For Speed World/GameLauncher.exe"
 
 load_nfsworld_mono()
 {
-    w_download http://static.cdn.ea.com/blackbox/u/f/NFSWO/Launcher/weblaunch_1.8.35.441/setup_441.exe 0f75ea12fc3fe40dd97bf0b6556ed146de435edf
+    w_download http://static.cdn.ea.com/blackbox/u/f/NFSWO/Launcher/weblaunch_1.8.40.659/akamai/setup_659.exe b1f10af09350e2b3f5ccbc679dbea628e9f432d0
 
     if w_workaround_wine_bug 25658 "Installing Mono 2.6"
     then
@@ -13430,6 +13912,11 @@ load_nfsworld_mono()
         w_download http://madewokherd.nfshost.com/omgsecret/mono-winebug23458.tar.gz \
              156a7d79e70864b67af22315ae257dc798cb2a2e
         w_try tar -C "$W_PROGRAMS_X86_UNIX/Mono-2.6.7/lib" -xvf "$W_CACHE/$W_PACKAGE"/mono-winebug23458.tar.gz
+    fi
+
+    if test "$W_OPT_UNATTENDED" && w_workaround_wine_bug 25961
+    then
+        w_call vcrun2008
     fi
 
     if w_workaround_wine_bug 26915 "installing corefonts so help works"
@@ -13467,6 +13954,7 @@ load_nfsworld_mono()
             send {Space}                    ; uncheck readme
             send {Tab}
             send {Space}                    ; uncheck launch (Vincent says let it launch?)
+            sleep 1000                      ; let launch uncheck take effect?
             ControlClick TNewButton5        ; Finish
         }
         winwaitclose
@@ -13494,6 +13982,80 @@ cd "C:\\Program Files\\Electronic Arts\\Need For Speed World"
 GameLauncher.exe
 __EOF__
 
+}
+
+#----------------------------------------------------------------
+
+w_metadata njcwp_trial apps \
+    title="NJStar Chinese Word Processor trial" \
+    publisher="NJStar" \
+    year="2009" \
+    media="download" \
+    file1="njcwp.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/NJStar Chinese WP/njstar.exe" \
+    homepage="http://www.njstar.com/cms/njstar-chinese-word-processor"
+
+load_njcwp_trial()
+{
+    w_download http://www.njstar.com/download/njcwp.exe 006da155bad1ac4a73b953c98cb821eb7fd96507
+    cd "$W_CACHE/$W_PACKAGE"
+    if test "$W_OPT_UNATTENDED"
+    then
+        w_ahk_do "
+        SetTitleMatchMode, 2
+        run $file1
+        WinWait, Setup, Wizard
+        ControlClick Button2 ; next
+        WinWait, Setup, License
+        ControlClick Button2 ; agree
+        WinWait, Setup, Install
+        ControlClick Button2 ; install
+        WinWait, Setup, Completing
+        ControlClick Button4 ; do not launch
+        ControlClick Button2 ; finish
+        WinWaitClose
+        "
+    else
+        w_try $WINE $file1
+    fi
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\NJStar Chinese WP" "njstar.exe"
+}
+
+#----------------------------------------------------------------
+
+w_metadata njjwp_trial apps \
+    title="NJStar Japanese Word Processor trial" \
+    publisher="NJStar" \
+    year="2009" \
+    media="download" \
+    file1="njjwp.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/NJStar Japanese WP/njstarj.exe" \
+    homepage="http://www.njstar.com/cms/njstar-japanese-word-processor"
+
+load_njjwp_trial()
+{
+    w_download http://www.njstar.com/download/njjwp.exe 363d22e4ca7b79d0290a8ccdb0fa99169971d418
+    cd "$W_CACHE/$W_PACKAGE"
+    if test "$W_OPT_UNATTENDED"
+    then
+        w_ahk_do "
+        SetTitleMatchMode, 2
+        run $file1
+        WinWait, Setup, Wizard
+        ControlClick Button2 ; next
+        WinWait, Setup, License
+        ControlClick Button2 ; agree
+        WinWait, Setup, Install
+        ControlClick Button2 ; install
+        WinWait, Setup, Completing
+        ControlClick Button4 ; do not launch
+        ControlClick Button2 ; finish
+        WinWaitClose
+        "
+    else
+        w_try $WINE $file1
+    fi
+    w_declare_exe "$W_PROGRAMS_X86_WIN\\NJStar Japanese WP" "njstarj.exe"
 }
 
 #----------------------------------------------------------------
@@ -13745,6 +14307,54 @@ load_puzzleagent_demo()
 
 #----------------------------------------------------------------
 
+w_metadata ragnarok games \
+    title="Ragnarok" \
+    publisher="GRAVITY" \
+    year="2002" \
+    media="manual_download" \
+    file1="iRO-13.2.2-FullInstall-20110421-1717.msi" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Gravity/Ragnarok Online/Ragnarok.exe"
+
+load_ragnarok()
+{
+    if w_workaround_wine_bug 657 "Visual C++ 6 runtime"
+    then
+        w_call vcrun6
+    fi
+    if w_workaround_wine_bug 28228 "Installing Visual C++ 2008 runtime"
+    then
+        w_call vcrun2008
+    fi
+
+    # publisher puts SHA1 checksums on download page, nice
+    # BDA295E3A2A57CD02BD122ED7BF4836AC012369A
+    w_download_manual http://www.playragnarok.com/downloads/clientdownload.aspx iRO-13.2.2-FullInstall-20110421-1717.msi bda295e3a2a57cd02bd122ed7bf4836ac012369a
+
+    cd "$W_CACHE/$W_PACKAGE"
+
+    w_ahk_do "
+        Run, msiexec /i $file1
+        SetTitleMatchMode, 2
+        WinWait, Ragnarok Online Setup, Please read the Ragnarok Online License Agreement
+        if ( w_opt_unattended > 0 ) {
+            Sleep 500
+            ControlClick Button1
+            Sleep 500
+            ControlClick Button3
+            }
+            WinWait, Ragnarok Online Setup, Completed the Ragnarok Online Setup Wizard
+        if ( w_opt_unattended > 0 ) {
+            Sleep 500
+            ControlClick Button1 ;Direct
+        }
+    "
+
+    # Game autoupdates:
+    killall "Ragnarok.exe"
+}
+
+#----------------------------------------------------------------
+
 w_metadata rct3deluxe games \
     title="RollerCoaster Tycoon 3 Deluxe (drm broken on wine)" \
     publisher="Atari" \
@@ -13930,6 +14540,7 @@ load_secondlife()
     cd "$W_CACHE/$W_PACKAGE"
     w_ahk_do "
         SetTitleMatchMode, 2
+        SetWinDelay 500
         run, Second_Life_2-5-0-220251_Setup.exe
         if ( w_opt_unattended > 0 ) {
             winwait, Installer Language
@@ -14177,7 +14788,7 @@ load_sims3_gen()
             send {Enter}
             loop
             {
-	        SetTitleMatchMode, 2
+                SetTitleMatchMode, 2
                 ifwinexist, - InstallShield Wizard, Setup will now attempt to update
                 {
                     ControlClick, Button1, - InstallShield Wizard
@@ -14191,7 +14802,7 @@ load_sims3_gen()
                 {
                     winactivate, Sims, License
                     sleep 1000
-		    ControlClick, Button3
+                    ControlClick, Button3
                     sleep 1000
                     ControlClick, Button1
                     sleep 1000
@@ -14200,7 +14811,7 @@ load_sims3_gen()
                 sleep 1000
             }
             winwait, Sims, Please enter the entire Registration Code
-	    sleep 1000
+            sleep 1000
             send {Raw}$W_KEY
             send {Enter}
             winwait, - InstallShield Wizard, Setup Type
@@ -14886,7 +15497,7 @@ load_tropico3_demo()
 
     w_workaround_wine_bug 16328 "seawater is invisible in this wine, please update to 1.3.9 or later" 1.3.9,
 
-    if w_workaround_wine_bug 24845 "disabling mmdevapi to fix sound"
+    if w_workaround_wine_bug 24845 "disabling mmdevapi to fix sound" 1.3.21,
     then
         w_override_dlls disabled mmdevapi
     fi
@@ -14992,7 +15603,7 @@ w_metadata wglgears benchmarks \
 
 load_wglgears()
 {
-    w_download http://www.cs.nmsu.edu/~jeffery/win32/wglgears.exe d65d2098bc11af76cb614946342913b1af62924d
+    w_download http://www2.cs.uidaho.edu/~jeffery/win32/wglgears.exe d65d2098bc11af76cb614946342913b1af62924d
     mkdir -p "$W_PROGRAMS_X86_UNIX/misc"
     cp "$W_CACHE"/wglgears/wglgears.exe "$W_PROGRAMS_X86_UNIX/misc"
     chmod +x "$W_PROGRAMS_X86_UNIX/misc/wglgears.exe"
@@ -15296,6 +15907,68 @@ load_wog()
 
 #----------------------------------------------------------------
 
+w_metadata wot games \
+    title="World of Tanks" \
+    publisher="Wargaming" \
+    year="2011" \
+    media="download" \
+    file1="WoT_0.6.7_us_setup.exe" \
+    installed_exe1="c:/Games/World_of_Tanks/WorldOfTanks.exe" \
+    wine_showstoppers="20395"   # list a showstopper to hide this from average users for now
+
+load_wot()
+{
+    if w_workaround_wine_bug 20395 "game requires raw input hack"
+    then
+        w_open_webpage https://gist.github.com/895204#gistcomment-41069
+        w_warn "You need to apply rawinput-hack.patch from vincas for this game to work"
+    fi
+    if w_workaround_wine_bug 25370 "installing msxml3 to avoid startup crash"
+    then
+        w_call msxml3
+    fi
+    if w_workaround_wine_bug 11675 "need d3dx9_36 for effects framework"
+    then
+        w_call d3dx9_36
+    fi
+    if w_workaround_wine_bug 25779 "installing ie7 for launcher"
+    then
+        w_call ie7
+    fi
+
+    # http://cdn1.worldoftanks.com/patches/auto/WoT_0.6.7_us_setup.exe.torrent
+    w_download http://cdn1.worldoftanks.com/patches/auto/WoT_0.6.7_us_setup.exe 440c4b3f8269d3746c912db94d697eccb139d3a6
+
+    cd "$W_CACHE/$W_PACKAGE"
+    w_ahk_do "
+        SetWinDelay 500
+        run $file1
+        winwait, Setup - World of Tanks
+        if ( w_opt_unattended > 0 ) {
+            ControlClick, TNewButton1   ; Next
+            winwait, Setup - World of Tanks, Select Destination
+            ControlClick, TNewButton3   ; Next
+            winwait, Setup - World of Tanks, Select Start
+            ControlClick, TNewButton4   ; Next
+            winwait, Setup - World of Tanks, Select Additional
+            ControlClick, TNewButton4   ; Next
+            winwait, Setup - World of Tanks, Ready
+            ControlClick, TNewButton4   ; Next
+        }
+        winwait, Setup - World of Tanks, Completing
+        if ( w_opt_unattended > 0 ) {
+            ControlFocus, TNewCheckListBox1
+            send {space}                      ; uncheck Wiki
+            sleep 500
+            ControlClick, TNewButton4   ; Finish
+            winwaitclose
+        }
+        "
+    w_declare_exe "c:\\Games\\World_of_Tanks" WorldOfTanks.exe
+}
+
+#----------------------------------------------------------------
+
 w_metadata wowtrial games \
     title="World of Warcraft trial" \
     publisher="Blizzard" \
@@ -15425,6 +16098,28 @@ load_sacrifice_gog()
     winetricks_load_gog "sacrifice" "Sacrifice" "" "TsCheckBox2" "sacrifice" "" "" "591161642,63e77685599ce20c08b004a9fa3324e466ce1679"
 }
 
+w_metadata the_witcher_2_gog games \
+    title="The Witcher 2: Assassins of Kings" \
+    publisher="Atari" \
+    year="2011" \
+    media="manual_download" \
+    file1="setup_the_witcher_2.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/GOG.com/The Witcher 2/bin/witcher2.exe"
+
+load_the_witcher_2_gog()
+{
+    winetricks_load_gog "the_witcher_2" \
+        "The Witcher 2 - Assassins of Kings" \
+        "setup_the_witcher_2-1.bin,2048477,b826cd7b096fd98eab78517752522b2a3ca8af5e\
+        setup_the_witcher_2-2.bin,2050788,a419926e4d02de81d79d586bf893150d3231833c \
+        setup_the_witcher_2-3.bin,2050788,6974cadc29fb8a8795aa245c5f8bb24e5e0cff5e \
+        setup_the_witcher_2-4.bin,2050788,ed79c1e9456801addf6fd6e687528fa01354b0d8 \
+        setup_the_witcher_2-5.bin,1631852,354cb73ae3e73cb88dedc53dd472803862a654cf \
+        setup_the_witcher_2.bin,129136,d3aa93bf147e155c5035ae15444916feabfd47b4" \
+        "" "bin/witcher2.exe" "" "The Witcher 2" \
+        "2308,9ca06383301f242143f69fe08974f9d4d713ac6b"
+}
+
 # Brief HOWTO for adding a GOG game:
 # - "beneath_a_steel_sky" is the installer exe name, minus "setup_" and ".exe"
 # - "Beneath a Steel Sky" is installer window title, minus "Setup - "
@@ -15487,6 +16182,45 @@ w_metadata borderlands_steam games \
 load_borderlands_steam()
 {
     w_steam_install_game 8980 "Borderlands"
+}
+
+#----------------------------------------------------------------
+
+w_metadata civ5_demo_steam games \
+    title="Civ V Demo (Steam)" \
+    publisher="2K Games" \
+    year="2010" \
+    media="download" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Steam/steamapps/common/sid meier's civilization v - demo/CivilizationV.exe"
+
+load_civ5_demo_steam()
+{
+    # Start autohotkey watching for directx9 option in the background, and select it when it comes up
+    w_ahk_do  "
+        SetWinDelay 500
+        loop
+        {
+            ifWinExist, Sid Meier's Civilization V - Demo - Steam
+            {
+                winactivate
+                click 26,108    ; select directx9
+                sleep 500
+                click 200,150   ; Play
+            }
+            ifWinExist, Updating Sid Meier's Civilization V - Demo
+            {
+                break
+            }
+            sleep 1000
+        }
+    " &
+    _job=$!
+	# While that's running, install the game.
+	# You'll see *two* Autohotkey icons until that first script
+	# finds the dialog it's looking for, clicks, and exits.
+	w_info "If you already own the full Civ 5 game on steam, the installer won't even appear."
+    w_steam_install_game 65900 "Sid Meier's Civilization V - Demo"
+    kill -HUP $_job   # just in case
 }
 
 #----------------------------------------------------------------
@@ -15746,9 +16480,9 @@ load_psm()
 #----------------------------------------------------------------
 
 w_metadata strictdrawordering=enabled settings \
-    title="Enable StrictDrawOrdering (default)"
+    title="Enable StrictDrawOrdering"
 w_metadata strictdrawordering=disabled settings \
-    title="Disable StrictDrawOrdering"
+    title="Disable StrictDrawOrdering (default)"
 
 load_strictdrawordering()
 {
@@ -15906,7 +16640,7 @@ w_metadata forcemono settings \
 
 load_forcemono()
 {
-    w_override_dlls native mscoree.dll
+    w_override_dlls native mscoree
     w_override_dlls disabled mscorsvw.exe
 }
 
@@ -16230,6 +16964,16 @@ w_metadata win7 settings \
 load_win7()
 {
     w_set_winver win7
+}
+
+#----------------------------------------------------------------
+
+w_metadata win95 settings \
+    title="Set windows version to Windows 95"
+
+load_win95()
+{
+    w_set_winver win95
 }
 
 #----------------------------------------------------------------
