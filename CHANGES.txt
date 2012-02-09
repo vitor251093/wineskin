@@ -5,7 +5,7 @@ Release 2.5.4 - in Beta
 • File Associations should work correctly
 • Various error detection and handling improvements
 • Fixes to detecting where fonts are on system X11
-• Uses newest version quartz-wm on your system, unless its not found, then uses wrapper version.  This fixes many problems with decorated windows.
+• Uses newest version quartz-wm on your system, unless its not found, then uses wrapper version.  This fixes many problems with decorated windows. (optional-default)
 • WineskinQuitScript script added in Menu Script folder to do a CMD+Q shutdown.  Lets software makers have a chance to put in commands and such to do before someone can just kill it with CMD+Q.
 • CD Eject command added to top menubar by default.  Can help getting discs switched right for multi-disc game installs.
 • If you launch a wrapper that a different user is already using, it no longer causes problems, it just gives an error that it cannot be used by multiple users at the same time.
