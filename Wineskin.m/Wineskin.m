@@ -165,8 +165,12 @@
 	//exit if the lock file exists, another user is running this wrapper currently
 	if ([[NSFileManager defaultManager] fileExistsAtPath:lockfile])
 	{
-		CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Another user on this system is currently using this application\n\nThey must exit the application before you can use it."), NULL);
-		return;
+		//read in lock file to get user name of who locked it, if same user name ignore
+		if (![[[self readFileToStringArray:lockfile] objectAtIndex:0] isEqualToString:NSUserName()])
+		{
+			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Another user on this system is currently using this application\n\nThey must exit the application before you can use it."), NULL);
+			return;
+		}
 	}
 	[self installEngine];
 	if ([wssCommand isEqualToString:@"WSS-InstallICE"]) return; //just called for ICE install, dont run.
@@ -383,7 +387,7 @@
 	if (killWineskin) return;
 	
 	//create lockfile that we are already in use	
-	[self writeStringArray:[NSArray arrayWithObject:@"X"] toFile:lockfile];
+	[self writeStringArray:[NSArray arrayWithObject:NSUserName()] toFile:lockfile];
 	
 	//change fullscreen reso if needed
 	if (fullScreenOption)
