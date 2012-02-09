@@ -1,5 +1,5 @@
 //  Wineskin.m
-//  Copyright 2011 by The Wineskin Project and doh123@doh123.com All rights reserved.
+//  Copyright 2012 by The Wineskin Project and doh123@doh123.com All rights reserved.
 //  Licensed for use under the LGPL <http://www.gnu.org/licenses/lgpl-2.1.txt>
 
 #import <Cocoa/Cocoa.h>
@@ -10,6 +10,7 @@
 	NSString *contentsFold;					//Contents folder in the wrapper
 	NSString *frameworksFold;				//Frameworks folder in the wrapper
 	NSString *appNameWithPath;				//full path to and including the app name
+	NSString *lockfile;						//lockfile being used to know if the app is already in use
 	NSString *engineVersion;				//engine being used
 	NSString *firstPIDFile;					//pid file used to find wineserver pid
 	NSString *secondPIDFile;				//pid file used to find wineserver pid
@@ -124,6 +125,9 @@
 @implementation Wineskin
 - (void)mainRun:(NSArray *)argv
 {
+	// TODO need to add option to make wrapper run in AppSupport (shadowcopy) so that no files will ever be written in the app
+	// TODO need to make all the temp files inside the wrapper run correctly using BundleID and in /tmp.  If they don't exist, assume everything is fine.
+	// TODO add blocks to sections that need them for variables to free up memory.
 	filesToRun = [[NSMutableArray alloc] init];
 	runWithStartExe = NO;
 	fullScreenOption = NO;
@@ -153,6 +157,13 @@
 	displayNumberFile = [NSString stringWithFormat:@"%@/.currentuseddisplay",contentsFold];
 	infoPlistFile = [NSString stringWithFormat:@"%@/Info.plist",contentsFold];
 	winePrefix=[NSString stringWithFormat:@"%@/Resources",contentsFold];
+	lockfile=[NSString stringWithFormat:@"/tmp/%@",[appNameWithPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
+	//exit if the lock file exists, another user is running this wrapper currently
+	if ([[NSFileManager defaultManager] fileExistsAtPath:lockfile])
+	{
+		CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Another user on this system is currently using this application\n\nThey must exit the application before you can use it."), NULL);
+		return;
+	}
 	[self installEngine];
 	if ([wssCommand isEqualToString:@"WSS-InstallICE"]) return; //just called for ICE install, dont run.
 	wineserverPIDToCheck = [[self readFileToStringArray:wineserverPIDFile] objectAtIndex:0];
@@ -342,7 +353,7 @@
 	x11PID = [self startX11];
 	if ([x11PID isEqualToString:@"ERROR"]) return;
 	NSLog(@"WineskinX11 running on PID %@",x11PID);
-	
+
 	//**********set user folders
 	if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
 	{
@@ -365,6 +376,9 @@
 	//********** exit if already running and just opening new file
 	//if wineserver pid was already running in startWine and openFiles was true, then exit, we already have a Wineskin monitoring the wrapper
 	if (killWineskin) return;
+	
+	//create lockfile that we are already in use	
+	[self writeStringArray:[NSArray arrayWithObject:@"X"] toFile:lockfile];
 	
 	//change fullscreen reso if needed
 	if (fullScreenOption)
@@ -406,6 +420,8 @@
 	NSLog(@"Application finished, cleaning up and shut down...\n");
 	[self cleanUpAndShutDown];
 	if ([[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue] == 1) [self removeGPUInfo];
+	//delete the lockfile
+	[[NSFileManager defaultManager] removeItemAtPath:lockfile error:nil];
 	NSLog(@"Finished!\n");
 	return;
 }
@@ -598,6 +614,8 @@
 
 - (void)tryToUseGPUInfo
 {
+	//TODO if cannot read/write drive log error and skip
+	
 	//if user.reg doesn't exist, don't do anything
 	if (!([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]])) return;
 	NSString *deviceID = @"error";
@@ -712,6 +730,7 @@
 
 - (void)removeGPUInfo
 {
+	// TODO - skip if not on read/write volume
 	NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 	NSMutableArray *newUserRegContents = [NSMutableArray arrayWithCapacity:[userRegContents count]];
 	BOOL deviceIDFound = NO;
@@ -779,6 +798,65 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
 	[fm release];
 }
+- (NSString *)setWindowManager
+{
+	if (fullScreenOption) return @"";//do not run quartz-wm in override->fullscreen
+	NSFileManager *fm = [NSFileManager defaultManager];
+	//look for quartz-wm in all locations, if not found default to backup
+	//should be in /usr/bin/quartz-wm or /opt/X11/bin/quartz-wm or /opt/local/bin/quartz-wm
+	//find the newest version
+	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold];
+	NSMutableArray *pathsToCheck = [NSMutableArray arrayWithCapacity:1];
+	if ([fm fileExistsAtPath:@"/usr/bin/quartz-wm"])
+		[pathsToCheck addObject:@"/usr/bin/quartz-wm"];
+	if ([fm fileExistsAtPath:@"/opt/X11/bin/quartz-wm"])
+		[pathsToCheck addObject:@"/opt/X11/bin/quartz-wm"];
+	if ([fm fileExistsAtPath:@"/opt/local/bin/quartz-wm"])
+		[pathsToCheck addObject:@"/opt/local/bin/quartz-wm"];
+	while([pathsToCheck count] > 1) //go through list, remove all but newest version
+	{
+		NSString *indexZero = [self systemCommand:[NSString stringWithFormat:@"%@ --version",[pathsToCheck objectAtIndex:0]]];
+		NSString *indexOne =[self systemCommand:[NSString stringWithFormat:@"%@ --version",[pathsToCheck objectAtIndex:1]]];
+		NSMutableArray *indexZeroArray = [NSMutableArray arrayWithCapacity:4];
+		NSMutableArray *indexOneArray = [NSMutableArray arrayWithCapacity:4];
+		[indexZeroArray addObjectsFromArray:[indexZero componentsSeparatedByString:@"."]];
+		[indexOneArray addObjectsFromArray:[indexOne componentsSeparatedByString:@"."]];
+		if ([indexZeroArray count] < [indexOneArray count]) //make sure both are the same length for compare
+		{
+			while ([indexZeroArray count] < [indexOneArray count])
+				[indexZeroArray addObject:@"0"];
+		}
+		else if ([indexOneArray count] < [indexZeroArray count])
+		{
+			while ([indexOneArray count] < [indexZeroArray count])
+				[indexOneArray addObject:@"0"];
+		}
+		BOOL removed=NO;
+		int i;
+		for(i=0;i<[indexZeroArray count];i++)
+		{
+			NSComparisonResult result = [[indexZeroArray objectAtIndex:i] compare:[indexOneArray objectAtIndex:i] options:NSNumericSearch];
+			if (result == NSOrderedAscending) //indexZeroArray is smaller, get rid of it
+			{
+				[pathsToCheck removeObjectAtIndex:0];
+				removed=YES;
+				break;
+			}
+			else if (result == NSOrderedDescending) //indexOneArray is smaller, get rid of it
+			{
+				[pathsToCheck removeObjectAtIndex:1];
+				removed=YES;
+				break;
+			}
+		}
+		if (!removed) //they must be equal versions, pull second one out
+			[pathsToCheck removeObjectAtIndex:1];
+	}
+	if ([pathsToCheck count] == 1)
+		quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@'\"",[pathsToCheck objectAtIndex:0]];
+	[fm release];
+	return quartzwmLine;
+}
 
 - (NSString *)startX11
 {
@@ -800,12 +878,11 @@
 	//fix the Frameworks Libraires
 	[self fixFrameworksLibraries];	
 	//set up quartz-wm launch correctly
-	//NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm' --prefs-domain '%@.plist'\"",frameworksFold,x11PrefFileName];
-	NSString *quartzwmLine = [NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold,x11PrefFileName];
-	if (fullScreenOption) quartzwmLine=@"";
+	NSString *quartzwmLine = [self setWindowManager];						  
 	//copy the plist over
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
 	[fm copyItemAtPath:wsX11PlistFile toPath:[NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName] error:nil];
+	
 	//make proper files and symlinks in /tmp/Wineskin
 	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil]; // try to remove old folder if you can
 	[fm createDirectoryAtPath:@"/tmp/Wineskin" withIntermediateDirectories:YES attributes:nil error:nil];
@@ -825,6 +902,7 @@
 	//stuff for Xmodmap
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/.Xmodmap" withDestinationPath:[NSString stringWithFormat:@"%@/.Xmodmap",frameworksFold] error:nil];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/.Xmodmap"];
+	 
 	//check if wineserverstill running	
 	if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
 	{
@@ -844,7 +922,7 @@
 		NSLog(@"Error, cannot write to Info.plist, there are permission problems, or you are on a read-only volume. This cannot run from within a read-only dmg file.");
 		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)@"ERROR! cannot write to Info.plist, there are permission problems, or you are on a read-only volume.\n\nThis cannot run from within a read-only dmg file.", NULL);
 		return @"ERROR";
-	}
+	}	
 	//set up fontpath variable for server depending where X11 fonts are on the system
 	NSString *wineskinX11FontPathPrefix = @"/usr/X11/lib/X11/fonts";
 	if (![fm fileExistsAtPath:wineskinX11FontPathPrefix])
@@ -864,7 +942,7 @@
 	if ([wineskinX11FontPathPrefix isEqualToString:@"MISSING"])
 		wineskinX11FontPath = @"";
 	else
-		wineskinX11FontPath = [NSString stringWithFormat:@"-fp %@/75dpi,%@/100dpi,%@/cyrillic,%@/encodings,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
+		wineskinX11FontPath = [NSString stringWithFormat:@"-fp %@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
 	// set log variable
 	NSString *logFileLocation;
 	if (debugEnabled)
@@ -997,8 +1075,20 @@
 	BOOL wineInstalled = NO;
 	for (NSString *file in iceFiles)
 		if ([file isEqualToString:wineFileInstalledName]) wineInstalled = YES;
+	CFUserNotificationRef pDlg = NULL;
 	if (!wineInstalled)
 	{
+		// pop up install notice
+		SInt32 nRes = 0;
+		NSString *icnsPath = [[[NSBundle mainBundle] bundlePath] stringByReplacingOccurrencesOfString:@".app/Contents/Frameworks/bin" withString:@".app/Contents/Resources/Wineskin.icns"];
+		NSLog(@"icnsPath = %@",icnsPath);
+		NSMutableDictionary* dict = [[NSMutableDictionary alloc] initWithCapacity:6];
+		[dict setObject:@"*****Wineskin ICE Detected*****\n" forKey:(NSString *)kCFUserNotificationAlertHeaderKey];
+		[dict setObject:@"Wineskin Engine ICE version installing\n\nICE = Installable Compressed Engine\n\n" forKey:(NSString *)kCFUserNotificationAlertMessageKey];
+		[dict setObject:@"I'll be patient!" forKey:(NSString *)kCFUserNotificationDefaultButtonTitleKey];
+		[dict setObject:@"true" forKey:(NSString *)kCFUserNotificationProgressIndicatorValueKey];
+		[dict setObject:[NSURL fileURLWithPath:icnsPath] forKey:(NSString *)kCFUserNotificationIconURLKey];
+		pDlg = CFUserNotificationCreate(NULL,0,kCFUserNotificationNoteAlertLevel | kCFUserNotificationNoDefaultButtonFlag | CFUserNotificationCheckBoxChecked(0) | CFUserNotificationSecureTextField(0) | CFUserNotificationPopUpSelection(0),&nRes,(CFDictionaryRef)dict);
 		//if the Wine bundle is not located in the install folder, then uncompress it and move it over there.
 		if (!wineInstalled)
 		{
@@ -1022,11 +1112,14 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/lib\"",frameworksFold]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/share\"",frameworksFold]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/version\"",frameworksFold]];
+	//clear the pop up
+	CFUserNotificationCancel(pDlg);
 	[fm release];
 }
 
 - (void)setToVirtualDesktop:(NSString *)resolution named:(NSString *)desktopName
 {
+	// TODO test if on read/write volume first
 	//read in user.reg to an array
 	NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 	NSMutableArray *newUserRegContents = [NSMutableArray arrayWithCapacity:[userRegContents count]];
@@ -1082,6 +1175,7 @@
 
 - (void)setToNoVirtualDesktop
 {
+	// TODO test if on read/write volume first
 	//if file doesn't exist, don't do anything
 	if (!([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]]))
 		return;
@@ -1128,7 +1222,7 @@
 {
 	[[NSFileManager defaultManager] removeItemAtPath:theFile error:nil];
 	[[theArray componentsJoinedByString:@"\n"] writeToFile:theFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
-	//[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",theFile]];
+	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",theFile]];
 }
 
 - (BOOL)isPID:(NSString *)pid named:(NSString *)name
@@ -1371,15 +1465,6 @@
 				fixGamma = YES;
 				fixGammaCounter = 0;
 			}
-		}
-		if ([fm fileExistsAtPath:@"/tmp/WineskinXrandrTempFileSwitch"])
-		{
-			//only used in WS7 engines to toggle correctly back to fullscreen with Cmd+Opt+A
-			//WS8+ the toggle is all built into WineskinX11
-			//need to call xrandr for the last fullscreen res
-			[fm removeItemAtPath:@"/tmp/WineskinXrandrTempFileSwitch" error:nil];
-			if (!([randrXres isEqualToString:@"0"]) && !([randrYres isEqualToString:@"0"]))
-				[self setResolution:[NSString stringWithFormat:@"%@ %@",randrXres,randrYres]];
 		}
 		//if WineskinX11 is no longer running, tell wineserver to close
 		if (![self isPID:x11PID named:@"WineskinX11"])
