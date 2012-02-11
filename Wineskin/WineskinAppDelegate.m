@@ -207,12 +207,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	for (NSString *item in filesTEMP2)
 		if ([item hasSuffix:@".exe"] || [item hasSuffix:@".bat"] || [item hasSuffix:@".msi"])
 			[files2 addObject:item];
-	//get last set exe, remove nothing.exe
-	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	NSMutableArray *finalList = [NSMutableArray arrayWithCapacity:5];
-	[finalList addObject:[plistDictionary valueForKey:@"Program Name and Path"]];
-	[plistDictionary release];
-	[finalList removeObject:@"nothing.exe"];
 	//fill new array of new .exe, .msi, and .bat files
 	for (NSString *item2 in files2)
 	{
@@ -221,6 +216,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 			if (([item2 isEqualToString:item1]) || ([item2 hasPrefix:@"users/Wineskin"]) || ([item2 hasPrefix:@"windows/Installer"])) matchFound=YES;
 		if (!matchFound) [finalList addObject:[NSString stringWithFormat:@"/%@",item2]];
 	}
+	[finalList removeObject:@"nothing.exe"]; //nothing.exe is the default setting, and should not be in the list
 	//display warning if final array is 0 length and exit method
 	if ([finalList count] == 0)
 	{
@@ -238,11 +234,15 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[exeChoicePopUp removeAllItems];
 	for (NSString *item in finalList)
 		[exeChoicePopUp addItemWithTitle:item];
-	//show choose exe window
-	[chooseExeWindow makeKeyAndOrderFront:self];
+	//if set EXE is not located inside of the wrapper,show choose exe window
+	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[plistDictionary valueForKey:@"Program Name and Path"]]])
+		[window makeKeyAndOrderFront:self];
+	else
+		[chooseExeWindow makeKeyAndOrderFront:self];
+	[plistDictionary release];
 	//close busy window
 	[busyWindow orderOut:self];
-	//control here will pass over to chooseExeOKButtonPressed
 }
 - (IBAction)chooseExeOKButtonPressed:(id)sender
 {
