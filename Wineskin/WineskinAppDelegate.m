@@ -709,8 +709,23 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
 	[optSendsAltCheckBoxButton setState:[[plistDictionary2 valueForKey:@"option_sends_alt"] intValue]];
 	[emulateThreeButtonMouseCheckBoxButton setState:[[plistDictionary2 valueForKey:@"enable_fake_buttons"] intValue]];
-	[confirmQuitCheckBoxButton setState:![[plistDictionary2 valueForKey:@"no_quit_alert"] intValue]];
 	[focusFollowsMouseCheckBoxButton setState:[[plistDictionary2 valueForKey:@"wm_ffm"] intValue]];
+	NSString *theFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	if ([[NSFileManager defaultManager] fileExistsAtPath:theFile])
+	{
+		NSArray *inputFromFile = [[NSString stringWithContentsOfFile:theFile encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+		for (NSString *item in inputFromFile)
+		{
+			if ([item hasPrefix:@"wineskinAppChoice="])
+			{
+				if ([item hasSuffix:@"1"])
+					[confirmQuitCheckBoxButton setState:0];
+				else
+					[confirmQuitCheckBoxButton setState:1];
+				break;
+			}
+		}
+	}
 	[plistDictionary2 release];
 }
 - (IBAction)windowsExeBrowseButtonPressed:(id)sender
@@ -922,13 +937,25 @@ static NSInteger localizedComparator(id a, id b, void* context)
 }
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender
 {
-	NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-	if ([confirmQuitCheckBoxButton state] == 0)
-		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"no_quit_alert"];
-	else
-		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"no_quit_alert"];
-	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
-	[plistDictionary release];
+	NSString *theFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:theFile]) return;
+	NSArray *inputFromFile = [[NSString stringWithContentsOfFile:theFile encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+	NSMutableArray *newInputToWriteToFile = [NSMutableArray arrayWithCapacity:[inputFromFile count]];
+	for (NSString *item in inputFromFile)
+	{
+		if ([item hasPrefix:@"wineskinAppChoice="])
+		{
+			if ([confirmQuitCheckBoxButton state] == 0)
+				[newInputToWriteToFile addObject:@"wineskinAppChoice=1"];
+			else
+				[newInputToWriteToFile addObject:@"wineskinAppChoice=2"];
+		}
+		else
+			[newInputToWriteToFile addObject:item];
+	}
+	[[NSFileManager defaultManager] removeItemAtPath:theFile error:nil];
+	[[newInputToWriteToFile componentsJoinedByString:@"\n"] writeToFile:theFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+	system([[NSString stringWithFormat: @"chmod 777 \"%@\"",theFile] UTF8String]);
 }
 - (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender
 {
