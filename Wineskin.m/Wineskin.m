@@ -916,8 +916,9 @@
 	//check if wineserverstill running	
 	if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
 	{
-		//wineserver is still running, so this *should* be a custom exe launcher, so return the current pid
+		//wineserver is still running do not start up WineskinX11, and kill this Wineskin daemon, as another will be doing the monitoring
 		[fm release];
+		killWineskin = YES;
 		return @"wineserver running from previous launch, not relaunching WineskinX11";
 	}
 	//change Info.plist to use main.nib (xquartz's nib) instead of MainMenu.nib (WineskinLauncher's nib)
@@ -1400,7 +1401,7 @@
 		}
 		else //wineserver was already running, use old display setting
 		{
-			if (openingFiles) killWineskin = YES;
+			killWineskin = YES; //if it was already running, then a Wineskin Daemon is already monitoring, and this one is not needed.
 			NSArray *displayArray = [self readFileToStringArray:displayNumberFile];
 			theDisplayNumber = [displayArray objectAtIndex:0];
 		}
