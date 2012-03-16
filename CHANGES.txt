@@ -1,4 +1,7 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
+Release 2.5.5 - Pending
+• Custom EXE launchers should work right again to use multiple EXEs at once.
+
 Release 2.5.4 - Released Feb 14, 2012
 • new Icon and logo
 • updated WineskinX11 to xorg-server 1.11.99.902+patches
