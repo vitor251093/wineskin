@@ -15,7 +15,7 @@
 	NSString *firstPIDFile;					//pid file used to find wineserver pid
 	NSString *secondPIDFile;				//pid file used to find wineserver pid
 	NSString *wineserverPIDFile;			//pid file holding wineserver pid of current/last run
-	NSString *wineskinX11PIDFile;			//pid file holding wineskinx11 pid of current/last run
+	NSString *wineskinX11PIDFile;			//pid file holding bundle pid of current/last run
 	NSString *displayNumberFile;			//pid file holding display number of current/last run
 	NSString *infoPlistFile;				//the Info.plist file in the wrapper
 	NSString *winePrefix;					//the $WINEPREFIX
@@ -36,7 +36,8 @@
 	int sleepNumber;						//fullscreen resolution switch pause number in seconds
 	NSString *wineserverPIDToCheck;			//wineserver PID of last run
 	NSString *wineServerPID; 				//wineserver PID of current run
-	NSString *x11PID;						//PID of running X server
+	NSString *wrapperBundlePID;				//PID of running wrapper bundle
+	NSString *wineskinX11PID;				//PID of running WineskinX11 exectuable (not used except for shutdown, only use wrapper bundle for checks)
 	NSMutableArray *filesToRun;				//list of files passed in to open
 	BOOL debugEnabled;						//set if debug mode is being run, to make logs
 	BOOL cexeRun;							//set if runnin from a custom exe launcher
@@ -359,9 +360,10 @@
 
 	//**********start the X server
 	NSLog(@"Starting up WineskinX11");
-	x11PID = [self startX11];
-	if ([x11PID isEqualToString:@"ERROR"]) return;
-	NSLog(@"WineskinX11 running on PID %@",x11PID);
+	[self startX11];
+	if ([wrapperBundlePID isEqualToString:@"ERROR"]) return;
+	NSLog(@"Wrapper Bundle running on PID %@",wrapperBundlePID);
+	NSLog(@"WineskinX11 running on PID %@",wineskinX11PID);
 
 	//**********set user folders
 	if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
@@ -400,7 +402,7 @@
 	if (debugEnabled)
 	{
 		NSFileManager *fm = [NSFileManager defaultManager];
-		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/%@.Wineskin.p.X11.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
+		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11/%@.Wineskin.p.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
 		if ([fm fileExistsAtPath:logName])
 		{
 			NSString *logFileLocation=[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
@@ -409,7 +411,6 @@
 		}
 		[fm release];
 	}
-	
 	//**********sleep and monitor in background while app is running
 	NSLog(@"Sleeping and monitoring from the background while app runs...");
 	[self sleepAndMonitor];
@@ -962,12 +963,40 @@
 		logFileLocation = @"/dev/null";
 	//make sure the X11 lock files is gone before starting X11
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+	//find WineskinX11 executable PID (this is only used for proper shut down, all other PID usage for X11 should be the Bundle PID
+	//make first pid array
+	NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];	
 	//Start WineskinX11
-	NSString *thePidToReturn = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
+	wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
+	//do loop compare to find correct wineskinX11PID, only try 3 times, then try again slower 5 times over 5 seconds
+	wineskinX11PID = @"-1";
+	BOOL match = YES;
+	int i = 0;
+	for (i=0;i<9;i++)
+	{
+		NSArray *secondPIDlist = [self makePIDArray:@"WineskinX11"];
+		for(NSString *secondPIDlistItem in secondPIDlist)
+		{
+			if ([secondPIDlistItem isEqualToString:wrapperBundlePID]) continue;// skip the wrapper bundle PID and find the next
+			match = NO;
+			for(NSString *firstPIDlistItem in firstPIDlist)
+				if ([secondPIDlistItem isEqualToString:firstPIDlistItem]) match = YES;
+			if (!match)
+			{
+				wineskinX11PID = secondPIDlistItem;
+				break;
+			}
+		}
+		if (!match) break;
+		if (i>2) usleep(1000000);
+	}
+	//if no PID found, log problem
+	if ([wineskinX11PID isEqualToString:@"-1"])
+		NSLog(@"Wineskin: Error! WineskinX11 PID not found, there may be unexpected errors on shut down!\n");
 	//fix Info.plist back
 	usleep(500000);
 	//bring X11 to front before any windows are drawn
-	[self bringToFront:thePidToReturn];
+	[self bringToFront:wrapperBundlePID];
 	NSMutableDictionary* quickEdit2 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
 	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
@@ -976,9 +1005,9 @@
 	//get rid of X11 lock folder that shouldnt be needed
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	//write x pid out to a file, so other runs can tell if it is already running
-	[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",thePidToReturn],nil] toFile:wineskinX11PIDFile];
+	[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",wrapperBundlePID],nil] toFile:wineskinX11PIDFile];
 	[fm release];
-	return thePidToReturn;
+	return;
 }
 
 - (void)bringToFront:(NSString *)thePid
@@ -1478,7 +1507,7 @@
 			}
 		}
 		//if WineskinX11 is no longer running, tell wineserver to close
-		if (![self isPID:x11PID named:@"WineskinX11"])
+		if (![self isPID:wrapperBundlePID named:@"WineskinX11"])
 			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver -k > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,frameworksFold]];
 		//if running in override fullscreen, need to handle resolution changes
 		if(fullScreenOption)
@@ -1536,9 +1565,11 @@
 		NSLog(@"Changing the resolution back to %@...",currentResolution);
 		[self setResolution:currentResolution];
 	}
-	//kill the X server
+	//kill WineskinX11 PID
 	char *tmp;
-	kill((pid_t)(strtoimax([x11PID UTF8String], &tmp, 10)), 9);
+	kill((pid_t)(strtoimax([wineskinX11PID UTF8String], &tmp, 10)), 9);
+	//kill the wrapper bundle PID
+	kill((pid_t)(strtoimax([wrapperBundlePID UTF8String], &tmp, 10)), 9);
 	//delete the Display lock file in /tmp
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
