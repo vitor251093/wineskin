@@ -48,6 +48,7 @@
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
 	IBOutlet NSButton *testRunButton;
+	IBOutlet NSButton *commandLineWineTestButton;
 	IBOutlet NSButton *advancedDoneButton;
 	IBOutlet NSProgressIndicator *toolRunningPI;
 	IBOutlet NSTextField *toolRunningPIText;
@@ -218,6 +219,7 @@
 //advanced menu
 - (IBAction)advancedMenuDoneButtonPressed:(id)sender;
 - (IBAction)testRunButtonPressed:(id)sender;
+- (IBAction)commandLineWineTestButtonPressed:(id)sender;
 - (void)runATestRun;
 - (IBAction)killWineskinProcessesButtonPressed:(id)sender;
 - (IBAction)advancedHelpButtonPressed:(id)sender;

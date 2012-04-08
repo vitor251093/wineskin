@@ -21,6 +21,7 @@
 		A82E5B94133E7407007AA611 /* WSGamma in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2512820212001EBA25 /* WSGamma */; };
 		A82E5B95133E740C007AA611 /* Wineskin.icns in Resources */ = {isa = PBXBuildFile; fileRef = A88CCE4E127B9CED007FBC32 /* Wineskin.icns */; };
 		A82E5B96133E7411007AA611 /* WineskinBanner.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */; };
+		A84DB68B153230490071D4F8 /* Command Line Wine Test in Resources */ = {isa = PBXBuildFile; fileRef = A84DB68A153230490071D4F8 /* Command Line Wine Test */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Wineskin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Wineskin-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Wineskin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wineskin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A84DB68A153230490071D4F8 /* Command Line Wine Test */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "Command Line Wine Test"; sourceTree = "<group>"; };
 		A868FC2512820212001EBA25 /* WSGamma */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = WSGamma; sourceTree = "<group>"; };
 		A868FC2812820226001EBA25 /* cabextract */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cabextract; sourceTree = "<group>"; };
 		A868FC2912820226001EBA25 /* winetricks */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winetricks; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A84DB68A153230490071D4F8 /* Command Line Wine Test */,
 				A868FC2E12820240001EBA25 /* CustomEXE.app */,
 				A868FC2C12820230001EBA25 /* remakedefaults.reg */,
 				A868FC2712820226001EBA25 /* Winetricks */,
@@ -212,6 +215,7 @@
 				A82E5B8C133E73B8007AA611 /* CustomEXE.app in Resources */,
 				16987CF3142873C2003AFFFF /* winetricksHelpList.plist in Resources */,
 				162AD88C1434CE2800FC0426 /* Defaults.plist in Resources */,
+				A84DB68B153230490071D4F8 /* Command Line Wine Test in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
