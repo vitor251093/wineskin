@@ -92,7 +92,8 @@
 	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
 	IBOutlet NSButton *disableCPUsCheckBoxButton;
 	IBOutlet NSButton *forceWrapperQuartzWMButton;
-	
+	IBOutlet NSButton *forceSystemXQuartzButton;
+		
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
 	IBOutlet NSPopUpButton *changeEngineWindowPopUpButton;
@@ -258,6 +259,7 @@
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
 - (IBAction)disableCPUsButtonPressed:(id)sender;
 - (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender;
+- (IBAction)forceSystemXQuartzButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;

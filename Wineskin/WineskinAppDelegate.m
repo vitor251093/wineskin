@@ -592,8 +592,8 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[self enableButtons];
 	//offer to show logs
 	NSAlert *alert = [[NSAlert alloc] init];
-	[alert addButtonWithTitle:@"Yes"];
-	[alert addButtonWithTitle:@"No"];
+	[alert addButtonWithTitle:@"View"];
+	[alert addButtonWithTitle:@"Cancel"];
 	[alert setMessageText:@"Test Run Complete!"];
 	[alert setInformativeText:@"Do you wish to view the Test Run Logs?"];
 	[alert setAlertStyle:NSInformationalAlertStyle];
@@ -704,6 +704,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[modifyMappingsButton setEnabled:YES];
 	[disableCPUsCheckBoxButton setState:[[plistDictionary valueForKey:@"Disable CPUs"] intValue]];
 	[forceWrapperQuartzWMButton setState:[[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue]];
+	[forceSystemXQuartzButton setState:[[plistDictionary valueForKey:@"Use XQuartz"] intValue]];
 	[plistDictionary release];
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
@@ -1002,7 +1003,17 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[plistDictionary writeToFile:plistFile atomically:YES];
 	[plistDictionary release];
 }
-
+- (IBAction)forceSystemXQuartzButtonPressed:(id)sender
+{
+	NSString *plistFile = [NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:plistFile];
+	if ([forceSystemXQuartzButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"Use XQuartz"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Use XQuartz"];
+	[plistDictionary writeToFile:plistFile atomically:YES];
+	[plistDictionary release];
+}
 //*************************************************************
 //**************** Advanced Menu - Tools Tab ******************
 //*************************************************************

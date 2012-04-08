@@ -29,6 +29,7 @@
 	BOOL useRandR;							//if "Autoamatic" is set in Wineskin.app
 	BOOL useGamma;							//wether or not gamma correction will be checked for
 	BOOL forceWrapperQuartzWM;				//YES if forced to use wrapper quartz-wm and not newest version on the system
+	BOOL useXQuartz;						//YES if using System XQuartz instead of WineskinX11
 	NSString *vdResolution; 				//virtual desktop resolution to be used for rootless or fullscreen
 	NSString *gammaCorrection;				//added in gamma correction
 	NSString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
@@ -38,6 +39,8 @@
 	NSString *wineServerPID; 				//wineserver PID of current run
 	NSString *wrapperBundlePID;				//PID of running wrapper bundle
 	NSString *wineskinX11PID;				//PID of running WineskinX11 exectuable (not used except for shutdown, only use wrapper bundle for checks)
+	NSString *xQuartzX11BinPID;				//PID of running XQuartz X11.bin (only needed for Override->Fullscreen)
+	NSString *xQuartzBundlePID;				//PID of running XQuartz bundle (only needed for Override->Fullscreen)
 	NSMutableArray *filesToRun;				//list of files passed in to open
 	BOOL debugEnabled;						//set if debug mode is being run, to make logs
 	BOOL cexeRun;							//set if runnin from a custom exe launcher
@@ -53,6 +56,7 @@
 	NSString *randrYres;					//holds Y res for keyboard shortcut to toggle back to fullscreen mode
 	BOOL killWineskin;						//sets to true if opening files and wineserver was already running, kills extra wineskin
 	NSString *cliCustomCommands;			//from CLI Variables entry in info.plist
+	NSString *dyldFallBackLibraryPath;		//the path for DYLD_FALLBACK_LIBRARY_PATH
 }
 //the main running of the program...
 - (void)mainRun:(NSArray *)argv;
@@ -90,8 +94,11 @@
 //returns the correct line needed for startX11 to get the right quartz-wm started
 - (NSString *)setWindowManager;
 
-//starts up WineskinX11 and passes its PID back
-- (NSString *)startX11;
+//starts up WineskinX11
+- (void)startX11;
+
+//starts up XQuartz
+- (void)startXQuartz;
 
 //bring the app to the front most
 - (void)bringToFront:(NSString *)thePid;
@@ -212,6 +219,12 @@
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
 	}
 	forceWrapperQuartzWM = [[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue];
+	useXQuartz = [[plistDictionary valueForKey:@"Use XQuartz"] intValue];
+	//set correct dyldFallBackLibraryPath
+	if (useXQuartz)
+		dyldFallBackLibraryPath=[NSString stringWithFormat:@"/opt/X11/lib:/opt/local/lib:%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold];
+	else
+		dyldFallBackLibraryPath=[NSString stringWithFormat:@"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/opt/X11/lib:/opt/local/lib:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold];
 	gammaCorrection = [plistDictionary valueForKey:@"Gamma Correction"];
 	x11PrefFileName = [plistDictionary valueForKey:@"CFBundleIdentifier"];
 	uLimitNumber=@"10000"; // run as 10000 for now.. I don't think this needs to be edited.  If peoples launchctl limit report less than 10000, they need to fix their machine, or reboot
@@ -359,12 +372,19 @@
 	}
 
 	//**********start the X server
-	NSLog(@"Starting up WineskinX11");
-	[self startX11];
-	if ([wrapperBundlePID isEqualToString:@"ERROR"]) return;
-	NSLog(@"Wrapper Bundle running on PID %@",wrapperBundlePID);
-	NSLog(@"WineskinX11 running on PID %@",wineskinX11PID);
-
+	if (useXQuartz)
+	{
+		NSLog(@"Starting up XQuartz");
+		[self startXQuartz];
+	}
+	if (!useXQuartz)
+	{
+		NSLog(@"Starting up WineskinX11");
+		[self startX11];
+		if ([wrapperBundlePID isEqualToString:@"ERROR"]) return;
+		NSLog(@"Wrapper Bundle running on PID %@",wrapperBundlePID);
+		NSLog(@"WineskinX11 running on PID %@",wineskinX11PID);
+	}
 	//**********set user folders
 	if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
 	{
@@ -462,7 +482,7 @@
 	NSString *yRes = [reso stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@ ",xRes] withString:@""];
 	//if XxY doesn't exist, we will ignore for now... in the future maybe add way to find the closest reso that is available.
 	//change the resolution using Xrandr
-	system([[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" xrandr -s %@x%@ > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,frameworksFold,xRes,yRes] UTF8String]);
+	system([[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" xrandr -s %@x%@ > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,dyldFallBackLibraryPath,xRes,yRes] UTF8String]);
 }
 
 - (NSString *)getResolution
@@ -869,13 +889,16 @@
 	return quartzwmLine;
 }
 
-- (NSString *)startX11
+- (void)startX11
 {
 	// do not start X server for Winetricks listings.. its a waste of time.
 	if ([wssCommand isEqualToString:@"WSS-winetricks"])
 		if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
 		    || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"])))
-			return @"Winetricks Listing, no X server needed";
+		{
+			wineskinX11PID = @"Winetricks Listing, no X server needed";
+			return;
+		}
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold];
@@ -920,7 +943,8 @@
 		//wineserver is still running do not start up WineskinX11, and kill this Wineskin daemon, as another will be doing the monitoring
 		[fm release];
 		killWineskin = YES;
-		return @"wineserver running from previous launch, not relaunching WineskinX11";
+		wineskinX11PID = @"wineserver running from previous launch, not relaunching WineskinX11";
+		return;
 	}
 	//change Info.plist to use main.nib (xquartz's nib) instead of MainMenu.nib (WineskinLauncher's nib)
 	NSMutableDictionary* quickEdit1 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
@@ -933,7 +957,8 @@
 		//error!  read only volume or other permissions problem, cannot run.
 		NSLog(@"Error, cannot write to Info.plist, there are permission problems, or you are on a read-only volume. This cannot run from within a read-only dmg file.");
 		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)@"ERROR! cannot write to Info.plist, there are permission problems, or you are on a read-only volume.\n\nThis cannot run from within a read-only dmg file.", NULL);
-		return @"ERROR";
+		wineskinX11PID = @"ERROR";
+		return;
 	}	
 	//set up fontpath variable for server depending where X11 fonts are on the system
 	NSString *wineskinX11FontPathPrefix = @"/usr/X11/lib/X11/fonts";
@@ -967,7 +992,7 @@
 	//make first pid array
 	NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];	
 	//Start WineskinX11
-	wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,frameworksFold,frameworksFold,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
+	wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
 	//do loop compare to find correct wineskinX11PID, only try 3 times, then try again slower 5 times over 5 seconds
 	wineskinX11PID = @"-1";
 	BOOL match = YES;
@@ -1006,6 +1031,69 @@
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	//write x pid out to a file, so other runs can tell if it is already running
 	[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",wrapperBundlePID],nil] toFile:wineskinX11PIDFile];
+	[fm release];
+	return;
+}
+- (void)startXQuartz
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+	{
+		NSLog(@"Error XQuartz not found, defaulting back to WineskinX11");
+		useXQuartz = NO;
+		[fm release];
+		return;
+	}
+	if (!fullScreenOption)
+	{
+		[self systemCommand:@"open /Applications/Utilities/XQuartz.app"];
+		theDisplayNumber = [self systemCommand:@"echo $DISPLAY"];
+	}
+	else
+	{
+		//make sure XQuartz is not already running
+		//this is because it needs to be started with no Quartz-wm for override->fullscreen to function correctly.
+		if ([[self systemCommand:@"killall -s X11.bin"] hasPrefix:@"kill"])
+		{
+			//already running, error and exit
+			NSLog(@"Error: XQuartz cannot already be running if using Override Fullscreen option!  Please close XQuartz and try again!");
+			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: XQuartz cannot already be running if using Override Fullscreen option!\n\nPlease close XQuartz and try again!"), NULL);
+			killWineskin = YES;
+			return;
+		}
+		//make first pid array
+		NSArray *firstPIDlist = [self makePIDArray:@"X11.bin"];
+		//start XQuartz
+		xQuartzBundlePID = [self systemCommand:[NSString stringWithFormat:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin %@ > /dev/null & echo $!",theDisplayNumber]];
+		//do loop compare to find correct X11.bin PID, only try 3 times, then try again slower 5 times over 5 seconds
+		xQuartzX11BinPID = @"-1";
+		BOOL match = YES;
+		int i = 0;
+		for (i=0;i<9;i++)
+		{
+			NSArray *secondPIDlist = [self makePIDArray:@"X11.bin"];
+			for(NSString *secondPIDlistItem in secondPIDlist)
+			{
+				if ([secondPIDlistItem isEqualToString:xQuartzBundlePID]) continue;// skip the wrapper bundle PID and find the next
+				match = NO;
+				for(NSString *firstPIDlistItem in firstPIDlist)
+					if ([secondPIDlistItem isEqualToString:firstPIDlistItem]) match = YES;
+				if (!match)
+				{
+					xQuartzX11BinPID = secondPIDlistItem;
+					break;
+				}
+			}
+			if (!match) break;
+			if (i>2) usleep(1000000);
+		}
+		//if no PID found, log problem
+		if ([xQuartzX11BinPID isEqualToString:@"-1"])
+			NSLog(@"Error! XQuartz X11.Bin PID not found, there may be unexpected errors on shut down!\n");
+		//if started this way we need extra time or Wine may be gotten too too quickly
+		usleep(1500000);
+		[self bringToFront:xQuartzBundlePID];
+	}
 	[fm release];
 	return;
 }
@@ -1287,7 +1375,7 @@
 			//calling wineboot is a simple builtin refresh that needs to NOT prompt for gecko
 			NSString *mshtmlLine = @"";
 			if ([wssCommand isEqualToString:@"WSS-wineboot"]) mshtmlLine = @"export WINEDLLOVERRIDES=\"mshtml=\";";
-			[self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine wineboot > \"%@\" 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,wineLogFile]];
+			[self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot > \"%@\" 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,wineLogFile]];
 			usleep(3000000);
 			if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
 			{
@@ -1315,7 +1403,7 @@
 					[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
 				}
 				//load Wineskin default reg entries
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"%@\" 2>&1",wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,contentsFold,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"%@\" 2>&1",wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,contentsFold,wineLogFile]];
 				usleep(5000000);
 			}
 			//fix user name entires over to Wineskin
@@ -1358,10 +1446,10 @@
 			    || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"]))) //just getting a list of packages... X should NOT be running.
 			{
 				NSString *wineLogFile = [NSString stringWithFormat:@"%@/Logs/WinetricksTemp.log",winePrefix];
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate %@ > \"%@\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,[winetricksCommands componentsJoinedByString:@" "],wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],wineLogFile]];
 			}
 			else
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" winetricks --no-isolate \"%@\" > \"%@\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,[winetricksCommands componentsJoinedByString:@"\" \""],wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],wineLogFile]];
 			usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
 		}
 	}
@@ -1395,7 +1483,7 @@
 			//make first pid array
 			NSArray *firstPIDlist = [self makePIDArray:@"wineserver"];
 			//start wineserver
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver > /dev/null 2>&1",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,frameworksFold,frameworksFold]];
+			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wineserver > /dev/null 2>&1",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,dyldFallBackLibraryPath]];
 			//do loop compare to find correct PID, only try 3 times, then try again slower 5 times over 5 seconds
 			BOOL match = YES;
 			int i = 0;
@@ -1463,9 +1551,9 @@
 		//Wine start section... if opening files handle differently.
 		if (openingFiles)
 			for (NSString *item in filesToRun) //start wine with files
-				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,frameworksFold,frameworksFold,item,wineLogFile]];
+				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,dyldFallBackLibraryPath,item,wineLogFile]];
 		else  //launch Wine normally
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,frameworksFold,frameworksFold,startExeLine,wineRunFile,programFlags,wineLogFile]];
+			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";launchctl limit maxfiles %@ %@;ulimit -n %@ > /dev/null 2>&1;export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,uLimitNumber,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,dyldFallBackLibraryPath,startExeLine,wineRunFile,programFlags,wineLogFile]];
 		vdResolution = [vdResolution stringByReplacingOccurrencesOfString:@"x" withString:@" "];
 	}
 	[fm release];
@@ -1507,8 +1595,9 @@
 			}
 		}
 		//if WineskinX11 is no longer running, tell wineserver to close
-		if (![self isPID:wrapperBundlePID named:@"WineskinX11"])
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib\" wineserver -k > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,frameworksFold,frameworksFold]];
+		if (!useXQuartz)
+			if (![self isPID:wrapperBundlePID named:@"WineskinX11"])
+				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wineserver -k > /dev/null 2>&1",frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,dyldFallBackLibraryPath]];
 		//if running in override fullscreen, need to handle resolution changes
 		if(fullScreenOption)
 		{
@@ -1540,7 +1629,7 @@
 						//change resolution
 						[self setResolution:newScreenReso];
 						NSLog(@"Changing resolution to request: %@",newScreenReso);
-						break;
+						//don't break out, needs to always find all of them, not just the first.
 					}
 				}
 			}
@@ -1565,14 +1654,22 @@
 		NSLog(@"Changing the resolution back to %@...",currentResolution);
 		[self setResolution:currentResolution];
 	}
-	//kill WineskinX11 PID
-	char *tmp;
-	kill((pid_t)(strtoimax([wineskinX11PID UTF8String], &tmp, 10)), 9);
-	//kill the wrapper bundle PID
-	kill((pid_t)(strtoimax([wrapperBundlePID UTF8String], &tmp, 10)), 9);
-	//delete the Display lock file in /tmp
-	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
-	[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
+	if (!useXQuartz)
+	{
+		char *tmp;
+		kill((pid_t)(strtoimax([wineskinX11PID UTF8String], &tmp, 10)), 9);
+		kill((pid_t)(strtoimax([wrapperBundlePID UTF8String], &tmp, 10)), 9);
+		[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
+	}
+	else if (fullScreenOption)
+	{
+		char *tmp;
+		kill((pid_t)(strtoimax([xQuartzBundlePID UTF8String], &tmp, 10)), 9);
+		kill((pid_t)(strtoimax([xQuartzX11BinPID UTF8String], &tmp, 10)), 9);
+		[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
+	}
 	//fix user folders back
 	if ([[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix] error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix] error:nil];
@@ -1591,6 +1688,8 @@
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/Winetricks.log",winePrefix] error:nil];
 	}
+	if (useXQuartz)
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
 	//fixes for multi-user use
 	NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix] error:nil];
 	for (NSString *item in tmpy3)
