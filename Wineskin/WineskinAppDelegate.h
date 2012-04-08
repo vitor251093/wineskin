@@ -85,6 +85,7 @@
 	IBOutlet NSButton *updateWrapperButton;
 	
 	//advanced menu - Options Tab
+	IBOutlet NSButton *alwaysMakeLogFilesCheckBoxButton;
 	IBOutlet NSButton *optSendsAltCheckBoxButton;
 	IBOutlet NSButton *emulateThreeButtonMouseCheckBoxButton;
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
@@ -253,6 +254,7 @@
 - (void)runCmd;
 
 //advanced menu - Options Tab
+- (IBAction)alwaysMakeLogFilesCheckBoxButtonPressed:(id)sender;
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 - (IBAction)emulateThreeButtonMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;

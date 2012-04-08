@@ -732,6 +732,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[disableCPUsCheckBoxButton setState:[[plistDictionary valueForKey:@"Disable CPUs"] intValue]];
 	[forceWrapperQuartzWMButton setState:[[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue]];
 	[forceSystemXQuartzButton setState:[[plistDictionary valueForKey:@"Use XQuartz"] intValue]];
+	[alwaysMakeLogFilesCheckBoxButton setState:[[plistDictionary valueForKey:@"Debug Mode"] intValue]];
 	[plistDictionary release];
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
@@ -925,6 +926,16 @@ static NSInteger localizedComparator(id a, id b, void* context)
 //*************************************************************
 //*************** Advanced Menu - Options Tab *****************
 //*************************************************************
+- (IBAction)alwaysMakeLogFilesCheckBoxButtonPressed:(id)sender
+{
+	NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	if ([alwaysMakeLogFilesCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"Debug Mode"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Debug Mode"];
+	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+	[plistDictionary release];
+}
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 {
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];

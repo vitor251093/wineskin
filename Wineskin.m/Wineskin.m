@@ -218,6 +218,7 @@
 		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
 	}
+	debugEnabled = [[plistDictionary valueForKey:@"Debug Mode"] intValue];
 	forceWrapperQuartzWM = [[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue];
 	useXQuartz = [[plistDictionary valueForKey:@"Use XQuartz"] intValue];
 	//set correct dyldFallBackLibraryPath
@@ -419,7 +420,7 @@
 	}
 	
 	//for xorg1.11.0+, log files are put in ~/Library/Logs.  Need to move to correct place if in Debug
-	if (debugEnabled)
+	if (debugEnabled && !useXQuartz)
 	{
 		NSFileManager *fm = [NSFileManager defaultManager];
 		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11/%@.Wineskin.p.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
@@ -1688,8 +1689,6 @@
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/Winetricks.log",winePrefix] error:nil];
 	}
-	if (useXQuartz)
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
 	//fixes for multi-user use
 	NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix] error:nil];
 	for (NSString *item in tmpy3)
