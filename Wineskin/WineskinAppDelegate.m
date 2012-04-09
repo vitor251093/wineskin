@@ -176,6 +176,11 @@ static NSInteger localizedComparator(id a, id b, void* context)
 }
 - (IBAction)installWindowsSoftwareButtonPressed:(id)sender
 {
+	[window orderOut:self];
+	[installerWindow makeKeyAndOrderFront:self];
+}
+- (IBAction)chooseSetupExecutableButtonPressed:(id)sender
+{
 	// have user choose install program
 	//NSOpenPanel *panel = [NSOpenPanel openPanel];
 	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
@@ -187,12 +192,15 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	// runModalForDirectory deprecated in 10.6, but only method currently working in Lion beta for this.
 	int error = [panel runModalForDirectory:@"/" file:nil types:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
 	//exit method if cancel pushed
-	if (error == 0) return;
+	if (error == 0)
+	{
+		[panel release];
+		return;
+	}
 	//show busy window
 	[busyWindow makeKeyAndOrderFront:self];
 	// get rid of main window
-	[window orderOut:self];
-	[panel release];
+	[installerWindow orderOut:self];
 	//make 1st array of .exe, .msi, and .bat files
 	NSArray *filesTEMP1 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files1 = [NSMutableArray arrayWithCapacity:10];
@@ -201,6 +209,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 			[files1 addObject:item];
 	//run install in Wine
 	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-installer",[[panel filenames] objectAtIndex:0],nil]];
+	[panel release];
 	//make 2nd array of .exe, .msi, and .bat files
 	NSArray *filesTEMP2 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files2 = [NSMutableArray arrayWithCapacity:10];
@@ -223,11 +232,11 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert addButtonWithTitle:@"OK"];
 		[alert setMessageText:@"Oops!"];
-		[alert setInformativeText:@"No new executables found!\n\nMaybe the installer failed...?"];
+		[alert setInformativeText:@"No new executables found!\n\nMaybe the installer failed...?\n\nIf you tried to install somewhere other than C: drive (drive_c in the wrapper) then you will get this message too.  All software must be installed in C: drive."];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
 		[alert release];
-		[window makeKeyAndOrderFront:self];
+		[installerWindow makeKeyAndOrderFront:self];
 		return;
 	}
 	// populate choose exe list
@@ -243,6 +252,126 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[plistDictionary release];
 	//close busy window
 	[busyWindow orderOut:self];
+}
+- (IBAction)copyAFolderInsideButtonPressed:(id)sender
+{
+	[self copyMoveFolder:@"copy"];
+}
+- (IBAction)moveAFolderInsideButtonPressed:(id)sender
+{
+	[self copyMoveFolder:@"move"];
+}
+- (void)copyMoveFolder:(NSString *)command
+{
+	BOOL copyIt = NO;
+	if ([command isEqualToString:@"copy"])
+		copyIt = YES;
+	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
+	if (copyIt)
+		[panel setTitle:@"Please choose the Folder to COPY in"];
+	else
+		[panel setTitle:@"Please choose the Folder to MOVE in"];
+	[panel setPrompt:@"Choose"];
+	[panel setCanChooseDirectories:YES];
+	[panel setCanChooseFiles:NO];
+	[panel setAllowsMultipleSelection:NO];
+	// runModalForDirectory deprecated in 10.6, but only method currently working in Lion beta for this.
+	int error = [panel runModalForDirectory:@"/" file:nil types:[NSArray arrayWithObjects:nil]];
+	//exit method if cancel pushed
+	if (error == 0)
+	{
+		[panel release];
+		return;
+	}
+	NSFileManager *fm = [NSFileManager defaultManager];
+	//show busy window
+	[busyWindow makeKeyAndOrderFront:self];
+	// get rid of installer window
+	[installerWindow orderOut:self];
+	//make 1st array of .exe, .msi, and .bat files
+	NSArray *filesTEMP1 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	NSMutableArray *files1 = [NSMutableArray arrayWithCapacity:10];
+	for (NSString *item in filesTEMP1)
+		if ([item hasSuffix:@".exe"] || [item hasSuffix:@".bat"] || [item hasSuffix:@".msi"])
+			[files1 addObject:item];
+	//copy or move the folder to Program Files
+	NSString *theFileNamePath = [[panel filenames] objectAtIndex:0];
+	NSString *theFileName = [theFileNamePath substringFromIndex:[theFileNamePath rangeOfString:@"/" options:NSBackwardsSearch].location];
+	BOOL success;
+	if (copyIt)
+		success = [fm copyItemAtPath:[[panel filenames] objectAtIndex:0] toPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c/Program Files%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],theFileName] error:nil];
+	else
+		success = [fm moveItemAtPath:[[panel filenames] objectAtIndex:0] toPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c/Program Files%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],theFileName] error:nil];
+	[panel release];
+	if (!success)
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert addButtonWithTitle:@"OK"];
+		[alert setMessageText:@"Oops!"];
+		if (copyIt)
+			[alert setInformativeText:@"The copy failed.\n\nYou either do not have permission to copy, or there is already a folder with that name in the wrapper's Program Files folder"];
+		else
+			[alert setInformativeText:@"The move failed.\n\nYou either do not have permission to move, or there is already a folder with that name in the wrapper's Program Files folder"];
+		[alert setAlertStyle:NSInformationalAlertStyle];
+		[alert runModal];
+		[alert release];
+		[installerWindow makeKeyAndOrderFront:self];
+		[busyWindow orderOut:self];
+		[fm release];
+		return;
+	}
+	//make 2nd array of .exe, .msi, and .bat files
+	NSArray *filesTEMP2 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	NSMutableArray *files2 = [NSMutableArray arrayWithCapacity:10];
+	for (NSString *item in filesTEMP2)
+		if ([item hasSuffix:@".exe"] || [item hasSuffix:@".bat"] || [item hasSuffix:@".msi"])
+			[files2 addObject:item];
+	NSMutableArray *finalList = [NSMutableArray arrayWithCapacity:5];
+	//fill new array of new .exe, .msi, and .bat files
+	for (NSString *item2 in files2)
+	{
+		BOOL matchFound=NO;
+		for (NSString *item1 in files1)
+			if (([item2 isEqualToString:item1]) || ([item2 hasPrefix:@"users/Wineskin"]) || ([item2 hasPrefix:@"windows/Installer"])) matchFound=YES;
+		if (!matchFound) [finalList addObject:[NSString stringWithFormat:@"/%@",item2]];
+	}
+	[finalList removeObject:@"nothing.exe"]; //nothing.exe is the default setting, and should not be in the list
+	//display warning if final array is 0 length and exit method
+	if ([finalList count] == 0)
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert addButtonWithTitle:@"OK"];
+		[alert setMessageText:@"Oops!"];
+		if (copyIt)
+			[alert setInformativeText:@"No new executables found after copying the selected folder inside the wrapper!"];
+		else
+			[alert setInformativeText:@"No new executables found after moving the selected folder inside the wrapper!"];
+		[alert setAlertStyle:NSInformationalAlertStyle];
+		[alert runModal];
+		[alert release];
+		[window makeKeyAndOrderFront:self];
+		[busyWindow orderOut:self];
+		[fm release];
+		return;
+	}
+	// populate choose exe list
+	[exeChoicePopUp removeAllItems];
+	for (NSString *item in finalList)
+		[exeChoicePopUp addItemWithTitle:item];
+	//if set EXE is not located inside of the wrapper,show choose exe window
+	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[plistDictionary valueForKey:@"Program Name and Path"]]])
+		[window makeKeyAndOrderFront:self];
+	else
+		[chooseExeWindow makeKeyAndOrderFront:self];
+	[busyWindow orderOut:self];
+	[plistDictionary release];
+	[fm release];
+}
+- (IBAction)installerCancelButtonPressed:(id)sender
+{
+	[window makeKeyAndOrderFront:self];
+	[installerWindow orderOut:self];
 }
 - (IBAction)chooseExeOKButtonPressed:(id)sender
 {

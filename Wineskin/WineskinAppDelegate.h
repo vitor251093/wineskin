@@ -20,6 +20,7 @@
 	IBOutlet NSPopUpButton *exeChoicePopUp;
 	IBOutlet NSWindow *helpWindow;
 	IBOutlet NSWindow *aboutWindow;
+	IBOutlet NSWindow *installerWindow;
 	IBOutlet NSTextField *aboutWindowVersionNumber;
 	
 	//Screen Options window
@@ -202,6 +203,12 @@
 - (IBAction)chooseExeOKButtonPressed:(id)sender;
 - (IBAction)setScreenOptionsPressed:(id)sender;
 - (IBAction)advancedButtonPressed:(id)sender;
+//Installer window methods
+- (IBAction)chooseSetupExecutableButtonPressed:(id)sender;
+- (IBAction)copyAFolderInsideButtonPressed:(id)sender;
+- (IBAction)moveAFolderInsideButtonPressed:(id)sender;
+- (IBAction)installerCancelButtonPressed:(id)sender;
+- (void)copyMoveFolder:(NSString *)command;
 
 //Screen Options window methods
 - (void)saveScreenOptionsData;
