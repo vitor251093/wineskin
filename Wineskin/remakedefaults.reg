@@ -1,7 +1,25 @@
 REGEDIT4
 
 [HKEY_CURRENT_USER\Control Panel\Colors]
+"ActiveBorder"="212 212 212"
 "background"="0 0 0"
+"ButtonAlternateFace"="181 181 181"
+"ButtonFace"="212 212 212"
+"ButtonHilight"="255 255 255"
+"ButtonLight"="212 212 212"
+"ButtonShadow"="128 128 128"
+"ButtonText"="0 0 0"
+"GradientInactiveTitle"="192 192 192"
+"GrayText"="128 128 128"
+"HotTrackingColor"="0 0 200"
+"InactiveBorder"="212 212 212"
+"InactiveTitle"="128 128 128"
+"InactiveTitleText"="212 212 212"
+"Menu"="212 212 212"
+"MenuBar"="212 212 212"
+"Scrollbar"="212 212 212"
+"Window"="255 255 255"
+"WindowFrame"="0 0 0"
 
 [HKEY_CURRENT_USER\Control Panel\Desktop]
 "FontSmoothing"="1"
