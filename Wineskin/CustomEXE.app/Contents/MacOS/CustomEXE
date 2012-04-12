@@ -21,8 +21,7 @@ CFRAMEBINFOLD="$(dirname "$0")"
 FRAMEBINFOLD="$CFRAMEBINFOLD/../../../Contents/Frameworks/bin"
 cd "$FRAMEBINFOLD"
 FRAMEBINFOLD="$(echo "$PWD")"
-CEXENAME="${CFRAMEBINFOLD%/Contents/MacOS}"
-CEXENAME="${CEXENAME#${CEXENAME%/*}/}"
+CEXENAME="$(basename "${CFRAMEBINFOLD%/Contents/MacOS}")"
 
 # Launch wrapper
 "$FRAMEBINFOLD/Wineskin" "CustomEXE" "$CEXENAME"
