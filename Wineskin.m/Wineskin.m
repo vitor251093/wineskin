@@ -814,6 +814,8 @@
 	[fm removeItemAtPath:symlinkName error:nil];
 	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
+	
+	/* removed for 2.5.5
 	//fix to have the right libGL for the OS version, let older one work if its dropped in place
 	//should be able to build 1 libGL that will work fine on 10.5+, but its not working...
 	symlinkName = [NSString stringWithFormat:@"%@/libGL.1.dylib",frameworksFold];
@@ -827,6 +829,7 @@
 	else
 		[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
+	 */
 	[fm release];
 }
 - (NSString *)setWindowManager
