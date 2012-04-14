@@ -1674,6 +1674,14 @@
 		[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
 	}
+	else //using XQuartz but not override->Fullscreen. Change back to Rootless resolution so it won't be stuck in a fullscreen.
+	{
+		int xRes = [[currentResolution substringToIndex:[currentResolution rangeOfString:@" "].location] intValue];
+		int yRes = [[currentResolution substringFromIndex:[currentResolution rangeOfString:@" "].location+1] intValue]-22;//if the resolution is the yMax-22 it should be the Rootless resolution
+		currentResolution = [NSString stringWithFormat:@"%d %d",xRes,yRes];
+		NSLog(@"Changing the resolution back to %@...",currentResolution);
+		[self setResolution:currentResolution];
+	}
 	//fix user folders back
 	if ([[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix] error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix] error:nil];
