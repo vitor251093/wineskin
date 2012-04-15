@@ -35,6 +35,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[winetricksCancelButton setHidden:YES];
 	disableButtonCounter=0;
 	disableXButton=NO;
+	usingAdvancedWindow=NO;
 	//clear out cells in Screen Options, They need to be blank but IB likes putting them back to defaults by just opening it and resaving
 	[fullscreenRootlessToggleRootlessButton setIntegerValue:0];
 	[fullscreenRootlessToggleFullscreenButton setIntegerValue:0];
@@ -177,6 +178,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 - (IBAction)installWindowsSoftwareButtonPressed:(id)sender
 {
 	[window orderOut:self];
+	[advancedWindow orderOut:self];
 	[installerWindow makeKeyAndOrderFront:self];
 }
 - (IBAction)chooseSetupExecutableButtonPressed:(id)sender
@@ -201,6 +203,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[busyWindow makeKeyAndOrderFront:self];
 	// get rid of main window
 	[installerWindow orderOut:self];
+	[advancedWindow orderOut:self];
 	//make 1st array of .exe, .msi, and .bat files
 	NSArray *filesTEMP1 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files1 = [NSMutableArray arrayWithCapacity:10];
@@ -246,7 +249,12 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	//if set EXE is not located inside of the wrapper,show choose exe window
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[plistDictionary valueForKey:@"Program Name and Path"]]])
-		[window makeKeyAndOrderFront:self];
+	{
+		if (usingAdvancedWindow)
+			[advancedWindow makeKeyAndOrderFront:self];
+		else
+			[window makeKeyAndOrderFront:self];
+	}
 	else
 		[chooseExeWindow makeKeyAndOrderFront:self];
 	[plistDictionary release];
@@ -349,7 +357,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
 		[alert release];
-		[window makeKeyAndOrderFront:self];
+		if (usingAdvancedWindow)
+			[advancedWindow makeKeyAndOrderFront:self];
+		else
+			[window makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
 		[fm release];
 		return;
@@ -361,7 +372,12 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	//if set EXE is not located inside of the wrapper,show choose exe window
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[plistDictionary valueForKey:@"Program Name and Path"]]])
-		[window makeKeyAndOrderFront:self];
+	{
+		if (usingAdvancedWindow)
+			[advancedWindow makeKeyAndOrderFront:self];
+		else
+			[window makeKeyAndOrderFront:self];
+	}
 	else
 		[chooseExeWindow makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
@@ -370,7 +386,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 }
 - (IBAction)installerCancelButtonPressed:(id)sender
 {
-	[window makeKeyAndOrderFront:self];
+	if (usingAdvancedWindow)
+		[advancedWindow makeKeyAndOrderFront:self];
+	else
+		[window makeKeyAndOrderFront:self];
 	[installerWindow orderOut:self];
 }
 - (IBAction)chooseExeOKButtonPressed:(id)sender
@@ -380,7 +399,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[windowsExeTextField setStringValue:[[exeChoicePopUp selectedItem] title]];
 	[self saveAllData];
 	//show main menu
-	[window makeKeyAndOrderFront:self];
+	if (usingAdvancedWindow)
+		[advancedWindow makeKeyAndOrderFront:self];
+	else
+		[window makeKeyAndOrderFront:self];
 	[chooseExeWindow orderOut:self];
 }
 - (IBAction)setScreenOptionsPressed:(id)sender
@@ -388,11 +410,13 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[self loadScreenOptionsData];
 	[screenOptionsWindow makeKeyAndOrderFront:self];
 	[window orderOut:self];
+	[advancedWindow orderOut:self];
 }
 - (IBAction)advancedButtonPressed:(id)sender
 {
 	[self loadAllData];
 	[advancedWindow makeKeyAndOrderFront:self];
+	usingAdvancedWindow=YES;
 	[window orderOut:self];
 }
 //*************************************************************
@@ -579,7 +603,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 - (IBAction)doneButtonPressed:(id)sender
 {
 	[self saveScreenOptionsData];
-	[window makeKeyAndOrderFront:self];
+	if (usingAdvancedWindow)
+		[advancedWindow makeKeyAndOrderFront:self];
+	else
+		[window makeKeyAndOrderFront:self];
 	[screenOptionsWindow orderOut:self];
 }
 - (IBAction)automaticClicked:(id)sender
@@ -699,12 +726,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 //*************************************************************
 //********************* Advanced Menu *************************
 //*************************************************************
-- (IBAction)advancedMenuDoneButtonPressed:(id)sender
-{
-	[self saveAllData];
-	[window makeKeyAndOrderFront:self];
-	[advancedWindow orderOut:self];
-}
 - (IBAction)testRunButtonPressed:(id)sender
 {
 	[self saveAllData];
@@ -2265,12 +2286,14 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	else if (sender==advancedWindow)
 	{
 		[self saveAllData];
-		[window makeKeyAndOrderFront:self];
 	}
 	else if (sender==screenOptionsWindow)
 	{
 		[self saveScreenOptionsData];
-		[window makeKeyAndOrderFront:self];
+		if (usingAdvancedWindow)
+			[advancedWindow makeKeyAndOrderFront:self];
+		else
+			[window makeKeyAndOrderFront:self];
 	}
 	else if (sender==winetricksWindow)
 	{

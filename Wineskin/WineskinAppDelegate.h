@@ -13,6 +13,7 @@
 	int disableButtonCounter;
 	BOOL disableXButton;
 	BOOL winetricksDone;
+	BOOL usingAdvancedWindow;
 	
 	//main window
     IBOutlet NSWindow *window;
@@ -225,7 +226,6 @@
 - (IBAction)screenOptionsHelpButtonPressed:(id)sender;
 
 //advanced menu
-- (IBAction)advancedMenuDoneButtonPressed:(id)sender;
 - (IBAction)testRunButtonPressed:(id)sender;
 - (IBAction)commandLineWineTestButtonPressed:(id)sender;
 - (void)runATestRun;
