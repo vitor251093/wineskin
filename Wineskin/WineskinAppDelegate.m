@@ -2017,15 +2017,34 @@ static NSInteger localizedComparator(id a, id b, void* context)
 }
 - (IBAction)changeEngineUsedButtonPressed:(id)sender
 {
+	//set the list of engines
+	[self setEngineList:@""];
+	//show Change Engine Window
+	[changeEngineWindow makeKeyAndOrderFront:self];
+	//order out advanced window
+	[advancedWindow orderOut:self];
+}
+- (void)setEngineList:(NSString *)theFilter
+{
 	//get installed engines
 	NSMutableArray *installedEnginesList = [NSMutableArray arrayWithCapacity:10];
 	NSString *folder = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
 	NSArray *filesTEMP = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingFunction:localizedComparator context:nil];
 	NSArray *files = [[filesTEMP reverseObjectEnumerator] allObjects];
-	for(NSString *file in files) // standard first
-		if ([file hasSuffix:@".tar.7z"] && (NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0)))) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
-	for(NSString *file in files) // CX at end of list
-		if ([file hasSuffix:@".tar.7z"] && !(NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0)))) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
+	if ([theFilter isEqualToString:@""])
+	{
+		for(NSString *file in files) // standard first
+			if ([file hasSuffix:@".tar.7z"] && (NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0)))) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
+		for(NSString *file in files) // CX at end of list
+			if ([file hasSuffix:@".tar.7z"] && !(NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0)))) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];		
+	}
+	else
+	{
+		for(NSString *file in files) // standard first
+			if ([file hasSuffix:@".tar.7z"] && (NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0))) && ([file rangeOfString:theFilter options:NSCaseInsensitiveSearch].location != NSNotFound)) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
+		for(NSString *file in files) // CX at end of list
+			if ([file hasSuffix:@".tar.7z"] && !(NSEqualRanges([file rangeOfString:@"CX"],NSMakeRange(NSNotFound, 0))) && ([file rangeOfString:theFilter options:NSCaseInsensitiveSearch].location != NSNotFound)) [installedEnginesList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
+	}
 	//update engine list in change engine window
 	[changeEngineWindowPopUpButton removeAllItems];
 	for (NSString *item in installedEnginesList)
@@ -2044,10 +2063,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		//change currentVersionTextField to engine name
 		[currentVersionTextField setStringValue:[currentEngineVersionArray objectAtIndex:0]];
 	}
-	//show Change Engine Window
-	[changeEngineWindow makeKeyAndOrderFront:self];
-	//order out advanced window
-	[advancedWindow orderOut:self];
 }
 - (IBAction)changeEngineUsedOkButtonPressed:(id)sender
 {
@@ -2098,6 +2113,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[advancedWindow makeKeyAndOrderFront:self];
 	//order out change engine window
 	[changeEngineWindow orderOut:self];
+}
+- (IBAction)changeEngineSearchFilter:(id)sender
+{
+	[self setEngineList:[[sender stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
 }
 - (IBAction)updateWrapperButtonPressed:(id)sender
 {

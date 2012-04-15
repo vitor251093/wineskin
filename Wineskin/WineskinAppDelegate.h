@@ -253,8 +253,10 @@
 - (IBAction)rebuildWrapperButtonPressed:(id)sender;
 - (IBAction)refreshWrapperButtonPressed:(id)sender;
 - (IBAction)changeEngineUsedButtonPressed:(id)sender;
+- (void)setEngineList:(NSString *)theFilter;
 - (IBAction)changeEngineUsedOkButtonPressed:(id)sender;
 - (IBAction)changeEngineUsedCancelButtonPressed:(id)sender;
+- (IBAction)changeEngineSearchFilter:(id)sender;
 - (IBAction)updateWrapperButtonPressed:(id)sender;
 - (IBAction)logsButtonPressed:(id)sender;
 - (IBAction)commandLineShellButtonPressed:(id)sender;
