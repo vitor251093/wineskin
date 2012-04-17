@@ -7,14 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
-///*
+/*
 #if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
 @interface Wineskin_WineryAppDelegate : NSObject
 #else
 @interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
 #endif
-//*/
-//@interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
+*/
+@interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
 {
 	//main window
     IBOutlet NSWindow *window;
@@ -84,15 +84,18 @@
 - (IBAction)refreshButtonPressed:(id)sender;
 - (IBAction)downloadPackagesManuallyButtonPressed:(id)sender;
 - (IBAction)plusButtonPressed:(id)sender;
+- (void)showAvailableEngines:(NSString *)theFilter;
 - (IBAction)minusButtonPressed:(id)sender;
 - (IBAction)updateButtonPressed:(id)sender;
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender;
-- (void)getInstalledEngines;
+- (void)getInstalledEngines:(NSString *)theFilter;
 - (NSArray *)getEnginesToIgnore;
 - (NSMutableArray *)getAvailableEngines;
 - (NSString *)getCurrentWrapperVersion;
 - (void)setEnginesAvailablePrompt;
 - (void)setWrapperAvailablePrompt;
+- (IBAction)engineSearchFilter:(id)sender;
+- (IBAction)availEngineSearchFilter:(id)sender;
 
 //engine build window
 - (IBAction)engineBuildChooseButtonPressed:(id)sender;

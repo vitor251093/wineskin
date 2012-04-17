@@ -223,14 +223,12 @@
 - (IBAction)virtualDesktopClicked:(id)sender;
 - (IBAction)gammaChanged:(id)sender;
 - (IBAction)windowManagerCheckBoxClicked:(id)sender;
-- (IBAction)screenOptionsHelpButtonPressed:(id)sender;
 
 //advanced menu
 - (IBAction)testRunButtonPressed:(id)sender;
 - (IBAction)commandLineWineTestButtonPressed:(id)sender;
 - (void)runATestRun;
 - (IBAction)killWineskinProcessesButtonPressed:(id)sender;
-- (IBAction)advancedHelpButtonPressed:(id)sender;
 
 //advanced menu - Configuration Tab
 - (void)saveAllData;
@@ -293,7 +291,6 @@
 - (void)winetricksWriteFinished;
 - (void)updateWinetrickOutput;
 - (NSArray *)makePIDArray:(NSString *)processToLookFor;
-- (IBAction)winetricksHelpButtonPressed:(id)sender;
 // cexe maker
 - (IBAction)createCustomExeLauncherButtonPressed:(id)sender;
 - (IBAction)cEXESaveButtonPressed:(id)sender;

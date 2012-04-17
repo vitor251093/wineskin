@@ -718,10 +718,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		regFileContents = [regFileContents stringByAppendingString:[item stringByAppendingString:@"\n"]];
 	[regFileContents writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
-- (IBAction)screenOptionsHelpButtonPressed:(id)sender
-{
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://wineskin.doh123.com/tiki-index.php?page=Manual+4.2+Screen+Options"]];
-}
 
 //*************************************************************
 //********************* Advanced Menu *************************
@@ -801,19 +797,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		popen([@"killall WineskinX11" UTF8String],[@"r" UTF8String]);
 	}
 	[alert release];
-}
-- (IBAction)advancedHelpButtonPressed:(id)sender
-{
-	if ([tab indexOfTabViewItem:[tab selectedTabViewItem]] == 0)
-		//go to config help
-		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://wineskin.doh123.com/tiki-index.php?page=Manual+4.4+Advanced+-+Configuration"]];
-	else if ([tab indexOfTabViewItem:[tab selectedTabViewItem]] == 1)
-		//go to tools help
-		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://wineskin.doh123.com/tiki-index.php?page=Manual+4.5+Advanced+-+Tools"]];
-	else
-		//go to Options help
-		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://wineskin.doh123.com/tiki-index.php?page=Manual+4.6+Advanced+-+Options"]];
-		
 }
 
 //*************************************************************
@@ -1765,10 +1748,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	NSString *resultString = [NSString stringWithFormat:@"00000\n%@",[self systemCommandWithOutputReturned:[NSString stringWithFormat:@"ps axc|awk \"{if (\\$5==\\\"%@\\\") print \\$1}\"",processToLookFor]]];
 	return [resultString componentsSeparatedByString:@"\n"];
-}
-- (IBAction)winetricksHelpButtonPressed:(id)sender
-{
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://wineskin.doh123.com/tiki-index.php?page=Manual+4.5.1+Advanced+-+Winetricks"]];
 }
 
 //*********** CEXE
