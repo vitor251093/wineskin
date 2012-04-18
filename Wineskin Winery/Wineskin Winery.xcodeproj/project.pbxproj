@@ -234,8 +234,9 @@
 				GCC_PREFIX_HEADER = Wineskin_Winery_Prefix.pch;
 				INFOPLIST_FILE = "Wineskin_Winery-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = "Wineskin Winery";
+				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -262,10 +263,10 @@
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;

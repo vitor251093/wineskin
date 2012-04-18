@@ -7,14 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
-/*
+
 #if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
 @interface Wineskin_WineryAppDelegate : NSObject
 #else
 @interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
 #endif
-*/
-@interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
+
+//@interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
 {
 	//main window
     IBOutlet NSWindow *window;
