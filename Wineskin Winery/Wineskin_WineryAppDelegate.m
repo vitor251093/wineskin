@@ -213,7 +213,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 
 - (IBAction)downloadPackagesManuallyButtonPressed:(id)sender;
 {
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Latest_Update.html?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/tiki-index.php?page=Downloads?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	[[NSWorkspace sharedWorkspace] openURL:url];
 }
 

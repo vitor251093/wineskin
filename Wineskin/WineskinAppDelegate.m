@@ -2298,6 +2298,13 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[self winetricksDoneButtonPressed:sender];
 		return NO;
 	}
+	else if (sender==installerWindow)
+	{
+		if (usingAdvancedWindow)
+			[advancedWindow makeKeyAndOrderFront:self];
+		else
+			[window makeKeyAndOrderFront:self];
+	}
 	[sender orderOut:self];
 	return NO;
 }
