@@ -1,6 +1,17 @@
 Release numbers go by wrapper versions as they are the main thing updated covering everything but Winery, which should not be updated very often.
-Release 2.5.5 - Pending
+Release 2.5.5 - Released Apr 18, 2012
+• Wrappers no longer support running on Mac OS X 10.5 from Wineskin 2.5.5 and later.  OSX 10.5 is very little used, and most still using it are on PPC Macs that cannot use Wineskin anyways.  Wineskin now only supports OSX 10.6+. Any engine seen as WS9 will also only work on 10.6+.  WS8 10.5 engines will still work on Wineskin 2.5.5 though.
+• Wineskin.app now has everything available in a redesigned Advanced Menu.  Once you press Advanced, you stay in that menu until next time.  No more need to go back through the main menu to get to the Installer or Screen Options.
+• New X.org server build and related libraries, the latest available including a much updated Mesa build (for OpenGL)
+• Advanced menu redesigned slightly. Installer and Screen Settings can be changed from there too, so no going back to the main menu to get to those.  Once you go in Advanced you can do everything needed.  The Main menu is more for end users of shared wrappers who just need to install something, or change screen settings.
+• New Installer window added.  It describes more what is going on, and if you choose a EXE it works the same as before, but it also now has options to copy or move a folder inside the wrapper so you can use it to get in pre-installed programs or programs that do not install and just run.
+• New testing option added that will launch Terminal ready to use Wine from the wrappers engine in a normal command line way.  This is for Wine specific testing and comparing and doesn't use anything in the wrapper besides the Wine build in the engine.  All usage is command line and the wineprefix is the default ~/.wine unless you change it.  If your using a stock engine this should be considered normal Wine usage that *should* be reportable at winehq.org.
+• There is now an option to use XQuartz instead of the built in WineskinX11.  Some features may not work right with it, but it will run things under XQuartz.app instead of its own icon.  This is disabled by default.  This will ONLY try to use normal XQuartz installed to /opt/X11... not X11.app or Macports or whatever... may be buggy and go back to your default X11.app if XQuartz is missing, but could cause a lot of problems.
+• Default gray for windows made more neutral gray instead of Windows normal reddish gray to match OSX better.  This will only take affect on new or rebuilt wrappers.
+• Always Make Log Files option added in Wineskin.app so you do not have to only use Test Run to get them.
 • Custom EXE launchers should work right again to use multiple EXEs at once.
+• Custom EXEs should be less likely to crashing with some special characters in path names.
+• New Engine base for making custom engines from Wine source.  Should work with Xcode 3.x and 4.x for SDKs.  Uses a gcc compiler not available in recent versions of Xcode, so it will let you install it before building if you need it.
 
 Release 2.5.4 - Released Feb 14, 2012
 • new Icon and logo
