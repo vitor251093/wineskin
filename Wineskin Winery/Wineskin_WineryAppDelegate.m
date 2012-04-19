@@ -32,6 +32,21 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[alert runModal];
 	[alert release];
 	 */
+	
+	SInt32 OSXversionMajor, OSXversionMinor;
+	if(Gestalt(gestaltSystemVersionMajor, &OSXversionMajor) == noErr && Gestalt(gestaltSystemVersionMinor, &OSXversionMinor) == noErr)
+	{
+		if(OSXversionMajor == 10 && OSXversionMinor <= 5) // display warning about 10.5 no longer being supported.
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert addButtonWithTitle:@"Ok, I got it!"];
+			[alert setMessageText:@"Mac OS X 10.5 Warning"];
+			[alert setInformativeText:@"Wineskin no longer supports Mac OS X 10.5!\n\nYou may want to upgrade your OS!\n\nIf you want to use Wineskin Winery on 10.5 you can, but the built in downloads will get 10.6+ compatible files.\n\nTo use this on 10.5, you must get Manual Download files and only use Wineskin 2.5.3 - 2.5.4 and WS8 based engines.\n\nWineskin 2.5.5+ and WS9 engines are Mac OS X 10.6+ only!"];
+			[alert setAlertStyle:NSInformationalAlertStyle];
+			[alert runModal];
+			[alert release];
+		}
+	}
 	srand(time(NULL));
 	[waitWheel startAnimation:self];
 	[busyWindow makeKeyAndOrderFront:self];
