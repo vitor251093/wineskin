@@ -1,3 +1,12 @@
+Release 1.5 - Released Apr 18th 2012
+• Interface redesigned to be simpler and smaller
+• Search filter added for engine list
+• Search filter added for available engines drop down box
+• Warning message added if running on 10.5 about other Wineskin programs dropping 10.5 support.
+• Fixed Download Packages Manually button to go to the Wineskin download site instead of the old page that diverts to the home page.
+• Engine Builder screen updated slightly with correct info for Wineskin 2.5.5+
+• new Engine base available when Wineskin 2.5.5 is released to handle building Engines easier for people with any version of Xcode 3 or 4 installed.
+
 Release 1.4 - Released Feb 10th 2012
 • Updated to new Icon
 
