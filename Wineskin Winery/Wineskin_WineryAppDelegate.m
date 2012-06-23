@@ -147,7 +147,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	//get current version number
 	NSString *currentVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Winery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Winery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (!([newVersion hasPrefix:@"Wineskin"]) || ([currentVersion isEqualToString:newVersion]))
@@ -184,7 +184,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[fm removeItemAtPath:@"/tmp/WineskinWinery.app.tar" error:nil];
 	[fm removeItemAtPath:@"/tmp/WineskinWinery.app" error:nil];
 	//update selected, download update
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/Winery/WineskinWinery.app.tar.7z?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Winery/WineskinWinery.app.tar.7z?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:@"file:///tmp/WineskinWinery.app.tar.7z"];
 	[fileName setStringValue:@"Wineskin Winery Update"];
 	[downloadingWindow makeKeyAndOrderFront:self];
@@ -228,7 +228,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 
 - (IBAction)downloadPackagesManuallyButtonPressed:(id)sender;
 {
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/tiki-index.php?page=Downloads?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/tiki-index.php?page=Downloads?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	[[NSWorkspace sharedWorkspace] openURL:url];
 }
 
@@ -307,7 +307,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 - (IBAction)updateButtonPressed:(id)sender
 {
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![[newVersion substringToIndex:8] isEqualToString:@"Wineskin"])
@@ -322,7 +322,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		return;
 	}
 	//download new wrapper to /tmp
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/Wrapper/%@.app.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Wrapper/%@.app.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.app.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"Wrapper"];
@@ -332,7 +332,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/?%@",[[NSNumber numberWithLong:rand()] stringValue]]]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/?%@",[[NSNumber numberWithLong:rand()] stringValue]]]];
 }
 
 - (void)getInstalledEngines:(NSString *)theFilter
@@ -373,7 +373,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 
 - (NSMutableArray *)getAvailableEngines
 {
-	NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Engines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
+	NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
 	if ([fileString hasSuffix:@"\n"])
 	{
 		fileString = [fileString stringByAppendingString:@":!:!:"];
@@ -439,7 +439,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 - (void)setWrapperAvailablePrompt
 {
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![[newVersion substringToIndex:8] isEqualToString:@"Wineskin"]) return;
@@ -544,7 +544,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	//get latest available version number
 	NSString *newVersion = [self availableEngineBuildVersion];
 	//download new wrapper to /tmp
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/EngineBase/%@.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/EngineBase/%@.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"EngineBase"];
@@ -580,7 +580,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 }
 - (NSString *)availableEngineBuildVersion
 {
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/EngineBase/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/EngineBase/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![newVersion hasSuffix:@"EngineBase"]) return @"ERROR";
@@ -590,7 +590,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 //************ Engine Window (+ button) methods *******************
 - (IBAction)engineWindowDownloadAndInstallButtonPressed:(id)sender
 {
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.doh123.com/Engines/%@.tar.7z?%@",[[engineWindowEngineList selectedItem] title],[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/%@.tar.7z?%@",[[engineWindowEngineList selectedItem] title],[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",[[engineWindowEngineList selectedItem] title]]];
 	[fileName setStringValue:[[engineWindowEngineList selectedItem] title]];
 	[fileNameDestination setStringValue:@"Engines"];
