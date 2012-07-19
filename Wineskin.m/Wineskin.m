@@ -818,32 +818,22 @@
 }
 - (void)fixFrameworksLibraries
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
-	//fix to have the right libXplugin for the OS version
-	SInt32 majorVersion,minorVersion;
-	Gestalt(gestaltSystemVersionMajor, &majorVersion);
-	Gestalt(gestaltSystemVersionMinor, &minorVersion);
-	NSString *mainFile = [NSString stringWithFormat:@"libXplugin.1.%d.%d.dylib",majorVersion,minorVersion];
-	NSString *symlinkName = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
-	[fm removeItemAtPath:symlinkName error:nil];
-	[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
-	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
-	
-	/* removed for 2.5.5
-	//fix to have the right libGL for the OS version, let older one work if its dropped in place
-	//should be able to build 1 libGL that will work fine on 10.5+, but its not working...
-	symlinkName = [NSString stringWithFormat:@"%@/libGL.1.dylib",frameworksFold];
-	if (minorVersion == 5)
-		mainFile = [NSString stringWithFormat:@"libGL.1.10.5.dylib"];
-	else
-		mainFile = [NSString stringWithFormat:@"libGL.1.10.6.dylib"];
-	[fm removeItemAtPath:symlinkName error:nil];
-	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/libGL.1.2.dylib",frameworksFold]])
-		[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:[NSString stringWithFormat:@"libGL.1.2.dylib"] error:nil];
-	else
-		[fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
-	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
-	 */
+    NSFileManager *fm = [NSFileManager defaultManager];
+    //fix to have the right libXplugin for the OS version
+    SInt32 majorVersion,minorVersion;
+    Gestalt(gestaltSystemVersionMajor, &majorVersion);
+    Gestalt(gestaltSystemVersionMinor, &minorVersion);
+    NSString *symlinkName = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
+    NSString *mainFile = [NSString stringWithFormat:@"libXplugin.1.%d.%d.dylib",majorVersion,minorVersion];
+    if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",frameworksFold,mainFile]])
+    {
+        NSLog(@"WARNING!!:  You are running Wineskin on an unsupported OS and there may be major problems!");
+        [self systemCommand:[NSString stringWithFormat:@"echo \"WARNING!!:  You are running Wineskin on an unsupported OS and there may be major problems!\" >> \"%@/Logs/LastRunX11.log\"",winePrefix]];
+        mainFile = @"/usr/lib/libXplugin.1.dylib";
+    }
+    [fm removeItemAtPath:symlinkName error:nil];
+    [fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
+    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
 	[fm release];
 }
 - (NSString *)setWindowManager
@@ -917,6 +907,15 @@
 			wineskinX11PID = @"Winetricks Listing, no X server needed";
 			return;
 		}
+    //Do not try to start WineskinX11 if its already running!!!
+    NSString *wineskinX11PIDToCheck = [[self readFileToStringArray:wineskinX11PIDFile] objectAtIndex:0];
+    if ([self isPID:wineskinX11PIDToCheck named:@"WineskinX11"])
+    {
+        //already running, do not start again
+        wrapperBundlePID = [NSString stringWithFormat:@"%@",wineskinX11PIDToCheck];
+        wineskinX11PID = @"WineskinX11 was already running, NOT trying to start it again!!!";
+        return;
+    }
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold];
