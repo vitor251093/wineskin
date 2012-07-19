@@ -50,8 +50,8 @@
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
 	IBOutlet NSButton *testRunButton;
-	IBOutlet NSButton *commandLineWineTestButton;
-	IBOutlet NSButton *advancedDoneButton;
+	IBOutlet NSButton *advancedInstallSoftwareButton;
+    IBOutlet NSButton *advancedSetScreenOptionsButton;
 	IBOutlet NSProgressIndicator *toolRunningPI;
 	IBOutlet NSTextField *toolRunningPIText;
 	IBOutlet NSTabView *tab;
@@ -71,6 +71,7 @@
 	IBOutlet NSButton *iconBrowseButton;
 	IBOutlet NSPopUpButton *extPopUpButton;
 	IBOutlet NSButton *extEditButton;
+    IBOutlet NSButton *extPlusButton;
 	IBOutlet NSButton *extMinusButton;
 	
 	//advanced menu - Tools Tab
@@ -85,6 +86,7 @@
 	IBOutlet NSButton *changeEngineButton;
 	IBOutlet NSTextField *currentVersionTextField;
 	IBOutlet NSButton *updateWrapperButton;
+    IBOutlet NSButton *commandLineWineTestButton;
 	
 	//advanced menu - Options Tab
 	IBOutlet NSButton *alwaysMakeLogFilesCheckBoxButton;
