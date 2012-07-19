@@ -446,6 +446,14 @@
 		}
 		[fm release];
 	}
+    
+    //********** Write system info to end X11 log file
+    if (debugEnabled)
+    {
+        //use mini detail level so no personal information can be displayed
+        [self systemCommand:[NSString stringWithFormat:@"system_profiler -detailLevel mini SPHardwareDataType SPDisplaysDataType >> \"%@/Logs/LastRunX11.log\"",winePrefix]];
+    }
+    
 	//**********sleep and monitor in background while app is running
 	NSLog(@"Sleeping and monitoring from the background while app runs...");
 	[self sleepAndMonitor];
