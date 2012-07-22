@@ -437,12 +437,13 @@
 	if (debugEnabled && !useXQuartz)
 	{
 		NSFileManager *fm = [NSFileManager defaultManager];
-		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11/%@.Wineskin.p.log",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleName"]];
+        NSString *theBundleID = [[plistDictionary valueForKey:@"CFBundleIdentifier"] stringByReplacingOccurrencesOfString:@".wineskin.prefs" withString:@""];
+		NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11/%@.Wineskin.p.log",NSHomeDirectory(),theBundleID];
 		if ([fm fileExistsAtPath:logName])
 		{
 			NSString *logFileLocation=[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix] error:nil];
-			[fm copyItemAtPath:logName toPath:logFileLocation error:nil];
+			[fm moveItemAtPath:logName toPath:logFileLocation error:nil];
 		}
 		[fm release];
 	}
