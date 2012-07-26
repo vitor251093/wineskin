@@ -1400,7 +1400,7 @@
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/.update-timestamp",winePrefix] error:nil];
 			//calling wineboot is a simple builtin refresh that needs to NOT prompt for gecko
 			NSString *mshtmlLine = @"";
-			if ([wssCommand isEqualToString:@"WSS-wineboot"]) mshtmlLine = @"export WINEDLLOVERRIDES=\"mshtml=\";";
+			if ([wssCommand isEqualToString:@"WSS-wineboot"]) mshtmlLine = @"export WINEDLLOVERRIDES=\"mscoree,mshtml=\";";
 			[self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot > \"%@\" 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,wineLogFile]];
 			usleep(3000000);
 			if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
