@@ -15,7 +15,6 @@
 	NSString *firstPIDFile;					//pid file used to find wineserver pid
 	NSString *secondPIDFile;				//pid file used to find wineserver pid
 	NSString *wineserverPIDFile;			//pid file holding wineserver pid of current/last run
-	NSString *wineskinX11PIDFile;			//pid file holding bundle pid of current/last run
 	NSString *displayNumberFile;			//pid file holding display number of current/last run
 	NSString *infoPlistFile;				//the Info.plist file in the wrapper
 	NSString *winePrefix;					//the $WINEPREFIX
@@ -166,7 +165,6 @@
 	firstPIDFile = [NSString stringWithFormat:@"%@/.firstpidfile",contentsFold];
 	secondPIDFile = [NSString stringWithFormat:@"%@/.secondpidfile",contentsFold];
 	wineserverPIDFile = [NSString stringWithFormat:@"%@/.wineserverpidfile",contentsFold];
-	wineskinX11PIDFile = [NSString stringWithFormat:@"%@/.x11pidfile",contentsFold];
 	displayNumberFile = [NSString stringWithFormat:@"%@/.currentuseddisplay",contentsFold];
 	infoPlistFile = [NSString stringWithFormat:@"%@/Info.plist",contentsFold];
 	winePrefix=[NSString stringWithFormat:@"%@/Resources",contentsFold];
@@ -196,7 +194,10 @@
         //just called for ICE install, dont run.
         return;
     }
-	wineserverPIDToCheck = [[self readFileToStringArray:wineserverPIDFile] objectAtIndex:0];
+    if ([fm fileExistsAtPath:wineserverPIDFile])
+        wineserverPIDToCheck = [[self readFileToStringArray:wineserverPIDFile] objectAtIndex:0];
+    if ([wineserverPIDToCheck isEqualToString:@"-1"])
+        wineserverPIDToCheck = @"-9";
 	NSLog(@"Starting up...");
 	NSLog(@"reading all configuration information...");
 	//open Info.plist to read all needed info
@@ -938,15 +939,6 @@
 			wineskinX11PID = @"Winetricks Listing, no X server needed";
 			return;
 		}
-    //Do not try to start WineskinX11 if its already running!!!
-    NSString *wineskinX11PIDToCheck = [[self readFileToStringArray:wineskinX11PIDFile] objectAtIndex:0];
-    if ([self isPID:wineskinX11PIDToCheck named:@"WineskinX11"])
-    {
-        //already running, do not start again
-        wrapperBundlePID = [NSString stringWithFormat:@"%@",wineskinX11PIDToCheck];
-        wineskinX11PID = @"WineskinX11 was already running, NOT trying to start it again!!!";
-        return;
-    }
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSString *wsX11PlistFile = [NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold];
@@ -1013,7 +1005,7 @@
 		else
 			wineskinX11FontPathPrefix=[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold];
 	}
-	NSString *wineskinX11FontPath = wineskinX11FontPath = [NSString stringWithFormat:@"-fp %@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
+	NSString *wineskinX11FontPath = wineskinX11FontPath = [NSString stringWithFormat:@"-fp \"%@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util\"",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
 	// set log variable
 	NSString *logFileLocation;
 	if (debugEnabled)
@@ -1063,8 +1055,6 @@
 	[quickEdit2 release];
 	//get rid of X11 lock folder that shouldnt be needed
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
-	//write x pid out to a file, so other runs can tell if it is already running
-	[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",wrapperBundlePID],nil] toFile:wineskinX11PIDFile];
 	[fm release];
 	return;
 }
@@ -1499,12 +1489,13 @@
 		if ([vdResolution isEqualToString:@"novd"]) [self setToNoVirtualDesktop];
 		else [self setToVirtualDesktop:vdResolution named:virtualDesktopName];
 		// if Wineserver was already running, use the same one, so no need to do X or keepthe daemon running
-		if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
-		{
-			returnPID = wineserverPIDToCheck;
-			killWineskin = YES;
-			theDisplayNumber = [[self readFileToStringArray:displayNumberFile] objectAtIndex:0];
-		}
+		if (![wineserverPIDToCheck isEqualToString:@"-9"])// -9 is new fresh wrapper thats never been run
+            if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
+            {
+                returnPID = wineserverPIDToCheck;
+                killWineskin = YES;
+                theDisplayNumber = [[self readFileToStringArray:displayNumberFile] objectAtIndex:0];
+            }
 		//write out new display file
 		[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",theDisplayNumber],nil] toFile:displayNumberFile];
 		NSString *wineDebugLine;
