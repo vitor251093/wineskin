@@ -987,25 +987,21 @@
 		return;
 	}	
 	//set up fontpath variable for server depending where X11 fonts are on the system
-	NSString *wineskinX11FontPathPrefix = @"/usr/X11/lib/X11/fonts";
+	NSString *wineskinX11FontPathPrefix = @"/opt/X11/share/fonts";
 	if (![fm fileExistsAtPath:wineskinX11FontPathPrefix])
 	{
 		if ([fm fileExistsAtPath:@"/usr/X11/share/fonts"])
 			wineskinX11FontPathPrefix=@"/usr/X11/share/fonts";
-		else if ([fm fileExistsAtPath:@"/opt/X11/share/fonts"])
-			wineskinX11FontPathPrefix=@"/opt/X11/share/fonts";
 		else if ([fm fileExistsAtPath:@"/opt/local/share/fonts"])
 			wineskinX11FontPathPrefix=@"/opt/local/share/fonts";
+        else if ([fm fileExistsAtPath:@"/usr/X11/lib/X11/fonts"])
+			wineskinX11FontPathPrefix=@"/usr/X11/lib/X11/fonts";
 		else if ([fm fileExistsAtPath:@"/usr/X11R6/lib/X11/fonts"])
 			wineskinX11FontPathPrefix=@"/usr/X11R6/lib/X11/fonts";
 		else
-			wineskinX11FontPathPrefix=@"MISSING";
+			wineskinX11FontPathPrefix=[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold];
 	}
-	NSString *wineskinX11FontPath;
-	if ([wineskinX11FontPathPrefix isEqualToString:@"MISSING"])
-		wineskinX11FontPath = @"";
-	else
-		wineskinX11FontPath = [NSString stringWithFormat:@"-fp %@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
+	NSString *wineskinX11FontPath = wineskinX11FontPath = [NSString stringWithFormat:@"-fp %@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
 	// set log variable
 	NSString *logFileLocation;
 	if (debugEnabled)
