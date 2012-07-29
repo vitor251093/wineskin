@@ -822,11 +822,9 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	if ([alert runModal] == NSAlertFirstButtonReturn)
 	{
 		//kill Wineskin WineskinX11 wine wineserver
-		popen([@"killall wine" UTF8String],[@"r" UTF8String]);
-		sleep(2);
-		popen([@"killall wineserver" UTF8String],[@"r" UTF8String]);
-		sleep(2);
-		popen([@"killall WineskinX11" UTF8String],[@"r" UTF8String]);
+        popen([@"killall -9 WineskinX11" UTF8String],[@"r" UTF8String]);
+		popen([@"killall -9 wine" UTF8String],[@"r" UTF8String]);
+		popen([@"killall -9 wineserver" UTF8String],[@"r" UTF8String]);
 	}
 	[alert release];
 }
