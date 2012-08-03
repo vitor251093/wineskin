@@ -791,21 +791,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 - (void)runACommandLineTestRun
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	// TODO
-	/*
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert addButtonWithTitle:@"View"];
-	[alert addButtonWithTitle:@"Cancel"];
-	[alert setMessageText:@"Test Run Complete!"];
-	[alert setInformativeText:@"Do you wish to view the Test Run Logs?"];
-	[alert setAlertStyle:NSInformationalAlertStyle];
-	if ([alert runModal] == NSAlertFirstButtonReturn)
-	{
-		[self systemCommand:@"/usr/bin/open" withArgs:[NSArray arrayWithObjects:@"-e",[NSString stringWithFormat:@"%@/Contents/Resources/Logs/LastRunX11.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
-		[self systemCommand:@"/usr/bin/open" withArgs:[NSArray arrayWithObjects:@"-e",[NSString stringWithFormat:@"%@/Contents/Resources/Logs/LastRunWine.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
-	}
-	[alert release];
-	 */
 	NSString *contFold = [NSString stringWithFormat:@"%@/Contents",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	system([[NSString stringWithFormat: @"export PATH=\"%@/Frameworks/wswine.bundle/bin:$PATH\";open -a Terminal.app \"%@/Contents/Resources/Command Line Wine Test\"",contFold,[[NSBundle mainBundle] bundlePath]] UTF8String]);
 	[pool release];
