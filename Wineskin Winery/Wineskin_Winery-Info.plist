@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Winery.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.wineskin.doh123.WineskinWinery</string>
+	<string>com.urgesoftware.wineskin.wineskinwinery</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>Wineskin-Winery-1.6</string>
+	<string>Wineskin-Winery-1.7</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>Wineskin-Winery-1.6</string>
+	<string>Wineskin-Winery-1.7</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>
