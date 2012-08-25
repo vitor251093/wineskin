@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Wineskin.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.wineskin.doh123.Wineskin</string>
+	<string>com.urgesoftware.wineskin.wineskin</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
