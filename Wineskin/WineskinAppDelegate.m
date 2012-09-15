@@ -88,6 +88,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
         [updateWrapperButton setEnabled:YES];
         [changeEngineButton setEnabled:YES];
         [alwaysMakeLogFilesCheckBoxButton setEnabled:YES];
+        [setMaxFilesCheckBoxButton setEnabled:YES];
         [optSendsAltCheckBoxButton setEnabled:YES];
         [emulateThreeButtonMouseCheckBoxButton setEnabled:YES];
         [mapUserFoldersCheckBoxButton setEnabled:YES];
@@ -128,6 +129,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
     [updateWrapperButton setEnabled:NO];
 	[changeEngineButton setEnabled:NO];
 	[alwaysMakeLogFilesCheckBoxButton setEnabled:NO];
+    [setMaxFilesCheckBoxButton setEnabled:NO];
 	[optSendsAltCheckBoxButton setEnabled:NO];
 	[emulateThreeButtonMouseCheckBoxButton setEnabled:NO];
 	[mapUserFoldersCheckBoxButton setEnabled:NO];
@@ -205,7 +207,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 //*************************************************************
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com?%@",[[NSNumber numberWithLong:rand()] stringValue]]]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com?%@",[[NSNumber numberWithLong:rand()] stringValue]]]];
 }
 - (IBAction)installWindowsSoftwareButtonPressed:(id)sender
 {
@@ -458,10 +460,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	//gamma always set the same, set it first
-	if ([gammaSlider doubleValue] == 80.0)
+	if ([gammaSlider doubleValue] == 60.0)
 		[plistDictionary setValue:@"default" forKey:@"Gamma Correction"];
 	else
-		[plistDictionary setValue:[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-80))/100] forKey:@"Gamma Correction"];
+		[plistDictionary setValue:[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-60))/100] forKey:@"Gamma Correction"];
 	if ([automaticOverrideToggleAutomaticButton intValue] == 1)
 	{
 		//set to automatic
@@ -543,9 +545,9 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[automaticOverrideToggle deselectAllCells];
 	[automaticOverrideToggle selectCellWithTag:[[plistDictionary valueForKey:@"Use RandR"] intValue]];
 	if ([[plistDictionary valueForKey:@"Gamma Correction"] isEqualToString:@"default"])
-		[gammaSlider setDoubleValue:80.0];
+		[gammaSlider setDoubleValue:60.0];
 	else
-		[gammaSlider setDoubleValue:(-100*[[plistDictionary valueForKey:@"Gamma Correction"] doubleValue])+180];
+		[gammaSlider setDoubleValue:(-100*[[plistDictionary valueForKey:@"Gamma Correction"] doubleValue])+160];
 	//set override section stuff
 	if ([automaticOverrideToggleAutomaticButton intValue] == 0)
 	{
@@ -686,8 +688,8 @@ static NSInteger localizedComparator(id a, id b, void* context)
 }
 - (IBAction)gammaChanged:(id)sender
 {
-	if ([gammaSlider doubleValue] != 80.0)
-		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Resources/WSGamma",[[NSBundle mainBundle] bundlePath]] withArgs:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-80))/100],nil]];
+	if ([gammaSlider doubleValue] != 60.0)
+		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Resources/WSGamma",[[NSBundle mainBundle] bundlePath]] withArgs:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-60))/100],nil]];
 }
 - (IBAction)windowManagerCheckBoxClicked:(id)sender
 {
@@ -881,6 +883,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[forceWrapperQuartzWMButton setState:[[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue]];
 	[forceSystemXQuartzButton setState:[[plistDictionary valueForKey:@"Use XQuartz"] intValue]];
 	[alwaysMakeLogFilesCheckBoxButton setState:[[plistDictionary valueForKey:@"Debug Mode"] intValue]];
+    [setMaxFilesCheckBoxButton setState:[[plistDictionary valueForKey:@"set max files"] intValue]];
 	[plistDictionary release];
 	NSString *x11PlistFile = [NSString stringWithFormat:@"%@/Contents/Frameworks/WSX11Prefs.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	NSDictionary *plistDictionary2 = [[NSDictionary alloc] initWithContentsOfFile:x11PlistFile];
@@ -1081,6 +1084,16 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"Debug Mode"];
 	else
 		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"Debug Mode"];
+	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
+	[plistDictionary release];
+}
+- (IBAction)setMaxFilesCheckBoxButtonPressed:(id)sender
+{
+    NSMutableDictionary* plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
+	if ([setMaxFilesCheckBoxButton state] == 0)
+		[plistDictionary setValue:[NSNumber numberWithBool:NO] forKey:@"set max files"];
+	else
+		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"set max files"];
 	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
 	[plistDictionary release];
 }
@@ -1347,7 +1360,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 - (IBAction)winetricksUpdateButtonPressed:(id)sender
 {
 	//Get the URL where winetricks is located
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.doh123.com/WineskinWinetricks/Location.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/WineskinWinetricks/Location.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *urlWhereWinetricksIs = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	urlWhereWinetricksIs = [urlWhereWinetricksIs stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	//confirm update
@@ -1853,10 +1866,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	else
 		[plistDictionary setValue:[NSNumber numberWithBool:YES] forKey:@"use start.exe"];
 	//fix gamma entry
-	if ([gammaSlider doubleValue] == 80.0)
+	if ([gammaSlider doubleValue] == 60.0)
 		[plistDictionary setValue:@"default" forKey:@"Gamma Correction"];
 	else
-		[plistDictionary setValue:[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-80))/100] forKey:@"Gamma Correction"];
+		[plistDictionary setValue:[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-60))/100] forKey:@"Gamma Correction"];
 	if ([cEXEautoOrOvverrideDesktopToggleAutomaticButton intValue] == 1)
 	{
 		//set up for RandR
@@ -2006,8 +2019,8 @@ static NSInteger localizedComparator(id a, id b, void* context)
 }
 - (IBAction)cEXEGammaChanged:(id)sender
 {
-	if ([cEXEGammaSlider doubleValue] != 80.0)
-		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Resources/WSGamma",[[NSBundle mainBundle] bundlePath]] withArgs:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%1.2f",(100.0-([cEXEGammaSlider doubleValue]-80))/100],nil]];
+	if ([cEXEGammaSlider doubleValue] != 60.0)
+		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Resources/WSGamma",[[NSBundle mainBundle] bundlePath]] withArgs:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%1.2f",(100.0-([cEXEGammaSlider doubleValue]-60))/100],nil]];
 }
 - (IBAction)changeEngineUsedButtonPressed:(id)sender
 {

@@ -412,7 +412,7 @@
 		<key>amstream</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS amstream.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS amstream.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>amstream</string>
 		</dict>
@@ -440,7 +440,7 @@
 		<key>cmd</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS cmd.exe (Microsoft, 2000) [downloadable]</string>
+			<string>MS cmd.exe (Microsoft, 2004) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>cmd</string>
 		</dict>
@@ -475,119 +475,119 @@
 		<key>d3dcompiler_43</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dcompiler_43.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dcompiler_43.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dcompiler_43</string>
 		</dict>
 		<key>d3dx10</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx10_??.dll from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx10_??.dll from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx10</string>
 		</dict>
 		<key>d3dx11_42</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx11_42.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx11_42.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx11_42</string>
 		</dict>
 		<key>d3dx11_43</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx11_43.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx11_43.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx11_43</string>
 		</dict>
 		<key>d3dx9</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_??.dll from DirectX 9 redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_??.dll from DirectX 9 redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9</string>
 		</dict>
 		<key>d3dx9_26</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_26.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_26.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_26</string>
 		</dict>
 		<key>d3dx9_28</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_28.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_28.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_28</string>
 		</dict>
 		<key>d3dx9_31</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_31.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_31.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_31</string>
 		</dict>
 		<key>d3dx9_35</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_35.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_35.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_35</string>
 		</dict>
 		<key>d3dx9_36</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_36.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_36.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_36</string>
 		</dict>
 		<key>d3dx9_39</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_39.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_39.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_39</string>
 		</dict>
 		<key>d3dx9_42</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_42.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_42.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_42</string>
 		</dict>
 		<key>d3dx9_43</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dx9_43.dll (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dx9_43.dll (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dx9_43</string>
 		</dict>
 		<key>d3dxof</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS d3dxof.dll from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS d3dxof.dll from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>d3dxof</string>
 		</dict>
 		<key>devenum</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS devenum.dll from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS devenum.dll from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>devenum</string>
 		</dict>
 		<key>dinput</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS dinput.dll; breaks mouse, use only on Rayman 2 etc. (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS dinput.dll; breaks mouse, use only on Rayman 2 etc. (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>dinput</string>
 		</dict>
 		<key>dinput8</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS DirectInput 8 from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS DirectInput 8 from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>dinput8</string>
 		</dict>
@@ -601,28 +601,28 @@
 		<key>directmusic</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS DirectMusic from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS DirectMusic from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>directmusic</string>
 		</dict>
 		<key>directplay</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS DirectPlay from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS DirectPlay from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>directplay</string>
 		</dict>
 		<key>directx9</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS DirectX 9 (Usually overkill. Try d3dx9_36 first) (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS DirectX 9 (Usually overkill. Try d3dx9_36 first) (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>directx9</string>
 		</dict>
 		<key>dmsynth</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS midi synthesizer from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS midi synthesizer from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>dmsynth</string>
 		</dict>
@@ -643,7 +643,7 @@
 		<key>dotnet20</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS .NET 2.0 (Microsoft, 2006) [downloadable]</string>
+			<string>MS .NET 2.0 (Microsoft, 2006)</string>
 			<key>WS-Name</key>
 			<string>dotnet20</string>
 		</dict>
@@ -664,7 +664,7 @@
 		<key>dotnet30</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS .NET 3.0 (Microsoft, 2006) [downloadable]</string>
+			<string>MS .NET 3.0 (Microsoft, 2006)</string>
 			<key>WS-Name</key>
 			<string>dotnet30</string>
 		</dict>
@@ -706,7 +706,7 @@
 		<key>dsound</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS DirectSound from DirectX user redistributable (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS DirectSound from DirectX user redistributable (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>dsound</string>
 		</dict>
@@ -720,14 +720,14 @@
 		<key>dxdiag</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>DirectX Diagnostic Tool (Microsoft, 2010) [downloadable,cached]</string>
+			<string>DirectX Diagnostic Tool (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>dxdiag</string>
 		</dict>
 		<key>dxdiagn</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>DirectX Diagnostic Library (Microsoft, 2010) [downloadable,cached]</string>
+			<string>DirectX Diagnostic Library (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>dxdiagn</string>
 		</dict>
@@ -769,7 +769,7 @@
 		<key>gdiplus</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS GDI+ (Microsoft, 2009) [downloadable]</string>
+			<string>MS GDI+ (Microsoft, 2004)</string>
 			<key>WS-Name</key>
 			<string>gdiplus</string>
 		</dict>
@@ -822,17 +822,10 @@
 			<key>WS-Name</key>
 			<string>icodecs</string>
 		</dict>
-		<key>ie3</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Internet Explorer 3 (Microsoft, 1996) [downloadable]</string>
-			<key>WS-Name</key>
-			<string>ie3</string>
-		</dict>
 		<key>ie6</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Internet Explorer 6 (Microsoft, 2002) [downloadable]</string>
+			<string>Internet Explorer 6 (Microsoft, 2002)</string>
 			<key>WS-Name</key>
 			<string>ie6</string>
 		</dict>
@@ -860,7 +853,7 @@
 		<key>l3codecx</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MPEG Layer-3 Audio Codec for Microsoft DirectShow (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MPEG Layer-3 Audio Codec for Microsoft DirectShow (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>l3codecx</string>
 		</dict>
@@ -881,7 +874,7 @@
 		<key>mfc40</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS mfc40 (Microsoft Foundation Classes from Visual C++ 4.0) (Microsoft, 2004) [downloadable]</string>
+			<string>MS mfc40 (Microsoft Foundation Classes from Visual C++ 4.0) (Microsoft, 1999) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>mfc40</string>
 		</dict>
@@ -898,20 +891,6 @@
 			<string>Mono 2.10 (.NET compatability) (Novell, 2011) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>mono210</string>
-		</dict>
-		<key>mono26</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Mono 2.6 (.NET compatability) (Novell, 2009) [downloadable]</string>
-			<key>WS-Name</key>
-			<string>mono26</string>
-		</dict>
-		<key>mono28</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Mono 2.8 (.NET compatability) (Novell, 2010) [downloadable]</string>
-			<key>WS-Name</key>
-			<string>mono28</string>
 		</dict>
 		<key>msasn1</key>
 		<dict>
@@ -934,13 +913,6 @@
 			<key>WS-Name</key>
 			<string>mshflxgd</string>
 		</dict>
-		<key>msi2</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Windows Installer 2.0 (Microsoft, 2001) [downloadable]</string>
-			<key>WS-Name</key>
-			<string>msi2</string>
-		</dict>
 		<key>msls31</key>
 		<dict>
 			<key>WS-Description</key>
@@ -958,7 +930,7 @@
 		<key>mspatcha</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS mspatcha (Microsoft, 2001) [downloadable]</string>
+			<string>MS mspatcha (Microsoft, 2004) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>mspatcha</string>
 		</dict>
@@ -1021,14 +993,14 @@
 		<key>pngfilt</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>pngfilt.dll (from ie6) (Microsoft, 2002) [downloadable]</string>
+			<string>pngfilt.dll (from ie5) (Microsoft, 2004) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>pngfilt</string>
 		</dict>
 		<key>quartz</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>quartz.dll (from Directx 9 user redistributable) (Microsoft, 2010) [downloadable,cached]</string>
+			<string>quartz.dll (from Directx 9 user redistributable) (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>quartz</string>
 		</dict>
@@ -1049,7 +1021,7 @@
 		<key>riched20</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS RichEdit Control version 2.0 (riched20.dll, riched32.dll) (Microsoft, 1999) [downloadable]</string>
+			<string>MS RichEdit Control version 2.0 (riched20.dll) (Microsoft, 2004) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>riched20</string>
 		</dict>
@@ -1133,7 +1105,7 @@
 		<key>vb6run</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS Visual Basic 6 runtime sp6 (Microsoft, 2004) [downloadable]</string>
+			<string>MS Visual Basic 6 runtime sp6 (Microsoft, 2004)</string>
 			<key>WS-Name</key>
 			<string>vb6run</string>
 		</dict>
@@ -1154,7 +1126,7 @@
 		<key>vcrun2008</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Visual C++ 2008 libraries (mfc90,msvcp90,msvcr90) (Microsoft, 2011) [downloadable,cached]</string>
+			<string>Visual C++ 2008 libraries (mfc90,msvcp90,msvcr90) (Microsoft, 2011) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>vcrun2008</string>
 		</dict>
@@ -1175,7 +1147,7 @@
 		<key>vcrun6sp6</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Visual C++ 6 sp6 libraries (with fixes in atl and mfc) (Microsoft, 2004) [downloadable]</string>
+			<string>Visual C++ 6 sp6 libraries (with fixes in atl and mfc) (Microsoft, 2004)</string>
 			<key>WS-Name</key>
 			<string>vcrun6sp6</string>
 		</dict>
@@ -1203,7 +1175,7 @@
 		<key>wininet</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS Windows Internet API (Microsoft, 1999) [downloadable]</string>
+			<string>MS Windows Internet API (Microsoft, 2008) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>wininet</string>
 		</dict>
@@ -1217,7 +1189,7 @@
 		<key>wmp10</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Windows Media Player 10 (Microsoft, 2006) [downloadable]</string>
+			<string>Windows Media Player 10 (Microsoft, 2006)</string>
 			<key>WS-Name</key>
 			<string>wmp10</string>
 		</dict>
@@ -1252,21 +1224,21 @@
 		<key>xact</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS XACT Engine (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS XACT Engine (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>xact</string>
 		</dict>
 		<key>xact_jun2010</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS XACT Engine (Microsoft, 2010) [downloadable,cached]</string>
+			<string>MS XACT Engine (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>xact_jun2010</string>
 		</dict>
 		<key>xinput</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Microsoft XInput (Xbox controller support) (Microsoft, 2010) [downloadable,cached]</string>
+			<string>Microsoft XInput (Xbox controller support) (Microsoft, 2010) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>xinput</string>
 		</dict>
@@ -1996,13 +1968,6 @@
 			<string>Need For Speed World (EA, 2011) [downloadable]</string>
 			<key>WS-Name</key>
 			<string>nfsworld</string>
-		</dict>
-		<key>nfsworld_mono</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Need For Speed World (using Mono) (EA, 2011) [downloadable]</string>
-			<key>WS-Name</key>
-			<string>nfsworld_mono</string>
 		</dict>
 		<key>oblivion</key>
 		<dict>
@@ -2734,6 +2699,34 @@
 			<string>Set windows version to Windows 98</string>
 			<key>WS-Name</key>
 			<string>win98</string>
+		</dict>
+		<key>windowmanagerdecorated=n</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>Prevent the window manager from decorating windows</string>
+			<key>WS-Name</key>
+			<string>windowmanagerdecorated=n</string>
+		</dict>
+		<key>windowmanagerdecorated=y</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>Allow the window manager to decorate windows (default)</string>
+			<key>WS-Name</key>
+			<string>windowmanagerdecorated=y</string>
+		</dict>
+		<key>windowmanagermanaged=n</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>Prevent the window manager from controling windows</string>
+			<key>WS-Name</key>
+			<string>windowmanagermanaged=n</string>
+		</dict>
+		<key>windowmanagermanaged=y</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>Allow the window manager to control windows (default)</string>
+			<key>WS-Name</key>
+			<string>windowmanagermanaged=y</string>
 		</dict>
 		<key>winver=</key>
 		<dict>

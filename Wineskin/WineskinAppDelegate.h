@@ -90,6 +90,7 @@
 	
 	//advanced menu - Options Tab
 	IBOutlet NSButton *alwaysMakeLogFilesCheckBoxButton;
+    IBOutlet NSButton *setMaxFilesCheckBoxButton;
 	IBOutlet NSButton *optSendsAltCheckBoxButton;
 	IBOutlet NSButton *emulateThreeButtonMouseCheckBoxButton;
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
@@ -264,6 +265,7 @@
 
 //advanced menu - Options Tab
 - (IBAction)alwaysMakeLogFilesCheckBoxButtonPressed:(id)sender;
+- (IBAction)setMaxFilesCheckBoxButtonPressed:(id)sender;
 - (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
 - (IBAction)emulateThreeButtonMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
