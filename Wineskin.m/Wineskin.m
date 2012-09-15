@@ -1014,19 +1014,13 @@
 			wineskinX11FontPathPrefix=[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold];
 	}
 	NSString *wineskinX11FontPath = wineskinX11FontPath = [NSString stringWithFormat:@"-fp \"%@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util\"",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
-	// set log variable
-	NSString *logFileLocation;
-	if (debugEnabled)
-        logFileLocation = @"/dev/null";
-	else
-		logFileLocation=x11LogFile;
 	//make sure the X11 lock files is gone before starting X11
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	//find WineskinX11 executable PID (this is only used for proper shut down, all other PID usage for X11 should be the Bundle PID
 	//make first pid array
 	NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];	
 	//Start WineskinX11
-	wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"%@\" 2>&1 & echo \"$!\"",theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine,logFileLocation]];
+	wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"/dev/null\" 2>&1 & echo \"$!\"",theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine]];
 	//do loop compare to find correct wineskinX11PID, only try 3 times, then try again slower 5 times over 5 seconds
 	wineskinX11PID = @"-1";
 	BOOL match = YES;
