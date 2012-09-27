@@ -334,7 +334,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	NSArray *filesTEMP1 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files1 = [NSMutableArray arrayWithCapacity:10];
 	for (NSString *item in filesTEMP1)
-		if ([item hasSuffix:@".exe"] || [item hasSuffix:@".bat"] || [item hasSuffix:@".msi"])
+		if ([[item lowercaseString] hasSuffix:@".exe"] || [[item lowercaseString] hasSuffix:@".bat"] || [[item lowercaseString] hasSuffix:@".msi"])
 			[files1 addObject:item];
 	//copy or move the folder to Program Files
 	NSString *theFileNamePath = [[panel filenames] objectAtIndex:0];
@@ -366,7 +366,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	NSArray *filesTEMP2 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files2 = [NSMutableArray arrayWithCapacity:10];
 	for (NSString *item in filesTEMP2)
-		if ([item hasSuffix:@".exe"] || [item hasSuffix:@".bat"] || [item hasSuffix:@".msi"])
+		if ([[item lowercaseString] hasSuffix:@".exe"] || [[item lowercaseString] hasSuffix:@".bat"] || [[item lowercaseString] hasSuffix:@".msi"])
 			[files2 addObject:item];
 	NSMutableArray *finalList = [NSMutableArray arrayWithCapacity:5];
 	//fill new array of new .exe, .msi, and .bat files
