@@ -109,7 +109,7 @@
 - (void)installEngine;
 
 //Changes VD Desktop user.reg entries to a given virtual desktop
-- (void)setToVirtualDesktop:(NSString *)resolution named:(NSString *)desktopName;
+- (void)setToVirtualDesktop:(NSString *)resolution;
 
 //Changes VD Desktop user.reg entires to not have a virtual desktop
 - (void)setToNoVirtualDesktop;
@@ -171,10 +171,6 @@
     [fm createDirectoryAtPath:tmpFolder withIntermediateDirectories:YES attributes:nil error:nil];
     displayNumberFile = [NSString stringWithFormat:@"%@/currentuseddisplay",tmpFolder];
     wineserverPIDFile = [NSString stringWithFormat:@"%@/wineserverpidfile",tmpFolder];
-    
-    
-    
-    
 	lockfile=[NSString stringWithFormat:@"%@/lockfile",tmpFolder];
     wineLogFile = [NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix];
     wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
@@ -349,9 +345,9 @@
 					programNameAndPath = [NSString stringWithFormat:@"/windows/system32/%@.exe",[wssCommand stringByReplacingOccurrencesOfString:@"WSS-" withString:@""]];
 				}
 				programFlags = @""; // just in case there were some flags... don't use on these.
-				if ([wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-winetricks"])
+				if ([wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"])
 					nonStandardRun=YES; // handle Wine differently if its one of these 2
-			}			
+			}
 		}
 		else if ([wssCommand isEqualToString:@"debug"]) //if wssCommand is debug, run in debug mode
 		{
@@ -396,7 +392,7 @@
 	int randomint = 5+(int)(rand()%9994);
 	if (randomint<0){randomint=randomint*(-1);}
 	theDisplayNumber = [NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]];
-
+    
 	//****** if CPUs Disabled, disable all but 1 CPU
 	NSString *cpuCountInput;
 	if ([[plistDictionary valueForKey:@"Disable CPUs"] intValue] == 1)
@@ -453,7 +449,7 @@
         if ([[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue] == 1)
             [self tryToUseGPUInfo];
     }
-
+    
     //**********start wine
 	NSLog(@"Starting specified executable in Wine");
 	wineServerPID = [self startWine];
@@ -500,7 +496,7 @@
 		for (i=2;i<=cpuCount;i++)
 			[self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_enable %d",i]];
 	}
-
+    
 	//********** Wineskin Customizer shut down script
 	system([[NSString stringWithFormat:@"\"%@/WineskinShutdownScript\"",winePrefix] UTF8String]);
 	
@@ -659,13 +655,13 @@
 		if (doSymlinks && ([symlinkMyPictures length] > 0))
 		{
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix] error:nil];
-			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix] withDestinationPath:symlinkMyPictures error:nil];		
+			[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix] withDestinationPath:symlinkMyPictures error:nil];
 			[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/Wineskin/My Pictures\"",winePrefix]];
 		}
 		else
 			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix] withIntermediateDirectories:NO attributes:nil error:nil];
 	}
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];	
+	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:@"Wineskin" error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/crossover\"",winePrefix]];
@@ -961,9 +957,9 @@
 		NSLog(@"Using Engine %@",engineVersion);
 	}
 	//fix the Frameworks Libraires
-	[self fixFrameworksLibraries];	
+	[self fixFrameworksLibraries];
 	//set up quartz-wm launch correctly
-	NSString *quartzwmLine = [self setWindowManager];						  
+	NSString *quartzwmLine = [self setWindowManager];
 	//copy the plist over
 	[fm removeItemAtPath:x11PListFile error:nil];
 	[fm copyItemAtPath:wsX11PlistFile toPath:x11PListFile error:nil];
@@ -997,7 +993,7 @@
 		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)@"ERROR! cannot write to Info.plist, there are permission problems, or you are on a read-only volume.\n\nThis cannot run from within a read-only dmg file.", NULL);
 		wineskinX11PID = @"ERROR";
 		return;
-	}	
+	}
 	//set up fontpath variable for server depending where X11 fonts are on the system
 	NSString *wineskinX11FontPathPrefix = @"/opt/X11/share/fonts";
 	if (![fm fileExistsAtPath:wineskinX11FontPathPrefix])
@@ -1018,7 +1014,7 @@
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	//find WineskinX11 executable PID (this is only used for proper shut down, all other PID usage for X11 should be the Bundle PID
 	//make first pid array
-	NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];	
+	NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];
 	//Start WineskinX11
 	wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"/dev/null\" 2>&1 & echo \"$!\"",theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine]];
 	//do loop compare to find correct wineskinX11PID, only try 3 times, then try again slower 5 times over 5 seconds
@@ -1150,16 +1146,16 @@
 			{
 				//WineskinX11 is frontmost
 				/* Testing Data
-				if (i==0)
-					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! No method used\nWSTEST\nWSTEST");
-				else if (i==1)
-					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! NSWorkSpace launchApplication method successful\nWSTEST\nWSTEST");
-				else if (i==2)
-					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! system open method successful\nWSTEST\nWSTEST");
-				else if (i==3)
-					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! NSAppleScript activate method successful\nWSTEST\nWSTEST");
-				else if (i==3)
-					NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! osascript activate method successful\nWSTEST\nWSTEST");
+                 if (i==0)
+                 NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! No method used\nWSTEST\nWSTEST");
+                 else if (i==1)
+                 NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! NSWorkSpace launchApplication method successful\nWSTEST\nWSTEST");
+                 else if (i==2)
+                 NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! system open method successful\nWSTEST\nWSTEST");
+                 else if (i==3)
+                 NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! NSAppleScript activate method successful\nWSTEST\nWSTEST");
+                 else if (i==3)
+                 NSLog(@"WSTEST\nWSTEST\nThe App was detected as frontmost!!!! osascript activate method successful\nWSTEST\nWSTEST");
 				 */
 				break;
 			}
@@ -1271,9 +1267,10 @@
 	[fm release];
 }
 
-- (void)setToVirtualDesktop:(NSString *)resolution named:(NSString *)desktopName
+- (void)setToVirtualDesktop:(NSString *)resolution
 {
 	// TODO test if on read/write volume first
+    NSString *desktopName = [[appNameWithPath substringFromIndex:[appNameWithPath rangeOfString:@"/" options:NSBackwardsSearch].location+1] stringByReplacingOccurrencesOfString:@".app" withString:@""];
 	//read in user.reg to an array
 	NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 	NSMutableArray *newUserRegContents = [NSMutableArray arrayWithCapacity:[userRegContents count]];
@@ -1396,96 +1393,81 @@
 	if (nonStandardRun)
 	{
 		[self setToNoVirtualDesktop];
-		if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-wineboot"])
-		{
-			NSString *wineDebugLine = @"err-all,warn-all,fixme-all,trace-all";
-			//remove the .update-timestamp file
-			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/.update-timestamp",winePrefix] error:nil];
-			//calling wineboot is a simple builtin refresh that needs to NOT prompt for gecko
-			NSString *mshtmlLine = @"";
-			if ([wssCommand isEqualToString:@"WSS-wineboot"]) mshtmlLine = @"export WINEDLLOVERRIDES=\"mscoree,mshtml=\";";
-			[self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot > \"/dev/null\" 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath]];
-			usleep(3000000);
-			if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
-			{
-				//make sure windows/profiles is using users folder
-				[fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix] error:nil];
-				[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix] withDestinationPath:@"../users" error:nil];							
-				[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/windows/profiles\"",winePrefix]];
-				//rename new user folder to Wineskin and make symlinks
-				if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()]])
-				{
-					[fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];
-					[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
-					[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
-				}
-				else if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix]])
-				{
-					[fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];
-					[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:@"Wineskin" error:nil];
-					[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/crossover\"",winePrefix]];
-				}
-				else //this shouldn't ever happen.. but what the heck
-				{
-					[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
-					[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
-					[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
-				}
-				//load Wineskin default reg entries
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\" 2>&1",wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,contentsFold]];
-				usleep(5000000);
-			}
-			//fix user name entires over to Wineskin
-			NSArray *userReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
-			NSMutableArray *newUserReg = [NSMutableArray arrayWithCapacity:[userReg count]];
-			for (NSString *item in userReg)
-				[newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
-			[self writeStringArray:[NSArray arrayWithArray:newUserReg] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
-			[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
-			NSArray *userDefReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
-			NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:[userDefReg count]];
-			for (NSString *item in userDefReg)
-				[newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
-			[self writeStringArray:[NSArray arrayWithArray:newUserDefReg] toFile:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
-			// need Temp folder in Wineskin folder
-			[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
-			// do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
-			// Task Number 3221715 Fix Wrapper Permissions
-			//cocoa command don't seem to be working right, but chmod system command works fine.
-			// cannot 755 the whole wrapper and then change to 777s or this can break the wrapper for non-Admin users.
-			//[self systemCommand:[NSString stringWithFormat:@"chmod 755 \"%@\"",appNameWithPath]];
-			// need to chmod 777 on Contents, Resources, and Resources/* for multiuser fix on same machine
-			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",contentsFold]];
-			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
-			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",frameworksFold]];
-			[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/wswine.bundle\"",frameworksFold]];//for ICE symlinks
-			[self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@/drive_c\"",winePrefix]];
-			NSArray *tmpy2 = [fm contentsOfDirectoryAtPath:winePrefix error:nil];
-			for (NSString *item in tmpy2)
-				[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,item]];
-			NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix] error:nil];
-			for (NSString *item in tmpy3)
-				[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/dosdevices/%@\"",winePrefix,item]];
-		}
-		else if ([wssCommand isEqualToString:@"WSS-winetricks"])
-		{
-			NSString *wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
-			if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
-			    || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"]))) //just getting a list of packages... X should NOT be running.
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@/Logs/WinetricksTemp.log\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],winePrefix]];
-			else
-				[self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,cliCustomCommands,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
-			usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
-		}
+        NSString *wineDebugLine = @"err-all,warn-all,fixme-all,trace-all";
+        //remove the .update-timestamp file
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/.update-timestamp",winePrefix] error:nil];
+        //calling wineboot is a simple builtin refresh that needs to NOT prompt for gecko
+        NSString *mshtmlLine = @"";
+        if ([wssCommand isEqualToString:@"WSS-wineboot"]) mshtmlLine = @"export WINEDLLOVERRIDES=\"mscoree,mshtml=\";";
+        [self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot > \"/dev/null\" 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath]];
+        usleep(3000000);
+        if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
+        {
+            //make sure windows/profiles is using users folder
+            [fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix] error:nil];
+            [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix] withDestinationPath:@"../users" error:nil];
+            [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/windows/profiles\"",winePrefix]];
+            //rename new user folder to Wineskin and make symlinks
+            if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()]])
+            {
+                [fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];
+                [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
+                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
+            }
+            else if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix]])
+            {
+                [fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] error:nil];
+                [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:@"Wineskin" error:nil];
+                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/crossover\"",winePrefix]];
+            }
+            else //this shouldn't ever happen.. but what the heck
+            {
+                [fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
+                [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
+                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
+            }
+            //load Wineskin default reg entries
+            [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\" 2>&1",wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,contentsFold]];
+            usleep(5000000);
+        }
+        //fix user name entires over to Wineskin
+        NSArray *userReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+        NSMutableArray *newUserReg = [NSMutableArray arrayWithCapacity:[userReg count]];
+        for (NSString *item in userReg)
+            [newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
+        [self writeStringArray:[NSArray arrayWithArray:newUserReg] toFile:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+        [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+        NSArray *userDefReg = [self readFileToStringArray:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
+        NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:[userDefReg count]];
+        for (NSString *item in userDefReg)
+            [newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
+        [self writeStringArray:[NSArray arrayWithArray:newUserDefReg] toFile:[NSString stringWithFormat:@"%@/userdef.reg",winePrefix]];
+        // need Temp folder in Wineskin folder
+        [fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Temp",winePrefix] withIntermediateDirectories:YES attributes:nil error:nil];
+        // do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
+        // Task Number 3221715 Fix Wrapper Permissions
+        //cocoa command don't seem to be working right, but chmod system command works fine.
+        // cannot 755 the whole wrapper and then change to 777s or this can break the wrapper for non-Admin users.
+        //[self systemCommand:[NSString stringWithFormat:@"chmod 755 \"%@\"",appNameWithPath]];
+        // need to chmod 777 on Contents, Resources, and Resources/* for multiuser fix on same machine
+        [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",contentsFold]];
+        [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
+        [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",frameworksFold]];
+        [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/wswine.bundle\"",frameworksFold]];//for ICE symlinks
+        [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@/drive_c\"",winePrefix]];
+        NSArray *tmpy2 = [fm contentsOfDirectoryAtPath:winePrefix error:nil];
+        for (NSString *item in tmpy2)
+            [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,item]];
+        NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix] error:nil];
+        for (NSString *item in tmpy3)
+            [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/dosdevices/%@\"",winePrefix,item]];
 	}
 	else //Normal Wine Run
 	{
-		//set desktop name for VD
-        NSString *virtualDesktopName = [[appNameWithPath substringFromIndex:[appNameWithPath rangeOfString:@"/" options:NSBackwardsSearch].location+1] stringByReplacingOccurrencesOfString:@".app" withString:@""];
 		//edit reg entiries for VD settings
 		if ([vdResolution isEqualToString:@"novd"]) [self setToNoVirtualDesktop];
-		else [self setToVirtualDesktop:vdResolution named:virtualDesktopName];
-		// if Wineserver was already running, use the same one, so no need to do X or keepthe daemon running
+		else [self setToVirtualDesktop:vdResolution];
+		// if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
 		if (![wineserverPIDToCheck isEqualToString:@"-9"])// -9 means its not running for sure as the temp files didn't exist
             if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
             {
@@ -1511,13 +1493,24 @@
 		}
 		//fix start.exe line
 		NSString *startExeLine = @"";
-		if (runWithStartExe) startExeLine = @" start /unix";		
+		if (runWithStartExe) startExeLine = @" start /unix";
         //make first pid array
         NSArray *firstPIDlist;
         if (![returnPID isEqualToString:wineserverPIDToCheck])
             firstPIDlist = [self makePIDArray:@"wineserver"];
-		//Wine start section... if opening files handle differently.
-		if (openingFiles)
+		//Wine start section
+        if ([wssCommand isEqualToString:@"WSS-winetricks"])
+        {
+            NSString *wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
+            if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
+                || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"]))) //just getting a list of packages... X should NOT be running.
+                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@/Logs/WinetricksTemp.log\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],winePrefix]];
+            else
+                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,cliCustomCommands,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
+            usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
+        }
+		else if (openingFiles)
+        {
 			for (NSString *item in filesToRun) //start wine with files
             {
                 //don't try to run things xorg sometimes passes back stupidly...
@@ -1534,8 +1527,12 @@
                 if (breakOut) break;
 				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,dyldFallBackLibraryPath,item,wineLogFileLocal]];
             }
-		else  //launch Wine normally
+        }
+		else
+        {
+            //launch Wine normally
 			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,dyldFallBackLibraryPath,startExeLine,wineRunFile,programFlags,wineLogFileLocal]];
+        }
 		vdResolution = [vdResolution stringByReplacingOccurrencesOfString:@"x" withString:@" "];
         if (![returnPID isEqualToString:wineserverPIDToCheck])
         {
