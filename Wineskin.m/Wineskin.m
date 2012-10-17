@@ -173,13 +173,13 @@
         wssCommand = @"nothing";
     }
 	if ([wssCommand isEqualToString:@"CustomEXE"]) cexeRun = YES;
-	//if wssCommand is WSS-InstallICE, then just run ICE install and quit!
 	contentsFold=[[NSString stringWithFormat:@"%@",[[NSBundle mainBundle] bundlePath]] stringByReplacingOccurrencesOfString:@"/Frameworks/bin" withString:@""];
 	frameworksFold=[NSString stringWithFormat:@"%@/Frameworks",contentsFold];
 	appNameWithPath=[[NSString stringWithFormat:@"%@",contentsFold] stringByReplacingOccurrencesOfString:@"/Contents" withString:@""];
 	infoPlistFile = [NSString stringWithFormat:@"%@/Info.plist",contentsFold];
 	winePrefix=[NSString stringWithFormat:@"%@/Resources",contentsFold];
     tmpFolder=[NSString stringWithFormat:@"/tmp/%@",[appNameWithPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
+    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
     [fm createDirectoryAtPath:tmpFolder withIntermediateDirectories:YES attributes:nil error:nil];
     displayNumberFile = [NSString stringWithFormat:@"%@/currentuseddisplay",tmpFolder];
     wineserverPIDFile = [NSString stringWithFormat:@"%@/wineserverpidfile",tmpFolder];
@@ -203,13 +203,19 @@
     {
         //create lockfile that we are already in use
         [self writeStringArray:[NSArray arrayWithObject:NSUserName()] toFile:lockfile];
+        [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
     }
+    //if wssCommand is WSS-InstallICE, then just run ICE install and quit!
 	[self installEngine];
 	if ([wssCommand isEqualToString:@"WSS-InstallICE"])
     {
         //delete the lockfile
+        [fm removeItemAtPath:displayNumberFile error:nil];
+        [fm removeItemAtPath:wineserverPIDFile error:nil];
+        [fm removeItemAtPath:lockfile error:nil];
         [fm removeItemAtPath:tmpFolder error:nil];
         //just called for ICE install, dont run.
+        [fm release];
         return;
     }
     if ([fm fileExistsAtPath:wineserverPIDFile])
@@ -412,20 +418,14 @@
 		//error, file doesn't exist, and its not a special command
 		NSLog(@"Error! Set executable not found.  Wineskin.app running instead.");
 		system([[NSString stringWithFormat:@"open \"%@/Wineskin.app\"",appNameWithPath] UTF8String]);
+        [fm removeItemAtPath:displayNumberFile error:nil];
+        [fm removeItemAtPath:wineserverPIDFile error:nil];
+        [fm removeItemAtPath:lockfile error:nil];
         [fm removeItemAtPath:tmpFolder error:nil];
 		return;
 	}
 	//********** Wineskin Customizer start up script
 	system([[NSString stringWithFormat:@"\"%@/WineskinStartupScript\"",winePrefix] UTF8String]);
-	
-	//**********set the display number
-	srand((unsigned)time(0));
-	int randomint = 5+(int)(rand()%9994);
-	if (randomint < 0)
-    {
-        randomint = randomint * (-1);
-    }
-	[theDisplayNumber setString:[NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]]];
     
 	//****** if CPUs Disabled, disable all but 1 CPU
 	NSString *cpuCountInput;
@@ -442,6 +442,16 @@
     if (lockFileAlreadyExisted)
     {
         killWineskin = YES;
+        //use old $DISPLAY number
+        if ([fm fileExistsAtPath:displayNumberFile])
+        {
+            [theDisplayNumber setString:[[self readFileToStringArray:displayNumberFile] objectAtIndex:0]];
+        }
+        else //error, no display file, but WineskinX11 is running?
+        {
+            NSLog(@"ERROR: WineskinX11 may be running, but there is no $DISPLAY value stored, cannot launch anything new.  You may need to make sure the wrapper properly shuts down before starting it again.");
+        }
+        //ignore if no WineskinX11 is running, must have been in error
         if (![self systemCommand:@"killall -0 WineskinX11 2>&1"])
         {
             NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
@@ -451,6 +461,16 @@
     }
     if (!lockFileAlreadyExisted)
     {
+        //**********set a new display number
+        srand((unsigned)time(0));
+        int randomint = 5+(int)(rand()%9994);
+        if (randomint < 0)
+        {
+            randomint = randomint * (-1);
+        }
+        [theDisplayNumber setString:[NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]]];
+        [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",theDisplayNumber],nil] toFile:displayNumberFile];
+        [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
         //**********start the X server
         if (useXQuartz)
         {
@@ -461,6 +481,9 @@
             [self startX11];
             if ([wrapperBundlePID isEqualToString:@"ERROR"])
             {
+                [fm removeItemAtPath:displayNumberFile error:nil];
+                [fm removeItemAtPath:wineserverPIDFile error:nil];
+                [fm removeItemAtPath:lockfile error:nil];
                 [fm removeItemAtPath:tmpFolder error:nil];
                 return;
             }
@@ -517,6 +540,10 @@
     if (debugEnabled)
     {
         //use mini detail level so no personal information can be displayed
+        if (useXQuartz)
+        {
+            [self systemCommand:[NSString stringWithFormat:@"echo \"No X11 Log info when using XQuartz!\n\" > \"%@\"",x11LogFile]];
+        }
         [self systemCommand:[NSString stringWithFormat:@"system_profiler -detailLevel mini SPHardwareDataType SPDisplaysDataType >> \"%@\"",x11LogFile]];
     }
     
@@ -1214,6 +1241,10 @@
 			NSLog(@"Error: XQuartz cannot already be running if using Override Fullscreen option!  Please close XQuartz and try again!");
 			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: XQuartz cannot already be running if using Override Fullscreen option!\n\nPlease close XQuartz and try again!"), NULL);
 			killWineskin = YES;
+            [fm removeItemAtPath:displayNumberFile error:nil];
+            [fm removeItemAtPath:wineserverPIDFile error:nil];
+            [fm removeItemAtPath:lockfile error:nil];
+            [fm removeItemAtPath:tmpFolder error:nil];
 			return;
 		}
 		//make first pid array
@@ -1579,6 +1610,15 @@
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSMutableString *returnPID = [[[NSMutableString alloc] init] autorelease];
     [returnPID setString:@"-1"];
+    // if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
+    if (![wineserverPIDToCheck isEqualToString:@"-9"])// -9 means its not running for sure as the temp files didn't exist
+    {
+        if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
+        {
+            [returnPID setString:wineserverPIDToCheck];
+            killWineskin = YES;
+        }
+    }
 	if (nonStandardRun)
 	{
 		[self setToNoVirtualDesktop];
@@ -1673,18 +1713,6 @@
         {
             [self setToVirtualDesktop:vdResolution];
         }
-		// if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
-		if (![wineserverPIDToCheck isEqualToString:@"-9"])// -9 means its not running for sure as the temp files didn't exist
-        {
-            if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
-            {
-                [returnPID setString:wineserverPIDToCheck];
-                killWineskin = YES;
-                [theDisplayNumber setString:[[self readFileToStringArray:displayNumberFile] objectAtIndex:0]];
-            }
-        }
-		//write out new display file
-		[self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",theDisplayNumber],nil] toFile:displayNumberFile];
 		NSString *wineDebugLine;
         NSString *wineLogFileLocal = [NSString stringWithFormat:@"%@",wineLogFile];
 		//set log file names, and stuff
@@ -1803,11 +1831,14 @@
         {
             [fm release];
             killWineskin = YES;
+            NSLog(@"ERROR, no new wineserver was launched, shutting down wrapper");
+            [self cleanUpAndShutDown];
             return @"-1";
         }
         if (![returnPID isEqualToString:wineserverPIDToCheck])
         {
             [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",returnPID],nil] toFile:wineserverPIDFile];
+            [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
         }
 	}
 	[fm release];
@@ -1980,6 +2011,9 @@
     //get rid of the preference file
     [fm removeItemAtPath:x11PListFile error:nil];
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@.lockfile",x11PListFile] error:nil];
+    [fm removeItemAtPath:displayNumberFile error:nil];
+    [fm removeItemAtPath:wineserverPIDFile error:nil];
+    [fm removeItemAtPath:lockfile error:nil];
     [fm removeItemAtPath:tmpFolder error:nil];
 	[fm release];
 }
