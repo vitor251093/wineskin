@@ -12,7 +12,6 @@
 	NSString *appNameWithPath;                      //full path to and including the app name
 	NSString *lockfile;                             //lockfile being used to know if the app is already in use
     NSString *tmpFolder;                            //where tmp files can be made and used to be specific to just this wrapper
-	NSString *engineVersion;                        //engine being used
 	NSString *wineserverPIDFile;                    //pid file holding wineserver pid of current/last run
 	NSString *displayNumberFile;                    //pid file holding display number of current/last run
 	NSString *infoPlistFile;                        //the Info.plist file in the wrapper
@@ -49,6 +48,7 @@
 	BOOL nonStandardRun;                            //set if a special wine run
 	BOOL openingFiles;                              //set if we are opening files instead of a program
 	BOOL isIce;                                     //YES if ICE engine being used
+    BOOL removeX11TraceFromLog;                     //YES if Wineskin added the X11 trace to winedebug to remove them from the output log
 	NSString *wssCommand;                           //should be argv[1], if a special command
 	NSArray *winetricksCommands;                    //should be argv[2]+ if wssCommand is WSS-winetricks
 	NSMutableString *programNameAndPath;            //directly from the info.plist
@@ -152,6 +152,7 @@
     xQuartzX11BinPID = [[[NSMutableString alloc] init] autorelease];
     programNameAndPath = [[[NSMutableString alloc] init] autorelease];
     cliCustomCommands = [[[NSMutableString alloc] init] autorelease];
+    removeX11TraceFromLog = NO;
 	runWithStartExe = NO;
 	fullScreenOption = NO;
 	useRandR = NO;
@@ -452,7 +453,7 @@
             NSLog(@"ERROR: WineskinX11 may be running, but there is no $DISPLAY value stored, cannot launch anything new.  You may need to make sure the wrapper properly shuts down before starting it again.");
         }
         //ignore if no WineskinX11 is running, must have been in error
-        if (![self systemCommand:@"killall -0 WineskinX11 2>&1"])
+        if ([self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
         {
             NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
             lockFileAlreadyExisted = NO;
@@ -539,11 +540,17 @@
     //********** Write system info to end X11 log file
     if (debugEnabled)
     {
-        //use mini detail level so no personal information can be displayed
         if (useXQuartz)
         {
             [self systemCommand:[NSString stringWithFormat:@"echo \"No X11 Log info when using XQuartz!\n\" > \"%@\"",x11LogFile]];
         }
+        NSString *versionFile = [NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold];
+        if ([fm fileExistsAtPath:versionFile])
+        {
+            NSArray *tempArray = [self readFileToStringArray:versionFile];
+            [self systemCommand:[NSString stringWithFormat:@"echo \"Engine Used: %@\" >> \"%@\"",[tempArray objectAtIndex:0],x11LogFile]];
+        }
+        //use mini detail level so no personal information can be displayed
         [self systemCommand:[NSString stringWithFormat:@"system_profiler -detailLevel mini SPHardwareDataType SPDisplaysDataType >> \"%@\"",x11LogFile]];
     }
     
@@ -1090,16 +1097,6 @@
     }
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
 	NSFileManager *fm = [NSFileManager defaultManager];
-	//get current engine
-	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold]])
-	{
-		NSArray *tempArray = [self readFileToStringArray:[NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold]];
-		engineVersion = [tempArray objectAtIndex:0];
-        if (debugEnabled)
-        {
-            [self systemCommand:[NSString stringWithFormat:@"echo \"Engine Used: %@\" >> \"%@\"",engineVersion,x11LogFile]];
-        }
-	}
 	//fix the Frameworks Libraires
 	[self fixFrameworksLibraries];
 	//set up quartz-wm launch correctly
@@ -1722,7 +1719,15 @@
         }
 		else if (debugEnabled && fullScreenOption) //always need a log with x11settings
         {
-			wineDebugLine = [NSString stringWithFormat:@"%@,trace+x11settings",wineDebugLineFromPlist];
+            if ([wineDebugLineFromPlist rangeOfString:@"trace+x11settings"].location == NSNotFound)
+            {
+                removeX11TraceFromLog = YES;
+                wineDebugLine = [NSString stringWithFormat:@"%@,trace+x11settings",wineDebugLineFromPlist];
+            }
+            else
+            {
+                wineDebugLine = wineDebugLineFromPlist;
+            }
         }
 		else if (!debugEnabled && fullScreenOption) //need log for reso changes
         {
@@ -1907,9 +1912,9 @@
 				{
 					if ([item hasPrefix:@"trace:x11settings:X11DRV_ChangeDisplaySettingsEx width="])
 					{
-						[newScreenReso setString:[item substringToIndex:[newScreenReso rangeOfString:@" bpp="].location]];
-                        [newScreenReso replaceOccurrencesOfString:@"trace:x11settings:X11DRV_ChangeDisplaySettingsEx width=" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
-                        [newScreenReso replaceOccurrencesOfString:@"height=" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
+						[newScreenReso setString:[item substringToIndex:[item rangeOfString:@" bpp="].location]];
+                        [newScreenReso replaceOccurrencesOfString:@"trace:x11settings:X11DRV_ChangeDisplaySettingsEx width=" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [newScreenReso length])];
+                        [newScreenReso replaceOccurrencesOfString:@"height=" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [newScreenReso length])];
 						[self setResolution:newScreenReso];
 					}
 				}
@@ -1993,8 +1998,28 @@
         NSArray *tempArray = [self readFileToStringArray:wineLogFile];
         NSArray *oldDataArray = [self readFileToStringArray:wineTempLogFile];
         NSMutableArray *temp = [NSMutableArray arrayWithCapacity:[oldDataArray count]];
-        [temp addObjectsFromArray:oldDataArray];
-        [temp addObjectsFromArray:tempArray];
+        if (removeX11TraceFromLog)
+        {
+            for (NSString *item in oldDataArray)
+            {
+                if ([item rangeOfString:@"trace:x11settings"].location == NSNotFound)
+                {
+                    [temp addObject:item];
+                }
+            }
+            for (NSString *item in tempArray)
+            {
+                if ([item rangeOfString:@"trace:x11settings"].location == NSNotFound)
+                {
+                    [temp addObject:item];
+                }
+            }
+        }
+        else
+        {
+            [temp addObjectsFromArray:oldDataArray];
+            [temp addObjectsFromArray:tempArray];
+        }
         [self writeStringArray:temp toFile:wineLogFile];
     }
 	//fixes for multi-user use
