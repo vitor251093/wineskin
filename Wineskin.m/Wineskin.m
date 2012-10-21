@@ -180,8 +180,8 @@
 	infoPlistFile = [NSString stringWithFormat:@"%@/Info.plist",contentsFold];
 	winePrefix=[NSString stringWithFormat:@"%@/Resources",contentsFold];
     tmpFolder=[NSString stringWithFormat:@"/tmp/%@",[appNameWithPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
-    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
     [fm createDirectoryAtPath:tmpFolder withIntermediateDirectories:YES attributes:nil error:nil];
+    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
     displayNumberFile = [NSString stringWithFormat:@"%@/currentuseddisplay",tmpFolder];
     wineserverPIDFile = [NSString stringWithFormat:@"%@/wineserverpidfile",tmpFolder];
 	lockfile=[NSString stringWithFormat:@"%@/lockfile",tmpFolder];
@@ -196,6 +196,7 @@
 		if (![[[self readFileToStringArray:lockfile] objectAtIndex:0] isEqualToString:NSUserName()])
 		{
 			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Another user on this system is currently using this application\n\nThey must exit the application before you can use it."), NULL);
+            [fm release];
 			return;
 		}
         lockFileAlreadyExisted = YES;
@@ -1122,7 +1123,7 @@
 	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/.Xmodmap" withDestinationPath:[NSString stringWithFormat:@"%@/.Xmodmap",frameworksFold] error:nil];
 	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/.Xmodmap"];
 	//change Info.plist to use main.nib (xquartz's nib) instead of MainMenu.nib (WineskinLauncher's nib)
-	NSMutableDictionary* quickEdit1 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
+	NSMutableDictionary* quickEdit1 = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit1 setValue:@"X11Application" forKey:@"NSPrincipalClass"];
 	[quickEdit1 setValue:@"main.nib" forKey:@"NSMainNibFile"];
 	BOOL fileWriteWorked = [quickEdit1 writeToFile:infoPlistFile atomically:YES];
@@ -1203,7 +1204,7 @@
 	usleep(500000);
 	//bring X11 to front before any windows are drawn
 	[self bringToFront:wrapperBundlePID];
-	NSMutableDictionary* quickEdit2 = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
+	NSMutableDictionary* quickEdit2 = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
 	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
 	[quickEdit2 writeToFile:infoPlistFile atomically:YES];
