@@ -1794,6 +1794,10 @@
             //launch Wine normally
 			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,dyldFallBackLibraryPath,startExeLine,wineRunFile,programFlags,wineLogFileLocal]];
         }
+        
+        // troy's hack?  sleep a bit (.25 secs) for pid to appear valid? (increased to 0.33 seconds)
+        usleep(330000);
+        
         [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
         if (![returnPID isEqualToString:wineserverPIDToCheck])
         {
