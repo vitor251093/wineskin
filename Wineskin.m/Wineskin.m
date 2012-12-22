@@ -57,6 +57,7 @@
 	BOOL killWineskin;                              //sets to true if opening files and wineserver was already running, kills extra wineskin
 	NSMutableString *cliCustomCommands;             //from CLI Variables entry in info.plist
 	NSString *dyldFallBackLibraryPath;              //the path for DYLD_FALLBACK_LIBRARY_PATH
+    BOOL useMacDriver;                              //YES if using Mac Driver over X11
 }
 //the main running of the program...
 - (void)mainRun:(NSArray *)argv;
@@ -93,6 +94,9 @@
 
 //returns the correct line needed for startX11 to get the right quartz-wm started
 - (NSString *)setWindowManager;
+
+//checks if Mac or X11 driver is set in Wine
+- (BOOL)checkToUseMacDriver;
 
 //starts up WineskinX11
 - (void)startX11;
@@ -188,6 +192,7 @@
     wineLogFile = [NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix];
     wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
     x11LogFile = [NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
+    useMacDriver = [self checkToUseMacDriver];
 	//exit if the lock file exists, another user is running this wrapper currently
     BOOL lockFileAlreadyExisted = NO;
 	if ([fm fileExistsAtPath:lockfile])
@@ -440,74 +445,76 @@
 			[self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_disable %d",i]];
         }
 	}
-    
-    if (lockFileAlreadyExisted)
+    if (!useMacDriver)
     {
-        killWineskin = YES;
-        //use old $DISPLAY number
-        if ([fm fileExistsAtPath:displayNumberFile])
+        if (lockFileAlreadyExisted)
         {
-            [theDisplayNumber setString:[[self readFileToStringArray:displayNumberFile] objectAtIndex:0]];
-        }
-        else //error, no display file, but WineskinX11 is running?
-        {
-            NSLog(@"ERROR: WineskinX11 may be running, but there is no $DISPLAY value stored, cannot launch anything new.  You may need to make sure the wrapper properly shuts down before starting it again.");
-        }
-        //ignore if no WineskinX11 is running, must have been in error
-        if ([self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
-        {
-            NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
-            lockFileAlreadyExisted = NO;
-            killWineskin = NO;
-        }
-    }
-    if (!lockFileAlreadyExisted)
-    {
-        //**********set a new display number
-        srand((unsigned)time(0));
-        int randomint = 5+(int)(rand()%9994);
-        if (randomint < 0)
-        {
-            randomint = randomint * (-1);
-        }
-        [theDisplayNumber setString:[NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]]];
-        [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",theDisplayNumber],nil] toFile:displayNumberFile];
-        [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
-        //**********start the X server
-        if (useXQuartz)
-        {
-            [self startXQuartz];
-        }
-        if (!useXQuartz)
-        {
-            [self startX11];
-            if ([wrapperBundlePID isEqualToString:@"ERROR"])
+            killWineskin = YES;
+            //use old $DISPLAY number
+            if ([fm fileExistsAtPath:displayNumberFile])
             {
-                [fm removeItemAtPath:displayNumberFile error:nil];
-                [fm removeItemAtPath:wineserverPIDFile error:nil];
-                [fm removeItemAtPath:lockfile error:nil];
-                [fm removeItemAtPath:tmpFolder error:nil];
-                return;
+                [theDisplayNumber setString:[[self readFileToStringArray:displayNumberFile] objectAtIndex:0]];
+            }
+            else //error, no display file, but WineskinX11 is running?
+            {
+                NSLog(@"ERROR: WineskinX11 may be running, but there is no $DISPLAY value stored, cannot launch anything new.  You may need to make sure the wrapper properly shuts down before starting it again.");
+            }
+            //ignore if no WineskinX11 is running, must have been in error
+            if ([self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
+            {
+                NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
+                lockFileAlreadyExisted = NO;
+                killWineskin = NO;
             }
         }
-        //**********set user folders
-        if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
+        if (!lockFileAlreadyExisted)
         {
-            [self setUserFolders:YES];
+            //**********set a new display number
+            srand((unsigned)time(0));
+            int randomint = 5+(int)(rand()%9994);
+            if (randomint < 0)
+            {
+                randomint = randomint * (-1);
+            }
+            [theDisplayNumber setString:[NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]]];
+            [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",theDisplayNumber],nil] toFile:displayNumberFile];
+            [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
+            //**********start the X server if needed
+            if (useXQuartz)
+            {
+                [self startXQuartz];
+            }
+            if (!useXQuartz)
+            {
+                [self startX11];
+                if ([wrapperBundlePID isEqualToString:@"ERROR"])
+                {
+                    [fm removeItemAtPath:displayNumberFile error:nil];
+                    [fm removeItemAtPath:wineserverPIDFile error:nil];
+                    [fm removeItemAtPath:lockfile error:nil];
+                    [fm removeItemAtPath:tmpFolder error:nil];
+                    return;
+                }
+            }
         }
-        else
-        {
-            [self setUserFolders:NO];
-        }
-        
-        //********** fix wineprefix
-        [self fixWinePrefixForCurrentUser];
-        
-        //********** If setting GPU info, do it
-        if ([[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue] == 1)
-        {
-            [self tryToUseGPUInfo];
-        }
+    }
+    //**********set user folders
+    if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
+    {
+        [self setUserFolders:YES];
+    }
+    else
+    {
+        [self setUserFolders:NO];
+    }
+    
+    //********** fix wineprefix
+    [self fixWinePrefixForCurrentUser];
+    
+    //********** If setting GPU info, do it
+    if ([[plistDictionary valueForKey:@"Try To Use GPU Info"] intValue] == 1)
+    {
+        [self tryToUseGPUInfo];
     }
     
     //**********start wine
@@ -1082,6 +1089,21 @@
     }
 	[fm release];
 	return [quartzwmLine copy];
+}
+
+- (BOOL)checkToUseMacDriver
+{
+    BOOL result = NO;
+    NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
+    for (NSString *item in userRegContents)
+    {
+        if ([item isEqualToString:@"\"Graphics\"=\"mac\""])
+        {
+            result = YES;
+            break;
+        }
+    }
+    return result;
 }
 
 - (void)startX11
@@ -1888,7 +1910,7 @@
 			}
 		}
 		//if WineskinX11 is no longer running, tell wineserver to close
-		if (!useXQuartz)
+		if (!useXQuartz && !useMacDriver)
         {
 			if (![self isPID:wrapperBundlePID named:@"WineskinX11"])
             {
