@@ -45,6 +45,7 @@
 	IBOutlet NSPopUpButton *switchPause;
 	IBOutlet NSSlider *gammaSlider;
 	IBOutlet NSButton *windowManagerCheckBoxButton;
+    IBOutlet NSButton *useMacDriverInsteadOfX11CheckBoxButton;
 	IBOutlet NSButton *autoDetectGPUInfoCheckBoxButton;
 	
 	//advanced menu
@@ -226,6 +227,7 @@
 - (IBAction)virtualDesktopClicked:(id)sender;
 - (IBAction)gammaChanged:(id)sender;
 - (IBAction)windowManagerCheckBoxClicked:(id)sender;
+- (IBAction)useMacDriverInsteadOfX11CheckBoxClicked:(id)sender;
 
 //advanced menu
 - (IBAction)testRunButtonPressed:(id)sender;

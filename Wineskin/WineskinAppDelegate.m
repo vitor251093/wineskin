@@ -510,11 +510,18 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	NSArray *arrayToSearch = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
 	//read plist for other info
 	NSDictionary *plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-	//Fix decorate checkmark
+	//Fix decorate and Mac driver checkmarks
 	BOOL startTesting = NO;
-	int enableCheck = 0; //if this gets to 2, then it is disabled, otherwise enabled
+	int enableCheckForWindowManager = 0; //if this gets to 2, then it is disabled, otherwise enabled
+    [useMacDriverInsteadOfX11CheckBoxButton setState:0];
 	for (NSString *item in arrayToSearch)
 	{
+        //check if line is for Mac driver
+        if ([item isEqualToString:@"\"Graphics\"=\"mac\""])
+        {
+            [useMacDriverInsteadOfX11CheckBoxButton setState:1];
+            continue;
+        }
 		//only tests lines after the main line found
 		if ([item hasPrefix:@"[Software\\\\Wine\\\\X11 Driver]"])
 		{
@@ -527,10 +534,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		if (startTesting)
 		{
 			if ([item isEqualToString:@"\"Decorated\"=\"Y\""] || [item isEqualToString:@"\"Managed\"=\"Y\""]) break;
-			else if ([item isEqualToString:@"\"Decorated\"=\"N\""] || [item isEqualToString:@"\"Managed\"=\"N\""]) enableCheck++;
+			else if ([item isEqualToString:@"\"Decorated\"=\"N\""] || [item isEqualToString:@"\"Managed\"=\"N\""]) enableCheckForWindowManager++;
 		}
 	}
-	if (enableCheck > 1)
+	if (enableCheckForWindowManager > 1)
 	{
 		//check the mark
 		[windowManagerCheckBoxButton setState:0];
@@ -750,6 +757,51 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	NSString *regFileContents = @"";
 	for (NSString *item in finalArray)
 		regFileContents = [regFileContents stringByAppendingString:[item stringByAppendingString:@"\n"]];
+	[regFileContents writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
+
+- (IBAction)useMacDriverInsteadOfX11CheckBoxClicked:(id)sender
+{
+    // get state of checkmark, set a string to mac or x11 for correct writing in same code
+	NSString *settingString;
+	if ([useMacDriverInsteadOfX11CheckBoxButton state] == 0)
+    {
+		settingString = [NSString stringWithFormat:@"x11"];
+    }
+	else
+    {
+		settingString = [NSString stringWithFormat:@"mac"];
+    }
+    NSArray *arrayToSearch = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+	BOOL mainSectionFound = NO;
+	NSMutableArray *finalArray = [NSMutableArray arrayWithCapacity:[arrayToSearch count]];
+    for (NSString *item in arrayToSearch)
+	{
+		if ([item hasPrefix:@"[Software\\\\Wine\\\\Drivers]"])
+		{
+			mainSectionFound = YES;
+			[finalArray addObject:item];
+            [finalArray addObject:[NSString stringWithFormat:@"\"Graphics\"=\"%@\"",settingString]];
+			continue;
+		}
+        if ([item isEqualToString:@"\"Graphics\"=\"mac\""] || [item isEqualToString:@"\"Graphics\"=\"x11\""])
+        {
+            continue;
+        }
+        [finalArray addObject:item];
+	}
+    if (!mainSectionFound)
+	{
+		[finalArray addObject:@"[Software\\\\Wine\\\\Drivers]"];
+        [finalArray addObject:[NSString stringWithFormat:@"\"Graphics\"=\"%@\"",settingString]];
+	}
+    //write file back out to .reg file
+	NSMutableString *regFileContents = [[[NSMutableString alloc] init] autorelease];
+	for (NSString *item in finalArray)
+    {
+        [regFileContents appendString:item];
+        [regFileContents appendString:@"\n"];
+    }
 	[regFileContents writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
