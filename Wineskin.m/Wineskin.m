@@ -58,6 +58,8 @@
 	NSMutableString *cliCustomCommands;             //from CLI Variables entry in info.plist
 	NSString *dyldFallBackLibraryPath;              //the path for DYLD_FALLBACK_LIBRARY_PATH
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
+	int bundleRandomInt1;
+    int bundleRandomInt2;
 }
 //the main running of the program...
 - (void)mainRun:(NSArray *)argv;
@@ -242,10 +244,11 @@
 	}
     //Randomize the CFBundleID for every launch
 	srand((unsigned)time(0));
-	int bundleRandomInt1 = (int)(rand()%999999999);
+	bundleRandomInt1 = (int)(rand()%999999999);
 	if (bundleRandomInt1<0){bundleRandomInt1=bundleRandomInt1*(-1);}
-    int bundleRandomInt2 = (int)(rand()%999999999);
+    bundleRandomInt2 = (int)(rand()%999999999);
 	if (bundleRandomInt2<0){bundleRandomInt2=bundleRandomInt2*(-1);}
+    
     [plistDictionary setValue:[NSString stringWithFormat:@"%@%@.wineskin.prefs",[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] forKey:@"CFBundleIdentifier"];
     [plistDictionary writeToFile:infoPlistFile atomically:YES];
 	//need to handle it different if its a cexe
@@ -2067,6 +2070,8 @@
     [fm removeItemAtPath:wineserverPIDFile error:nil];
     [fm removeItemAtPath:lockfile error:nil];
     [fm removeItemAtPath:tmpFolder error:nil];
+    //get rid of OS X saved state file
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/%@%@.wineskin.prefs.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] error:nil];
 	[fm release];
 }
 - (void)ds:(NSString *)input
