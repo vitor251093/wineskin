@@ -79,6 +79,9 @@
 //Makes an Array with a list of PIDs that match the process name
 - (NSArray *)makePIDArray:(NSString *)processToLookFor;
 
+//returns PID of new process (after it appears)
+- (NSString *)getNewPid:(NSString *)processToLookFor from:(NSArray *)firstPIDlist confirm:(bool)confirm_pid;
+
 //sets the drive_c/user/Wineskin folder correctly for a run
 - (void)setUserFolders:(BOOL)doSymlinks;
 
@@ -227,10 +230,6 @@
         [fm release];
         return;
     }
-    if ([fm fileExistsAtPath:wineserverPIDFile])
-    {
-        [wineserverPIDToCheck setString:[[self readFileToStringArray:wineserverPIDFile] objectAtIndex:0]];
-    }
 	//open Info.plist to read all needed info
 	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	NSDictionary *cexePlistDictionary;
@@ -248,7 +247,6 @@
 	if (bundleRandomInt1<0){bundleRandomInt1=bundleRandomInt1*(-1);}
     bundleRandomInt2 = (int)(rand()%999999999);
 	if (bundleRandomInt2<0){bundleRandomInt2=bundleRandomInt2*(-1);}
-    
     [plistDictionary setValue:[NSString stringWithFormat:@"%@%@.wineskin.prefs",[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] forKey:@"CFBundleIdentifier"];
     [plistDictionary writeToFile:infoPlistFile atomically:YES];
 	//need to handle it different if its a cexe
@@ -462,12 +460,33 @@
             {
                 NSLog(@"ERROR: WineskinX11 may be running, but there is no $DISPLAY value stored, cannot launch anything new.  You may need to make sure the wrapper properly shuts down before starting it again.");
             }
-            //ignore if no WineskinX11 is running, must have been in error
+            // check if WineskinX11 is even running
             if ([self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
             {
+                //ignore if no WineskinX11 is running, must have been in error
                 NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
                 lockFileAlreadyExisted = NO;
                 killWineskin = NO;
+            }
+            else
+            {
+                // sleep 1 sec, then 2, then 4 ... up to 2 minutes total, to wait for parent process to launch wineserver
+                int i;
+                for (i = 0; i < 15; ++i)
+                {
+                    if ([fm fileExistsAtPath:wineserverPIDFile])
+                    {
+                        break;
+                    }
+                    // log delay if it will take longer than 1 second
+                    if (i > 0)
+                    {
+                        NSLog(@"Wineskin: >>> Waiting %d seconds for parent process to start wineserver", i + 1);
+                    }
+                    // sleep and then try again
+                    usleep((i + 1) * 1000000);
+                }
+                
             }
         }
         if (!lockFileAlreadyExisted)
@@ -485,11 +504,14 @@
             //**********start the X server if needed
             if (useXQuartz)
             {
+                NSLog(@"Wineskin: Starting XQuartz");
                 [self startXQuartz];
             }
             if (!useXQuartz)
             {
+                NSLog(@"Wineskin: Starting WineskinX11");
                 [self startX11];
+                NSLog(@"Wineskin: WineskinX11 Started, PID = %@", wineskinX11PID);
                 if ([wrapperBundlePID isEqualToString:@"ERROR"])
                 {
                     [fm removeItemAtPath:displayNumberFile error:nil];
@@ -498,6 +520,10 @@
                     [fm removeItemAtPath:tmpFolder error:nil];
                     return;
                 }
+            }
+            else
+            {
+                NSLog(@"Wineskin: XQuartz Started, PID = %@", xQuartzX11BinPID);
             }
         }
     }
@@ -521,11 +547,28 @@
     }
     
     //**********start wine
+    if (lockFileAlreadyExisted)
+    {
+        NSLog(@"Wineskin: Starting Wine (wrapper was already running)");
+    }
+    else
+    {
+        NSLog(@"Wineskin: Starting Wine");
+    }
 	wineServerPID = [self startWine];
+    if (lockFileAlreadyExisted)
+    {
+        NSLog(@"Wineskin: Wine Started (wrapper was already running), PID = %@", wineServerPID);
+    }
+    else
+    {
+        NSLog(@"Wineskin: Wine Started, PID = %@", wineServerPID);
+    }
 	//********** exit if already running and just opening new file
 	//if wineserver pid was already running in startWine and openFiles was true, then exit, we already have a Wineskin monitoring the wrapper
 	if (killWineskin)
     {
+        NSLog(@"Wineskin: Extra Wineskin process exiting since we already have one monitoring the wrapper.");
         return;
     }
 	
@@ -654,6 +697,72 @@
 {
 	NSString *resultString = [NSString stringWithFormat:@"00000\n%@",[self systemCommand:[NSString stringWithFormat:@"ps axc|awk \"{if (\\$5==\\\"%@\\\") print \\$1}\"",processToLookFor]]];
 	return [resultString componentsSeparatedByString:@"\n"];
+}
+
+- (NSString *)getNewPid:(NSString *)processToLookFor from:(NSArray *)firstPIDlist confirm:(bool)confirm_pid;
+{
+    //do loop compare to find correct PID, try 8 times, doubling the delay each try ... up to 102.2 secs of total waiting
+    int i = 0;
+    int sleep_duration = 200000; // start off w/ 0.2 secs and double each iteration
+    //re-usable array
+    NSMutableArray *secondPIDlist = [[[NSMutableArray alloc] init] autorelease];
+    for (i = 0; i < 9; ++i)
+    {
+        // log delay if it will take longer than 1 second
+        if (sleep_duration / 1000000 > 1)
+        {
+            NSLog(@"Wineskin: Waiting %d seconds for %@ to start.", sleep_duration / 1000000, processToLookFor);
+        }
+        // sleep a bit before checking for current pid list
+        usleep(sleep_duration);
+        sleep_duration = sleep_duration * 2;
+        [secondPIDlist removeAllObjects];
+        [secondPIDlist addObjectsFromArray:[self makePIDArray:processToLookFor]];
+        for (NSString *secondPIDlistItem in secondPIDlist)
+        {
+            if ([secondPIDlistItem isEqualToString:wrapperBundlePID])
+            {
+                continue;
+            }
+            BOOL match = NO;
+            for (NSString *firstPIDlistItem in firstPIDlist)
+            {
+                if ([secondPIDlistItem isEqualToString:firstPIDlistItem])
+                {
+                    match = YES;
+                }
+            }
+            if (!match)
+            {
+                if (!confirm_pid)
+                {
+                    return secondPIDlistItem;
+                }
+                else
+                {
+                    // sleep another duration (+ 0.25 secs) to confirm pid is still valid
+                    sleep_duration = (sleep_duration / 2) + 250000;
+                    // log delay if it will take longer than 1 second
+                    if (sleep_duration / 1000000 > 1)
+                    {
+                        NSLog(@"Wineskin: Waiting %d more seconds to confirm PID (%@) is valid for %@.", sleep_duration / 1000000, secondPIDlistItem, processToLookFor);
+                    }
+                    // sleep a bit before checking for current pid list
+                    usleep(sleep_duration);
+                    // return PID if still valid
+                    if ([self isPID:secondPIDlistItem named:processToLookFor])
+                    {
+                        return secondPIDlistItem;
+                    }
+                }
+                // pid isn't valid
+                match = NO;
+                NSLog(@"Wineskin: Found invalid %@ pid: %@.", processToLookFor, secondPIDlistItem);
+            }
+        }
+    }
+    NSLog(@"Wineskin: Could not find PID for %@", processToLookFor);
+    return @"-1";
 }
 
 - (void)setUserFolders:(BOOL)doSymlinks
@@ -1161,79 +1270,51 @@
 		[wineskinX11PID setString:@"ERROR"];
 		return;
 	}
-	//set up fontpath variable for server depending where X11 fonts are on the system
-	NSMutableString *wineskinX11FontPathPrefix = [[[NSMutableString alloc] init] autorelease];
-    [wineskinX11FontPathPrefix setString:@"/opt/X11/share/fonts"];
-	if (![fm fileExistsAtPath:wineskinX11FontPathPrefix])
-	{
-        NSArray *locsToCheck = [NSArray arrayWithObjects:@"/usr/X11/share/fonts",@"/opt/local/share/fonts",@"/usr/X11/lib/X11/fonts",@"/usr/X11R6/lib/X11/fonts",[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold],nil];
-        for (NSString *item in locsToCheck)
+    @try
+    {
+        //set up fontpath variable for server depending where X11 fonts are on the system
+        NSMutableString *wineskinX11FontPathPrefix = [[[NSMutableString alloc] init] autorelease];
+        [wineskinX11FontPathPrefix setString:@"/opt/X11/share/fonts"];
+        if (![fm fileExistsAtPath:wineskinX11FontPathPrefix])
         {
-            if ([fm fileExistsAtPath:item])
+            NSArray *locsToCheck = [NSArray arrayWithObjects:@"/usr/X11/share/fonts",@"/opt/local/share/fonts",@"/usr/X11/lib/X11/fonts",@"/usr/X11R6/lib/X11/fonts",[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold],nil];
+            for (NSString *item in locsToCheck)
             {
-                [wineskinX11FontPathPrefix setString:item];
-                break;
-            }
-        }
-	}
-	NSString *wineskinX11FontPath = [NSString stringWithFormat:@"-fp \"%@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util\"",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
-	//make sure the X11 lock files is gone before starting X11
-	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
-	//find WineskinX11 executable PID (this is only used for proper shut down, all other PID usage for X11 should be the Bundle PID
-	//make first pid array
-	NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];
-	//Start WineskinX11
-	wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"/dev/null\" 2>&1 & echo \"$!\"",theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine]];
-	//do loop compare to find correct wineskinX11PID, only try 3 times, then try again slower 5 times over 5 seconds
-	[wineskinX11PID setString:@"-1"];
-	BOOL match = YES;
-	int i = 0;
-	for (i = 0; i < 9; ++i)
-	{
-		NSArray *secondPIDlist = [self makePIDArray:@"WineskinX11"];
-		for (NSString *secondPIDlistItem in secondPIDlist)
-		{
-			if ([secondPIDlistItem isEqualToString:wrapperBundlePID])
-            {
-                continue;
-            }
-			match = NO;
-			for (NSString *firstPIDlistItem in firstPIDlist)
-            {
-				if ([secondPIDlistItem isEqualToString:firstPIDlistItem])
+                if ([fm fileExistsAtPath:item])
                 {
-                    match = YES;
+                    [wineskinX11FontPathPrefix setString:item];
+                    break;
                 }
             }
-			if (!match)
-			{
-				[wineskinX11PID setString:secondPIDlistItem];
-				break;
-			}
-		}
-		if (!match)
-        {
-            break;
         }
-		if (i>2)
+        NSString *wineskinX11FontPath = [NSString stringWithFormat:@"-fp \"%@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util\"",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
+        //make sure the X11 lock files is gone before starting X11
+        [fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+        //find WineskinX11 executable PID (this is only used for proper shut down, all other PID usage for X11 should be the Bundle PID
+        //make first pid array
+        NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];
+        //Start WineskinX11
+        wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"/dev/null\" 2>&1 & echo \"$!\"",theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine]];
+        // get PID of WineskinX11 just launched
+        [wineskinX11PID setString:[self getNewPid:@"WineskinX11" from:firstPIDlist confirm:NO]];
+        //if no PID found, log problem
+        if ([wineskinX11PID isEqualToString:@"-1"])
         {
-            usleep(1000000);
+            NSLog(@"Wineskin: Error! WineskinX11 PID not found, there may be unexpected errors on shut down!\n");
         }
-	}
-	//if no PID found, log problem
-	if ([wineskinX11PID isEqualToString:@"-1"])
-    {
-		NSLog(@"Wineskin: Error! WineskinX11 PID not found, there may be unexpected errors on shut down!\n");
     }
-	//fix Info.plist back
-	usleep(500000);
-	//bring X11 to front before any windows are drawn
-	[self bringToFront:wrapperBundlePID];
-	NSMutableDictionary* quickEdit2 = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
-	[quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
-	[quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
-	[quickEdit2 writeToFile:infoPlistFile atomically:YES];
-	[quickEdit2 release];
+    @finally
+    {
+        //fix Info.plist back
+        usleep(500000);
+        //bring X11 to front before any windows are drawn
+        [self bringToFront:wrapperBundlePID];
+        NSMutableDictionary* quickEdit2 = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
+        [quickEdit2 setValue:@"NSApplication" forKey:@"NSPrincipalClass"];
+        [quickEdit2 setValue:@"MainMenu.nib" forKey:@"NSMainNibFile"];
+        [quickEdit2 writeToFile:infoPlistFile atomically:YES];
+        [quickEdit2 release];
+    }
 	//get rid of X11 lock folder that shouldnt be needed
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
 	[fm release];
@@ -1274,42 +1355,8 @@
 		NSArray *firstPIDlist = [self makePIDArray:@"X11.bin"];
 		//start XQuartz
 		xQuartzBundlePID = [self systemCommand:[NSString stringWithFormat:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin %@ > /dev/null & echo $!",theDisplayNumber]];
-		//do loop compare to find correct X11.bin PID, only try 3 times, then try again slower 5 times over 5 seconds
-		[xQuartzX11BinPID setString:@"-1"];
-		BOOL match = YES;
-		int i;
-		for (i = 0; i < 9; ++i)
-		{
-			NSArray *secondPIDlist = [self makePIDArray:@"X11.bin"];
-			for (NSString *secondPIDlistItem in secondPIDlist)
-			{
-				if ([secondPIDlistItem isEqualToString:xQuartzBundlePID])
-                {
-                    continue;
-                }
-				match = NO;
-				for (NSString *firstPIDlistItem in firstPIDlist)
-                {
-					if ([secondPIDlistItem isEqualToString:firstPIDlistItem])
-                    {
-                        match = YES;
-                    }
-                }
-				if (!match)
-				{
-                    [xQuartzX11BinPID setString:secondPIDlistItem];
-					break;
-				}
-			}
-			if (!match)
-            {
-                break;
-            }
-			if (i>2)
-            {
-                usleep(1000000);
-            }
-		}
+		// get PID of X11.bin just launched
+        [xQuartzX11BinPID setString:[self getNewPid:@"X11.bin" from:firstPIDlist confirm:NO]];
 		//if no PID found, log problem
 		if ([xQuartzX11BinPID isEqualToString:@"-1"])
         {
@@ -1631,6 +1678,10 @@
 - (NSString *)startWine
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
+    if ([fm fileExistsAtPath:wineserverPIDFile])
+    {
+        [wineserverPIDToCheck setString:[[self readFileToStringArray:wineserverPIDFile] objectAtIndex:0]];
+    }
 	NSMutableString *returnPID = [[[NSMutableString alloc] init] autorelease];
     [returnPID setString:@"-1"];
     // if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
@@ -1819,47 +1870,12 @@
             //launch Wine normally
 			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,dyldFallBackLibraryPath,startExeLine,wineRunFile,programFlags,wineLogFileLocal]];
         }
-        
-        // troy's hack?  sleep a bit (.25 secs) for pid to appear valid? (increased to 0.33 seconds)
-        usleep(330000);
-        
+              
         [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
         if (![returnPID isEqualToString:wineserverPIDToCheck])
         {
-            //do loop compare to find correct PID, only try 3 times, then try again slower 5 times over 5 seconds
-            BOOL match = YES;
-            int i = 0;
-            for (i = 0; i < 9; ++i)
-            {
-                NSArray *secondPIDlist = [self makePIDArray:@"wineserver"];
-                for (NSString *item in secondPIDlist)
-                {
-                    for (NSString *secondPIDlistItem in secondPIDlist)
-                    {
-                        match = NO;
-                        for (NSString *firstPIDlistItem in firstPIDlist)
-                        {
-                            if ([secondPIDlistItem isEqualToString:firstPIDlistItem])
-                            {
-                                match = YES;
-                            }
-                        }
-                        if (!match)
-                        {
-                            [returnPID setString:secondPIDlistItem];
-                            break;
-                        }
-                    }
-                }
-                if (!match)
-                {
-                    break;
-                }
-                if (i>2)
-                {
-                    usleep(1000000);
-                }
-            }
+            // get PID of wineserver just launched
+            [returnPID setString:[self getNewPid:@"wineserver" from:firstPIDlist confirm:YES]];
         }
         //if no PID found, log message and quit
         if ([returnPID isEqualToString:@"-1"])
@@ -1874,6 +1890,10 @@
         {
             [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",returnPID],nil] toFile:wineserverPIDFile];
             [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
+        }
+        else
+        {
+            NSLog(@"Wineskin: >>> Using existing wineserver PID: %@", returnPID);
         }
 	}
 	[fm release];
@@ -1893,27 +1913,21 @@
     NSString *timestampChecker = [NSString stringWithFormat:@"find \"%@\" -type f newer \"%@\"",[NSString stringWithFormat:@"%@/Logs",winePrefix],timeStampFile];
 	BOOL fixGamma = NO;
 	int fixGammaCounter = 0;
+    BOOL usingWineskinX11 = YES;
     if (fullScreenOption)
     {
         [self systemCommand:[NSString stringWithFormat:@"> \"%@\"",timeStampFile]];
         [self systemCommand:[NSString stringWithFormat:@"> \"%@\"",wineTempLogFile]];
     }
+    if (useXQuartz || useMacDriver)
+    {
+        //use most efficent checking for background loop
+        usingWineskinX11 = NO;
+    }
 	while ([self isPID:wineServerPID named:@"wineserver"])
 	{
-		//check for xrandr made files in /tmp
-		if (useGamma)
-		{
-			if ([fm fileExistsAtPath:xRandRTempFile])
-			{
-                [fm removeItemAtPath:xRandRTempFile error:nil];
-				///tmp/WineskinXrandrTempFile is written by WineskinX11 when there is a resolution change
-                //when this happens Gamma is set to default, so we need to fix it, but there could be a delay, so it needs to try a few times over a few moments before giving up.
-				fixGamma = YES;
-				fixGammaCounter = 0;
-			}
-		}
 		//if WineskinX11 is no longer running, tell wineserver to close
-		if (!useXQuartz && !useMacDriver)
+		if (usingWineskinX11)
         {
 			if (![self isPID:wrapperBundlePID named:@"WineskinX11"])
             {
@@ -1950,16 +1964,29 @@
 				}
 			}
 		}
-		if (fixGamma)
+        //check for xrandr made file in /tmp to know to do a gamma change
+		if (useGamma)
 		{
-			[self setGamma:gammaCorrection];
-			++fixGammaCounter;
+			if ([fm fileExistsAtPath:xRandRTempFile])
+			{
+                [fm removeItemAtPath:xRandRTempFile error:nil];
+				///tmp/WineskinXrandrTempFile is written by WineskinX11 when there is a resolution change
+                //when this happens Gamma is set to default, so we need to fix it, but there could be a delay, so it needs to try a few times over a few moments before giving up.
+                //if it doesn't give up, multiple wrappers will fight eachother endlessly
+                fixGamma = YES;
+				fixGammaCounter = 0;
+			}
+            if (fixGamma)
+            {
+                [self setGamma:gammaCorrection];
+                ++fixGammaCounter;
+                if (fixGammaCounter > 6)
+                {
+                    fixGamma = NO;
+                }
+            }
 		}
-		if (fixGammaCounter > 6)
-        {
-            fixGamma = NO;
-        }
-		usleep(1250000); // sleeping in background 1.25 seconds
+		usleep(1000000); // sleeping in background 1 second
 	}
     [fm removeItemAtPath:timeStampFile error:nil];
 	[fm release];
