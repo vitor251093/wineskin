@@ -1863,7 +1863,7 @@
             NSLog(@"Wineskin: >>> Using existing wineserver PID: %@", returnPID);
         }
 	}
-	return [returnPID copy];
+	return [NSString stringWithString:returnPID];
 }
 
 - (void)sleepAndMonitor
