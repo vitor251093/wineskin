@@ -1052,9 +1052,6 @@
 	// TODO - skip if not on read/write volume
 	NSArray *userRegContents = [self readFileToStringArray:[NSString stringWithFormat:@"%@/user.reg",winePrefix]];
 	NSMutableArray *newUserRegContents = [NSMutableArray arrayWithCapacity:[userRegContents count]];
-	BOOL deviceIDFound = NO;
-	BOOL vendorIDFound = NO;
-	BOOL VRAMFound = NO;
 	BOOL startTesting = NO;
 	for (NSString *item in userRegContents)
 	{
@@ -1064,23 +1061,9 @@
 			startTesting = YES;
 			continue;
 		}
-		if (startTesting)
+		if (startTesting && ([item hasPrefix:@"\"VideoMemorySize\""] || [item hasPrefix:@"\"VideoPciDeviceID\""] || [item hasPrefix:@"\"VideoPciVendorID\""]))
 		{
-			if ([item hasPrefix:@"\"VideoMemorySize\""])
-			{
-				VRAMFound = YES;
-				continue;
-			}
-			else if ([item hasPrefix:@"\"VideoPciDeviceID\""])
-			{
-				deviceIDFound = YES;
-				continue;
-			}
-			else if ([item hasPrefix:@"\"VideoPciVendorID\""])
-			{
-				vendorIDFound = YES;
-				continue;
-			}
+            continue;
 		}
 		if ([item hasPrefix:@"["])
         {
