@@ -58,6 +58,7 @@
 	NSMutableString *cliCustomCommands;             //from CLI Variables entry in info.plist
 	NSString *dyldFallBackLibraryPath;              //the path for DYLD_FALLBACK_LIBRARY_PATH
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
+    NSFileManager *fm;                              //master object to use for default file manager
 	int bundleRandomInt1;
     int bundleRandomInt2;
 }
@@ -146,7 +147,7 @@
 @implementation Wineskin
 - (void)mainRun:(NSArray *)argv
 {
-    NSFileManager *fm = [NSFileManager defaultManager];
+    fm = [NSFileManager defaultManager];
 	// TODO need to add option to make wrapper run in AppSupport (shadowcopy) so that no files will ever be written in the app
 	// TODO need to make all the temp files inside the wrapper run correctly using BundleID and in /tmp.  If they don't exist, assume everything is fine.
 	// TODO add blocks to sections that need them for variables to free up memory.
@@ -206,7 +207,6 @@
 		if (![[[self readFileToStringArray:lockfile] objectAtIndex:0] isEqualToString:NSUserName()])
 		{
 			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Another user on this system is currently using this application\n\nThey must exit the application before you can use it."), NULL);
-            [fm release];
 			return;
 		}
         lockFileAlreadyExisted = YES;
@@ -227,7 +227,6 @@
         [fm removeItemAtPath:lockfile error:nil];
         [fm removeItemAtPath:tmpFolder error:nil];
         //just called for ICE install, dont run.
-        [fm release];
         return;
     }
 	//open Info.plist to read all needed info
@@ -631,7 +630,6 @@
         [self removeGPUInfo];
     }
 	[self cleanUpAndShutDown];
-    [fm release];
     [plistDictionary release];
 	return;
 }
@@ -767,7 +765,6 @@
 
 - (void)setUserFolders:(BOOL)doSymlinks
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//get symlink locations
 	NSDictionary *plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	NSMutableString *symlinkMyDocuments = [[[NSMutableString alloc] init] autorelease];
@@ -879,7 +876,6 @@
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:@"Wineskin" error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/crossover\"",winePrefix]];
     [plistDictionary release];
-	[fm release];
 }
 
 - (void)fixWinePrefixForCurrentUser
@@ -887,12 +883,10 @@
 	// changing owner just fails, need this to work for normal users without admin password on the fly.
 	// Needed folders are set to 777, so just make a new resources folder and move items, should always work.
 	// NSFileManager changing posix permissions still failing to work right, using chmod as a system command
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//if owner and current user match, exit
 	NSDictionary *checkThis = [fm attributesOfItemAtPath:winePrefix error:nil];
 	if ([NSUserName() isEqualToString:[checkThis valueForKey:@"NSFileOwnerAccountName"]])
 	{
-		[fm release];
 		return;
 	}
 	//make ResoTemp
@@ -909,7 +903,6 @@
 	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/ResoTemp",contentsFold] toPath:[NSString stringWithFormat:@"%@/Resources",contentsFold] error:nil];
 	//fix Reosurces to 777
 	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
-	[fm release];
 }
 
 - (void)tryToUseGPUInfo
@@ -917,7 +910,7 @@
 	//TODO if cannot read/write drive log error and skip
 	
 	//if user.reg doesn't exist, don't do anything
-	if (!([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]]))
+	if (!([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]]))
     {
         return;
     }
@@ -1102,7 +1095,6 @@
 }
 - (void)fixFrameworksLibraries
 {
-    NSFileManager *fm = [NSFileManager defaultManager];
     //fix to have the right libXplugin for the OS version
     SInt32 majorVersion,minorVersion;
     Gestalt(gestaltSystemVersionMajor, &majorVersion);
@@ -1119,7 +1111,6 @@
     [fm removeItemAtPath:symlinkName error:nil];
     [fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
     [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
-	[fm release];
 }
 - (NSString *)setWindowManager
 {
@@ -1134,7 +1125,6 @@
     {
         return [quartzwmLine copy];
     }
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//look for quartz-wm in all locations, if not found default to backup
 	//should be in /usr/bin/quartz-wm or /opt/X11/bin/quartz-wm or /opt/local/bin/quartz-wm
 	//find the newest version
@@ -1200,7 +1190,6 @@
     {
 		[quartzwmLine setString:[NSString stringWithFormat:@" +extension \"'%@'\"",[pathsToCheck objectAtIndex:0]]];
     }
-	[fm release];
 	return [quartzwmLine copy];
 }
 
@@ -1232,7 +1221,6 @@
 		}
     }
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//fix the Frameworks Libraires
 	[self fixFrameworksLibraries];
 	//set up quartz-wm launch correctly
@@ -1318,17 +1306,14 @@
     }
 	//get rid of X11 lock folder that shouldnt be needed
 	[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
-	[fm release];
 	return;
 }
 - (void)startXQuartz
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
 	{
 		NSLog(@"Error XQuartz not found, defaulting back to WineskinX11");
 		useXQuartz = NO;
-		[fm release];
 		return;
 	}
 	if (!fullScreenOption)
@@ -1367,7 +1352,6 @@
 		usleep(1500000);
 		[self bringToFront:xQuartzBundlePID];
 	}
-	[fm release];
 	return;
 }
 
@@ -1431,7 +1415,6 @@
 
 - (void)installEngine
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	NSMutableArray *wswineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
 	//get directory contents of wswine.bundle
 	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/",frameworksFold] error:nil];
@@ -1449,7 +1432,6 @@
     }
 	if (!isIce)
 	{
-		[fm release];
 		return;
 	}
 	//install Wine on the system
@@ -1525,7 +1507,6 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/version\"",frameworksFold]];
 	//clear the pop up
 	CFUserNotificationCancel(pDlg);
-	[fm release];
 }
 
 - (void)setToVirtualDesktop:(NSString *)resolution
@@ -1601,7 +1582,7 @@
 {
 	// TODO test if on read/write volume first
 	//if file doesn't exist, don't do anything
-	if (!([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]]))
+	if (!([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]]))
     {
 		return;
     }
@@ -1658,7 +1639,7 @@
 
 - (void)writeStringArray:(NSArray *)theArray toFile:(NSString *)theFile
 {
-	[[NSFileManager defaultManager] removeItemAtPath:theFile error:nil];
+	[fm removeItemAtPath:theFile error:nil];
 	[[theArray componentsJoinedByString:@"\n"] writeToFile:theFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",theFile]];
 }
@@ -1678,7 +1659,6 @@
 
 - (NSString *)startWine
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
     if ([fm fileExistsAtPath:wineserverPIDFile])
     {
         [wineserverPIDToCheck setString:[[self readFileToStringArray:wineserverPIDFile] objectAtIndex:0]];
@@ -1881,7 +1861,6 @@
         //if no PID found, log message and quit
         if ([returnPID isEqualToString:@"-1"])
         {
-            [fm release];
             killWineskin = YES;
             NSLog(@"ERROR, no new wineserver was launched, shutting down wrapper");
             [self cleanUpAndShutDown];
@@ -1897,13 +1876,11 @@
             NSLog(@"Wineskin: >>> Using existing wineserver PID: %@", returnPID);
         }
 	}
-	[fm release];
 	return [returnPID copy];
 }
 
 - (void)sleepAndMonitor
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
     NSString *timeStampFile = [NSString stringWithFormat:@"%@/Logs/.timestamp",winePrefix];
 	if (useGamma)
     {
@@ -1990,12 +1967,10 @@
 		usleep(1000000); // sleeping in background 1 second
 	}
     [fm removeItemAtPath:timeStampFile error:nil];
-	[fm release];
 }
 
 - (void)cleanUpAndShutDown
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//fix screen resolution back to original if fullscreen
 	if (fullScreenOption)
 	{
@@ -2100,7 +2075,6 @@
     [fm removeItemAtPath:tmpFolder error:nil];
     //get rid of OS X saved state file
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/%@%@.wineskin.prefs.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] error:nil];
-	[fm release];
 }
 - (void)ds:(NSString *)input
 {
