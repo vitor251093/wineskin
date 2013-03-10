@@ -14,7 +14,7 @@
 @synthesize winetricksList, winetricksFilteredList, winetricksSelectedList, winetricksInstalledList, winetricksCachedList;
 
 // Comparator to replace @selector(localizedStandardCompare:) missing in 10.5
-static NSInteger localizedComparator(id a, id b, void* context)
+static NSInteger localizedComparator(id a, id b, void *context)
 {
 	NSInteger compareOptions = NSCaseInsensitiveSearch|NSNumericSearch;
 	
@@ -359,7 +359,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert release];
 		[installerWindow makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
-		[fm release];
 		return;
 	}
 	//make 2nd array of .exe, .msi, and .bat files
@@ -396,7 +395,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		else
 			[window makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
-		[fm release];
 		return;
 	}
 	// populate choose exe list
@@ -416,7 +414,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[chooseExeWindow makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
 	[plistDictionary release];
-	[fm release];
 }
 - (IBAction)installerCancelButtonPressed:(id)sender
 {
@@ -1026,7 +1023,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[fm moveItemAtPath:[NSString stringWithFormat:@"%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:[NSString stringWithFormat:@"%@WineskinTempRenamer",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	[fm moveItemAtPath:[NSString stringWithFormat:@"%@WineskinTempRenamer",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:[NSString stringWithFormat:@"%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	[panel release];
-	[fm release];
 }
 - (IBAction)extPlusButtonPressed:(id)sender
 {
@@ -1345,7 +1341,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[busyWindow orderOut:self];
 	}
 	[alert release];
-	[fm release];
 }
 - (IBAction)refreshWrapperButtonPressed:(id)sender
 {
@@ -1438,13 +1433,13 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	//if new version looks messed up, prompt the download failed, and exit.
 	if ([newVersion length] < 50)
 	{
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert addButtonWithTitle:@"OK"];
-		[alert setMessageText:@"Cannot Update!!"];
-		[alert setInformativeText:@"Connection to the website failed.  The site is either down currently, or there is a problem with your internet connection."];
-		[alert setAlertStyle:NSInformationalAlertStyle];
-		[alert runModal];
-		[alert release];
+		NSAlert *alert2 = [[NSAlert alloc] init];
+		[alert2 addButtonWithTitle:@"OK"];
+		[alert2 setMessageText:@"Cannot Update!!"];
+		[alert2 setInformativeText:@"Connection to the website failed.  The site is either down currently, or there is a problem with your internet connection."];
+		[alert2 setAlertStyle:NSInformationalAlertStyle];
+		[alert2 runModal];
+		[alert2 release];
 		[winetricksWindow makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
 		return;
@@ -1585,6 +1580,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 			}
 			if ([thisCategoryList count] > 0)
 				[list setValue:thisCategoryList forKey:eachCategory];
+            [thisCategoryList release];
 		}
 		[self setWinetricksFilteredList:list];
 	}
@@ -2164,7 +2160,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[advancedWindow makeKeyAndOrderFront:self];
 	//hide busy window
 	[busyWindow orderOut:self];
-	[fm release];
 }
 - (IBAction)changeEngineUsedCancelButtonPressed:(id)sender
 {
@@ -2221,6 +2216,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 			[plistDictionary release];
 			return;
 		}
+        [alert release];
 	}
 	//confirm wrapper change
 	NSAlert *alert = [[NSAlert alloc] init];
@@ -2248,13 +2244,13 @@ static NSInteger localizedComparator(id a, id b, void* context)
 			|| [[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
 		{
 			//delete WineskinEngine.bundle
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert addButtonWithTitle:@"OK"];
-			[alert setMessageText:@"Warning"];
-			[alert setInformativeText:@"Warning, ICE engine detected.  Engine will not be converted, you must choose a new WS8+ engine manually later (Change Engine in Wineskin.app)"];
-			[alert setAlertStyle:NSInformationalAlertStyle];
-			[alert runModal];
-			[alert release];
+			NSAlert *alert2 = [[NSAlert alloc] init];
+			[alert2 addButtonWithTitle:@"OK"];
+			[alert2 setMessageText:@"Warning"];
+			[alert2 setInformativeText:@"Warning, ICE engine detected.  Engine will not be converted, you must choose a new WS8+ engine manually later (Change Engine in Wineskin.app)"];
+			[alert2 setAlertStyle:NSInformationalAlertStyle];
+			[alert2 runModal];
+			[alert2 release];
 			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 		}
 		//if wswine.bundle already exists, just remove WineskinEngine.bundle
@@ -2324,7 +2320,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	//open new Wineskin.app
 	[self systemCommand:@"/usr/bin/open" withArgs:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@/Wineskin.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 	//close program
-	[fm release];
 	[NSApp terminate:sender];
 }
 - (IBAction)logsButtonPressed:(id)sender
