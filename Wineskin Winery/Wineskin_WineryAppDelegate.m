@@ -78,6 +78,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert release];
 		return;
 	}
+    [alert release];
 	//if convert, do convert	
 	[busyWindow makeKeyAndOrderFront:self];
 	[window orderOut:self];
@@ -115,7 +116,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		//trash the old engine
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),item] error:nil];
 	}
-	[fm release];
 	[window makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
 	[self refreshButtonPressed:self];
@@ -243,8 +243,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	//populate engines list in engines window
 	[engineWindowEngineList removeAllItems];
-	NSMutableArray *availableEngines = [NSMutableArray arrayWithCapacity:5];
-	availableEngines = [self getAvailableEngines];
+	NSMutableArray *availableEngines = [self getAvailableEngines];
 	NSMutableArray *testList = [NSMutableArray arrayWithCapacity:[availableEngines count]];
 	for (NSString *itemAE in availableEngines)
 	{
@@ -296,7 +295,13 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[alert setMessageText:@"Confirm Deletion"];
 	[alert setInformativeText:[NSString stringWithFormat:@"Are you sure you want to delete the engine \"%@\"",selectedEngine]];
 	[alert setAlertStyle:NSInformationalAlertStyle];
-	if ([alert runModal] != NSAlertFirstButtonReturn) return;
+	if ([alert runModal] != NSAlertFirstButtonReturn)
+    {
+        [selectedEngine release];
+        [alert release];
+        return;
+    }
+    [alert release];
 	//move file to trash
 	NSArray *filenamesArray = [NSArray arrayWithObject:[NSString stringWithFormat:@"%@.tar.7z",selectedEngine]];
 	[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()] destination:@"" files:filenamesArray tag:nil];
@@ -959,6 +964,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:[NSString stringWithFormat:@"The engine %@ is corrupted or opened incorrectly. If this error continues next time you try, reinstall the selected engine",[createWrapperEngine stringValue]]];
 		[alert setAlertStyle:NSCriticalAlertStyle];
 		[alert runModal];
+        [alert release];
 		//get rid of junk in /tmp
 		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),[createWrapperEngine stringValue]] error:nil];
@@ -982,7 +988,10 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:[NSString stringWithFormat:@"Created File: %@.app\n\nCreated In:%@/Applications/Wineskin\n",[createWrapperName stringValue],NSHomeDirectory()]];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		if ([alert runModal] == NSAlertFirstButtonReturn)
+        {
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Applications/Wineskin/",NSHomeDirectory()]]];
+        }
+        [alert release];
 	}
 	// bring main window back
 	[window makeKeyAndOrderFront:self];
