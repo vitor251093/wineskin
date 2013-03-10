@@ -1106,7 +1106,7 @@
     [quartzwmLine setString:[NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold]];
 	if (forceWrapperQuartzWM)
     {
-        return [quartzwmLine copy];
+        return [NSString stringWithString:quartzwmLine];
     }
 	//look for quartz-wm in all locations, if not found default to backup
 	//should be in /usr/bin/quartz-wm or /opt/X11/bin/quartz-wm or /opt/local/bin/quartz-wm
@@ -1173,7 +1173,7 @@
     {
 		[quartzwmLine setString:[NSString stringWithFormat:@" +extension \"'%@'\"",[pathsToCheck objectAtIndex:0]]];
     }
-	return [quartzwmLine copy];
+	return [NSString stringWithString:quartzwmLine];
 }
 
 - (BOOL)checkToUseMacDriver
