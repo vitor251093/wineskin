@@ -1474,6 +1474,7 @@
 			//have uncompressed version now, move it to ICE folder.
 			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,wineFile] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),wineFileInstalledName] error:nil];
 		}
+        [dict release];
 	}
 	//make/remake the symlink in wswine.bundle to point to the correct location
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold] error:nil];
@@ -1488,8 +1489,11 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/lib\"",frameworksFold]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/share\"",frameworksFold]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/version\"",frameworksFold]];
-	//clear the pop up
-	CFUserNotificationCancel(pDlg);
+	//clear the pop up if it exists
+    if (pDlg != NULL) {
+        CFUserNotificationCancel(pDlg);
+        CFRelease(pDlg);
+    }
 }
 
 - (void)setToVirtualDesktop:(NSString *)resolution
