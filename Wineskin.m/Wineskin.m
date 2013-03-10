@@ -878,6 +878,7 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
 	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:@"Wineskin" error:nil];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/crossover\"",winePrefix]];
+    [plistDictionary release];
 	[fm release];
 }
 
