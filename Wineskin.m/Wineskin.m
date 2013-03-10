@@ -691,7 +691,7 @@
     {
         [returnString deleteCharactersInRange:NSMakeRange([returnString length]-1,1)];
     }
-	return [returnString copy];
+	return [NSString stringWithString:returnString];
 }
 
 - (NSArray *)makePIDArray:(NSString *)processToLookFor
