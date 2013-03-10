@@ -757,7 +757,6 @@
                     }
                 }
                 // pid isn't valid
-                match = NO;
                 NSLog(@"Wineskin: Found invalid %@ pid: %@.", processToLookFor, secondPIDlistItem);
             }
         }
