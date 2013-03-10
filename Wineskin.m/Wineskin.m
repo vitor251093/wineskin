@@ -1790,7 +1790,7 @@
             startExeLine = @" start /unix";
         }
         //make first pid array
-        NSArray *firstPIDlist;
+        NSArray *firstPIDlist = NULL;
         if (![returnPID isEqualToString:wineserverPIDToCheck])
         {
             firstPIDlist = [self makePIDArray:@"wineserver"];
@@ -1840,7 +1840,7 @@
         }
               
         [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
-        if (![returnPID isEqualToString:wineserverPIDToCheck])
+        if (firstPIDlist != NULL && ![returnPID isEqualToString:wineserverPIDToCheck])
         {
             // get PID of wineserver just launched
             [returnPID setString:[self getNewPid:@"wineserver" from:firstPIDlist confirm:YES]];
