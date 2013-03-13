@@ -1792,12 +1792,6 @@
         {
             startExeLine = @" start /unix";
         }
-        //make first pid array
-        NSArray *firstPIDlist = NULL;
-        if (![returnPID isEqualToString:wineserverPIDToCheck])
-        {
-            firstPIDlist = [self makePIDArray:@"wineserver"];
-        }
 		//Wine start section
         if ([wssCommand isEqualToString:@"WSS-winetricks"])
         {
@@ -1813,57 +1807,64 @@
                 [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,cliCustomCommands,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
             }
             usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
-        }
-		else if (openingFiles)
-        {
-			for (NSString *item in filesToRun) //start wine with files
+        } else {
+            //make first pid array
+            NSArray *firstPIDlist = NULL;
+            if (![returnPID isEqualToString:wineserverPIDToCheck])
             {
-                //don't try to run things xorg sometimes passes back stupidly...
-                BOOL breakOut = NO;
-                NSArray *breakStrings = [NSArray arrayWithObjects:@"/opt/X11/share/fonts",@"/usr/X11/share/fonts",@"/opt/local/share/fonts",@"/usr/X11/lib/X11/fonts",@"/usr/X11R6/lib/X11/fonts",[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold],nil];
-                for (NSString *breakItem in breakStrings)
+                firstPIDlist = [self makePIDArray:@"wineserver"];
+            }
+            if (openingFiles)
+            {
+                for (NSString *item in filesToRun) //start wine with files
                 {
-                    if ([item hasPrefix:breakItem])
+                    //don't try to run things xorg sometimes passes back stupidly...
+                    BOOL breakOut = NO;
+                    NSArray *breakStrings = [NSArray arrayWithObjects:@"/opt/X11/share/fonts",@"/usr/X11/share/fonts",@"/opt/local/share/fonts",@"/usr/X11/lib/X11/fonts",@"/usr/X11R6/lib/X11/fonts",[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold],nil];
+                    for (NSString *breakItem in breakStrings)
                     {
-                        breakOut = YES;
+                        if ([item hasPrefix:breakItem])
+                        {
+                            breakOut = YES;
+                            break;
+                        }
+                    }
+                    if (breakOut)
+                    {
                         break;
                     }
+                    [self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,dyldFallBackLibraryPath,item,wineLogFileLocal]];
                 }
-                if (breakOut)
-                {
-                    break;
-                }
-				[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,dyldFallBackLibraryPath,item,wineLogFileLocal]];
             }
-        }
-		else
-        {
-            //launch Wine normally
-			[self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,dyldFallBackLibraryPath,startExeLine,wineRunFile,programFlags,wineLogFileLocal]];
-        }
-              
-        [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
-        if (firstPIDlist != NULL && ![returnPID isEqualToString:wineserverPIDToCheck])
-        {
-            // get PID of wineserver just launched
-            [returnPID setString:[self getNewPid:@"wineserver" from:firstPIDlist confirm:YES]];
-        }
-        //if no PID found, log message and quit
-        if ([returnPID isEqualToString:@"-1"])
-        {
-            killWineskin = YES;
-            NSLog(@"ERROR, no new wineserver was launched, shutting down wrapper");
-            [self cleanUpAndShutDown];
-            return @"-1";
-        }
-        if (![returnPID isEqualToString:wineserverPIDToCheck])
-        {
-            [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",returnPID],nil] toFile:wineserverPIDFile];
-            [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
-        }
-        else
-        {
-            NSLog(@"Wineskin: >>> Using existing wineserver PID: %@", returnPID);
+            else
+            {
+                //launch Wine normally
+                [self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,dyldFallBackLibraryPath,startExeLine,wineRunFile,programFlags,wineLogFileLocal]];
+            }
+            
+            [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
+            if (firstPIDlist != NULL && ![returnPID isEqualToString:wineserverPIDToCheck])
+            {
+                // get PID of wineserver just launched
+                [returnPID setString:[self getNewPid:@"wineserver" from:firstPIDlist confirm:YES]];
+            }
+            //if no PID found, log message and quit
+            if ([returnPID isEqualToString:@"-1"])
+            {
+                killWineskin = YES;
+                NSLog(@"ERROR, no new wineserver was launched, shutting down wrapper");
+                [self cleanUpAndShutDown];
+                return @"-1";
+            }
+            if (![returnPID isEqualToString:wineserverPIDToCheck])
+            {
+                [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",returnPID],nil] toFile:wineserverPIDFile];
+                [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
+            }
+            else
+            {
+                NSLog(@"Wineskin: >>> Using existing wineserver PID: %@", returnPID);
+            }
         }
 	}
 	return [NSString stringWithString:returnPID];
