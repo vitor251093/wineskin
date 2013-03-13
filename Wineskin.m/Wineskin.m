@@ -231,7 +231,7 @@
     }
 	//open Info.plist to read all needed info
 	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
-	NSDictionary *cexePlistDictionary;
+	NSDictionary *cexePlistDictionary = nil;
 	NSString *resolutionTemp;
 	//check to make sure CFBundleName is not WineskinWineskinDefault3345, if it is, change it to current wrapper name
 	if ([[plistDictionary valueForKey:@"CFBundleName"] isEqualToString:@"WineskinWineskinDefault3345"])
@@ -269,7 +269,10 @@
 		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
 	}
-    [cexePlistDictionary release];
+    if (cexePlistDictionary != nil)
+    {
+        [cexePlistDictionary release];
+    }
 	debugEnabled = [[plistDictionary valueForKey:@"Debug Mode"] intValue];
 	forceWrapperQuartzWM = [[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue];
 	useXQuartz = [[plistDictionary valueForKey:@"Use XQuartz"] intValue];
