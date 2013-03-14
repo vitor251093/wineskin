@@ -10,9 +10,9 @@
 	NSString *contentsFold;                         //Contents folder in the wrapper
 	NSString *frameworksFold;                       //Frameworks folder in the wrapper
 	NSString *appNameWithPath;                      //full path to and including the app name
+    NSString *appName;                              //name of our app/wrapper
 	NSString *lockfile;                             //lockfile being used to know if the app is already in use
     NSString *tmpFolder;                            //where tmp files can be made and used to be specific to just this wrapper
-	NSString *wineserverPIDFile;                    //pid file holding wineserver pid of current/last run
 	NSString *displayNumberFile;                    //pid file holding display number of current/last run
 	NSString *infoPlistFile;                        //the Info.plist file in the wrapper
 	NSString *winePrefix;                           //the $WINEPREFIX
@@ -36,8 +36,6 @@
 	NSMutableString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
 	NSString *currentResolution;                    //the resolution that was running when the wrapper was started
 	int sleepNumber;                                //fullscreen resolution switch pause number in seconds
-	NSMutableString *wineserverPIDToCheck;          //wineserver PID of last run
-	NSString *wineServerPID;                        //wineserver PID of current run
 	NSString *wrapperBundlePID;                     //PID of running wrapper bundle
 	NSMutableString *wineskinX11PID;                //PID of running WineskinX11 exectuable (not used except for shutdown, only use wrapper bundle for checks)
 	NSMutableString *xQuartzX11BinPID;              //PID of running XQuartz X11.bin (only needed for Override->Fullscreen)
@@ -59,6 +57,8 @@
 	NSString *dyldFallBackLibraryPath;              //the path for DYLD_FALLBACK_LIBRARY_PATH
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
     NSFileManager *fm;                              //master object to use for default file manager
+    NSString *wineServerName;                       //the name of the Wineserver we'll be launching
+    NSString *wineName;                             //the name of the Wine process we'll be launching
 	int bundleRandomInt1;
     int bundleRandomInt2;
 }
@@ -131,8 +131,14 @@
 //returns true if running PID has the specified name
 - (BOOL)isPID:(NSString *)pid named:(NSString *)name;
 
-//start wine, return wineserver PID;
-- (NSString *)startWine;
+//returns true if Wineserver for this wrapper is running
+- (BOOL)isWineserverRunning;
+
+//fix wine and wineserver names in engines to be unique for launch
+- (void)fixWineExecutableNames;
+
+//start wine
+- (void)startWine;
 
 //background monitoring while Wine is running
 - (void)sleepAndMonitor;
@@ -157,7 +163,6 @@
     programFlags = [[[NSMutableString alloc] init] autorelease];
     vdResolution = [[[NSMutableString alloc] init] autorelease];
     fullScreenResolutionBitDepth = [[[NSMutableString alloc] init] autorelease];
-    wineserverPIDToCheck = [[[NSMutableString alloc] init] autorelease];
     wineskinX11PID = [[[NSMutableString alloc] init] autorelease];
     xQuartzX11BinPID = [[[NSMutableString alloc] init] autorelease];
     programNameAndPath = [[[NSMutableString alloc] init] autorelease];
@@ -168,7 +173,6 @@
 	useRandR = NO;
 	useGamma = YES;
 	[gammaCorrection setString:@"default"];
-	[wineserverPIDToCheck setString:@"-9"];
 	debugEnabled = NO;
 	cexeRun = NO;
 	nonStandardRun = NO;
@@ -187,13 +191,13 @@
 	contentsFold=[[NSString stringWithFormat:@"%@",[[NSBundle mainBundle] bundlePath]] stringByReplacingOccurrencesOfString:@"/Frameworks/bin" withString:@""];
 	frameworksFold=[NSString stringWithFormat:@"%@/Frameworks",contentsFold];
 	appNameWithPath=[[NSString stringWithFormat:@"%@",contentsFold] stringByReplacingOccurrencesOfString:@"/Contents" withString:@""];
+    appName = [[appNameWithPath substringFromIndex:[appNameWithPath rangeOfString:@"/" options:NSBackwardsSearch].location+1] stringByReplacingOccurrencesOfString:@".app" withString:@""];
 	infoPlistFile = [NSString stringWithFormat:@"%@/Info.plist",contentsFold];
 	winePrefix=[NSString stringWithFormat:@"%@/Resources",contentsFold];
     tmpFolder=[NSString stringWithFormat:@"/tmp/%@",[appNameWithPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
     [fm createDirectoryAtPath:tmpFolder withIntermediateDirectories:YES attributes:nil error:nil];
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
     displayNumberFile = [NSString stringWithFormat:@"%@/currentuseddisplay",tmpFolder];
-    wineserverPIDFile = [NSString stringWithFormat:@"%@/wineserverpidfile",tmpFolder];
 	lockfile=[NSString stringWithFormat:@"%@/lockfile",tmpFolder];
     wineLogFile = [NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix];
     wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
@@ -223,12 +227,20 @@
     {
         //delete the lockfile
         [fm removeItemAtPath:displayNumberFile error:nil];
-        [fm removeItemAtPath:wineserverPIDFile error:nil];
         [fm removeItemAtPath:lockfile error:nil];
         [fm removeItemAtPath:tmpFolder error:nil];
         //just called for ICE install, dont run.
         return;
     }
+    //Randomize the CFBundleID for every launch
+	srand((unsigned)time(0));
+	bundleRandomInt1 = (int)(rand()%999999999);
+	if (bundleRandomInt1<0){bundleRandomInt1=bundleRandomInt1*(-1);}
+    bundleRandomInt2 = (int)(rand()%999999999);
+	if (bundleRandomInt2<0){bundleRandomInt2=bundleRandomInt2*(-1);}
+    //set names for wine and wineserver
+    wineServerName=[NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
+    wineName=[NSString stringWithFormat:@"%@%dWine",appName,bundleRandomInt1];
 	//open Info.plist to read all needed info
 	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	NSDictionary *cexePlistDictionary = nil;
@@ -236,16 +248,9 @@
 	//check to make sure CFBundleName is not WineskinWineskinDefault3345, if it is, change it to current wrapper name
 	if ([[plistDictionary valueForKey:@"CFBundleName"] isEqualToString:@"WineskinWineskinDefault3345"])
 	{
-		NSString *tempWrapperName = [[appNameWithPath substringFromIndex:[appNameWithPath rangeOfString:@"/" options:NSBackwardsSearch].location+1] stringByReplacingOccurrencesOfString:@".app" withString:@""];
-		[plistDictionary setValue:tempWrapperName forKey:@"CFBundleName"];
+		[plistDictionary setValue:appName forKey:@"CFBundleName"];
 		[plistDictionary writeToFile:infoPlistFile atomically:YES];
 	}
-    //Randomize the CFBundleID for every launch
-	srand((unsigned)time(0));
-	bundleRandomInt1 = (int)(rand()%999999999);
-	if (bundleRandomInt1<0){bundleRandomInt1=bundleRandomInt1*(-1);}
-    bundleRandomInt2 = (int)(rand()%999999999);
-	if (bundleRandomInt2<0){bundleRandomInt2=bundleRandomInt2*(-1);}
     [plistDictionary setValue:[NSString stringWithFormat:@"%@%@.wineskin.prefs",[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] forKey:@"CFBundleIdentifier"];
     [plistDictionary writeToFile:infoPlistFile atomically:YES];
 	//need to handle it different if its a cexe
@@ -430,7 +435,6 @@
 		NSLog(@"Error! Set executable not found.  Wineskin.app running instead.");
 		system([[NSString stringWithFormat:@"open \"%@/Wineskin.app\"",appNameWithPath] UTF8String]);
         [fm removeItemAtPath:displayNumberFile error:nil];
-        [fm removeItemAtPath:wineserverPIDFile error:nil];
         [fm removeItemAtPath:lockfile error:nil];
         [fm removeItemAtPath:tmpFolder error:nil];
 		return;
@@ -471,26 +475,6 @@
                 lockFileAlreadyExisted = NO;
                 killWineskin = NO;
             }
-            else
-            {
-                // sleep 1 sec, then 2, then 4 ... up to 2 minutes total, to wait for parent process to launch wineserver
-                int i;
-                for (i = 0; i < 15; ++i)
-                {
-                    if ([fm fileExistsAtPath:wineserverPIDFile])
-                    {
-                        break;
-                    }
-                    // log delay if it will take longer than 1 second
-                    if (i > 0)
-                    {
-                        NSLog(@"Wineskin: >>> Waiting %d seconds for parent process to start wineserver", i + 1);
-                    }
-                    // sleep and then try again
-                    usleep((i + 1) * 1000000);
-                }
-                
-            }
         }
         if (!lockFileAlreadyExisted)
         {
@@ -518,7 +502,6 @@
                 if ([wrapperBundlePID isEqualToString:@"ERROR"])
                 {
                     [fm removeItemAtPath:displayNumberFile error:nil];
-                    [fm removeItemAtPath:wineserverPIDFile error:nil];
                     [fm removeItemAtPath:lockfile error:nil];
                     [fm removeItemAtPath:tmpFolder error:nil];
                     return;
@@ -550,25 +533,9 @@
     }
     
     //**********start wine
-    if (lockFileAlreadyExisted)
-    {
-        NSLog(@"Wineskin: Starting Wine (wrapper was already running)");
-    }
-    else
-    {
-        NSLog(@"Wineskin: Starting Wine");
-    }
-	wineServerPID = [self startWine];
-    if (lockFileAlreadyExisted)
-    {
-        NSLog(@"Wineskin: Wine Started (wrapper was already running), PID = %@", wineServerPID);
-    }
-    else
-    {
-        NSLog(@"Wineskin: Wine Started, PID = %@", wineServerPID);
-    }
+	[self startWine];
 	//********** exit if already running and just opening new file
-	//if wineserver pid was already running in startWine and openFiles was true, then exit, we already have a Wineskin monitoring the wrapper
+	//if wineserver was already running in startWine and openFiles was true, then exit, we already have a Wineskin monitoring the wrapper
 	if (killWineskin)
     {
         NSLog(@"Wineskin: Extra Wineskin process exiting since we already have one monitoring the wrapper.");
@@ -1214,7 +1181,6 @@
 	//copy the plist over
 	[fm removeItemAtPath:x11PListFile error:nil];
 	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold] toPath:x11PListFile error:nil];
-	
 	//make proper files and symlinks in /tmp/Wineskin
 	[fm removeItemAtPath:@"/tmp/Wineskin" error:nil]; // try to remove old folder if you can
 	[fm createDirectoryAtPath:@"/tmp/Wineskin" withIntermediateDirectories:YES attributes:nil error:nil];
@@ -1318,7 +1284,7 @@
 			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: XQuartz cannot already be running if using Override Fullscreen option!\n\nPlease close XQuartz and try again!"), NULL);
 			killWineskin = YES;
             [fm removeItemAtPath:displayNumberFile error:nil];
-            [fm removeItemAtPath:wineserverPIDFile error:nil];
+//            [fm removeItemAtPath:wineserverPIDFile error:nil];
             [fm removeItemAtPath:lockfile error:nil];
             [fm removeItemAtPath:tmpFolder error:nil];
 			return;
@@ -1647,22 +1613,66 @@
 	return YES;
 }
 
-- (NSString *)startWine
+- (BOOL)isWineserverRunning
 {
-    if ([fm fileExistsAtPath:wineserverPIDFile])
+    return ([[self systemCommand:[NSString stringWithFormat:@"killall -0 \"%@\" 2>&1",wineServerName]] length] < 1);
+}
+
+- (void)fixWineExecutableNames
+{
+    BOOL fixWine=YES;
+    NSString *oldWineName = nil;
+    NSString *oldWineServerName = nil;
+    NSString *pathToWineBin = [NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold];
+    NSArray *engineBinContents = [fm contentsOfDirectoryAtPath:pathToWineBin error:nil];
+    for (NSString *item in engineBinContents)
     {
-        [wineserverPIDToCheck setString:[[self readFileToStringArray:wineserverPIDFile] objectAtIndex:0]];
-    }
-	NSMutableString *returnPID = [[[NSMutableString alloc] init] autorelease];
-    [returnPID setString:@"-1"];
-    // if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
-    if (![wineserverPIDToCheck isEqualToString:@"-9"])// -9 means its not running for sure as the temp files didn't exist
-    {
-        if ([self isPID:wineserverPIDToCheck named:@"wineserver"])
+        if ([item hasSuffix:@"Wine"])
         {
-            [returnPID setString:wineserverPIDToCheck];
-            killWineskin = YES;
+            oldWineName = [NSString stringWithFormat:@"%@",item];
         }
+        else if ([item hasSuffix:@"Wineserver"])
+        {
+            oldWineServerName = [NSString stringWithFormat:@"%@",item];
+        }
+    }
+    if (oldWineName == nil)
+    {
+        oldWineName=@"wine";
+    }
+    if (oldWineServerName == nil)
+    {
+        oldWineServerName=@"wineserver";
+    }
+    if ([oldWineName hasPrefix:appName] && [oldWineServerName hasPrefix:appName])
+    {
+        fixWine=NO;
+        wineName = [NSString stringWithFormat:@"%@",oldWineName];
+        wineServerName = [NSString stringWithFormat:@"%@",oldWineServerName];
+    }
+    if (fixWine)
+    {
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,wineName] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,wineServerName] error:nil];
+        [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,oldWineName] toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,wineName] error:nil];
+        [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,oldWineServerName] toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,wineServerName] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine",pathToWineBin] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBin] error:nil];
+        NSString *wineBash = [NSString stringWithFormat:@"#!/bin/bash\n\"$(dirname \"$0\")/%@\" \"$@\" &",wineName];
+        NSString *wineServerBash = [NSString stringWithFormat:@"#!/bin/bash\n\"$(dirname \"$0\")/%@\" \"$@\" &",wineServerName];
+        [wineBash writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBin] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBin] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBin]];
+    }
+}
+
+- (void)startWine
+{
+    [self fixWineExecutableNames];
+    // if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
+    if ([self isWineserverRunning])
+    {
+        killWineskin = YES;
     }
 	if (nonStandardRun)
 	{
@@ -1808,12 +1818,6 @@
             }
             usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
         } else {
-            //make first pid array
-            NSArray *firstPIDlist = NULL;
-            if (![returnPID isEqualToString:wineserverPIDToCheck])
-            {
-                firstPIDlist = [self makePIDArray:@"wineserver"];
-            }
             if (openingFiles)
             {
                 for (NSString *item in filesToRun) //start wine with files
@@ -1843,31 +1847,16 @@
             }
             
             [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
-            if (firstPIDlist != NULL && ![returnPID isEqualToString:wineserverPIDToCheck])
+            // give wineserver a minute to start up
+            int s;
+            for (s=0; s<480; ++s)
             {
-                // get PID of wineserver just launched
-                [returnPID setString:[self getNewPid:@"wineserver" from:firstPIDlist confirm:YES]];
-            }
-            //if no PID found, log message and quit
-            if ([returnPID isEqualToString:@"-1"])
-            {
-                killWineskin = YES;
-                NSLog(@"ERROR, no new wineserver was launched, shutting down wrapper");
-                [self cleanUpAndShutDown];
-                return @"-1";
-            }
-            if (![returnPID isEqualToString:wineserverPIDToCheck])
-            {
-                [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",returnPID],nil] toFile:wineserverPIDFile];
-                [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
-            }
-            else
-            {
-                NSLog(@"Wineskin: >>> Using existing wineserver PID: %@", returnPID);
+                if ([self isWineserverRunning]) break;
+                usleep(125000);
             }
         }
 	}
-	return [NSString stringWithString:returnPID];
+	return;
 }
 
 - (void)sleepAndMonitor
@@ -1892,8 +1881,8 @@
     {
         //use most efficent checking for background loop
         usingWineskinX11 = NO;
-    }
-	while ([self isPID:wineServerPID named:@"wineserver"])
+    }    
+	while ([self isWineserverRunning])
 	{
 		//if WineskinX11 is no longer running, tell wineserver to close
 		if (usingWineskinX11)
@@ -1962,33 +1951,36 @@
 
 - (void)cleanUpAndShutDown
 {
-	//fix screen resolution back to original if fullscreen
-	if (fullScreenOption)
-	{
-		[self setResolution:currentResolution];
-	}
-	if (!useXQuartz)
-	{
-		char *tmp;
-		kill((pid_t)(strtoimax([wineskinX11PID UTF8String], &tmp, 10)), 9);
-		kill((pid_t)(strtoimax([wrapperBundlePID UTF8String], &tmp, 10)), 9);
-		[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
-	}
-	else if (fullScreenOption)
-	{
-		char *tmp;
-		kill((pid_t)(strtoimax([xQuartzBundlePID UTF8String], &tmp, 10)), 9);
-		kill((pid_t)(strtoimax([xQuartzX11BinPID UTF8String], &tmp, 10)), 9);
-		[fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
-	}
-	else //using XQuartz but not override->Fullscreen. Change back to Rootless resolution so it won't be stuck in a fullscreen.
-	{
-		int xRes = [[currentResolution substringToIndex:[currentResolution rangeOfString:@" "].location] intValue];
-		int yRes = [[currentResolution substringFromIndex:[currentResolution rangeOfString:@" "].location+1] intValue]-22;//if the resolution is the yMax-22 it should be the Rootless resolution
-		[self setResolution:[NSString stringWithFormat:@"%d %d",xRes,yRes]];
-	}
+    if (!useMacDriver)
+    {
+        //fix screen resolution back to original if fullscreen
+        if (fullScreenOption)
+        {
+            [self setResolution:currentResolution];
+        }
+        if (!useXQuartz)
+        {
+            char *tmp;
+            kill((pid_t)(strtoimax([wineskinX11PID UTF8String], &tmp, 10)), 9);
+            kill((pid_t)(strtoimax([wrapperBundlePID UTF8String], &tmp, 10)), 9);
+            [fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
+        }
+        else if (fullScreenOption)
+        {
+            char *tmp;
+            kill((pid_t)(strtoimax([xQuartzBundlePID UTF8String], &tmp, 10)), 9);
+            kill((pid_t)(strtoimax([xQuartzX11BinPID UTF8String], &tmp, 10)), 9);
+            [fm removeItemAtPath:@"/tmp/.X11-unix" error:nil];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]] error:nil];
+        }
+        else //using XQuartz but not override->Fullscreen. Change back to Rootless resolution so it won't be stuck in a fullscreen.
+        {
+            int xRes = [[currentResolution substringToIndex:[currentResolution rangeOfString:@" "].location] intValue];
+            int yRes = [[currentResolution substringFromIndex:[currentResolution rangeOfString:@" "].location+1] intValue]-22;//if the resolution is the yMax-22 it should be the Rootless resolution
+            [self setResolution:[NSString stringWithFormat:@"%d %d",xRes,yRes]];
+        }
+    }
 	//fix user folders back
 	if ([[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix] error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
     {
@@ -2061,9 +2053,10 @@
     [fm removeItemAtPath:x11PListFile error:nil];
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@.lockfile",x11PListFile] error:nil];
     [fm removeItemAtPath:displayNumberFile error:nil];
-    [fm removeItemAtPath:wineserverPIDFile error:nil];
     [fm removeItemAtPath:lockfile error:nil];
     [fm removeItemAtPath:tmpFolder error:nil];
+    //kill processes
+    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineName]];
     //get rid of OS X saved state file
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/%@%@.wineskin.prefs.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] error:nil];
 }
