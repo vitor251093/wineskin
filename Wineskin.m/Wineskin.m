@@ -167,6 +167,7 @@
     xQuartzX11BinPID = [[[NSMutableString alloc] init] autorelease];
     programNameAndPath = [[[NSMutableString alloc] init] autorelease];
     cliCustomCommands = [[[NSMutableString alloc] init] autorelease];
+    gammaCorrection = [[[NSMutableString alloc] init] autorelease];
     removeX11TraceFromLog = NO;
 	runWithStartExe = NO;
 	fullScreenOption = NO;
