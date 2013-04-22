@@ -1285,7 +1285,7 @@
 			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: XQuartz cannot already be running if using Override Fullscreen option!\n\nPlease close XQuartz and try again!"), NULL);
 			killWineskin = YES;
             [fm removeItemAtPath:displayNumberFile error:nil];
-//            [fm removeItemAtPath:wineserverPIDFile error:nil];
+            //            [fm removeItemAtPath:wineserverPIDFile error:nil];
             [fm removeItemAtPath:lockfile error:nil];
             [fm removeItemAtPath:tmpFolder error:nil];
 			return;
@@ -1667,6 +1667,25 @@
     }
 }
 
+- (void)wineBootStuckProcessFix
+{
+    usleep(5000000);
+    int loopCount = 30;
+    int i;
+    for (i=0; i < loopCount; ++i)
+    {
+        NSArray *resultArray = [[self systemCommand:@"ps -eo pcpu,pid,args | grep \"wineboot.exe --init\""] componentsSeparatedByString:@" "];
+        if ([[resultArray objectAtIndex:1] floatValue] > 90.0)
+        {
+            char *tmp;
+            kill((pid_t)(strtoimax([[resultArray objectAtIndex:2] UTF8String], &tmp, 10)), 9);
+            break;
+        }
+        usleep(1000000);
+    }
+    
+}
+
 - (void)startWine
 {
     [self fixWineExecutableNames];
@@ -1675,6 +1694,21 @@
     {
         killWineskin = YES;
     }
+    else
+    {
+        //make sure the /tmp/.wine-uid folder and lock file are correct since Wine is buggy about it
+        NSDictionary *info = [fm attributesOfItemAtPath:winePrefix error:nil];
+        NSString *uid = [NSString stringWithFormat: @"%d", getuid()];
+        NSString *inode = [NSString stringWithFormat:@"%x", [[info objectForKey:NSFileSystemFileNumber] longValue]];
+        NSString *deviceId = [NSString stringWithFormat:@"%x", [[info objectForKey:NSFileSystemNumber] longValue]];
+        NSString *pathToWineLockFolder = [NSString stringWithFormat:@"/tmp/.wine-%@/server-%@-%@",uid,deviceId,inode];
+        if ([fm fileExistsAtPath:pathToWineLockFolder])
+        {
+            [fm removeItemAtPath:pathToWineLockFolder error:nil];
+        }
+        [fm createDirectoryAtPath:pathToWineLockFolder withIntermediateDirectories:YES attributes:nil error:nil];
+        [self systemCommand:[NSString stringWithFormat:@"chmod -R 700 \"/tmp/.wine-%@\"",uid]];
+    }
 	if (nonStandardRun)
 	{
 		[self setToNoVirtualDesktop];
@@ -1682,12 +1716,18 @@
         //remove the .update-timestamp file
         [fm removeItemAtPath:[NSString stringWithFormat:@"%@/.update-timestamp",winePrefix] error:nil];
         //calling wineboot is a simple builtin refresh that needs to NOT prompt for gecko
-        NSString *mshtmlLine = @"";
+        NSString *mshtmlLine;
         if ([wssCommand isEqualToString:@"WSS-wineboot"])
         {
             mshtmlLine = @"export WINEDLLOVERRIDES=\"mscoree,mshtml=\";";
         }
-        [self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot > \"/dev/null\" 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath]];
+        else
+        {
+            mshtmlLine = @"";
+        }
+        //launch monitor thread for killing stuck wineboots (work-a-round Macdriver bug for 1.5.28)
+        [NSThread detachNewThreadSelector:@selector(wineBootStuckProcessFix) toTarget:self withObject:nil];
+        [self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath]];
         usleep(3000000);
         if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
         {
@@ -1882,7 +1922,7 @@
     {
         //use most efficent checking for background loop
         usingWineskinX11 = NO;
-    }    
+    }
 	while ([self isWineserverRunning])
 	{
 		//if WineskinX11 is no longer running, tell wineserver to close
