@@ -2,7 +2,7 @@
 //  WineskinAppDelegate.m
 //  Wineskin
 //
-//  Copyright 2011 by The Wineskin Project and doh123@doh123.com All rights reserved.
+//  Copyright 2011-2013 by The Wineskin Project and Urge Software LLC All rights reserved.
 //  Licensed for use under the LGPL <http://www.gnu.org/licenses/lgpl-2.1.txt>
 //
 
@@ -12,14 +12,6 @@
 
 @synthesize window;
 @synthesize winetricksList, winetricksFilteredList, winetricksSelectedList, winetricksInstalledList, winetricksCachedList;
-
-// Comparator to replace @selector(localizedStandardCompare:) missing in 10.5
-static NSInteger localizedComparator(id a, id b, void *context)
-{
-	NSInteger compareOptions = NSCaseInsensitiveSearch|NSNumericSearch;
-	
-	return [(NSString*)a compare:b options:compareOptions range:NSMakeRange(0, [a length]) locale:nil]; // nil = current locale
-}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -2120,7 +2112,7 @@ static NSInteger localizedComparator(id a, id b, void *context)
 	//get installed engines
 	NSMutableArray *installedEnginesList = [NSMutableArray arrayWithCapacity:10];
 	NSString *folder = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
-	NSArray *filesTEMP = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingFunction:localizedComparator context:nil];
+	NSArray *filesTEMP = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
 	NSArray *files = [[filesTEMP reverseObjectEnumerator] allObjects];
 	if ([theFilter isEqualToString:@""])
 	{

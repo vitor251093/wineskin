@@ -2,7 +2,7 @@
 //  WineskinAppDelegate.h
 //  Wineskin
 //
-//  Copyright 2011 by The Wineskin Project and doh123@doh123.com All rights reserved.
+//  Copyright 2011-2013 by The Wineskin Project and Urge Software LLC All rights reserved.
 //  Licensed for use under the LGPL <http://www.gnu.org/licenses/lgpl-2.1.txt>
 //
 
