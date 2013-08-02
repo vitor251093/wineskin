@@ -233,15 +233,8 @@
         //just called for ICE install, dont run.
         return;
     }
-    //Randomize the CFBundleID for every launch
-	srand((unsigned)time(0));
-	bundleRandomInt1 = (int)(rand()%999999999);
-	if (bundleRandomInt1<0){bundleRandomInt1=bundleRandomInt1*(-1);}
-    bundleRandomInt2 = (int)(rand()%999999999);
-	if (bundleRandomInt2<0){bundleRandomInt2=bundleRandomInt2*(-1);}
-    //set names for wine and wineserver
-    wineServerName=[NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
-    wineName=[NSString stringWithFormat:@"%@%dWine",appName,bundleRandomInt1];
+    //fix Wine names which also is setting for bundle ID
+    [self fixWineExecutableNames];
 	//open Info.plist to read all needed info
 	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
 	NSDictionary *cexePlistDictionary = nil;
@@ -252,7 +245,7 @@
 		[plistDictionary setValue:appName forKey:@"CFBundleName"];
 		[plistDictionary writeToFile:infoPlistFile atomically:YES];
 	}
-    [plistDictionary setValue:[NSString stringWithFormat:@"%@%@.wineskin.prefs",[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] forKey:@"CFBundleIdentifier"];
+    [plistDictionary setValue:[NSString stringWithFormat:@"%@.wineskin.prefs",wineName] forKey:@"CFBundleIdentifier"];
     [plistDictionary writeToFile:infoPlistFile atomically:YES];
 	//need to handle it different if its a cexe
 	if (!cexeRun)
@@ -1653,6 +1646,13 @@
     }
     if (fixWine)
     {
+        // set CFBundleID too
+        srand((unsigned)time(0));
+        bundleRandomInt1 = (int)(rand()%999999999);
+        if (bundleRandomInt1<0){bundleRandomInt1=bundleRandomInt1*(-1);}
+        //set names for wine and wineserver
+        wineServerName=[NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
+        wineName=[NSString stringWithFormat:@"%@%dWine",appName,bundleRandomInt1];
         [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,wineName] error:nil];
         [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,wineServerName] error:nil];
         [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,oldWineName] toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBin,wineName] error:nil];
@@ -1695,7 +1695,6 @@
 
 - (void)startWine
 {
-    [self fixWineExecutableNames];
     // if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
     if ([self isWineserverRunning])
     {
