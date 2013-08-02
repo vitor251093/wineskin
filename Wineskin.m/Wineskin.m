@@ -1,5 +1,5 @@
 //  Wineskin.m
-//  Copyright 2012 by The Wineskin Project and doh123@doh123.com All rights reserved.
+//  Copyright 2012-2013 by The Wineskin Project and Urge Software LLC All rights reserved.
 //  Licensed for use under the LGPL <http://www.gnu.org/licenses/lgpl-2.1.txt>
 
 #import <Cocoa/Cocoa.h>
@@ -1667,23 +1667,30 @@
     }
 }
 
-- (void)wineBootStuckProcessFix
+- (void)wineBootStuckProcess
 {
+    //kills Wine if a Wine process is stuck with 90%+ usage.  Very hacky work around
     usleep(5000000);
     int loopCount = 30;
     int i;
+    int hit = 0;
     for (i=0; i < loopCount; ++i)
     {
         NSArray *resultArray = [[self systemCommand:@"ps -eo pcpu,pid,args | grep \"wineboot.exe --init\""] componentsSeparatedByString:@" "];
         if ([[resultArray objectAtIndex:1] floatValue] > 90.0)
         {
-            char *tmp;
-            kill((pid_t)(strtoimax([[resultArray objectAtIndex:2] UTF8String], &tmp, 10)), 9);
-            break;
+            if (hit > 5)
+            {
+                usleep(5000000);
+                char *tmp;
+                kill((pid_t)(strtoimax([[resultArray objectAtIndex:2] UTF8String], &tmp, 10)), 9);
+                break;
+            } else {
+                ++hit;
+            }
         }
         usleep(1000000);
     }
-    
 }
 
 - (void)startWine
@@ -1726,7 +1733,7 @@
             mshtmlLine = @"";
         }
         //launch monitor thread for killing stuck wineboots (work-a-round Macdriver bug for 1.5.28)
-        [NSThread detachNewThreadSelector:@selector(wineBootStuckProcessFix) toTarget:self withObject:nil];
+        [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
         [self systemCommand:[NSString stringWithFormat:@"%@export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot 2>&1",mshtmlLine,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath]];
         usleep(3000000);
         if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
