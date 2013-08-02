@@ -1398,8 +1398,9 @@ static NSInteger localizedComparator(id a, id b, void *context)
 	NSThread *thread = [[[NSThread alloc] initWithTarget:self selector:@selector(winetricksLoadPackageLists) object:nil] autorelease];
 	[thread start];
 	while (![thread isFinished]) // Wait in a non-locking mode until the thread finishes running
+    {
 		[self sleepWithRunLoopForSeconds:1];
-	
+	}
 	winetricksDone = YES;
 	[self setWinetricksBusy:NO];
 	[winetricksOutlineView reloadData];
@@ -1629,12 +1630,12 @@ static NSInteger localizedComparator(id a, id b, void *context)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSDictionary *list = nil;
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	
 	// List of all winetricks
 	list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]]];
 	BOOL needsListRebuild = NO;
-	if (list == nil) // This only happens in case of a winetricks update
+	if (list == nil) { // This only happens in case of a winetricks update
 		needsListRebuild = YES;
+    }
 	else
 	{
 		for (NSString *eachCategory in [list allKeys])
@@ -1664,37 +1665,70 @@ static NSInteger localizedComparator(id a, id b, void *context)
 	}
 	if (needsListRebuild)
 	{ // Invalid or missing list.  Rebuild it
-		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",@"list",nil]];
-		NSArray *winetricksCategories = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+        NSArray *winetricksFile = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+        NSMutableArray *linesToCheck = [NSMutableArray arrayWithCapacity:400];
+        NSArray *winetricksCategories;
+        int i;
+        for (i=0; i < [winetricksFile count]; ++i)
+        {
+            NSMutableString *fixedLine = [[[NSMutableString alloc] init] autorelease];
+            [fixedLine setString:[[winetricksFile objectAtIndex:i] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
+            if ([fixedLine hasPrefix:@"WINETRICKS_CATEGORIES="])
+            {
+                [fixedLine replaceOccurrencesOfString:@"WINETRICKS_CATEGORIES=" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                [fixedLine replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                winetricksCategories = [fixedLine componentsSeparatedByString:@" "];
+            }
+            else if ([fixedLine hasPrefix:@"w_metadata"])
+            {
+                [fixedLine replaceOccurrencesOfString:@"\\" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                [fixedLine replaceOccurrencesOfString:@"w_metadata" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                [fixedLine appendString:@" "];
+                NSMutableString *descriptionLine = [[[NSMutableString alloc] init] autorelease];
+                [descriptionLine setString:[winetricksFile objectAtIndex:i+1]];
+                [descriptionLine replaceOccurrencesOfString:@"\\" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [descriptionLine length])];
+                [descriptionLine replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [descriptionLine length])];
+                [descriptionLine replaceOccurrencesOfString:@"title=" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [descriptionLine length])];
+                [fixedLine appendString:[descriptionLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
+                [linesToCheck addObject:[fixedLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
+            }
+        }
 		list = [NSMutableDictionary dictionaryWithCapacity:[winetricksCategories count]];
-		for (NSString *eachCategory in winetricksCategories)
+		for (NSString *category in winetricksCategories)
 		{
-			//skip if its not needed
-			if (eachCategory.length == 0)
-				continue;
-			//run winetricks to get list of packages in current verb into winetricksTempList
-			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", eachCategory, @"list", nil]];
-			//before reading in the log, we need to find out if its iso-8859-1 which happens with some weird symbols Winetricks uses
-			NSString *logContents;
-			if ([[self systemCommandWithOutputReturned:[NSString stringWithFormat:@"file --mime-encoding \"%@/Contents/Resources/Logs/WinetricksTemp.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]] hasSuffix:@"iso-8859-1"]) //need to convert to UTF8
-				logContents = [self systemCommandWithOutputReturned:[NSString stringWithFormat:@"iconv -f iso-8859-1 -t utf-8 \"%@/Contents/Resources/Logs/WinetricksTemp.log\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-			else
-				logContents = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] usedEncoding:nil error:nil];
-			NSArray *winetricksTempList = [[logContents componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+            NSMutableArray *winetricksTempList = [NSMutableArray arrayWithCapacity:20];
+            for (NSString *line in linesToCheck)
+            {
+                NSMutableString *fixedLine = [[[NSMutableString alloc] init] autorelease];
+                [fixedLine setString:line]; //fix multiple space issue
+                while ([fixedLine rangeOfString:@"  "].location != NSNotFound)
+                {
+                    [fixedLine replaceOccurrencesOfString:@"  " withString:@" " options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                }
+                NSArray *splitLine = [fixedLine componentsSeparatedByString:@" "];
+                if ([[splitLine objectAtIndex:1] isEqualToString:category])
+                {
+                    [fixedLine replaceOccurrencesOfString:category withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                    while ([fixedLine rangeOfString:@"  "].location != NSNotFound)
+                    {
+                        [fixedLine replaceOccurrencesOfString:@"  " withString:@" " options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                    }
+                    [winetricksTempList addObject:[fixedLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
+                }
+            }
+            [winetricksTempList sortUsingSelector:(@selector(caseInsensitiveCompare:))];
 			NSMutableDictionary *winetricksThisCategoryList = [NSMutableDictionary dictionaryWithCapacity:20];
 			for (NSString *eachPackage in winetricksTempList)
 			{
 				NSRange position = [eachPackage rangeOfString:@" "];
-				if (position.location == NSNotFound) // Skip invalid entries
-					continue;
+				if (position.location == NSNotFound) continue;// Skip invalid entries
 				NSString *packageName = [eachPackage substringToIndex:position.location];
 				NSString *packageDescription = [[eachPackage substringFromIndex:position.location] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 				// Yes, we're inserting the name twice (as a key and as a value) on purpose, so that we won't have to do a nasty, slow allObjectsForKey when drawing the UI.
 				[winetricksThisCategoryList setValue:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"WS-Name", packageDescription, @"WS-Description", nil] forKey:packageName];
 			}
-			if ([winetricksThisCategoryList count] == 0)
-				continue;
-			[list setValue:winetricksThisCategoryList forKey:eachCategory];
+			if ([winetricksThisCategoryList count] == 0) continue;
+			[list setValue:winetricksThisCategoryList forKey:category];
 		}
 		[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]] atomically:YES];
 	}
@@ -1715,8 +1749,9 @@ static NSInteger localizedComparator(id a, id b, void *context)
 		[self setWinetricksInstalledList:[list valueForKey:@"WS-Installed"]];
 	}
 	else
+    {
 		[self setWinetricksInstalledList:[NSDictionary dictionary]];
-	
+	}
 	if ([defaults boolForKey:@"DownloadedColumnShown"])
 	{
 		// List of downloaded winetricks
@@ -1731,8 +1766,9 @@ static NSInteger localizedComparator(id a, id b, void *context)
 		[self setWinetricksCachedList:[list valueForKey:@"WS-Cached"]];
 	}
 	else
+    {
 		[self setWinetricksCachedList:[NSDictionary dictionary]];
-
+    }
 	[pool release];
 }
 - (void)setWinetricksBusy:(BOOL)isBusy;
