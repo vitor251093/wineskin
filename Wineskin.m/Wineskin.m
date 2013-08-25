@@ -268,10 +268,6 @@
 		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
 		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
 	}
-    if (cexePlistDictionary != nil)
-    {
-        [cexePlistDictionary release];
-    }
 	debugEnabled = [[plistDictionary valueForKey:@"Debug Mode"] intValue];
 	forceWrapperQuartzWM = [[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue];
 	useXQuartz = [[plistDictionary valueForKey:@"Use XQuartz"] intValue];
@@ -595,6 +591,10 @@
     }
 	[self cleanUpAndShutDown];
     [plistDictionary release];
+    if (cexePlistDictionary != nil)
+    {
+        [cexePlistDictionary release];
+    }
 	return;
 }
 
