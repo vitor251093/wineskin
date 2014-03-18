@@ -1,4 +1,0 @@
-Keys in Contents/Frameworks/bin
-main.scpt in Contents/Resources/Scripts
-WineskinLauncher in Contents/MacOS
-WineskinLauncher.rsrc in Contents/Resources

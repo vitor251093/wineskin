@@ -1,3 +1,0 @@
-#!/bin/sh
-cd "$(dirname "$0")"
-gcc -arch i386 -mmacosx-version-min=10.5 Keys.m -ObjC -framework Cocoa -o Keys
