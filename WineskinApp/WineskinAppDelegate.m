@@ -883,7 +883,13 @@ NSFileManager *fm;
         NSRange theDash = [result rangeOfString:@"-"];
         if (theDash.location != NSNotFound)
         {
+            // clear in front of - in case launchd has it as anonymous, then clear after first [
             NSString *entryToRemove = [[result substringFromIndex:theDash.location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSRange theBracket = [entryToRemove rangeOfString:@"["];
+            if (theBracket.location != NSNotFound) {
+                entryToRemove = [entryToRemove substringFromIndex:theBracket.location];
+            }
+            NSLog(@"launchctl remove \"%@\"",entryToRemove);
             [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
         }
     }
