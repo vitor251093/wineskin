@@ -873,6 +873,16 @@ NSFileManager *fm;
         popen([[NSString stringWithFormat:@"killall -9 %@",wineserverName] UTF8String],[@"r" UTF8String]);
 	}
 	[alert release];
+    //clear launchd entries that may be stuck
+    NSString *wrapperPath =[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
+    NSString *wrapperName = [[wrapperPath substringFromIndex:[wrapperPath rangeOfString:@"/" options:NSBackwardsSearch].location+1] stringByDeletingPathExtension];
+    NSString *results = [self systemCommand:[NSString stringWithFormat:@"launchctl list | grep \"%@\"",wrapperName]];
+    NSArray *resultArray=[results componentsSeparatedByString:@"\n"];
+    for (NSString *result in resultArray)
+    {
+        NSString *entryToRemove = [[result substringFromIndex:[result rangeOfString:@"-"].location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
+    }
 }
 
 //*************************************************************
@@ -2646,6 +2656,25 @@ NSFileManager *fm;
 	if ([panel runModalForDirectory:@"/" file:nil types:nil] != 0)
 		[modifyMappingsMyPicturesTextField setStringValue:[[[panel filenames] objectAtIndex:0] stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@"$HOME"]];
 	[panel release];
+}
+
+- (NSString *)systemCommand:(NSString *)command
+{
+	FILE *fp;
+	char buff[512];
+	NSMutableString *returnString = [[[NSMutableString alloc] init] autorelease];
+	fp = popen([command cStringUsingEncoding:NSUTF8StringEncoding], "r");
+	while (fgets( buff, sizeof buff, fp))
+    {
+        [returnString appendString:[NSString stringWithCString:buff encoding:NSUTF8StringEncoding]];
+    }
+	pclose(fp);
+	//cut out trailing new line
+	if ([returnString hasSuffix:@"\n"])
+    {
+        [returnString deleteCharactersInRange:NSMakeRange([returnString length]-1,1)];
+    }
+	return [NSString stringWithString:returnString];
 }
 
 //*************************************************************
