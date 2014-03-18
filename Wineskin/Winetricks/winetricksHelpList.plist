@@ -67,40 +67,19 @@
 			<key>WS-Name</key>
 			<string>controlpad</string>
 		</dict>
-		<key>cygwin</key>
+		<key>emu8086</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>cygwin</string>
+			<string>emu8086</string>
 			<key>WS-Name</key>
-			<string>cygwin</string>
+			<string>emu8086</string>
 		</dict>
 		<key>firefox</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Firefox 11</string>
+			<string>Firefox 24</string>
 			<key>WS-Name</key>
 			<string>firefox</string>
-		</dict>
-		<key>firefox35</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Firefox 3.5</string>
-			<key>WS-Name</key>
-			<string>firefox35</string>
-		</dict>
-		<key>firefox36</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Firefox 3.6</string>
-			<key>WS-Name</key>
-			<string>firefox36</string>
-		</dict>
-		<key>firefox5</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Firefox 5</string>
-			<key>WS-Name</key>
-			<string>firefox5</string>
 		</dict>
 		<key>fontxplorer</key>
 		<dict>
@@ -228,19 +207,19 @@
 			<key>WS-Name</key>
 			<string>psdkwin7</string>
 		</dict>
-		<key>python26</key>
+		<key>qq2012</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Python Interpreter, version 2.6.2</string>
+			<string>QQ 2012 (Chinese chat app)</string>
 			<key>WS-Name</key>
-			<string>python26</string>
+			<string>qq2012</string>
 		</dict>
-		<key>python26_comtypes</key>
+		<key>qqintl</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Comtypes 0.6.2 for Python 2.6</string>
+			<string>QQ International Instant Messenger 2.0</string>
 			<key>WS-Name</key>
-			<string>python26_comtypes</string>
+			<string>qqintl</string>
 		</dict>
 		<key>safari</key>
 		<dict>
@@ -318,6 +297,13 @@
 			<string>MS Visual C++ 2008 Express</string>
 			<key>WS-Name</key>
 			<string>vc2008express</string>
+		</dict>
+		<key>vc2010express</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Visual C++ 2010 Express</string>
+			<key>WS-Name</key>
+			<string>vc2010express</string>
 		</dict>
 		<key>vlc</key>
 		<dict>
@@ -405,7 +391,7 @@
 		<key>adobeair</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Adobe AIR 2.7</string>
+			<string>Adobe AIR 4.0</string>
 			<key>WS-Name</key>
 			<string>adobeair</string>
 		</dict>
@@ -436,6 +422,13 @@
 			<string>Adobe Type Manager</string>
 			<key>WS-Name</key>
 			<string>atmlib</string>
+		</dict>
+		<key>avifil32</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS avifil32</string>
+			<key>WS-Name</key>
+			<string>avifil32</string>
 		</dict>
 		<key>cabinet</key>
 		<dict>
@@ -636,7 +629,7 @@
 		<key>dotnet11</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS .NET 1.1 (broken on wine)</string>
+			<string>MS .NET 1.1</string>
 			<key>WS-Name</key>
 			<string>dotnet11</string>
 		</dict>
@@ -653,6 +646,13 @@
 			<string>MS .NET 2.0</string>
 			<key>WS-Name</key>
 			<string>dotnet20</string>
+		</dict>
+		<key>dotnet20sdk</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS .NET 2.0 SDK</string>
+			<key>WS-Name</key>
+			<string>dotnet20sdk</string>
 		</dict>
 		<key>dotnet20sp1</key>
 		<dict>
@@ -703,12 +703,26 @@
 			<key>WS-Name</key>
 			<string>dotnet40</string>
 		</dict>
+		<key>dotnet45</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS .NET 4.5</string>
+			<key>WS-Name</key>
+			<string>dotnet45</string>
+		</dict>
 		<key>dotnet_verifier</key>
 		<dict>
 			<key>WS-Description</key>
 			<string>MS .NET Verifier</string>
 			<key>WS-Name</key>
 			<string>dotnet_verifier</string>
+		</dict>
+		<key>dsdmo</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS dsdmo.dll</string>
+			<key>WS-Name</key>
+			<string>dsdmo</string>
 		</dict>
 		<key>dsound</key>
 		<dict>
@@ -762,7 +776,7 @@
 		<key>flash</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Flash Player 11</string>
+			<string>Flash Player 12</string>
 			<key>WS-Name</key>
 			<string>flash</string>
 		</dict>
@@ -927,6 +941,13 @@
 			<key>WS-Name</key>
 			<string>msflxgrd</string>
 		</dict>
+		<key>msftedit</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>Microsoft RichEdit Control</string>
+			<key>WS-Name</key>
+			<string>msftedit</string>
+		</dict>
 		<key>mshflxgd</key>
 		<dict>
 			<key>WS-Description</key>
@@ -990,6 +1011,13 @@
 			<key>WS-Name</key>
 			<string>msxml6</string>
 		</dict>
+		<key>nuget</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>NuGet Package manager</string>
+			<key>WS-Name</key>
+			<string>nuget</string>
+		</dict>
 		<key>ogg</key>
 		<dict>
 			<key>WS-Description</key>
@@ -1017,6 +1045,20 @@
 			<string>pngfilt.dll (from ie5)</string>
 			<key>WS-Name</key>
 			<string>pngfilt</string>
+		</dict>
+		<key>python26</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>Python Interpreter, version 2.6.2</string>
+			<key>WS-Name</key>
+			<string>python26</string>
+		</dict>
+		<key>python26_comtypes</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>Comtypes 0.6.2 for Python 2.6</string>
+			<key>WS-Name</key>
+			<string>python26_comtypes</string>
 		</dict>
 		<key>quartz</key>
 		<dict>
@@ -1301,26 +1343,33 @@
 	</dict>
 	<key>fonts</key>
 	<dict>
-		<key>all</key>
+		<key>allfonts</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>All</string>
+			<string>All fonts</string>
 			<key>WS-Name</key>
-			<string>all</string>
+			<string>allfonts</string>
 		</dict>
 		<key>baekmuk</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Baekmuk Korean</string>
+			<string>Baekmuk Korean fonts</string>
 			<key>WS-Name</key>
 			<string>baekmuk</string>
 		</dict>
-		<key>cjk</key>
+		<key>cambria</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>All Chinese, Japanese, Korean and aliases</string>
+			<string>MS Cambria font</string>
 			<key>WS-Name</key>
-			<string>cjk</string>
+			<string>cambria</string>
+		</dict>
+		<key>cjkfonts</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>All Chinese, Japanese, Korean fonts and aliases</string>
+			<key>WS-Name</key>
+			<string>cjkfonts</string>
 		</dict>
 		<key>consolas</key>
 		<dict>
@@ -1329,59 +1378,66 @@
 			<key>WS-Name</key>
 			<string>consolas</string>
 		</dict>
-		<key>core</key>
+		<key>constantia</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS Arial, Courier, Times</string>
+			<string>MS Constantia font</string>
 			<key>WS-Name</key>
-			<string>core</string>
+			<string>constantia</string>
+		</dict>
+		<key>corefonts</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Arial, Courier, Times fonts</string>
+			<key>WS-Name</key>
+			<string>corefonts</string>
 		</dict>
 		<key>droid</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Droid</string>
+			<string>Droid fonts</string>
 			<key>WS-Name</key>
 			<string>droid</string>
 		</dict>
-		<key>eu</key>
+		<key>eufonts</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Updated for Romanian and Bulgarian</string>
+			<string>Updated fonts for Romanian and Bulgarian</string>
 			<key>WS-Name</key>
-			<string>eu</string>
+			<string>eufonts</string>
 		</dict>
 		<key>fakechinese</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Creates aliases for Chinese using WenQuanYi</string>
+			<string>Creates aliases for Chinese fonts using WenQuanYi fonts</string>
 			<key>WS-Name</key>
 			<string>fakechinese</string>
 		</dict>
 		<key>fakejapanese</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Creates aliases for Japanese using Takao</string>
+			<string>Creates aliases for Japanese fonts using Takao fonts</string>
 			<key>WS-Name</key>
 			<string>fakejapanese</string>
 		</dict>
 		<key>fakekorean</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Creates aliases for Korean using Baekmuk</string>
+			<string>Creates aliases for Korean fonts using Baekmuk fonts</string>
 			<key>WS-Name</key>
 			<string>fakekorean</string>
 		</dict>
 		<key>fontfix</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Updated Arphic</string>
+			<string>Updated Arphic fonts</string>
 			<key>WS-Name</key>
 			<string>fontfix</string>
 		</dict>
 		<key>liberation</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Red Hat Liberation (Sans, Serif, Mono)</string>
+			<string>Red Hat Liberation fonts (Sans, Serif, Mono)</string>
 			<key>WS-Name</key>
 			<string>liberation</string>
 		</dict>
@@ -1395,21 +1451,21 @@
 		<key>opensymbol</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>OpenSymbol (replacement for Wingdings)</string>
+			<string>OpenSymbol fonts (replacement for Wingdings)</string>
 			<key>WS-Name</key>
 			<string>opensymbol</string>
 		</dict>
 		<key>tahoma</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>MS Tahoma font (not part of core)</string>
+			<string>MS Tahoma font (not part of corefonts)</string>
 			<key>WS-Name</key>
 			<string>tahoma</string>
 		</dict>
 		<key>takao</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Takao Japanese</string>
+			<string>Takao Japanese fonts</string>
 			<key>WS-Name</key>
 			<string>takao</string>
 		</dict>
@@ -2290,497 +2346,497 @@
 		<key>alldlls=builtin</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Override most common DLLs to builtin</string>
+			<string>title_uk=Перевизначити найбільш поширені DLL на вбудовані</string>
 			<key>WS-Name</key>
 			<string>alldlls=builtin</string>
 		</dict>
 		<key>alldlls=default</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Remove all DLL overrides</string>
+			<string>title_uk=Видалити всі перевизначення DLL</string>
 			<key>WS-Name</key>
 			<string>alldlls=default</string>
 		</dict>
 		<key>ao=disabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable AlwaysOffscreen (default)</string>
+			<string>title_uk=Вимкнути AlwaysOffscreen (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>ao=disabled</string>
 		</dict>
 		<key>ao=enabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable AlwaysOffscreen</string>
+			<string>title_uk=Включити AlwaysOffscreen</string>
 			<key>WS-Name</key>
 			<string>ao=enabled</string>
 		</dict>
 		<key>ddr=gdi</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set DirectDrawRenderer to gdi</string>
+			<string>title_uk=Поставити DirectDrawRenderer на gdi</string>
 			<key>WS-Name</key>
 			<string>ddr=gdi</string>
 		</dict>
 		<key>ddr=opengl</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set DirectDrawRenderer to opengl</string>
+			<string>title_uk=Поставити DirectDrawRenderer на opengl</string>
 			<key>WS-Name</key>
 			<string>ddr=opengl</string>
 		</dict>
 		<key>fontsmooth=bgr</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable subpixel font smoothing for BGR LCDs</string>
+			<string>title_uk=Включити субпіксельне згладжування шрифту для BGR LCD моніторів</string>
 			<key>WS-Name</key>
 			<string>fontsmooth=bgr</string>
 		</dict>
 		<key>fontsmooth=disable</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable font smoothing</string>
+			<string>title_uk=Вимкнути згладжування шрифту</string>
 			<key>WS-Name</key>
 			<string>fontsmooth=disable</string>
 		</dict>
 		<key>fontsmooth=gray</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable subpixel font smoothing</string>
+			<string>title_uk=Включити субпіксельне згладжування шрифту</string>
 			<key>WS-Name</key>
 			<string>fontsmooth=gray</string>
 		</dict>
 		<key>fontsmooth=rgb</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable subpixel font smoothing for RGB LCDs</string>
+			<string>title_uk=Включити субпіксельне згладжування шрифту для RGB LCD моніторів</string>
 			<key>WS-Name</key>
 			<string>fontsmooth=rgb</string>
 		</dict>
 		<key>forcemono</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Force using mono instead of .Net (for debugging)</string>
+			<string>title_uk=Примусове використання mono замість .Net (для налогодження)</string>
 			<key>WS-Name</key>
 			<string>forcemono</string>
 		</dict>
 		<key>glsl=disabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable glsl shaders, use arb shaders (faster, but sometimes breaks)</string>
+			<string>title_uk=Вимкнути glsl шейдери та використовувати arb шейдери (швидше, але іноді з перервами)</string>
 			<key>WS-Name</key>
 			<string>glsl=disabled</string>
 		</dict>
 		<key>glsl=enabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable glsl shaders (default)</string>
+			<string>title_uk=Включити glsl шейдери (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>glsl=enabled</string>
 		</dict>
 		<key>grabfullscreen=n</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable cursor clipping for full-screen windows (default)</string>
+			<string>title_uk=Вимкнути примусове захоплення курсору для повноекранних вікон (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>grabfullscreen=n</string>
 		</dict>
 		<key>grabfullscreen=y</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Force cursor clipping for full-screen windows (needed by some games)</string>
+			<string>title_uk=Примусове захоплення курсору для повноекранних вікон (необхідно для деяких ігор)</string>
 			<key>WS-Name</key>
 			<string>grabfullscreen=y</string>
 		</dict>
 		<key>heapcheck</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable heap checking with GlobalFlag</string>
+			<string>title_uk=Включити накопичувальну перевірку GlobalFlag</string>
 			<key>WS-Name</key>
 			<string>heapcheck</string>
 		</dict>
 		<key>hosts</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Add empty C:windowssystem32driversetc{hosts,services} files</string>
+			<string>title_uk=Додати порожні файли у C:windowssystem32driversetc{hosts,services}</string>
 			<key>WS-Name</key>
 			<string>hosts</string>
 		</dict>
 		<key>macdriver=mac</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable the Mac native Quartz driver (default)</string>
+			<string>title_uk=Включити рідний Mac Quartz драйвер (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>macdriver=mac</string>
 		</dict>
 		<key>macdriver=x11</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable the Mac native Quartz driver, use X11 instead</string>
+			<string>title_uk=Вимкнути рідний Mac Quartz драйвер та використовувати замість нього X11</string>
 			<key>WS-Name</key>
 			<string>macdriver=x11</string>
 		</dict>
 		<key>multisampling=disabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable Direct3D multisampling</string>
+			<string>title_uk=Вимкнути Direct3D мультисемплінг</string>
 			<key>WS-Name</key>
 			<string>multisampling=disabled</string>
 		</dict>
 		<key>multisampling=enabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable Direct3D multisampling</string>
+			<string>title_uk=Включити Direct3D мультисемплінг</string>
 			<key>WS-Name</key>
 			<string>multisampling=enabled</string>
 		</dict>
 		<key>mwo=disable</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set DirectInput MouseWarpOverride to disable</string>
+			<string>title_uk=Вимкнути DirectInput MouseWarpOverride</string>
 			<key>WS-Name</key>
 			<string>mwo=disable</string>
 		</dict>
 		<key>mwo=enabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set DirectInput MouseWarpOverride to enabled (default)</string>
+			<string>title_uk=Включити DirectInput MouseWarpOverride (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>mwo=enabled</string>
 		</dict>
 		<key>mwo=force</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set DirectInput MouseWarpOverride to force (needed by some games)</string>
+			<string>title_uk=Поставити примусове DirectInput MouseWarpOverride (необхідно для деяких ігор)</string>
 			<key>WS-Name</key>
 			<string>mwo=force</string>
 		</dict>
 		<key>native_mdac</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Override odbc32, odbccp32 and oledb32</string>
+			<string>title_uk=Перевизначити odbc32, odbccp32 та oledb32</string>
 			<key>WS-Name</key>
 			<string>native_mdac</string>
 		</dict>
 		<key>native_oleaut32</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Override oleaut32</string>
+			<string>title_uk=Перевизначити oleaut32</string>
 			<key>WS-Name</key>
 			<string>native_oleaut32</string>
 		</dict>
 		<key>nocrashdialog</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable crash dialog</string>
+			<string>title_uk=Вимкнути діалог про помилку</string>
 			<key>WS-Name</key>
 			<string>nocrashdialog</string>
 		</dict>
 		<key>npm=repack</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set NonPower2Mode to repack</string>
+			<string>title_uk=Поставити NonPower2Mode на repack</string>
 			<key>WS-Name</key>
 			<string>npm=repack</string>
 		</dict>
 		<key>nt40</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows NT 4.0</string>
+			<string>title_uk=Поставити версію Windows NT 4.0</string>
 			<key>WS-Name</key>
 			<string>nt40</string>
 		</dict>
 		<key>orm=backbuffer</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set OffscreenRenderingMode=backbuffer</string>
+			<string>title_uk=Поставити OffscreenRenderingMode=backbuffer</string>
 			<key>WS-Name</key>
 			<string>orm=backbuffer</string>
 		</dict>
 		<key>orm=fbo</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set OffscreenRenderingMode=fbo (default)</string>
+			<string>title_uk=Поставити OffscreenRenderingMode=fbo (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>orm=fbo</string>
 		</dict>
 		<key>psm=disabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set PixelShaderMode to disabled</string>
+			<string>title_uk=Вимкнути PixelShaderMode</string>
 			<key>WS-Name</key>
 			<string>psm=disabled</string>
 		</dict>
 		<key>psm=enabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set PixelShaderMode to enabled</string>
+			<string>title_uk=Включити PixelShaderMode</string>
 			<key>WS-Name</key>
 			<string>psm=enabled</string>
 		</dict>
 		<key>remove_mono</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Remove builtin wine-mono</string>
+			<string>title_uk=Видалити вбудоване wine-mono</string>
 			<key>WS-Name</key>
 			<string>remove_mono</string>
 		</dict>
 		<key>rtlm=auto</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set RenderTargetLockMode to auto (default)</string>
+			<string>title_uk=Поставити RenderTargetLockMode на авто (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>rtlm=auto</string>
 		</dict>
 		<key>rtlm=disabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set RenderTargetLockMode to disabled</string>
+			<string>title_uk=Вимкнути RenderTargetLockMode</string>
 			<key>WS-Name</key>
 			<string>rtlm=disabled</string>
 		</dict>
 		<key>rtlm=readdraw</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set RenderTargetLockMode to readdraw</string>
+			<string>title_uk=Поставити RenderTargetLockMode на readdraw</string>
 			<key>WS-Name</key>
 			<string>rtlm=readdraw</string>
 		</dict>
 		<key>rtlm=readtex</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set RenderTargetLockMode to readtex</string>
+			<string>title_uk=Поставити RenderTargetLockMode на readtex</string>
 			<key>WS-Name</key>
 			<string>rtlm=readtex</string>
 		</dict>
 		<key>rtlm=texdraw</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set RenderTargetLockMode to texdraw</string>
+			<string>title_uk=Поставити RenderTargetLockMode на texdraw</string>
 			<key>WS-Name</key>
 			<string>rtlm=texdraw</string>
 		</dict>
 		<key>rtlm=textex</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set RenderTargetLockMode to textex</string>
+			<string>title_uk=Поставити RenderTargetLockMode на textex</string>
 			<key>WS-Name</key>
 			<string>rtlm=textex</string>
 		</dict>
 		<key>sandbox</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Sandbox the wineprefix - remove links to HOME</string>
+			<string>title_uk=Пісочниця wineprefix - видалити посилання до HOME</string>
 			<key>WS-Name</key>
 			<string>sandbox</string>
 		</dict>
 		<key>sound=alsa</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set sound driver to ALSA</string>
+			<string>title_uk=Поставити звуковий драйвер ALSA</string>
 			<key>WS-Name</key>
 			<string>sound=alsa</string>
 		</dict>
 		<key>sound=coreaudio</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set sound driver to Mac CoreAudio</string>
+			<string>title_uk=Поставити звуковий драйвер Mac CoreAudio</string>
 			<key>WS-Name</key>
 			<string>sound=coreaudio</string>
 		</dict>
 		<key>sound=disabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set sound driver to disabled</string>
+			<string>title_uk=Вимкнути звуковий драйвер</string>
 			<key>WS-Name</key>
 			<string>sound=disabled</string>
 		</dict>
 		<key>sound=oss</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set sound driver to OSS</string>
+			<string>title_uk=Поставити звуковий драйвер OSS</string>
 			<key>WS-Name</key>
 			<string>sound=oss</string>
 		</dict>
 		<key>strictdrawordering=disabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable StrictDrawOrdering (default)</string>
+			<string>title_uk=Вимкнути StrictDrawOrdering (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>strictdrawordering=disabled</string>
 		</dict>
 		<key>strictdrawordering=enabled</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable StrictDrawOrdering</string>
+			<string>title_uk=Включити StrictDrawOrdering</string>
 			<key>WS-Name</key>
 			<string>strictdrawordering=enabled</string>
 		</dict>
 		<key>vd=1024x768</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable virtual desktop, set size to 1024x768</string>
+			<string>title_uk=Включити віртуальний робочий стіл та поставити розмір 1024x768</string>
 			<key>WS-Name</key>
 			<string>vd=1024x768</string>
 		</dict>
 		<key>vd=1280x1024</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable virtual desktop, set size to 1280x1024</string>
+			<string>title_uk=Включити віртуальний робочий стіл та поставити розмір 1280x1024</string>
 			<key>WS-Name</key>
 			<string>vd=1280x1024</string>
 		</dict>
 		<key>vd=1440x900</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable virtual desktop, set size to 1440x900</string>
+			<string>title_uk=Включити віртуальний робочий стіл та поставити розмір 1440x900</string>
 			<key>WS-Name</key>
 			<string>vd=1440x900</string>
 		</dict>
 		<key>vd=640x480</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable virtual desktop, set size to 640x480</string>
+			<string>title_uk=Включити віртуальний робочий стіл та поставити розмір 640x480</string>
 			<key>WS-Name</key>
 			<string>vd=640x480</string>
 		</dict>
 		<key>vd=800x600</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Enable virtual desktop, set size to 800x600</string>
+			<string>title_uk=Включити віртуальний робочий стіл та поставити розмір 800x600</string>
 			<key>WS-Name</key>
 			<string>vd=800x600</string>
 		</dict>
 		<key>vd=off</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Disable virtual desktop</string>
+			<string>title_uk=Вимкнути віртуальний робочий стіл</string>
 			<key>WS-Name</key>
 			<string>vd=off</string>
 		</dict>
 		<key>videomemorysize=1024</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Tell Wine your video card has 1024MB RAM</string>
+			<string>title_uk=Повідомити Wine про 1024МБ відеопам'яті</string>
 			<key>WS-Name</key>
 			<string>videomemorysize=1024</string>
 		</dict>
 		<key>videomemorysize=2048</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Tell Wine your video card has 2048MB RAM</string>
+			<string>title_uk=Повідомити Wine про 2048МБ відеопам'яті</string>
 			<key>WS-Name</key>
 			<string>videomemorysize=2048</string>
 		</dict>
 		<key>videomemorysize=512</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Tell Wine your video card has 512MB RAM</string>
+			<string>title_uk=Повідомити Wine про 512МБ відеопам'яті</string>
 			<key>WS-Name</key>
 			<string>videomemorysize=512</string>
 		</dict>
 		<key>videomemorysize=default</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Let Wine detect amount of video card memory</string>
+			<string>title_uk=Дати можливість Wine визначити розмір відеопам'яті</string>
 			<key>WS-Name</key>
 			<string>videomemorysize=default</string>
 		</dict>
 		<key>vista</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows Vista</string>
+			<string>title_uk=Поставити версію Windows Vista</string>
 			<key>WS-Name</key>
 			<string>vista</string>
-		</dict>
-		<key>volnum</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Rename drive_c to harddiskvolume0 (needed by some installers)</string>
-			<key>WS-Name</key>
-			<string>volnum</string>
 		</dict>
 		<key>vsm=hardware</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set VertexShaderMode to hardware</string>
+			<string>title_uk=Поставити VertexShaderMode на hardware</string>
 			<key>WS-Name</key>
 			<string>vsm=hardware</string>
 		</dict>
 		<key>win2k</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows 2000</string>
+			<string>title_uk=Поставити версію Windows 2000</string>
 			<key>WS-Name</key>
 			<string>win2k</string>
+		</dict>
+		<key>win2k3</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>title_uk=Поставити версію Windows 2003</string>
+			<key>WS-Name</key>
+			<string>win2k3</string>
 		</dict>
 		<key>win31</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows 3.1</string>
+			<string>title_uk=Поставити версію Windows 3.1</string>
 			<key>WS-Name</key>
 			<string>win31</string>
 		</dict>
 		<key>win7</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows 7</string>
+			<string>title_uk=Поставити версію Windows 7</string>
 			<key>WS-Name</key>
 			<string>win7</string>
 		</dict>
 		<key>win95</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows 95</string>
+			<string>title_uk=Поставити версію Windows 95</string>
 			<key>WS-Name</key>
 			<string>win95</string>
 		</dict>
 		<key>win98</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows 98</string>
+			<string>title_uk=Поставити версію Windows 98</string>
 			<key>WS-Name</key>
 			<string>win98</string>
 		</dict>
 		<key>windowmanagerdecorated=n</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Prevent the window manager from decorating windows</string>
+			<string>title_uk=Не дозволяти менеджеру вікон декорувати вікна</string>
 			<key>WS-Name</key>
 			<string>windowmanagerdecorated=n</string>
 		</dict>
 		<key>windowmanagerdecorated=y</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Allow the window manager to decorate windows (default)</string>
+			<string>title_uk=Дозволити менеджеру вікон декорувати вікна (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>windowmanagerdecorated=y</string>
 		</dict>
 		<key>windowmanagermanaged=n</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Prevent the window manager from controling windows</string>
+			<string>title_uk=Не дозволяти менеджеру вікон керування вікнами</string>
 			<key>WS-Name</key>
 			<string>windowmanagermanaged=n</string>
 		</dict>
 		<key>windowmanagermanaged=y</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Allow the window manager to control windows (default)</string>
+			<string>title_uk=Дозволити менеджеру вікон керування вікнами (за замовчуванням)</string>
 			<key>WS-Name</key>
 			<string>windowmanagermanaged=y</string>
 		</dict>
 		<key>winver=</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to default (winxp)</string>
+			<string>title_uk=Поставити версію Windows за замовчуванням (winxp)</string>
 			<key>WS-Name</key>
 			<string>winver=</string>
 		</dict>
 		<key>winxp</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Set windows version to Windows XP</string>
+			<string>title_uk=Поставити версію Windows XP</string>
 			<key>WS-Name</key>
 			<string>winxp</string>
 		</dict>

@@ -1716,7 +1716,7 @@ NSFileManager *fm;
                 NSArray *splitLine = [fixedLine componentsSeparatedByString:@" "];
                 if ([[splitLine objectAtIndex:1] isEqualToString:category])
                 {
-                    [fixedLine replaceOccurrencesOfString:category withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
+                    //[fixedLine replaceOccurrencesOfString:category withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
                     while ([fixedLine rangeOfString:@"  "].location != NSNotFound)
                     {
                         [fixedLine replaceOccurrencesOfString:@"  " withString:@" " options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
@@ -1731,7 +1731,10 @@ NSFileManager *fm;
 				NSRange position = [eachPackage rangeOfString:@" "];
 				if (position.location == NSNotFound) continue;// Skip invalid entries
 				NSString *packageName = [eachPackage substringToIndex:position.location];
-				NSString *packageDescription = [[eachPackage substringFromIndex:position.location] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                NSMutableString *packageDescription = [[[NSMutableString alloc] init] autorelease];
+				[packageDescription appendString:[[eachPackage substringFromIndex:position.location] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+                NSRange position2 = [packageDescription rangeOfString:[NSString stringWithFormat:@"%@ ",category]];
+                [packageDescription deleteCharactersInRange:position2];
 				// Yes, we're inserting the name twice (as a key and as a value) on purpose, so that we won't have to do a nasty, slow allObjectsForKey when drawing the UI.
 				[winetricksThisCategoryList setValue:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"WS-Name", packageDescription, @"WS-Description", nil] forKey:packageName];
 			}
