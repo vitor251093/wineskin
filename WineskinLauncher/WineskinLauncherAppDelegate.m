@@ -1240,7 +1240,7 @@
 	{
 		NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
 		int i=0;
-		for (i = 0; i < 5; ++i)
+		for (i = 0; i < 10; ++i)
 		{
 			//get frontmost application information
 			NSDictionary* frontMostAppInfo = [workspace activeApplication];
@@ -1258,29 +1258,33 @@
 			}
 			else
 			{
-				if (i==0)
+                if (i==0)
                 {
-					[workspace launchApplication:appNameWithPath];
+                    [[NSRunningApplication runningApplicationWithProcessIdentifier:[thePid intValue]] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
                 }
 				else if (i==1)
                 {
-					[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
+					[workspace launchApplication:appNameWithPath];
                 }
 				else if (i==2)
+                {
+					[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
+                }
+				else if (i==3)
 				{
 					NSString *theScript = [NSString stringWithFormat:@"tell Application \"%@\" to activate",appNameWithPath];
 					NSAppleScript *bringToFrontScript = [[NSAppleScript alloc] initWithSource:theScript];
 					[bringToFrontScript executeAndReturnError:nil];
 					[bringToFrontScript release];
 				}
-				else if (i==3)
+				else if (i==4)
                 {
 					[self systemCommand:[NSString stringWithFormat:@"arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
                 }
 				else
 				{
 					//only gets here if app never front most and breaks
-					NSLog(@"Application failed to ever become frontmost");
+					NSLog(@"Application PID %@ failed to ever become frontmost",thePid);
 					break;
 				}
 			}
