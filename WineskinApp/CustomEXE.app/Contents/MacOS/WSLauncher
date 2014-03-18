@@ -1,4 +1,0 @@
-#!/bin/bash
-PROGNAME="CustomEXE"
-WORKINGFOLDER="$(dirname "$0")"
-exec "$WORKINGFOLDER/$PROGNAME" &

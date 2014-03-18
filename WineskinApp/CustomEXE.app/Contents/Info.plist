@@ -17,6 +17,8 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>CFBundleExecutable</key>
-	<string>WSLauncher</string>
+	<string>CustomEXE</string>
+	<key>LSUIElement</key>
+	<true/>
 </dict>
 </plist>

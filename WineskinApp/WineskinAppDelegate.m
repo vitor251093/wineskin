@@ -239,7 +239,7 @@ NSFileManager *fm;
 		if ([[item lowercaseString] hasSuffix:@".exe"] || [[item lowercaseString] hasSuffix:@".bat"] || [[item lowercaseString] hasSuffix:@".msi"])
 			[files1 addObject:item];
 	//run install in Wine
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-installer",[[panel filenames] objectAtIndex:0],nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-installer",[[panel filenames] objectAtIndex:0],nil]];
 	[panel release];
 	//make 2nd array of .exe, .msi, and .bat files
 	NSArray *filesTEMP2 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
@@ -809,7 +809,7 @@ NSFileManager *fm;
 	//disable buttons for a test run
 	[self disableButtons];
 	//run the test run
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"debug",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"debug",nil]];
 	//enable the buttons that were disabled
 	[self enableButtons];
 	//offer to show logs
@@ -1301,7 +1301,7 @@ NSFileManager *fm;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[self disableButtons];
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winecfg",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winecfg",nil]];
 	[self enableButtons];
 	[pool release];
 }
@@ -1313,7 +1313,7 @@ NSFileManager *fm;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[self disableButtons];
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-uninstaller",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-uninstaller",nil]];
 	[self enableButtons];
 	[pool release];
 }
@@ -1325,7 +1325,7 @@ NSFileManager *fm;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[self disableButtons];
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-regedit",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-regedit",nil]];
 	[self enableButtons];
 	[pool release];
 }
@@ -1337,7 +1337,7 @@ NSFileManager *fm;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[self disableButtons];
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-taskmgr",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-taskmgr",nil]];
 	[self enableButtons];
 	[pool release];
 }
@@ -1364,7 +1364,7 @@ NSFileManager *fm;
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/userdef.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 		//refresh
-		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineprefixcreate",nil]];
+		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineprefixcreate",nil]];
 		[advancedWindow makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
 	}
@@ -1374,7 +1374,7 @@ NSFileManager *fm;
 {
 	[busyWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineprefixcreatenoregs",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineprefixcreatenoregs",nil]];
 	[advancedWindow makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
 }
@@ -1772,7 +1772,7 @@ NSFileManager *fm;
 		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 		if ([list valueForKey:@"WS-Installed"] == nil || ![[list valueForKey:@"WS-Installed"] isKindOfClass:[NSArray class]])
 		{ // Invalid or missing list.  Rebuild it (it only happens on a newly created wrapper or after a wrapper rebuild
-			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", @"list-installed", nil]];
+			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", @"list-installed", nil]];
 			NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 			list = [NSDictionary dictionaryWithObject:tempList forKey:@"WS-Installed"];
 			[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES];
@@ -1789,7 +1789,7 @@ NSFileManager *fm;
 		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]]];
 		if ([list valueForKey:@"WS-Cached"] == nil || ![[list valueForKey:@"WS-Cached"] isKindOfClass:[NSArray class]])
 		{ // Invalid or missing list.  Rebuild it (it only happens when the user first runs wineetricks on their system (from any wrapper) or after wiping ~/Caches/winetricks
-			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",@"list-cached",nil]];
+			[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks",@"list-cached",nil]];
 			NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 			list = [NSDictionary dictionaryWithObject:tempList forKey:@"WS-Cached"];
 			[list writeToFile:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]] atomically:YES];
@@ -1836,9 +1836,9 @@ NSFileManager *fm;
 	winetricksDone = NO;
 	// loop while winetricksDone is NO
 	if ([winetricksCustomCheckbox state])
-		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[[NSArray arrayWithObject:@"WSS-winetricks"] arrayByAddingObjectsFromArray:[[[winetricksCustomLine stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] componentsSeparatedByString:@" "]]];
+		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[[NSArray arrayWithObject:@"WSS-winetricks"] arrayByAddingObjectsFromArray:[[[winetricksCustomLine stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] componentsSeparatedByString:@" "]]];
 	else
-		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[[NSArray arrayWithObject:@"WSS-winetricks"] arrayByAddingObjectsFromArray:[[self winetricksSelectedList] allKeys]]];
+		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[[NSArray arrayWithObject:@"WSS-winetricks"] arrayByAddingObjectsFromArray:[[self winetricksSelectedList] allKeys]]];
 	winetricksDone = YES;
 	// Remove installed and cached packages lists since they need to be rebuilt
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
@@ -2220,7 +2220,7 @@ NSFileManager *fm;
 	[self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]],nil]];
 	[self installEngine];
 	//refresh wrapper
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineboot",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-wineboot",nil]];
 	[self loadAllData];
 	//order in advanced window
 	[advancedWindow makeKeyAndOrderFront:self];
@@ -2400,7 +2400,7 @@ NSFileManager *fm;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[self disableButtons];
-	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-cmd",nil]];
+	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/MacOS/WineskinLauncher",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-cmd",nil]];
 	[self enableButtons];
 	[pool release];
 }
@@ -2692,7 +2692,7 @@ NSFileManager *fm;
 //*************************************************************
 - (void)installEngine
 {
-	NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/Frameworks/bin/Wineskin\" WSS-InstallICE", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
+	NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/MacOS/WineskinLauncher\" WSS-InstallICE", [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
 	system([theSystemCommand UTF8String]);
 }
 //*************************************************************
