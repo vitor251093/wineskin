@@ -512,6 +512,12 @@ NSFileManager *fm;
             [useMacDriverInsteadOfX11CheckBoxButton setState:1];
             continue;
         }
+        //check if line is for D3DBoost setting
+        if ([item isEqualToString:@"\"CSMT\"=\"enabled\""])
+        {
+            [useD3DBoostIfAvailableCheckBoxButton setState:1];
+            continue;
+        }
 		//only tests lines after the main line found
 		if ([item hasPrefix:@"[Software\\\\Wine\\\\X11 Driver]"])
 		{
@@ -793,6 +799,52 @@ NSFileManager *fm;
         [regFileContents appendString:@"\n"];
     }
 	[regFileContents writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
+
+- (IBAction)useD3DBoostIfAvailableCheckBoxClicked:(id)sender
+{
+    // get state of checkmark, set a string to mac or x11 for correct writing in same code
+	NSString *settingString;
+	if ([useD3DBoostIfAvailableCheckBoxButton state] == 0)
+    {
+		settingString = [NSString stringWithFormat:@"disabled"];
+    }
+	else
+    {
+		settingString = [NSString stringWithFormat:@"enabled"];
+    }
+    NSArray *arrayToSearch = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+	BOOL mainSectionFound = NO;
+	NSMutableArray *finalArray = [NSMutableArray arrayWithCapacity:[arrayToSearch count]];
+    for (NSString *item in arrayToSearch)
+	{
+		if ([item hasPrefix:@"[Software\\\\Wine\\\\Direct3D]"])
+		{
+			mainSectionFound = YES;
+			[finalArray addObject:item];
+            [finalArray addObject:[NSString stringWithFormat:@"\"CSMT\"=\"%@\"",settingString]];
+			continue;
+		}
+        if ([item isEqualToString:@"\"CSMT\"=\"enabled\""] || [item isEqualToString:@"\"Graphics\"=\"disabled\""])
+        {
+            continue;
+        }
+        [finalArray addObject:item];
+	}
+    if (!mainSectionFound)
+	{
+		[finalArray addObject:@"[Software\\\\Wine\\\\Direct3D]"];
+        [finalArray addObject:[NSString stringWithFormat:@"\"CSMT\"=\"%@\"",settingString]];
+	}
+    //write file back out to .reg file
+	NSMutableString *regFileContents = [[[NSMutableString alloc] init] autorelease];
+	for (NSString *item in finalArray)
+    {
+        [regFileContents appendString:item];
+        [regFileContents appendString:@"\n"];
+    }
+	[regFileContents writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
 }
 
 //*************************************************************
