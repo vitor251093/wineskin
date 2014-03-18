@@ -1,7 +1,0 @@
-#!/bin/sh
-cd "$(dirname "$0")"
-checkingLine=""
-if [ -d ${HOME}/checker-272 ]; then
-    checkingLine="${HOME}/checker-272/scan-build "
-fi
-${checkingLine}gcc -arch i386 -arch x86_64 -mmacosx-version-min=10.5 Wineskin.m -ObjC -framework Foundation -framework ApplicationServices -framework AppKit -o Wineskin
