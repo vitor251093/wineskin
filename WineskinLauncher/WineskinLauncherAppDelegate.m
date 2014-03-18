@@ -21,15 +21,15 @@
 	// Normal run
 	if(openedByFile)
 	{
-		if (doFileStart)
-        {
-            [self mainRun:filesToOpen];
-        }
-        else
-        {
-            NSMutableArray *temp = [NSMutableArray arrayWithCapacity:0];
-            [self mainRun:temp];
-        }
+//		if (doFileStart)
+//        {
+            [self mainRun];
+//        }
+//        else
+//        {
+//            NSMutableArray *temp = [NSMutableArray arrayWithCapacity:0];
+//            [self mainRun:temp];
+//        }
 	}
 	[NSApp terminate: nil];
 }
@@ -125,7 +125,7 @@
 	if(openedByFile)
 	{
 		//openedByFile = NO;
-		filesToOpen = filenames;
+        filesToOpen = [[NSArray alloc] initWithArray:[filenames copy]];
 		doFileStart = YES;
 	}
 }
@@ -144,7 +144,7 @@
 // ********************************
 // Background Daemon (Old Wineskin.m)
 // ********************************
-- (void)mainRun:(NSArray *)argv
+- (void)mainRun
 {
 	// TODO need to add option to make wrapper run in AppSupport (shadowcopy) so that no files will ever be written in the app
 	// TODO need to make all the temp files inside the wrapper run correctly using BundleID and in /tmp.  If they don't exist, assume everything is fine.
@@ -171,9 +171,9 @@
 	nonStandardRun = NO;
 	openingFiles = NO;
 	killWineskin = NO;
-	if ([argv count] > 0)
+	if ([filesToOpen count] > 0)
     {
-        wssCommand = [argv objectAtIndex:0];
+        wssCommand = [filesToOpen objectAtIndex:0];
     }
     else
     {
@@ -250,7 +250,7 @@
 	}
 	else
 	{
-		cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[argv objectAtIndex:1]]];
+		cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[filesToOpen objectAtIndex:1]]];
 		[programNameAndPath setString:[cexePlistDictionary valueForKey:@"Program Name and Path"]];
 		[programFlags setString:[cexePlistDictionary valueForKey:@"Program Flags"]];
 		fullScreenOption = [[cexePlistDictionary valueForKey:@"Fullscreen"] intValue];
@@ -322,15 +322,15 @@
 	//CustomEXE {appname}		- running a custom EXE with appname
 	//starts with a"/" 			- will be 1+ path/filename to open
 	//no command line args		- normal run
-	if ([argv count] > 1)
+	if ([filesToOpen count] > 1)
 	{
-		winetricksCommands = [argv subarrayWithRange:NSMakeRange(1, [argv count]-1)];
+		winetricksCommands = [filesToOpen subarrayWithRange:NSMakeRange(1, [filesToOpen count]-1)];
 	}
-	if ([argv count] > 0)
+	if ([filesToOpen count] > 0)
 	{
 		if ([wssCommand hasPrefix:@"/"]) //if wssCommand starts with a / its file(s) passed in to open
 		{
-			for (NSString *item in argv)
+			for (NSString *item in filesToOpen)
             {
 				[filesToRun addObject:item];
             }
@@ -349,7 +349,7 @@
 					fullScreenOption = NO;
 					sleepNumber = 0;
 				}
-				[programNameAndPath setString:[argv objectAtIndex:1]]; // second argument full path and file name to run
+				[programNameAndPath setString:[filesToOpen objectAtIndex:1]]; // second argument full path and file name to run
 				runWithStartExe = YES; //installer always uses start.exe
 			}
 			else //any WSS that isn't the installer
