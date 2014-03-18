@@ -2106,6 +2106,19 @@
     [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineName]];
     //get rid of OS X saved state file
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/%@%@.wineskin.prefs.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]] error:nil];
+    //attempt to clear out any stuck processes in launchd for the wrapper
+    //this may prevent -10810 errors on next launch with 10.9, and *shouldn't* hurt anything.
+    NSArray *results=[[self systemCommand:[NSString stringWithFormat:@"launchctl list | grep \"%@\"",appName]] componentsSeparatedByString:@"\n"];
+    for (NSString *result in results)
+    {
+        NSRange theDash = [result rangeOfString:@"-"];
+        if (theDash.location != NSNotFound)
+        {
+            NSString *entryToRemove = [[result substringFromIndex:theDash.location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            [self ds:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
+            [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
+        }
+    }
 }
 - (void)ds:(NSString *)input
 {
