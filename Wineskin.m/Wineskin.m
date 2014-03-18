@@ -2115,7 +2115,6 @@
         if (theDash.location != NSNotFound)
         {
             NSString *entryToRemove = [[result substringFromIndex:theDash.location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            [self ds:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
             [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
         }
     }
