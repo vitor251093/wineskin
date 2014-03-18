@@ -142,6 +142,8 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "WineskinLauncher" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
@@ -209,6 +211,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -218,7 +221,9 @@
 				GCC_PREFIX_HEADER = WineskinLauncher_Prefix.pch;
 				INFOPLIST_FILE = "WineskinLauncher-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = WineskinLauncher;
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -226,13 +231,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WineskinLauncher_Prefix.pch;
 				INFOPLIST_FILE = "WineskinLauncher-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = WineskinLauncher;
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};
@@ -244,9 +252,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 				VALID_ARCHS = i386;
 			};
 			name = Debug;
@@ -258,9 +267,10 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 				VALID_ARCHS = i386;
 			};
 			name = Release;
