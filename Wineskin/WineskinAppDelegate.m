@@ -880,8 +880,12 @@ NSFileManager *fm;
     NSArray *resultArray=[results componentsSeparatedByString:@"\n"];
     for (NSString *result in resultArray)
     {
-        NSString *entryToRemove = [[result substringFromIndex:[result rangeOfString:@"-"].location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
+        NSRange theDash = [result rangeOfString:@"-"];
+        if (theDash.location != NSNotFound)
+        {
+            NSString *entryToRemove = [[result substringFromIndex:theDash.location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
+        }
     }
 }
 
