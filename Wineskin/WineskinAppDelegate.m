@@ -8,6 +8,7 @@
 
 #import "WineskinAppDelegate.h"
 
+NSFileManager *fm;
 @implementation WineskinAppDelegate
 
 @synthesize window;
@@ -15,6 +16,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    fm = [NSFileManager defaultManager];
 	[self setWinetricksCachedList:[NSArray array]];
 	[self setWinetricksInstalledList:[NSArray array]];
 	[self setWinetricksSelectedList:[NSMutableDictionary dictionary]];
@@ -231,7 +233,7 @@
 	[installerWindow orderOut:self];
 	[advancedWindow orderOut:self];
 	//make 1st array of .exe, .msi, and .bat files
-	NSArray *filesTEMP1 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	NSArray *filesTEMP1 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files1 = [NSMutableArray arrayWithCapacity:10];
 	for (NSString *item in filesTEMP1)
 		if ([[item lowercaseString] hasSuffix:@".exe"] || [[item lowercaseString] hasSuffix:@".bat"] || [[item lowercaseString] hasSuffix:@".msi"])
@@ -240,7 +242,7 @@
 	[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[NSArray arrayWithObjects:@"WSS-installer",[[panel filenames] objectAtIndex:0],nil]];
 	[panel release];
 	//make 2nd array of .exe, .msi, and .bat files
-	NSArray *filesTEMP2 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	NSArray *filesTEMP2 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files2 = [NSMutableArray arrayWithCapacity:10];
 	for (NSString *item in filesTEMP2)
 		if ([[item lowercaseString] hasSuffix:@".exe"] || [[item lowercaseString] hasSuffix:@".bat"] || [[item lowercaseString] hasSuffix:@".msi"])
@@ -274,7 +276,7 @@
 		[exeChoicePopUp addItemWithTitle:item];
 	//if set EXE is not located inside of the wrapper,show choose exe window
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
-	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[plistDictionary valueForKey:@"Program Name and Path"]]])
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c%@",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[plistDictionary valueForKey:@"Program Name and Path"]]])
 	{
 		if (usingAdvancedWindow)
 			[advancedWindow makeKeyAndOrderFront:self];
@@ -317,7 +319,6 @@
 		[panel release];
 		return;
 	}
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//show busy window
 	[busyWindow makeKeyAndOrderFront:self];
 	// get rid of installer window
@@ -354,7 +355,7 @@
 		return;
 	}
 	//make 2nd array of .exe, .msi, and .bat files
-	NSArray *filesTEMP2 = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	NSArray *filesTEMP2 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	NSMutableArray *files2 = [NSMutableArray arrayWithCapacity:10];
 	for (NSString *item in filesTEMP2)
 		if ([[item lowercaseString] hasSuffix:@".exe"] || [[item lowercaseString] hasSuffix:@".bat"] || [[item lowercaseString] hasSuffix:@".msi"])
@@ -840,19 +841,36 @@
 }
 - (IBAction)killWineskinProcessesButtonPressed:(id)sender
 {
+    //get name of wine and wineserver
+    NSString *wineName = @"wine";
+    NSString *wineserverName = @"wineserver";
+    
+    
+    NSArray *filesTEMP1 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/bin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+    for (NSString *item in filesTEMP1)
+    {
+		if ([item hasSuffix:@"Wine"])
+        {
+            wineName = [NSString stringWithFormat:@"%@",item];
+        }
+        else if ([item hasSuffix:@"Wineserver"])
+        {
+            wineserverName = [NSString stringWithFormat:@"%@",item];
+        }
+    }
 	//give warning message
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"Yes"];
 	[alert addButtonWithTitle:@"No"];
 	[alert setMessageText:@"Kill Processes, Are you Sure?"];
-	[alert setInformativeText:@"This will kill all processes running named \"WineskinX11\", \"wine\", and \"wineserver\" which means it will quit any other program also using Wine, wether its in the wrapper or part of Wineskin or not."];
+	[alert setInformativeText:[NSString stringWithFormat:@"This will kill all processes running named \"WineskinX11\", \"%@\", and \"%@\" which means it *may* quit other programs also using Wineskin.",wineName,wineserverName]];
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	if ([alert runModal] == NSAlertFirstButtonReturn)
 	{
 		//kill Wineskin WineskinX11 wine wineserver
         popen([@"killall -9 WineskinX11" UTF8String],[@"r" UTF8String]);
-		popen([@"killall -9 wine" UTF8String],[@"r" UTF8String]);
-		popen([@"killall -9 wineserver" UTF8String],[@"r" UTF8String]);
+        popen([[NSString stringWithFormat:@"killall -9 %@",wineName] UTF8String],[@"r" UTF8String]);
+        popen([[NSString stringWithFormat:@"killall -9 %@",wineserverName] UTF8String],[@"r" UTF8String]);
 	}
 	[alert release];
 }
@@ -884,7 +902,7 @@
 	[wrapperVersionText setStringValue:[NSString stringWithFormat:@"Wineskin %@",[plistDictionaryWV valueForKey:@"CFBundleVersion"]]];
 	[plistDictionaryWV release];
 	//get current engine and put it on Advanced Page engineVersionText
-	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
 	{
 		NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
 		NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
@@ -932,7 +950,7 @@
 	[emulateThreeButtonMouseCheckBoxButton setState:[[plistDictionary2 valueForKey:@"enable_fake_buttons"] intValue]];
 	[focusFollowsMouseCheckBoxButton setState:[[plistDictionary2 valueForKey:@"wm_ffm"] intValue]];
 	NSString *theFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
-	if ([[NSFileManager defaultManager] fileExistsAtPath:theFile])
+	if ([fm fileExistsAtPath:theFile])
 	{
 		NSArray *inputFromFile = [[NSString stringWithContentsOfFile:theFile encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
 		for (NSString *item in inputFromFile)
@@ -986,7 +1004,6 @@
 }
 - (IBAction)iconToUseBrowseButtonPressed:(id)sender
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
 	[panel setTitle:@"Please choose the .icns file to use in the wrapper"];
 	[panel setPrompt:@"Choose"];
@@ -1178,7 +1195,7 @@
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender
 {
 	NSString *theFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]];
-	if (![[NSFileManager defaultManager] fileExistsAtPath:theFile]) return;
+	if (![fm fileExistsAtPath:theFile]) return;
 	NSArray *inputFromFile = [[NSString stringWithContentsOfFile:theFile encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
 	NSMutableArray *newInputToWriteToFile = [NSMutableArray arrayWithCapacity:[inputFromFile count]];
 	for (NSString *item in inputFromFile)
@@ -1193,7 +1210,7 @@
 		else
 			[newInputToWriteToFile addObject:item];
 	}
-	[[NSFileManager defaultManager] removeItemAtPath:theFile error:nil];
+	[fm removeItemAtPath:theFile error:nil];
 	[[newInputToWriteToFile componentsJoinedByString:@"\n"] writeToFile:theFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	system([[NSString stringWithFormat: @"chmod 777 \"%@\"",theFile] UTF8String]);
 }
@@ -1306,7 +1323,6 @@
 }
 - (IBAction)rebuildWrapperButtonPressed:(id)sender
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//issue warning
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"Yes"];
@@ -1438,13 +1454,13 @@
 		return;
 	}
 	//delete old version
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] error:nil];
 	//write new version to correct spot
 	[newVersion writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] atomically:YES];
 	//chmod 755 new version
 	[self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]],nil]];
 	//remove old list of packages and descriptions (it'll be rebuilt when refreshing the list)
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]] error:nil];
 
 	//refresh window
 	[self winetricksRefreshButtonPressed:self];
@@ -1488,7 +1504,7 @@
 	// switch to the log tab
 	//[winetricksTabView selectTabViewItem:winetricksTabLog];
 	// delete log file
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
 	//killing sh processes from Winetricks will cancel out Winetricks correctly
 	//get first list of running "sh" processes
 	NSArray *firstPIDlist = [self makePIDArray:@"sh"];
@@ -1802,8 +1818,8 @@
 		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Frameworks/bin/Wineskin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] withArgs:[[NSArray arrayWithObject:@"WSS-winetricks"] arrayByAddingObjectsFromArray:[[self winetricksSelectedList] allKeys]]];
 	winetricksDone = YES;
 	// Remove installed and cached packages lists since they need to be rebuilt
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]] error:nil];
 	usleep(500000); // Wait just a little, to make sure logs aren't overwritten before updateWinetrickOutput is done
 	[self winetricksRefreshButtonPressed:self];
 	[self winetricksSelectNoneButtonPressed:self];
@@ -1857,8 +1873,8 @@
 //*********** CEXE
 - (IBAction)createCustomExeLauncherButtonPressed:(id)sender
 {
-	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/Wineskin.icns" error:nil];
-	[[NSFileManager defaultManager] copyItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Wineskin.icns",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:@"/tmp/Wineskin.icns" error:nil];
+	[fm removeItemAtPath:@"/tmp/Wineskin.icns" error:nil];
+	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Wineskin.icns",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] toPath:@"/tmp/Wineskin.icns" error:nil];
 	NSImage *theImage = [[NSImage alloc] initByReferencingFile:@"/tmp/Wineskin.icns"];
 	[cEXEIconImageView setImage:theImage];
 	[theImage release];
@@ -1911,7 +1927,7 @@
 		return;
 	}
 	//make sure file doesn't exist, if it does, error and return
-	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/%@.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]]])
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/%@.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]]])
 	{
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert addButtonWithTitle:@"OK"];
@@ -1928,7 +1944,7 @@
 	//hide cEXE window
 	[cEXEWindow orderOut:self];
 	//copy cexe template over with correct name
-	[[NSFileManager defaultManager] copyItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/CustomEXE.app",[[NSBundle mainBundle] bundlePath]] toPath:[NSString stringWithFormat:@"%@/%@.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]] error:nil];
+	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/CustomEXE.app",[[NSBundle mainBundle] bundlePath]] toPath:[NSString stringWithFormat:@"%@/%@.app",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]] error:nil];
 	//read cexe info.plist in
 	NSString *TEST = [NSString stringWithFormat:@"%@/%@.app/Contents/Info.plist.cexe",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]];
 	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:TEST];
@@ -1982,7 +1998,7 @@
 	[plistDictionary writeToFile:[NSString stringWithFormat:@"%@/%@.app/Contents/Info.plist.cexe",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]] atomically:YES];
 	[plistDictionary release];
 	//move /tmp/Wineskin.icns into the cexe
-	[[NSFileManager defaultManager] moveItemAtPath:@"/tmp/Wineskin.icns" toPath:[NSString stringWithFormat:@"%@/%@.app/Contents/Resources/Wineskin.icns",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]] error:nil];
+	[fm moveItemAtPath:@"/tmp/Wineskin.icns" toPath:[NSString stringWithFormat:@"%@/%@.app/Contents/Resources/Wineskin.icns",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent],[cEXENameToUseTextField stringValue]] error:nil];
 	//give done message
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"OK"];
@@ -2058,9 +2074,9 @@
 		return;
 	}
 	// delete old Wineskin.icns
-	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/Wineskin.icns" error:nil];
+	[fm removeItemAtPath:@"/tmp/Wineskin.icns" error:nil];
 	// copy [[panel filenames] objectAtIndex:0]] to be Wineskin.icns in tmp folder.  Save will use the one in tmp
-	[[NSFileManager defaultManager] copyItemAtPath:[[panel filenames] objectAtIndex:0] toPath:@"/tmp/Wineskin.icns" error:nil];
+	[fm copyItemAtPath:[[panel filenames] objectAtIndex:0] toPath:@"/tmp/Wineskin.icns" error:nil];
 	//refresh icon showing in config tab
 	NSImage *theImage = [[NSImage alloc] initByReferencingFile:@"/tmp/Wineskin.icns"];
 	[cEXEIconImageView setImage:theImage];
@@ -2112,7 +2128,7 @@
 	//get installed engines
 	NSMutableArray *installedEnginesList = [NSMutableArray arrayWithCapacity:10];
 	NSString *folder = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
-	NSArray *filesTEMP = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
+	NSArray *filesTEMP = [[fm contentsOfDirectoryAtPath:folder error:nil] sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
 	NSArray *files = [[filesTEMP reverseObjectEnumerator] allObjects];
 	if ([theFilter isEqualToString:@""])
 	{
@@ -2139,7 +2155,7 @@
 		[engineWindowOkButton setEnabled:YES];
 	//** Show current installed engine version
 	// read in current engine name from first line of version file in wswine.bundle
-	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
+	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]])
 	{
 		NSString *currentEngineVersion = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] encoding:NSUTF8StringEncoding error:nil];
 		NSArray *currentEngineVersionArray = [currentEngineVersion componentsSeparatedByString:@"\n"];
@@ -2149,7 +2165,6 @@
 }
 - (IBAction)changeEngineUsedOkButtonPressed:(id)sender
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//make sure 7za exists,if not prompt error and exit...
 	if (!([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/7za",NSHomeDirectory()]]))
 	{
@@ -2202,7 +2217,6 @@
 }
 - (IBAction)updateWrapperButtonPressed:(id)sender
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
 	//get current version from Info.plist, change spaces to - to it matches master wrapper naming
 	NSDictionary *plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]];
 	NSString *currentWrapperVersion = [plistDictionary valueForKey:@"CFBundleVersion"];
