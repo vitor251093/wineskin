@@ -58,42 +58,6 @@
 	system([theSystemCommand UTF8String]);
 }
 
-- (void)installEngine
-{
-	NSMutableArray *wswineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
-	//get directory contents of WineskinEngine.bundle
-	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/",[[NSBundle mainBundle] bundlePath]] error:nil];
-	for (NSString *file in files)
-		if ([file hasSuffix:@".bundle.tar.7z"]) [wswineBundleContentsList addObject:[file stringByReplacingOccurrencesOfString:@".tar.7z" withString:@""]];
-	
-	//exit if not ICE. if Wine or X11 folders are a symlink, need to do ICE.
-	isIce = NO;
-	if ([wswineBundleContentsList count] > 0) isIce = YES;
-	if (!isIce)
-	{
-		return;
-	}
-	//install Wine on the system
-	NSString *wineFile = @"OOPS";
-	for (NSString *item in wswineBundleContentsList)
-		if ([item hasPrefix:@"WSWine"] && [item hasSuffix:@"ICE.bundle"]) wineFile = [NSString stringWithFormat:@"%@",item];
-	//get md5 of wineFile and x11File
-	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/Contents/Frameworks/wswine.bundle/%@.tar.7z\"",[[NSBundle mainBundle] bundlePath],wineFile]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/Contents/Frameworks/wswine.bundle/%@.tar.7z",[[NSBundle mainBundle] bundlePath],wineFile] withString:@""];
-	NSString *wineFileInstalledName = [NSString stringWithFormat:@"%@%@.bundle",[wineFile stringByReplacingOccurrencesOfString:@"bundle" withString:@""],wineFileMd5];
-	NSArray *iceFiles = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE",NSHomeDirectory()] error:nil];
-	//if either Wine or X11 version is not installed...
-	BOOL wineInstalled = NO;
-	for (NSString *file in iceFiles)
-		if ([file isEqualToString:wineFileInstalledName]) wineInstalled = YES;
-	if (!wineInstalled)
-	{
-		[window makeKeyAndOrderFront:self];
-		NSString *theSystemCommand = [NSString stringWithFormat: @"\"%@/Contents/Frameworks/bin/Wineskin\" WSS-InstallICE", [[NSBundle mainBundle] bundlePath]];
-		system([theSystemCommand UTF8String]);
-		[window orderOut:self];
-	}
-}
-
 - (NSString *)systemCommand:(NSString *)command
 {
 	FILE *fp;
@@ -1324,7 +1288,7 @@
 	}
 }
 
-- (void)installEngineOld
+- (void)installEngine
 {
 	NSMutableArray *wswineBundleContentsList = [NSMutableArray arrayWithCapacity:2];
 	//get directory contents of wswine.bundle
@@ -1345,6 +1309,7 @@
 	{
 		return;
 	}
+    [window makeKeyAndOrderFront:self];
 	//install Wine on the system
 	NSMutableString *wineFile = [[[NSMutableString alloc] init] autorelease];
     [wineFile setString:@"OOPS"];
@@ -1380,29 +1345,14 @@
             wineInstalled = YES;
         }
     }
-	CFUserNotificationRef pDlg = NULL;
 	if (!wineInstalled)
 	{
-		// pop up install notice
-		SInt32 nRes = 0;
-		NSString *icnsPath = [[[NSBundle mainBundle] bundlePath] stringByReplacingOccurrencesOfString:@".app/Contents/Frameworks/bin" withString:@".app/Contents/Resources/Wineskin.icns"];
-		NSMutableDictionary* dict = [[NSMutableDictionary alloc] initWithCapacity:6];
-		[dict setObject:@"*****Wineskin ICE Detected*****\n" forKey:(NSString *)kCFUserNotificationAlertHeaderKey];
-		[dict setObject:@"Wineskin Engine ICE version installing\n\nICE = Installable Compressed Engine\n\n" forKey:(NSString *)kCFUserNotificationAlertMessageKey];
-		[dict setObject:@"I'll be patient!" forKey:(NSString *)kCFUserNotificationDefaultButtonTitleKey];
-		[dict setObject:@"true" forKey:(NSString *)kCFUserNotificationProgressIndicatorValueKey];
-		[dict setObject:[NSURL fileURLWithPath:icnsPath] forKey:(NSString *)kCFUserNotificationIconURLKey];
-		pDlg = CFUserNotificationCreate(NULL,0,kCFUserNotificationNoteAlertLevel | kCFUserNotificationNoDefaultButtonFlag | CFUserNotificationCheckBoxChecked(0) | CFUserNotificationSecureTextField(0) | CFUserNotificationPopUpSelection(0),&nRes,(CFDictionaryRef)dict);
 		//if the Wine bundle is not located in the install folder, then uncompress it and move it over there.
-		if (!wineInstalled)
-		{
-			system([[NSString stringWithFormat:@"\"%@/wswine.bundle/7za\" x \"%@/wswine.bundle/%@.tar.7z\" \"-o/%@/wswine.bundle\"",frameworksFold,frameworksFold,wineFile,frameworksFold] UTF8String]);
-			system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/wswine.bundle\" -xf \"%@/wswine.bundle/%@.tar\"",frameworksFold,frameworksFold,wineFile] UTF8String]);
-			[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@.tar",frameworksFold,wineFile] error:nil];
-			//have uncompressed version now, move it to ICE folder.
-			[fm moveItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,wineFile] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),wineFileInstalledName] error:nil];
-		}
-        [dict release];
+		system([[NSString stringWithFormat:@"\"%@/wswine.bundle/7za\" x \"%@/wswine.bundle/%@.tar.7z\" \"-o/%@/wswine.bundle\"",frameworksFold,frameworksFold,wineFile,frameworksFold] UTF8String]);
+		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/wswine.bundle\" -xf \"%@/wswine.bundle/%@.tar\"",frameworksFold,frameworksFold,wineFile] UTF8String]);
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@.tar",frameworksFold,wineFile] error:nil];
+		//have uncompressed version now, move it to ICE folder.
+        [fm moveItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,wineFile] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/ICE/%@",NSHomeDirectory(),wineFileInstalledName] error:nil];
 	}
 	//make/remake the symlink in wswine.bundle to point to the correct location
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold] error:nil];
@@ -1417,11 +1367,7 @@
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/lib\"",frameworksFold]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/share\"",frameworksFold]];
 	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/version\"",frameworksFold]];
-	//clear the pop up if it exists
-    if (pDlg != NULL) {
-        CFUserNotificationCancel(pDlg);
-        CFRelease(pDlg);
-    }
+    [window orderOut:self];
 }
 
 - (void)setToVirtualDesktop:(NSString *)resolution

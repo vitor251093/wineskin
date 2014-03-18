@@ -84,9 +84,6 @@
 // if Fn or Alt held on run
 - (void) doSpecialStartup;
 
-// checks if ICE, and if engine is installed... installs what is needed.
-- (void)installEngine;
-
 //run system command with output returned
 - (NSString *)systemCommand:(NSString *)command;
 
@@ -145,8 +142,8 @@
 //bring the app to the front most
 - (void)bringToFront:(NSString *)thePid;
 
-//installs ICE files OLD UNUSED
-- (void)installEngineOld;
+//installs ICE files
+- (void)installEngine;
 
 //Changes VD Desktop user.reg entries to a given virtual desktop
 - (void)setToVirtualDesktop:(NSString *)resolution;
