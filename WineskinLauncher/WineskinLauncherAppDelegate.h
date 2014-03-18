@@ -15,7 +15,7 @@
     // ********************************
 	BOOL openedByFile;
 	BOOL doFileStart;
-	NSArray *filesToOpen;
+	NSMutableArray *filesToOpen;
 	IBOutlet NSWindow *window;
 	IBOutlet NSProgressIndicator *waitWheel;
     NSFileManager *fm;

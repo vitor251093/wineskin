@@ -21,21 +21,14 @@
 	// Normal run
 	if(openedByFile)
 	{
-//		if (doFileStart)
-//        {
-            [self mainRun];
-//        }
-//        else
-//        {
-//            NSMutableArray *temp = [NSMutableArray arrayWithCapacity:0];
-//            [self mainRun:temp];
-//        }
+        [self mainRun];
 	}
 	[NSApp terminate: nil];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification*)aNotification
 {
+    filesToOpen = [[NSMutableArray alloc] init];
     fm = [NSFileManager defaultManager];
 	doFileStart = NO;
 	openedByFile = YES;
@@ -125,7 +118,7 @@
 	if(openedByFile)
 	{
 		//openedByFile = NO;
-        filesToOpen = [[NSArray alloc] initWithArray:[filenames copy]];
+        [filesToOpen addObjectsFromArray:filenames];
 		doFileStart = YES;
 	}
 }
