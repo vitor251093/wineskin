@@ -95,7 +95,7 @@
 // ********************************
 
 //the main running of the program...
-- (void)mainRun:(NSArray *)argv;
+- (void)mainRun;
 
 //used to change the gamma setting since Xquartz cannot yet
 - (void)setGamma:(NSString *)inputValue;
