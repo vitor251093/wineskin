@@ -1830,7 +1830,7 @@
     }
 	NSMutableString *newScreenReso = [[[NSMutableString alloc] init] autorelease];
     NSString *xRandRTempFile = @"/tmp/WineskinXrandrTempFile";
-    NSString *timestampChecker = [NSString stringWithFormat:@"find \"%@\" -type f newer \"%@\"",[NSString stringWithFormat:@"%@/Logs",winePrefix],timeStampFile];
+    NSString *timestampChecker = [NSString stringWithFormat:@"find \"%@\" -type f -newer \"%@\"",[NSString stringWithFormat:@"%@/Logs",winePrefix],timeStampFile];
 	BOOL fixGamma = NO;
 	int fixGammaCounter = 0;
     BOOL usingWineskinX11 = YES;
