@@ -30,6 +30,9 @@ REGEDIT4
 "Graphics"="x11"
 "Audio"="coreaudio"
 
+[HKEY_CURRENT_USER\Software\Wine\Mac Driver]
+"CaptureDisplaysForFullscreen"="y"
+
 [HKEY_CLASSES_ROOT\htmlfile\shell\open\command]
 @="C:\\windows\\system32\\winebrowser.exe -nohome %1"
 
