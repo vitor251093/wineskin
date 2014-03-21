@@ -896,8 +896,6 @@ NSFileManager *fm;
     //get name of wine and wineserver
     NSString *wineName = @"wine";
     NSString *wineserverName = @"wineserver";
-    
-    
     NSArray *filesTEMP1 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/bin",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
     for (NSString *item in filesTEMP1)
     {
@@ -915,15 +913,21 @@ NSFileManager *fm;
 	[alert addButtonWithTitle:@"Yes"];
 	[alert addButtonWithTitle:@"No"];
 	[alert setMessageText:@"Kill Processes, Are you Sure?"];
-	[alert setInformativeText:[NSString stringWithFormat:@"This will kill all processes running named \"WineskinX11\", \"%@\", and \"%@\" which means it *may* quit other programs also using Wineskin.",wineName,wineserverName]];
+	[alert setInformativeText:[NSString stringWithFormat:@"This will kill the following processes (if running) from this wrapper...\n\nWineskinLauncher\nWineskinX11\n%@\n%@",wineName,wineserverName]];
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	if ([alert runModal] == NSAlertFirstButtonReturn)
 	{
-		//kill Wineskin WineskinX11 wine wineserver
-        popen([@"killall -9 WineskinX11" UTF8String],[@"r" UTF8String]);
-        popen([[NSString stringWithFormat:@"killall -9 %@",wineName] UTF8String],[@"r" UTF8String]);
-        popen([[NSString stringWithFormat:@"killall -9 %@",wineserverName] UTF8String],[@"r" UTF8String]);
-	}
+		//kill WineskinLauncher WineskinX11 wine wineserver
+        [self systemCommand:[NSString stringWithFormat:@"killall -9 %@",wineName]];
+        [self systemCommand:[NSString stringWithFormat:@"killall -9 %@",wineserverName]];
+        NSMutableArray *pidsToKill = [[NSMutableArray alloc] initWithCapacity:5];
+        [pidsToKill addObjectsFromArray:[[self systemCommand:[NSString stringWithFormat:@"ps ax | grep \"%@\" | grep WineskinX11 | awk \"{print \\$1}\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]] componentsSeparatedByString:@"\n"]];
+        [pidsToKill addObjectsFromArray:[[self systemCommand:[NSString stringWithFormat:@"ps ax | grep \"%@\" | grep WineskinLauncher | awk \"{print \\$1}\"",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]] componentsSeparatedByString:@"\n"]];
+        for (NSString *pid in pidsToKill)
+        {
+            [self systemCommand:[NSString stringWithFormat:@"kill -9 %@",pid]];
+        }
+    }
 	[alert release];
     //clear launchd entries that may be stuck
     NSString *wrapperPath =[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
