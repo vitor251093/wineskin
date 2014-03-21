@@ -825,7 +825,7 @@ NSFileManager *fm;
             [finalArray addObject:[NSString stringWithFormat:@"\"CSMT\"=\"%@\"",settingString]];
 			continue;
 		}
-        if ([item isEqualToString:@"\"CSMT\"=\"enabled\""] || [item isEqualToString:@"\"Graphics\"=\"disabled\""])
+        if ([item isEqualToString:@"\"CSMT\"=\"enabled\""] || [item isEqualToString:@"\"CSMT\"=\"disabled\""])
         {
             continue;
         }
