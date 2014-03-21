@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>53229057-3195-4635-A47A-E9CB24647BA7</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Wineskin Winery</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>2E2CA57C-0E08-4A03-A84E-8F34CD287B0D</key>
+		<string>ssh://git.code.sf.net/p/wineskin/code</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Wineskin Winery/Wineskin Winery.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>2E2CA57C-0E08-4A03-A84E-8F34CD287B0D</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://git.code.sf.net/p/wineskin/code</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>2E2CA57C-0E08-4A03-A84E-8F34CD287B0D</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>2E2CA57C-0E08-4A03-A84E-8F34CD287B0D</string>
+			<key>IDESourceControlWCCName</key>
+			<string>wineskin</string>
+		</dict>
+	</array>
+</dict>
+</plist>

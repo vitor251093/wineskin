@@ -7,69 +7,43 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "WineStart.h"
 
 @interface WineskinLauncherAppDelegate : NSObject <NSApplicationDelegate>
 {
-    // ********************************
-    // START UP (Old WineskinLauncher)
-    // ********************************
-	BOOL openedByFile;
-	BOOL doFileStart;
-	NSMutableArray *filesToOpen;
+    BOOL primaryRun;
+    BOOL wrapperRunning;
 	IBOutlet NSWindow *window;
 	IBOutlet NSProgressIndicator *waitWheel;
     NSFileManager *fm;
-    
-    // ********************************
-    // Background Daemon (Old Wineskin.m)
-    // ********************************
+    NSMutableArray *globalFilesToOpen;
     NSString *contentsFold;                         //Contents folder in the wrapper
 	NSString *frameworksFold;                       //Frameworks folder in the wrapper
 	NSString *appNameWithPath;                      //full path to and including the app name
     NSString *appName;                              //name of our app/wrapper
 	NSString *lockfile;                             //lockfile being used to know if the app is already in use
     NSString *tmpFolder;                            //where tmp files can be made and used to be specific to just this wrapper
-	NSString *displayNumberFile;                    //pid file holding display number of current/last run
 	NSString *infoPlistFile;                        //the Info.plist file in the wrapper
 	NSString *winePrefix;                           //the $WINEPREFIX
 	NSMutableString *theDisplayNumber;              //the Display Number to use
-	NSString *x11PrefFileName;                      //the name of the X11 plist file
-	NSMutableString *wineRunLocation;               //path to exe for wine
-	NSString *wineRunFile;                          //exe file name for wine to run
-	NSMutableString *programFlags;                  //command line argments to windows exectuable
     NSString *wineLogFile;                          //location of wine log file
     NSString *wineTempLogFile;                      //location of wine temp log file
     NSString *x11LogFile;                           //location of x11 log file
     NSString *x11PListFile;                         //location of x11 plist
-	BOOL runWithStartExe;                           //wether start.exe is being used
 	BOOL fullScreenOption;                          //wether running fullscreen or rootless (RandR is rootless)
-	BOOL useRandR;                                  //if "Automatic" is set in Wineskin.app
 	BOOL useGamma;                                  //wether or not gamma correction will be checked for
 	BOOL forceWrapperQuartzWM;                      //YES if forced to use wrapper quartz-wm and not newest version on the system
 	BOOL useXQuartz;                                //YES if using System XQuartz instead of WineskinX11
-	NSMutableString *vdResolution;                  //virtual desktop resolution to be used for rootless or fullscreen
 	NSMutableString *gammaCorrection;               //added in gamma correction
 	NSMutableString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
 	NSString *currentResolution;                    //the resolution that was running when the wrapper was started
-	int sleepNumber;                                //fullscreen resolution switch pause number in seconds
 	NSString *wrapperBundlePID;                     //PID of running wrapper bundle
 	NSMutableString *wineskinX11PID;                //PID of running WineskinX11 exectuable (not used except for shutdown, only use wrapper bundle for checks)
 	NSMutableString *xQuartzX11BinPID;              //PID of running XQuartz X11.bin (only needed for Override->Fullscreen)
 	NSString *xQuartzBundlePID;                     //PID of running XQuartz bundle (only needed for Override->Fullscreen)
-	NSMutableArray *filesToRun;                     //list of files passed in to open
 	BOOL debugEnabled;                              //set if debug mode is being run, to make logs
-	BOOL cexeRun;                                   //set if runnin from a custom exe launcher
-	BOOL nonStandardRun;                            //set if a special wine run
-	BOOL openingFiles;                              //set if we are opening files instead of a program
 	BOOL isIce;                                     //YES if ICE engine being used
     BOOL removeX11TraceFromLog;                     //YES if Wineskin added the X11 trace to winedebug to remove them from the output log
-	NSString *wssCommand;                           //should be argv[1], if a special command
-	NSArray *winetricksCommands;                    //should be argv[2]+ if wssCommand is WSS-winetricks
-	NSMutableString *programNameAndPath;            //directly from the info.plist
-	NSString *uLimitNumber;                         //read from "max open files" in Info.plist
-	NSString *wineDebugLineFromPlist;               //read from "WINEDEBUG=" in Info.plist
-	BOOL killWineskin;                              //sets to true if opening files and wineserver was already running, kills extra wineskin
-	NSMutableString *cliCustomCommands;             //from CLI Variables entry in info.plist
 	NSString *dyldFallBackLibraryPath;              //the path for DYLD_FALLBACK_LIBRARY_PATH
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
     NSString *wineServerName;                       //the name of the Wineserver we'll be launching
@@ -78,9 +52,6 @@
     int bundleRandomInt2;
     
 }
-// ********************************
-// START UP (Old WineskinLauncher)
-// ********************************
 // if Fn or Alt held on run
 - (void) doSpecialStartup;
 
@@ -90,12 +61,14 @@
 // display string for troubleshooting
 - (void)ds:(NSString *)input;
 
-// ********************************
-// Background Daemon (Old Wineskin.m)
-// ********************************
-
 //the main running of the program...
-- (void)mainRun;
+- (void)mainRun:(NSArray*)filesToOpen;
+
+//Any time its re-ran after its already running, for like opening extra files or Custom EXEs
+- (void)secondaryRun:(NSArray*)filesToOpen;
+
+//a second instance of program is launched, needs to pass into back to main so it can run.
+- (void)handleWineskinLauncherDirectSecondaryRun:(WineStart *)wineStart;
 
 //used to change the gamma setting since Xquartz cannot yet
 - (void)setGamma:(NSString *)inputValue;
@@ -167,7 +140,7 @@
 - (void)fixWineExecutableNames;
 
 //start wine
-- (void)startWine;
+- (void)startWine:(WineStart *)wineStart;
 
 //background monitoring while Wine is running
 - (void)sleepAndMonitor;

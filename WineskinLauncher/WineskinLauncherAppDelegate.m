@@ -10,52 +10,49 @@
 
 @implementation WineskinLauncherAppDelegate
 
-// ********************************
-// START UP (Old WineskinLauncher)
-// ********************************
+- (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
+{
+    [globalFilesToOpen addObjectsFromArray:filenames];
+    if (wrapperRunning)
+    {
+        [NSThread detachNewThreadSelector:@selector(secondaryRun:) toTarget:self withObject:[globalFilesToOpen copy]];
+        [globalFilesToOpen removeAllObjects];
+    }
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	[window setLevel:NSStatusWindowLevel];
 	[waitWheel startAnimation:self];
 	[self installEngine];
 	// Normal run
-	if(openedByFile)
-	{
-        [self mainRun];
-	}
-	[NSApp terminate: nil];
+    [NSThread detachNewThreadSelector:@selector(mainRun:) toTarget:self withObject:[globalFilesToOpen copy]];
+    [globalFilesToOpen removeAllObjects];
+    wrapperRunning=YES;
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification*)aNotification
 {
-    filesToOpen = [[NSMutableArray alloc] init];
+    globalFilesToOpen = [[NSMutableArray alloc] init];
     fm = [NSFileManager defaultManager];
-	doFileStart = NO;
-	openedByFile = YES;
-    /*	SInt32 versionMinor;
-     Gestalt(gestaltSystemVersionMinor, &versionMinor);
-     if( versionMinor > 5 )
-     {
-     if (([NSEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSAlternateKeyMask || ([NSEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) == kCGEventFlagMaskSecondaryFn)
-     [self doSpecialStartup];
-     }
-     else
-     {
-     */
+    wrapperRunning = NO;
+    removeX11TraceFromLog = NO;
+    primaryRun = YES;
     CGEventRef event = CGEventCreate(NULL);
     CGEventFlags modifiers = CGEventGetFlags(event);
     CFRelease(event);
     if ((modifiers & kCGEventFlagMaskAlternate) == kCGEventFlagMaskAlternate || (modifiers & kCGEventFlagMaskSecondaryFn) == kCGEventFlagMaskSecondaryFn)
+    {
         [self doSpecialStartup];
-    //	}
+    }
 }
 
 - (void)doSpecialStartup
 {
 	//when holding modifier key
-	openedByFile = NO;
 	NSString* theSystemCommand = [NSString stringWithFormat: @"open \"%@/Wineskin.app\"", [[NSBundle mainBundle] bundlePath]];
 	system([theSystemCommand UTF8String]);
+    [NSApp terminate:nil];
 }
 
 - (NSString *)systemCommand:(NSString *)command
@@ -77,15 +74,6 @@
 	return [NSString stringWithString:returnString];
 }
 
-- (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
-{
-	if(openedByFile)
-	{
-		//openedByFile = NO;
-        [filesToOpen addObjectsFromArray:filenames];
-		doFileStart = YES;
-	}
-}
 - (void)ds:(NSString *)input
 {
 	if (input == nil) input=@"nil";
@@ -98,36 +86,35 @@
 	[TESTER release];
 }
 
-// ********************************
-// Background Daemon (Old Wineskin.m)
-// ********************************
-- (void)mainRun
+- (void)mainRun:(NSArray*)filesToOpen
 {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// TODO need to add option to make wrapper run in AppSupport (shadowcopy) so that no files will ever be written in the app
 	// TODO need to make all the temp files inside the wrapper run correctly using BundleID and in /tmp.  If they don't exist, assume everything is fine.
 	// TODO add blocks to sections that need them for variables to free up memory.
-	filesToRun = [[[NSMutableArray alloc] init] autorelease];
-    theDisplayNumber = [[[NSMutableString alloc] init] autorelease];
-    wineRunLocation = [[[NSMutableString alloc] init] autorelease];
-    programFlags = [[[NSMutableString alloc] init] autorelease];
-    vdResolution = [[[NSMutableString alloc] init] autorelease];
-    fullScreenResolutionBitDepth = [[[NSMutableString alloc] init] autorelease];
-    wineskinX11PID = [[[NSMutableString alloc] init] autorelease];
-    xQuartzX11BinPID = [[[NSMutableString alloc] init] autorelease];
-    programNameAndPath = [[[NSMutableString alloc] init] autorelease];
-    cliCustomCommands = [[[NSMutableString alloc] init] autorelease];
-    gammaCorrection = [[[NSMutableString alloc] init] autorelease];
-    removeX11TraceFromLog = NO;
-	runWithStartExe = NO;
-	fullScreenOption = NO;
-	useRandR = NO;
+    
+    NSMutableArray *filesToRun = [[[NSMutableArray alloc] init] autorelease];
+    theDisplayNumber = [[NSMutableString alloc] init];
+    NSMutableString *wineRunLocation = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *programNameAndPath = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *cliCustomCommands = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *programFlags = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *vdResolution = [[[NSMutableString alloc] init] autorelease];
+    fullScreenResolutionBitDepth = [[NSMutableString alloc] init];
+    [fullScreenResolutionBitDepth setString:@"unset"];
+    wineskinX11PID = [[NSMutableString alloc] init];
+    [wineskinX11PID setString:@"unset"];
+    xQuartzX11BinPID = [[NSMutableString alloc] init];
+    gammaCorrection = [[NSMutableString alloc] init];
+	BOOL runWithStartExe = NO;
+    fullScreenOption = NO;
+	//useRandR = NO;
 	useGamma = YES;
-	[gammaCorrection setString:@"default"];
 	debugEnabled = NO;
-	cexeRun = NO;
-	nonStandardRun = NO;
-	openingFiles = NO;
-	killWineskin = NO;
+	BOOL cexeRun = NO;
+	BOOL nonStandardRun = NO;
+	BOOL openingFiles = NO;
+    NSString *wssCommand;
 	if ([filesToOpen count] > 0)
     {
         wssCommand = [filesToOpen objectAtIndex:0];
@@ -146,7 +133,6 @@
     tmpFolder=[NSString stringWithFormat:@"/tmp/%@",[appNameWithPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
     [fm createDirectoryAtPath:tmpFolder withIntermediateDirectories:YES attributes:nil error:nil];
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
-    displayNumberFile = [NSString stringWithFormat:@"%@/currentuseddisplay",tmpFolder];
 	lockfile=[NSString stringWithFormat:@"%@/lockfile",tmpFolder];
     wineLogFile = [NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix];
     wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
@@ -170,17 +156,7 @@
         [self writeStringArray:[NSArray arrayWithObject:NSUserName()] toFile:lockfile];
         [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
     }
-    //if wssCommand is WSS-InstallICE, then just run ICE install and quit!
-	[self installEngine];
-	if ([wssCommand isEqualToString:@"WSS-InstallICE"])
-    {
-        //delete the lockfile
-        [fm removeItemAtPath:displayNumberFile error:nil];
-        [fm removeItemAtPath:lockfile error:nil];
-        [fm removeItemAtPath:tmpFolder error:nil];
-        //just called for ICE install, dont run.
-        return;
-    }
+    
     //fix Wine names which also is setting for bundle ID
     [self fixWineExecutableNames];
 	//open Info.plist to read all needed info
@@ -191,7 +167,6 @@
 	if ([[plistDictionary valueForKey:@"CFBundleName"] isEqualToString:@"WineskinWineskinDefault3345"])
 	{
 		[plistDictionary setValue:appName forKey:@"CFBundleName"];
-		[plistDictionary writeToFile:infoPlistFile atomically:YES];
 	}
     [plistDictionary setValue:[NSString stringWithFormat:@"%@.wineskin.prefs",wineName] forKey:@"CFBundleIdentifier"];
     [plistDictionary writeToFile:infoPlistFile atomically:YES];
@@ -203,7 +178,7 @@
 		fullScreenOption = [[plistDictionary valueForKey:@"Fullscreen"] intValue];
 		resolutionTemp = [plistDictionary valueForKey:@"Resolution"];
 		runWithStartExe = [[plistDictionary valueForKey:@"use start.exe"] intValue];
-		useRandR = [[plistDictionary valueForKey:@"Use RandR"] intValue];
+		//useRandR = [[plistDictionary valueForKey:@"Use RandR"] intValue];
 	}
 	else
 	{
@@ -213,8 +188,8 @@
 		fullScreenOption = [[cexePlistDictionary valueForKey:@"Fullscreen"] intValue];
 		resolutionTemp = [cexePlistDictionary valueForKey:@"Resolution"];
 		runWithStartExe = [[cexePlistDictionary valueForKey:@"use start.exe"] intValue];
-		useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
-		useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
+		//useGamma = [[cexePlistDictionary valueForKey:@"Use Gamma"] intValue];
+		//useRandR = [[cexePlistDictionary valueForKey:@"Use RandR"] intValue];
 	}
 	debugEnabled = [[plistDictionary valueForKey:@"Debug Mode"] intValue];
 	forceWrapperQuartzWM = [[plistDictionary valueForKey:@"force wrapper quartz-wm"] intValue];
@@ -229,8 +204,8 @@
 		dyldFallBackLibraryPath=[NSString stringWithFormat:@"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/opt/X11/lib:/opt/local/lib:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold];
     }
     [gammaCorrection setString:[plistDictionary valueForKey:@"Gamma Correction"]];
-	x11PrefFileName = [plistDictionary valueForKey:@"CFBundleIdentifier"];
-    x11PListFile = [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),x11PrefFileName];
+    x11PListFile = [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),[plistDictionary valueForKey:@"CFBundleIdentifier"]];
+    NSString *uLimitNumber;
     if ([[plistDictionary valueForKey:@"set max files"] intValue])
     {
         uLimitNumber = @"launchctl limit maxfiles 10240 10240;ulimit -n 10240 > /dev/null 2>&1;";
@@ -239,7 +214,6 @@
     {
         uLimitNumber = @"";
     }
-	wineDebugLineFromPlist = [plistDictionary valueForKey:@"WINEDEBUG="];
 	//if any program flags, need to add a space to the front of them
 	if (!([programFlags isEqualToString:@""]))
     {
@@ -247,10 +221,13 @@
     }
 	//resolutionTemp needs to be stripped for resolution info, bit depth, and switch pause
 	[vdResolution setString:[resolutionTemp substringToIndex:[resolutionTemp rangeOfString:@"x" options:NSBackwardsSearch].location]];
-	[fullScreenResolutionBitDepth setString:[resolutionTemp stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@x",vdResolution] withString:@""]];
-    [fullScreenResolutionBitDepth deleteCharactersInRange:NSMakeRange([fullScreenResolutionBitDepth rangeOfString:@"sleep"].location,6)];
-	NSString *sleepNumberTemp = [resolutionTemp stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@x%@sleep",vdResolution,fullScreenResolutionBitDepth] withString:@""];
-	sleepNumber = [sleepNumberTemp intValue];
+	if ([fullScreenResolutionBitDepth isEqualToString:@"unset"])
+    {
+        [fullScreenResolutionBitDepth setString:[resolutionTemp stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@x",vdResolution] withString:@""]];
+        [fullScreenResolutionBitDepth deleteCharactersInRange:NSMakeRange([fullScreenResolutionBitDepth rangeOfString:@"sleep"].location,6)];
+	}
+    //NSString *sleepNumberTemp = [resolutionTemp stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@x%@sleep",vdResolution,fullScreenResolutionBitDepth] withString:@""];
+	//sleepNumber = [sleepNumberTemp intValue];
 	//make sure vdReso has a space, not an x
     [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
 	currentResolution = [self getResolution];
@@ -279,9 +256,10 @@
 	//CustomEXE {appname}		- running a custom EXE with appname
 	//starts with a"/" 			- will be 1+ path/filename to open
 	//no command line args		- normal run
+    NSMutableArray *winetricksCommands = [NSMutableArray arrayWithCapacity:2];
 	if ([filesToOpen count] > 1)
 	{
-		winetricksCommands = [filesToOpen subarrayWithRange:NSMakeRange(1, [filesToOpen count]-1)];
+        [winetricksCommands addObjectsFromArray:[filesToOpen subarrayWithRange:NSMakeRange(1, [filesToOpen count]-1)]];
 	}
 	if ([filesToOpen count] > 0)
 	{
@@ -304,7 +282,7 @@
 					[fullScreenResolutionBitDepth setString:@"24"];
 					[vdResolution setString:@"novd"];
 					fullScreenOption = NO;
-					sleepNumber = 0;
+					//sleepNumber = 0;
 				}
 				[programNameAndPath setString:[filesToOpen objectAtIndex:1]]; // second argument full path and file name to run
 				runWithStartExe = YES; //installer always uses start.exe
@@ -314,7 +292,7 @@
 				[fullScreenResolutionBitDepth setString:@"24"]; // all should force normal windows
 				[vdResolution setString:@"novd"];
 				fullScreenOption = NO;
-				sleepNumber = 0;
+				//sleepNumber = 0;
 				//should only use this line for winecfg cmd regedit and taskmgr, other 2 do nonstandard runs and wont use this line
 				if ([wssCommand isEqualToString:@"WSS-regedit"])
                 {
@@ -360,11 +338,11 @@
         [programNameAndPath insertString:@"/" atIndex:0];
     }
 	[wineRunLocation setString:[programNameAndPath substringToIndex:[programNameAndPath rangeOfString:@"/" options:NSBackwardsSearch].location]];
-	wineRunFile = [programNameAndPath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@/",wineRunLocation] withString:@""];
+	NSString *wineRunFile = [programNameAndPath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@/",wineRunLocation] withString:@""];
 	//add path to drive C if its not an installer
 	if (!([wssCommand isEqualToString:@"WSS-installer"]))
     {
-		[wineRunLocation insertString:[NSString stringWithFormat:@"%@/Resources/drive_c",contentsFold] atIndex:0];
+		[wineRunLocation insertString:[NSString stringWithFormat:@"%@/drive_c",winePrefix] atIndex:0];
     }
 	//**********make sure that the set executable is found if normal run
 	if (!openingFiles && !([wssCommand hasPrefix:@"WSS-"]) && !([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",wineRunLocation,wineRunFile]]))
@@ -372,7 +350,6 @@
 		//error, file doesn't exist, and its not a special command
 		NSLog(@"Error! Set executable not found.  Wineskin.app running instead.");
 		system([[NSString stringWithFormat:@"open \"%@/Wineskin.app\"",appNameWithPath] UTF8String]);
-        [fm removeItemAtPath:displayNumberFile error:nil];
         [fm removeItemAtPath:lockfile error:nil];
         [fm removeItemAtPath:tmpFolder error:nil];
 		return;
@@ -395,16 +372,13 @@
     {
         if (lockFileAlreadyExisted)
         {
-            killWineskin = YES;
-            //use old $DISPLAY number
-            if ([fm fileExistsAtPath:displayNumberFile])
-            {
-                [theDisplayNumber setString:[[self readFileToStringArray:displayNumberFile] objectAtIndex:0]];
-            }
-            else //error, no display file, but WineskinX11 is running?
-            {
-                NSLog(@"ERROR: WineskinX11 may be running, but there is no $DISPLAY value stored, cannot launch anything new.  You may need to make sure the wrapper properly shuts down before starting it again.");
-            }
+            //if lockfile already existed, then this instance was launched when another is the main one.
+            //We need to pass the parameters given to WineskinLauncher over to the correct run of this program
+            WineStart *wineStartInfo = [[[WineStart alloc] init] autorelease];
+            [wineStartInfo setWssCommand:wssCommand];
+            [wineStartInfo setWinetricksCommands:winetricksCommands];
+            [self handleWineskinLauncherDirectSecondaryRun:wineStartInfo];
+            BOOL killWineskin = YES;
             // check if WineskinX11 is even running
             if ([self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
             {
@@ -412,6 +386,10 @@
                 NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
                 lockFileAlreadyExisted = NO;
                 killWineskin = NO;
+            }
+            if (killWineskin)
+            {
+                [NSApp terminate:nil];
             }
         }
         if (!lockFileAlreadyExisted)
@@ -424,9 +402,7 @@
                 randomint = randomint * (-1);
             }
             [theDisplayNumber setString:[NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]]];
-            [self writeStringArray:[NSArray arrayWithObjects:[NSString stringWithFormat:@"%@\n",theDisplayNumber],nil] toFile:displayNumberFile];
-            [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
-            //**********start the X server if needed
+            //**********start the X server
             if (useXQuartz)
             {
                 NSLog(@"Wineskin: Starting XQuartz");
@@ -439,7 +415,6 @@
                 NSLog(@"Wineskin: WineskinX11 Started, PID = %@", wineskinX11PID);
                 if ([wrapperBundlePID isEqualToString:@"ERROR"])
                 {
-                    [fm removeItemAtPath:displayNumberFile error:nil];
                     [fm removeItemAtPath:lockfile error:nil];
                     [fm removeItemAtPath:tmpFolder error:nil];
                     return;
@@ -469,17 +444,22 @@
     {
         [self tryToUseGPUInfo];
     }
-    
     //**********start wine
-	[self startWine];
-	//********** exit if already running and just opening new file
-	//if wineserver was already running in startWine and openFiles was true, then exit, we already have a Wineskin monitoring the wrapper
-	if (killWineskin)
-    {
-        NSLog(@"Wineskin: Extra Wineskin process exiting since we already have one monitoring the wrapper.");
-        return;
-    }
-	
+    WineStart *wineStartInfo = [[[WineStart alloc] init] autorelease];
+    [wineStartInfo setFilesToRun:filesToRun];
+    [wineStartInfo setProgramFlags:programFlags];
+    [wineStartInfo setWineRunLocation:wineRunLocation];
+    [wineStartInfo setVdResolution:vdResolution];
+    [wineStartInfo setCliCustomCommands:cliCustomCommands];
+    [wineStartInfo setRunWithStartExe:runWithStartExe];
+    [wineStartInfo setNonStandardRun:nonStandardRun];
+    [wineStartInfo setOpeningFiles:openingFiles];
+    [wineStartInfo setWssCommand:wssCommand];
+    [wineStartInfo setULimitNumber:uLimitNumber];
+    [wineStartInfo setWineDebugLine:[plistDictionary valueForKey:@"WINEDEBUG="]];
+    [wineStartInfo setWinetricksCommands:winetricksCommands];
+    [wineStartInfo setWineRunFile:wineRunFile];
+	[self startWine:wineStartInfo];
 	//change fullscreen reso if needed
 	if (fullScreenOption)
 	{
@@ -543,7 +523,230 @@
     {
         [cexePlistDictionary release];
     }
+    [pool release];
 	return;
+}
+
+- (void)secondaryRun:(NSArray*)filesToOpen
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    primaryRun = NO;
+    NSMutableArray *filesToRun = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableString *wineRunLocation = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *programNameAndPath = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *cliCustomCommands = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *programFlags = [[[NSMutableString alloc] init] autorelease];
+	BOOL runWithStartExe = NO;
+	BOOL nonStandardRun = NO;
+	BOOL openingFiles = NO;
+    NSString *wssCommand;
+	if ([filesToOpen count] > 0)
+    {
+        wssCommand = [filesToOpen objectAtIndex:0];
+    }
+    else
+    {
+        wssCommand = @"nothing";
+    }
+	//open Info.plist to read all needed info
+	NSMutableDictionary *plistDictionary = [[NSMutableDictionary alloc] initWithContentsOfFile:infoPlistFile];
+	NSDictionary *cexePlistDictionary = nil;
+	NSString *resolutionTemp;
+	//need to handle it different if its a cexe
+	if ([wssCommand isEqualToString:@"CustomEXE"])
+	{
+        cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[filesToOpen objectAtIndex:1]]];
+		[programNameAndPath setString:[cexePlistDictionary valueForKey:@"Program Name and Path"]];
+		[programFlags setString:[cexePlistDictionary valueForKey:@"Program Flags"]];
+		resolutionTemp = [cexePlistDictionary valueForKey:@"Resolution"];
+		runWithStartExe = [[cexePlistDictionary valueForKey:@"use start.exe"] intValue];
+	}
+	else
+	{
+		[programNameAndPath setString:[plistDictionary valueForKey:@"Program Name and Path"]];
+		[programFlags setString:[plistDictionary valueForKey:@"Program Flags"]];
+		resolutionTemp = [plistDictionary valueForKey:@"Resolution"];
+		runWithStartExe = [[plistDictionary valueForKey:@"use start.exe"] intValue];
+	}
+	//if any program flags, need to add a space to the front of them
+	if (!([programFlags isEqualToString:@""]))
+    {
+		[programFlags insertString:@" " atIndex:0];
+    }
+	[cliCustomCommands setString:[plistDictionary valueForKey:@"CLI Custom Commands"]];
+	if (!([cliCustomCommands hasSuffix:@";"]) && ([cliCustomCommands length] > 0))
+    {
+        [cliCustomCommands appendString:@";"];
+    }
+	//******* fix all data correctly
+	//list of possile options
+	//WSS-installer {path/file}	- Installer is calling the program
+	//WSS-winecfg 				- need to run winecfg
+	//WSS-cmd					- need to run cmd
+	//WSS-regedit 				- need to run regedit
+	//WSS-taskmgr 				- need to run taskmgr
+	//WSS-uninstall				- run uninstaller
+	//WSS-wineprefixcreate		- need to run wineboot, refresh wrapper
+	//WSS-wineprefixcreatenoregs- same as above, doesn't load default regs
+	//WSS-wineboot				- run simple wineboot, no deletions or loading regs. mshtml=disabled
+	//WSS-winetricks {command}	- winetricks is being run
+	//debug 					- run in debug mode, keep logs
+	//CustomEXE {appname}		- running a custom EXE with appname
+	//starts with a"/" 			- will be 1+ path/filename to open
+	//no command line args		- normal run
+    NSMutableArray *winetricksCommands = [NSMutableArray arrayWithCapacity:2];
+	if ([filesToOpen count] > 1)
+	{
+        [winetricksCommands addObjectsFromArray:[filesToOpen subarrayWithRange:NSMakeRange(1, [filesToOpen count]-1)]];
+	}
+	if ([filesToOpen count] > 0)
+	{
+		if ([wssCommand hasPrefix:@"/"]) //if wssCommand starts with a / its file(s) passed in to open
+		{
+			for (NSString *item in filesToOpen)
+            {
+				[filesToRun addObject:item];
+            }
+			openingFiles=YES;
+		}
+		else if ([wssCommand hasPrefix:@"WSS-"]) //if wssCommand starts with WSS- its a special command
+		{
+			if ([wssCommand isEqualToString:@"WSS-installer"]) //if its in the installer, need to know if normal windows are forced
+			{
+				// do not run the installer if the wrapper is already running!
+                CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: Do not try to run the Installer if the wrapper is already running something else!"), NULL);
+                NSLog(@"Error: Do not try to run the Installer if the wrapper is already running something else!");
+                return;
+			}
+			else //any WSS that isn't the installer
+			{
+				//should only use this line for winecfg cmd regedit and taskmgr, other 2 do nonstandard runs and wont use this line
+				if ([wssCommand isEqualToString:@"WSS-regedit"])
+                {
+					[programNameAndPath setString:@"/windows/regedit.exe"];
+                }
+				else
+				{
+					if ([wssCommand isEqualToString:@"WSS-cmd"])
+                    {
+                        runWithStartExe=YES;
+                    }
+					[programNameAndPath setString:[NSString stringWithFormat:@"/windows/system32/%@.exe",[wssCommand stringByReplacingOccurrencesOfString:@"WSS-" withString:@""]]];
+				}
+				[programFlags setString:@""]; // just in case there were some flags... don't use on these.
+				if ([wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"])
+                {
+					nonStandardRun=YES;
+                }
+			}
+		}
+	}
+	//fix wine run paths
+	if (![programNameAndPath hasPrefix:@"/"])
+    {
+        [programNameAndPath insertString:@"/" atIndex:0];
+    }
+	[wineRunLocation setString:[programNameAndPath substringToIndex:[programNameAndPath rangeOfString:@"/" options:NSBackwardsSearch].location]];
+	NSString *wineRunFile = [programNameAndPath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@/",wineRunLocation] withString:@""];
+	//add path to drive C if its not an installer
+	if (!([wssCommand isEqualToString:@"WSS-installer"]))
+    {
+		[wineRunLocation insertString:[NSString stringWithFormat:@"%@/drive_c",winePrefix] atIndex:0];
+    }
+    //**********start wine
+    WineStart *wineStartInfo = [[[WineStart alloc] init] autorelease];
+    [wineStartInfo setFilesToRun:filesToRun];
+    [wineStartInfo setProgramFlags:programFlags];
+    [wineStartInfo setWineRunLocation:wineRunLocation];
+    [wineStartInfo setVdResolution:@"secondary"];
+    [wineStartInfo setCliCustomCommands:cliCustomCommands];
+    [wineStartInfo setRunWithStartExe:runWithStartExe];
+    [wineStartInfo setNonStandardRun:nonStandardRun];
+    [wineStartInfo setOpeningFiles:openingFiles];
+    [wineStartInfo setWssCommand:wssCommand];
+    [wineStartInfo setULimitNumber:@""];
+    [wineStartInfo setWineDebugLine:[plistDictionary valueForKey:@"WINEDEBUG="]];
+    [wineStartInfo setWinetricksCommands:winetricksCommands];
+    [wineStartInfo setWineRunFile:wineRunFile];
+    [self startWine:wineStartInfo];
+    [pool release];
+	return;
+}
+
+- (void)handleWineskinLauncherDirectSecondaryRun:(WineStart *)wineStart
+{
+    //if lockfile already existed, then this instance was launched when another is the main one.
+    //We need to pass the parameters given to WineskinLauncher over to the correct run of this program
+    //WSS-installer {path/file}	-need to send file path to main
+    //WSS-winecfg 				- need to send path to winecfg.exe to main
+    //WSS-cmd					- need to send path to cmd.exe to main
+    //WSS-regedit 				- need to send path to regedit.exe to main
+    //WSS-taskmgr 				- need to send path to taskmgr.exe to main
+    //WSS-uninstall				- need to send path to uninstaller.exe to main
+    //WSS-wineprefixcreate		- need to error, saying this cannot run while the wrapper is running
+    //WSS-wineprefixcreatenoregs- need to error, saying this cannot run while the wrapper is running
+    //WSS-wineboot				- need to error, saying this cannot run while the wrapper is running
+    //WSS-winetricks {command}	- need to error, saying this cannot run while the wrapper is running
+    //debug 					- need to error, saying this cannot run while the wrapper is running
+    //CustomEXE {appname}		- need to send path to cexe to main
+    //starts with a"/" 			- need to just pass this one to main
+    //no command line args		- else condition... nothing to do, don't do anything.
+    NSString *wssCommand = [wineStart getWssCommand];
+    NSArray *otherCommands = [wineStart getWinetricksCommands];
+    NSString *theFileToRun;
+    if ([wssCommand isEqualToString:@"WSS-installer"])
+    {
+        theFileToRun = [otherCommands objectAtIndex:0];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-winecfg"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-cmd"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-regedit"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-taskmgr"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-uninstall"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] || [wssCommand isEqualToString:@"debug"])
+    {
+        NSString *errorMsg = [NSString stringWithFormat:@"ERROR, tried to run command %@ when the wrapper was already running.  Please make sure the wrapper is not running in order to do this.", wssCommand];
+        CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)errorMsg, NULL);
+        NSLog(@"%@",errorMsg);
+        return;
+    }
+    else if ([wssCommand isEqualToString:@"CustomEXE"])
+    {
+        NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[otherCommands objectAtIndex:0]]];
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/%@",winePrefix,[cexePlistDictionary valueForKey:@"Program Name and Path"]];
+    }
+    else if ([wssCommand hasPrefix:@"/"])
+    {
+        NSMutableString *temp = [[NSMutableString alloc] initWithString:wssCommand];
+        for (NSString *item in otherCommands)
+        {
+            [temp appendString:[NSString stringWithFormat:@"\" \"%@",item]];
+        }
+        theFileToRun = temp;
+    }
+    else
+    {
+        NSLog(@"ERROR, wrapper was re-run with no recognized command line options while already running.  This is a useless operation and ignored.");
+        return;
+    }
+    NSString *commandToRun = [NSString stringWithFormat:@"open \"%@\" -a \"%@\"",theFileToRun,appNameWithPath];;
+    [self systemCommand:commandToRun];
+    return;
 }
 
 - (void)setGamma:(NSString *)inputValue
@@ -1085,15 +1288,14 @@
 - (void)startX11
 {
 	// do not start X server for Winetricks listings.. its a waste of time.
-	if ([wssCommand isEqualToString:@"WSS-winetricks"])
-    {
-		if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
-		    || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"])))
-		{
-			[wineskinX11PID setString:@"Winetricks Listing, no X server needed"];
-			return;
-		}
-    }
+//	if ([wssCommand isEqualToString:@"WSS-winetricks"])
+//    {
+//		if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
+//		    || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"])))
+//		{
+//			return;
+//		}
+//    }
 	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
 	//fix the Frameworks Libraires
 	[self fixFrameworksLibraries];
@@ -1130,7 +1332,10 @@
 		//error!  read only volume or other permissions problem, cannot run.
 		NSLog(@"Error, cannot write to Info.plist, there are permission problems, or you are on a read-only volume. This cannot run from within a read-only dmg file.");
 		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)@"ERROR! cannot write to Info.plist, there are permission problems, or you are on a read-only volume.\n\nThis cannot run from within a read-only dmg file.", NULL);
-		[wineskinX11PID setString:@"ERROR"];
+        if ([wineskinX11PID isEqualToString:@"unset"])
+        {
+            [wineskinX11PID setString:@"ERROR"];
+        }
 		return;
 	}
     @try
@@ -1159,7 +1364,10 @@
         //Start WineskinX11
         wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"/dev/null\" 2>&1 & echo \"$!\"",theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine]];
         // get PID of WineskinX11 just launched
-        [wineskinX11PID setString:[self getNewPid:@"WineskinX11" from:firstPIDlist confirm:NO]];
+        if ([wineskinX11PID isEqualToString:@"unset"])
+        {
+            [wineskinX11PID setString:[self getNewPid:@"WineskinX11" from:firstPIDlist confirm:NO]];
+        }
         //if no PID found, log problem
         if ([wineskinX11PID isEqualToString:@"-1"])
         {
@@ -1194,7 +1402,7 @@
 	if (!fullScreenOption)
 	{
 		[self systemCommand:@"open /Applications/Utilities/XQuartz.app"];
-		[theDisplayNumber setString:[self systemCommand:@"echo $DISPLAY"]];
+        [theDisplayNumber setString:[self systemCommand:@"echo $DISPLAY"]];
 	}
 	else
 	{
@@ -1205,12 +1413,9 @@
 			//already running, error and exit
 			NSLog(@"Error: XQuartz cannot already be running if using Override Fullscreen option!  Please close XQuartz and try again!");
 			CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: XQuartz cannot already be running if using Override Fullscreen option!\n\nPlease close XQuartz and try again!"), NULL);
-			killWineskin = YES;
-            [fm removeItemAtPath:displayNumberFile error:nil];
-            //            [fm removeItemAtPath:wineserverPIDFile error:nil];
             [fm removeItemAtPath:lockfile error:nil];
             [fm removeItemAtPath:tmpFolder error:nil];
-			return;
+			[NSApp terminate:nil];
 		}
 		//make first pid array
 		NSArray *firstPIDlist = [self makePIDArray:@"X11.bin"];
@@ -1284,7 +1489,7 @@
 				else
 				{
 					//only gets here if app never front most and breaks
-					NSLog(@"Application PID %@ failed to ever become frontmost",thePid);
+					NSLog(@"Application PID %@ may have failed to become front most",thePid);
 					break;
 				}
 			}
@@ -1608,16 +1813,13 @@
     }
 }
 
-- (void)startWine
+- (void)startWine:(WineStart *)wineStartInfo
 {
-    // if Wineserver was already running, use the same one, so no need to do X or keep the daemon running
-    if ([self isWineserverRunning])
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSString *wssCommand = [wineStartInfo getWssCommand];
+    //make sure the /tmp/.wine-uid folder and lock file are correct since Wine is buggy about it
+    if (primaryRun)
     {
-        killWineskin = YES;
-    }
-    else
-    {
-        //make sure the /tmp/.wine-uid folder and lock file are correct since Wine is buggy about it
         NSDictionary *info = [fm attributesOfItemAtPath:winePrefix error:nil];
         NSString *uid = [NSString stringWithFormat: @"%d", getuid()];
         NSString *inode = [NSString stringWithFormat:@"%lx", (unsigned long)[[info objectForKey:NSFileSystemFileNumber] unsignedIntegerValue]];
@@ -1630,7 +1832,7 @@
         [fm createDirectoryAtPath:pathToWineLockFolder withIntermediateDirectories:YES attributes:nil error:nil];
         [self systemCommand:[NSString stringWithFormat:@"chmod -R 700 \"/tmp/.wine-%@\"",uid]];
     }
-	if (nonStandardRun)
+	if ([wineStartInfo isNonStandardRun])
 	{
 		[self setToNoVirtualDesktop];
         NSString *wineDebugLine = @"err-all,warn-all,fixme-all,trace-all";
@@ -1721,32 +1923,37 @@
 	}
 	else //Normal Wine Run
 	{
-		//edit reg entiries for VD settings
-		if ([vdResolution isEqualToString:@"novd"])
+        if (primaryRun)
         {
-            [self setToNoVirtualDesktop];
-        }
-		else
-        {
-            [self setToVirtualDesktop:vdResolution];
+            //edit reg entiries for VD settings
+            NSString *vdResolution = [wineStartInfo getVdResolution];
+            if ([vdResolution isEqualToString:@"novd"])
+            {
+                [self setToNoVirtualDesktop];
+            }
+            else
+            {
+                [self setToVirtualDesktop:vdResolution];
+            }
         }
 		NSString *wineDebugLine;
         NSString *wineLogFileLocal = [NSString stringWithFormat:@"%@",wineLogFile];
 		//set log file names, and stuff
 		if (debugEnabled && !fullScreenOption) //standard log
         {
-			wineDebugLine = [NSString stringWithFormat:@"%@",wineDebugLineFromPlist];
+			wineDebugLine = [NSString stringWithFormat:@"%@",[wineStartInfo getWineDebugLine]];
         }
 		else if (debugEnabled && fullScreenOption) //always need a log with x11settings
         {
-            if ([wineDebugLineFromPlist rangeOfString:@"trace+x11settings"].location == NSNotFound)
+            NSString *setWineDebugLine = [wineStartInfo getWineDebugLine];
+            if ([setWineDebugLine rangeOfString:@"trace+x11settings"].location == NSNotFound)
             {
                 removeX11TraceFromLog = YES;
-                wineDebugLine = [NSString stringWithFormat:@"%@,trace+x11settings",wineDebugLineFromPlist];
+                wineDebugLine = [NSString stringWithFormat:@"%@,trace+x11settings",setWineDebugLine];
             }
             else
             {
-                wineDebugLine = wineDebugLineFromPlist;
+                wineDebugLine = setWineDebugLine;
             }
         }
 		else if (!debugEnabled && fullScreenOption) //need log for reso changes
@@ -1760,7 +1967,7 @@
 		}
 		//fix start.exe line
 		NSString *startExeLine = @"";
-		if (runWithStartExe)
+		if ([wineStartInfo isRunWithStartExe])
         {
             startExeLine = @" start /unix";
         }
@@ -1768,6 +1975,7 @@
         if ([wssCommand isEqualToString:@"WSS-winetricks"])
         {
             NSString *wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
+            NSArray *winetricksCommands = [wineStartInfo getWinetricksCommands];
             if (([winetricksCommands count] == 2 && [[winetricksCommands objectAtIndex:1] isEqualToString:@"list"])
                 || ([winetricksCommands count] == 1 && ([[winetricksCommands objectAtIndex:0] isEqualToString:@"list"] || [[winetricksCommands objectAtIndex:0] hasPrefix:@"list-"])))
             {
@@ -1776,13 +1984,15 @@
             }
             else
             {
-                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,cliCustomCommands,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
+                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
             }
             usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
-        } else {
-            if (openingFiles)
+        }
+        else
+        {
+            if ([wineStartInfo isOpeningFiles])
             {
-                for (NSString *item in filesToRun) //start wine with files
+                for (NSString *item in [wineStartInfo getFilesToRun]) //start wine with files
                 {
                     //don't try to run things xorg sometimes passes back stupidly...
                     BOOL breakOut = NO;
@@ -1799,16 +2009,17 @@
                     {
                         break;
                     }
-                    [self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,frameworksFold,dyldFallBackLibraryPath,item,wineLogFileLocal]];
+                    [self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &",frameworksFold,frameworksFold,[wineStartInfo getULimitNumber],wineDebugLine,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],frameworksFold,dyldFallBackLibraryPath,item,wineLogFileLocal]];
                 }
             }
             else
             {
                 //launch Wine normally
-                [self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,uLimitNumber,wineDebugLine,theDisplayNumber,winePrefix,cliCustomCommands,wineRunLocation,dyldFallBackLibraryPath,startExeLine,wineRunFile,programFlags,wineLogFileLocal]];
+                [self systemCommand:[NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine%@ \"%@\"%@ > \"%@\" 2>&1 &",frameworksFold,frameworksFold,[wineStartInfo getULimitNumber],wineDebugLine,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],[wineStartInfo getWineRunLocation],dyldFallBackLibraryPath,startExeLine,[wineStartInfo getWineRunFile],[wineStartInfo getProgramFlags],wineLogFileLocal]];
             }
-            
+            NSMutableString *vdResolution = [[[NSMutableString alloc] initWithString:[wineStartInfo getVdResolution]] autorelease];
             [vdResolution replaceOccurrencesOfString:@"x" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [vdResolution length])];
+            [wineStartInfo setVdResolution:vdResolution];
             // give wineserver a minute to start up
             int s;
             for (s=0; s<480; ++s)
@@ -1818,6 +2029,7 @@
             }
         }
 	}
+    [pool release];
 	return;
 }
 
@@ -2014,7 +2226,6 @@
     //get rid of the preference file
     [fm removeItemAtPath:x11PListFile error:nil];
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@.lockfile",x11PListFile] error:nil];
-    [fm removeItemAtPath:displayNumberFile error:nil];
     [fm removeItemAtPath:lockfile error:nil];
     [fm removeItemAtPath:tmpFolder error:nil];
     //kill processes
@@ -2039,5 +2250,6 @@
             [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
         }
     }
+    [NSApp terminate:nil];
 }
 @end
