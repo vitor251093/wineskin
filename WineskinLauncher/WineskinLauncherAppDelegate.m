@@ -247,7 +247,7 @@
 	//WSS-cmd					- need to run cmd
 	//WSS-regedit 				- need to run regedit
 	//WSS-taskmgr 				- need to run taskmgr
-	//WSS-uninstall				- run uninstaller
+	//WSS-uninstaller			- run uninstaller
 	//WSS-wineprefixcreate		- need to run wineboot, refresh wrapper
 	//WSS-wineprefixcreatenoregs- same as above, doesn't load default regs
 	//WSS-wineboot				- run simple wineboot, no deletions or loading regs. mshtml=disabled
@@ -368,8 +368,8 @@
 			[self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_disable %d",i]];
         }
 	}
-    if (!useMacDriver)
-    {
+    //if (!useMacDriver)
+    //{
         if (lockFileAlreadyExisted)
         {
             //if lockfile already existed, then this instance was launched when another is the main one.
@@ -425,7 +425,7 @@
                 NSLog(@"Wineskin: XQuartz Started, PID = %@", xQuartzX11BinPID);
             }
         }
-    }
+    //}
     //**********set user folders
     if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
     {
@@ -585,7 +585,7 @@
 	//WSS-cmd					- need to run cmd
 	//WSS-regedit 				- need to run regedit
 	//WSS-taskmgr 				- need to run taskmgr
-	//WSS-uninstall				- run uninstaller
+	//WSS-uninstaller			- run uninstaller
 	//WSS-wineprefixcreate		- need to run wineboot, refresh wrapper
 	//WSS-wineprefixcreatenoregs- same as above, doesn't load default regs
 	//WSS-wineboot				- run simple wineboot, no deletions or loading regs. mshtml=disabled
@@ -682,7 +682,7 @@
     //WSS-cmd					- need to send path to cmd.exe to main
     //WSS-regedit 				- need to send path to regedit.exe to main
     //WSS-taskmgr 				- need to send path to taskmgr.exe to main
-    //WSS-uninstall				- need to send path to uninstaller.exe to main
+    //WSS-uninstaller			- need to send path to uninstaller.exe to main
     //WSS-wineprefixcreate		- need to error, saying this cannot run while the wrapper is running
     //WSS-wineprefixcreatenoregs- need to error, saying this cannot run while the wrapper is running
     //WSS-wineboot				- need to error, saying this cannot run while the wrapper is running
@@ -692,6 +692,7 @@
     //starts with a"/" 			- need to just pass this one to main
     //no command line args		- else condition... nothing to do, don't do anything.
     NSString *wssCommand = [wineStart getWssCommand];
+    [self ds:wssCommand];
     NSArray *otherCommands = [wineStart getWinetricksCommands];
     NSString *theFileToRun;
     if ([wssCommand isEqualToString:@"WSS-installer"])
@@ -714,7 +715,7 @@
     {
         theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix];
     }
-    else if ([wssCommand isEqualToString:@"WSS-uninstall"])
+    else if ([wssCommand isEqualToString:@"WSS-uninstaller"])
     {
         theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix];
     }
