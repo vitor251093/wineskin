@@ -949,6 +949,11 @@ NSFileManager *fm;
             [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
         }
     }
+    //delete lockfile
+    NSString *tmpFolder=[NSString stringWithFormat:@"/tmp/%@",[[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent] stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
+    NSString *lockfile=[NSString stringWithFormat:@"%@/lockfile",tmpFolder];
+    [fm removeItemAtPath:lockfile error:nil];
+    [fm removeItemAtPath:tmpFolder error:nil];
 }
 
 //*************************************************************
