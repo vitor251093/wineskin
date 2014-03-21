@@ -25,6 +25,7 @@
 	[window setLevel:NSStatusWindowLevel];
 	[waitWheel startAnimation:self];
 	[self installEngine];
+    if ([globalFilesToOpen containsObject:@"WSS-InstallICE"]) exit(0);
 	// Normal run
     [NSThread detachNewThreadSelector:@selector(mainRun:) toTarget:self withObject:[globalFilesToOpen copy]];
     [globalFilesToOpen removeAllObjects];
@@ -352,7 +353,7 @@
 		system([[NSString stringWithFormat:@"open \"%@/Wineskin.app\"",appNameWithPath] UTF8String]);
         [fm removeItemAtPath:lockfile error:nil];
         [fm removeItemAtPath:tmpFolder error:nil];
-		return;
+		exit(0);
 	}
 	//********** Wineskin Customizer start up script
 	system([[NSString stringWithFormat:@"\"%@/WineskinStartupScript\"",winePrefix] UTF8String]);
@@ -368,8 +369,7 @@
 			[self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_disable %d",i]];
         }
 	}
-    //if (!useMacDriver)
-    //{
+    
         if (lockFileAlreadyExisted)
         {
             //if lockfile already existed, then this instance was launched when another is the main one.
@@ -380,7 +380,7 @@
             [self handleWineskinLauncherDirectSecondaryRun:wineStartInfo];
             BOOL killWineskin = YES;
             // check if WineskinX11 is even running
-            if ([self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
+            if (!useMacDriver && [self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
             {
                 //ignore if no WineskinX11 is running, must have been in error
                 NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
@@ -389,9 +389,12 @@
             }
             if (killWineskin)
             {
-                [NSApp terminate:nil];
+                exit(0);
+                //[NSApp terminate:nil];
             }
         }
+    if (!useMacDriver)
+    {
         if (!lockFileAlreadyExisted)
         {
             //**********set a new display number
@@ -425,7 +428,7 @@
                 NSLog(@"Wineskin: XQuartz Started, PID = %@", xQuartzX11BinPID);
             }
         }
-    //}
+    }
     //**********set user folders
     if ([[plistDictionary valueForKey:@"Symlinks In User Folder"] intValue] == 1)
     {
@@ -692,7 +695,6 @@
     //starts with a"/" 			- need to just pass this one to main
     //no command line args		- else condition... nothing to do, don't do anything.
     NSString *wssCommand = [wineStart getWssCommand];
-    [self ds:wssCommand];
     NSArray *otherCommands = [wineStart getWinetricksCommands];
     NSString *theFileToRun;
     if ([wssCommand isEqualToString:@"WSS-installer"])
@@ -729,7 +731,7 @@
     else if ([wssCommand isEqualToString:@"CustomEXE"])
     {
         NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[otherCommands objectAtIndex:0]]];
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/%@",winePrefix,[cexePlistDictionary valueForKey:@"Program Name and Path"]];
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c%@",winePrefix,[cexePlistDictionary valueForKey:@"Program Name and Path"]];
     }
     else if ([wssCommand hasPrefix:@"/"])
     {
@@ -745,8 +747,7 @@
         NSLog(@"ERROR, wrapper was re-run with no recognized command line options while already running.  This is a useless operation and ignored.");
         return;
     }
-    NSString *commandToRun = [NSString stringWithFormat:@"open \"%@\" -a \"%@\"",theFileToRun,appNameWithPath];;
-    [self systemCommand:commandToRun];
+    [self systemCommand:[NSString stringWithFormat:@"open \"%@\" -a \"%@\"",theFileToRun,appNameWithPath]];
     return;
 }
 
