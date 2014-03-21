@@ -1773,8 +1773,18 @@ NSFileManager *fm;
                 [fixedLine replaceOccurrencesOfString:@"\\" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
                 [fixedLine replaceOccurrencesOfString:@"w_metadata" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [fixedLine length])];
                 [fixedLine appendString:@" "];
-                NSMutableString *descriptionLine = [[[NSMutableString alloc] init] autorelease];
-                [descriptionLine setString:[winetricksFile objectAtIndex:i+1]];
+                NSMutableString *descriptionLine = [[NSMutableString alloc] initWithString:@"No Description Found"];
+                //check next few lines for title
+                int counter = 1;
+                for (counter = 1; counter < 10; ++counter)
+                {
+                    if ([[winetricksFile objectAtIndex:i+counter] rangeOfString:@"title="].location != NSNotFound)
+                    {
+                        //this is the title!
+                        [descriptionLine setString:[winetricksFile objectAtIndex:i+counter]];
+                        break;
+                    }
+                }
                 [descriptionLine replaceOccurrencesOfString:@"\\" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [descriptionLine length])];
                 [descriptionLine replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [descriptionLine length])];
                 [descriptionLine replaceOccurrencesOfString:@"title=" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [descriptionLine length])];
