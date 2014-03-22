@@ -705,11 +705,11 @@ Gw
                             </tabViewItem>
                             <tabViewItem label="Fullscreen" identifier="2" id="568">
                                 <view key="view" id="569">
-                                    <rect key="frame" x="10" y="33" width="292" height="50"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <rect key="frame" x="10" y="7" width="292" height="76"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <popUpButton verticalHuggingPriority="750" id="631">
-                                            <rect key="frame" x="115" y="25" width="136" height="22"/>
+                                            <rect key="frame" x="115" y="51" width="136" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Current Resolution" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="2069" id="634">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -747,7 +747,7 @@ Gw
                                             </popUpButtonCell>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" id="632">
-                                            <rect key="frame" x="37" y="30" width="76" height="14"/>
+                                            <rect key="frame" x="37" y="56" width="76" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Resolution:" id="633">
                                                 <font key="font" size="11" name="LucidaGrande"/>
@@ -756,7 +756,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="639">
-                                            <rect key="frame" x="37" y="5" width="76" height="14"/>
+                                            <rect key="frame" x="37" y="31" width="76" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Color Depth:" id="640">
                                                 <font key="font" size="11" name="LucidaGrande"/>
@@ -765,7 +765,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="641">
-                                            <rect key="frame" x="37" y="-20" width="76" height="14"/>
+                                            <rect key="frame" x="37" y="6" width="76" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Switch Pause:" id="642">
                                                 <font key="font" size="11" name="LucidaGrande"/>
@@ -774,7 +774,7 @@ Gw
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton verticalHuggingPriority="750" id="643">
-                                            <rect key="frame" x="115" y="0.0" width="136" height="22"/>
+                                            <rect key="frame" x="115" y="26" width="136" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="24 bit" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="646" id="644">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -782,12 +782,14 @@ Gw
                                                 <menu key="menu" title="OtherViews" id="645">
                                                     <items>
                                                         <menuItem title="24 bit" state="on" id="646"/>
+                                                        <menuItem title="15 bit" id="eZ2-vA-bhi"/>
+                                                        <menuItem title="8 bit" id="Q4A-eo-4PU"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
                                         </popUpButton>
                                         <popUpButton verticalHuggingPriority="750" id="649">
-                                            <rect key="frame" x="115" y="-25" width="136" height="22"/>
+                                            <rect key="frame" x="115" y="1" width="136" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="0 sec." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="652" id="650">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
