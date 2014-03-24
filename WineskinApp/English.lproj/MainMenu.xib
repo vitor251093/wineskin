@@ -776,12 +776,12 @@ Gw
                                         <popUpButton verticalHuggingPriority="750" id="643">
                                             <rect key="frame" x="115" y="26" width="136" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="push" title="24 bit" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="646" id="644">
+                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="644">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" size="11" name="LucidaGrande"/>
                                                 <menu key="menu" title="OtherViews" id="645">
                                                     <items>
-                                                        <menuItem title="24 bit" state="on" id="646"/>
+                                                        <menuItem title="24 bit" id="646"/>
                                                         <menuItem title="15 bit" id="eZ2-vA-bhi"/>
                                                         <menuItem title="8 bit" id="Q4A-eo-4PU"/>
                                                     </items>
