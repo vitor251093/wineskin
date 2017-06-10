@@ -17,7 +17,7 @@
 //@interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
 {
 	//main window
-    IBOutlet NSWindow *window;
+    IBOutlet NSWindow *__unsafe_unretained window;
 	IBOutlet NSWindow *aboutWindow;
 	IBOutlet NSTextField *aboutWindowVersionNumber;
 	IBOutlet NSWindow *helpWindow;
@@ -72,7 +72,7 @@
 	IBOutlet NSProgressIndicator *waitWheel;
 	
 }
-@property (assign) IBOutlet NSWindow *window;
+@property (unsafe_unretained) IBOutlet NSWindow *window;
 
 //main stuff
 - (void)runConverter;

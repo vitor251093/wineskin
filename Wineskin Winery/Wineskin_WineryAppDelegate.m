@@ -44,7 +44,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 			[alert setInformativeText:@"Wineskin no longer supports Mac OS X 10.5!\n\nYou may want to upgrade your OS!\n\nIf you want to use Wineskin Winery on 10.5 you can, but the built in downloads will get 10.6+ compatible files.\n\nTo use this on 10.5, you must get Manual Download files and only use Wineskin 2.5.3 - 2.5.4 and WS8 based engines.\n\nWineskin 2.5.5+ and WS9 engines are Mac OS X 10.6+ only!"];
 			[alert setAlertStyle:NSInformationalAlertStyle];
 			[alert runModal];
-			[alert release];
 		}
 	}
 	srand(time(NULL));
@@ -75,10 +74,8 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	if ([alert runModal] != NSAlertFirstButtonReturn)
 	{
-		[alert release];
 		return;
 	}
-    [alert release];
 	//if convert, do convert	
 	[busyWindow makeKeyAndOrderFront:self];
 	[window orderOut:self];
@@ -124,7 +121,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[NSBundle mainBundle] bundlePath]]];
 	[aboutWindowVersionNumber setStringValue:[plistDictionary valueForKey:@"CFBundleVersion"]];
-	[plistDictionary release];
 	[aboutWindow makeKeyAndOrderFront:self];
 }
 - (IBAction)helpWindow:(id)sender
@@ -170,14 +166,11 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[warning setMessageText:@"Warning!"];
 		[warning setInformativeText:@"Some things may not function properly with new Wrappers or Engines until you update!"];
 		[warning runModal];
-		[warning release];
-		[alert release];
 		//bring main window up
 		[window makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
 		return;
 	}
-	[alert release];
 	//try removing files that might already exist
 	NSFileManager *fm = [NSFileManager defaultManager];
 	[fm removeItemAtPath:@"/tmp/WineskinWinery.app.tar.7z" error:nil];
@@ -196,7 +189,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	NSString *selectedEngine = [[NSString alloc] initWithString:[installedEnginesList objectAtIndex:[installedEngines selectedRow]]];
 	[createWrapperEngine setStringValue:selectedEngine];
-	[selectedEngine release];
 	[createWrapperWindow makeKeyAndOrderFront:self];
 	[window orderOut:self];
 }
@@ -297,16 +289,12 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	if ([alert runModal] != NSAlertFirstButtonReturn)
     {
-        [selectedEngine release];
-        [alert release];
         return;
     }
-    [alert release];
 	//move file to trash
 	NSArray *filenamesArray = [NSArray arrayWithObject:[NSString stringWithFormat:@"%@.tar.7z",selectedEngine]];
 	[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()] destination:@"" files:filenamesArray tag:nil];
 	[self refreshButtonPressed:self];
-	[selectedEngine release];
 }
 
 - (IBAction)updateButtonPressed:(id)sender
@@ -323,7 +311,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:@"Error, connection to download failed!"];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
-		[alert release];
 		return;
 	}
 	//download new wrapper to /tmp
@@ -477,7 +464,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[TESTER setInformativeText:input];
 	[TESTER setAlertStyle:NSInformationalAlertStyle];
 	[TESTER runModal];
-	[TESTER release];
 }
 //******************* engine build window *****************************
 - (IBAction)engineBuildChooseButtonPressed:(id)sender
@@ -502,7 +488,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:@"You must select a folder with the Wine source code and a valid engine name"];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
-		[alert release];
 		return;
 	}
 	if ([[engineBuildEngineName stringValue] isEqualToString:@""])
@@ -513,7 +498,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:@"You must enter a name for the Engine"];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
-		[alert release];
 		return;
 	}
 	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),[engineBuildEngineName stringValue]]])
@@ -524,7 +508,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:@"That engine name is already in use!"];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
-		[alert release];
 		return;
 	}
 	
@@ -540,7 +523,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[alert setInformativeText:@"This build will fail if you use Wineskin Winery, Wineskin, or any Wineskin wrapper while it is running!!!"];
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	[alert runModal];
-	[alert release];
 	//exit program
 	[NSApp terminate:sender];
 }
@@ -703,12 +685,12 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 	if (connection)
 	{
-		payload = [[NSMutableData data] retain];
+		payload = [NSMutableData data];
 		//NSLog(@"Connection starting: %@", connection);
 	}
 	else
 	{
-		NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+		NSAlert *alert = [[NSAlert alloc] init];
 		[alert addButtonWithTitle:@"OK"];
 		[alert setMessageText:@"Download Failed!"];
 		[alert setInformativeText:@"unable to download!"];
@@ -740,7 +722,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[warning setMessageText:@"Warning!"];
 		[warning setInformativeText:@"Some things may not function properly with new Wrappers or Engines until you update!"];
 		[warning runModal];
-		[warning release];
 		[window makeKeyAndOrderFront:self];
 		[downloadingWindow orderOut:self];
 	}
@@ -793,7 +774,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app.tar" error:nil];
 	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app" error:nil];
 	[payload writeToURL:[NSURL URLWithString:[urlOutput stringValue]] atomically:YES];
-	[conn release];
 	[busyWindow makeKeyAndOrderFront:self];
 	[downloadingWindow orderOut:self];
 	if (([[fileNameDestination stringValue] isEqualToString:@"Wrapper"]))
@@ -890,7 +870,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	[self downloadToggle:NO];
 	[payload setLength:0];	
-	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"OK"];
 	[alert setMessageText:[error localizedDescription]];
 	[alert setAlertStyle:NSCriticalAlertStyle];
@@ -930,7 +910,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:[NSString stringWithFormat:@"A wrapper at \"%@/Applications/Wineskin\" with the name \"%@\" already exists!  Please choose a different name.",NSHomeDirectory(),[createWrapperName stringValue]]];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[alert runModal];
-		[alert release];
 		return;
 	}
 	//get rid of window
@@ -964,7 +943,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		[alert setInformativeText:[NSString stringWithFormat:@"The engine %@ is corrupted or opened incorrectly. If this error continues next time you try, reinstall the selected engine",[createWrapperEngine stringValue]]];
 		[alert setAlertStyle:NSCriticalAlertStyle];
 		[alert runModal];
-        [alert release];
 		//get rid of junk in /tmp
 		[fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] error:nil];
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),[createWrapperEngine stringValue]] error:nil];
@@ -991,7 +969,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
         {
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@/Applications/Wineskin/",NSHomeDirectory()]]];
         }
-        [alert release];
 	}
 	// bring main window back
 	[window makeKeyAndOrderFront:self];
@@ -1019,11 +996,6 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		installedEnginesList = [[NSMutableArray alloc] initWithObjects:@"Please Wait...",nil];
 	}
 	return self;
-}
-- (void)dealloc
-{
-	[installedEnginesList release];
-	[super dealloc];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication
 {

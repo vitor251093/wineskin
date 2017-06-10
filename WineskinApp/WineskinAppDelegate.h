@@ -16,7 +16,7 @@
 	BOOL usingAdvancedWindow;
 	
 	//main window
-    IBOutlet NSWindow *window;
+    IBOutlet NSWindow *__unsafe_unretained window;
 	IBOutlet NSWindow *chooseExeWindow;
 	IBOutlet NSPopUpButton *exeChoicePopUp;
 	IBOutlet NSWindow *helpWindow;
@@ -181,12 +181,12 @@
 	IBOutlet NSTextField *modifyMappingsMyPicturesTextField;
 }
 
-@property (assign) IBOutlet NSWindow *window;
-@property (retain) NSDictionary *winetricksList;
-@property (retain) NSDictionary *winetricksFilteredList;
-@property (retain) NSMutableDictionary *winetricksSelectedList;
-@property (retain) NSArray *winetricksInstalledList;
-@property (retain) NSArray *winetricksCachedList;
+@property (unsafe_unretained) IBOutlet NSWindow *window;
+@property (strong) NSDictionary *winetricksList;
+@property (strong) NSDictionary *winetricksFilteredList;
+@property (strong) NSMutableDictionary *winetricksSelectedList;
+@property (strong) NSArray *winetricksInstalledList;
+@property (strong) NSArray *winetricksCachedList;
 
 - (void)sleepWithRunLoopForSeconds:(NSInteger)seconds;
 - (void)enableButtons;
