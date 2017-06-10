@@ -217,7 +217,7 @@ NSFileManager *fm;
 	[panel setCanChooseDirectories:NO];
 	[panel setCanChooseFiles:YES];
 	[panel setAllowsMultipleSelection:NO];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
     [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
 	// runModalForDirectory deprecated in 10.6, but only method currently working in Lion beta for this.
 	int error = [panel runModal];
@@ -307,7 +307,7 @@ NSFileManager *fm;
 	[panel setCanChooseDirectories:YES];
 	[panel setCanChooseFiles:NO];
 	[panel setAllowsMultipleSelection:NO];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	// runModalForDirectory deprecated in 10.6, but only method currently working in Lion beta for this.
 	int error = [panel runModal];
 	//exit method if cancel pushed
@@ -1044,7 +1044,7 @@ NSFileManager *fm;
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
     [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] isDirectory:YES]];
 	//loop until choice is in drive_c
 	BOOL inDriveC = NO;
 	while (!inDriveC)
@@ -1078,7 +1078,7 @@ NSFileManager *fm;
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
     [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"icns",nil]];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	//open browse to get .icns choice
 	int error = [panel runModal];
 	//if cancel return
@@ -2078,7 +2078,7 @@ NSFileManager *fm;
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
     [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"exe",@"msi",@"bat",nil]];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]]]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] isDirectory:YES]];
 	//loop until choice is in drive_c
 	BOOL inDriveC = NO;
 	while (!inDriveC)
@@ -2114,7 +2114,7 @@ NSFileManager *fm;
 	[panel setAllowsMultipleSelection:NO];
 	[panel setExtensionHidden:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
     [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"icns",nil]];
 	//open browse to get .icns choice
 	int error = [panel runModal];
@@ -2613,7 +2613,7 @@ NSFileManager *fm;
 	[panel setAllowsMultipleSelection:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
 	[panel setShowsHiddenFiles:YES];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	if ([panel runModal] != 0)
 		[modifyMappingsMyDocumentsTextField setStringValue:[[[[panel URLs] objectAtIndex:0] path] stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@"$HOME"]];
 }
@@ -2628,7 +2628,7 @@ NSFileManager *fm;
 	[panel setAllowsMultipleSelection:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
 	[panel setShowsHiddenFiles:YES];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
 	if ([panel runModal] != 0)
 		[modifyMappingsDesktopTextField setStringValue:[[[[panel URLs] objectAtIndex:0] path] stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@"$HOME"]];
 }
@@ -2643,7 +2643,7 @@ NSFileManager *fm;
 	[panel setAllowsMultipleSelection:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
 	[panel setShowsHiddenFiles:YES];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
     if ([panel runModal] != 0)
 		[modifyMappingsMyVideosTextField setStringValue:[[[[panel URLs] objectAtIndex:0] path] stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@"$HOME"]];
 }
@@ -2658,7 +2658,7 @@ NSFileManager *fm;
 	[panel setAllowsMultipleSelection:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
 	[panel setShowsHiddenFiles:YES];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
     if ([panel runModal] != 0)
 		[modifyMappingsMyMusicTextField setStringValue:[[[[panel URLs] objectAtIndex:0] path] stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@"$HOME"]];
 }
@@ -2673,7 +2673,7 @@ NSFileManager *fm;
 	[panel setAllowsMultipleSelection:NO];
 	[panel setTreatsFilePackagesAsDirectories:YES];
 	[panel setShowsHiddenFiles:YES];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:@"/" isDirectory:YES]];
     if ([panel runModal] != 0)
 		[modifyMappingsMyPicturesTextField setStringValue:[[[[panel URLs] objectAtIndex:0] path] stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@"$HOME"]];
 }
