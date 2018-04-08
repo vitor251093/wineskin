@@ -8,8 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "NSPortManager.h"
+#import "NSDropIconView.h"
+
 @interface WineskinAppDelegate : NSObject // <NSOutlineViewDataSource> //<NSApplicationDelegate>
 {
+    NSPortManager* portManager;
+    
 	int disableButtonCounter;
 	BOOL disableXButton;
 	BOOL winetricksDone;
@@ -62,13 +67,11 @@
 	
 	//advanced menu - Configuration Tab
 	IBOutlet NSTextField *windowsExeTextField;
-	IBOutlet NSTextField *exeFlagsTextField;
 	IBOutlet NSTextField *menubarNameTextField;
 	IBOutlet NSTextField *versionTextField;
 	IBOutlet NSTextField *wineDebugTextField;
 	IBOutlet NSTextField *customCommandsTextField;
-	IBOutlet NSButton *useStartExeCheckmark;
-	IBOutlet NSImageView *iconImageView;
+	IBOutlet NSDropIconView *iconImageView;
 	IBOutlet NSButton *exeBrowseButton;
 	IBOutlet NSButton *iconBrowseButton;
 	IBOutlet NSPopUpButton *extPopUpButton;
@@ -116,9 +119,7 @@
 	IBOutlet NSWindow *cEXEWindow;
 	IBOutlet NSTextField *cEXENameToUseTextField;
 	IBOutlet NSTextField *cEXEWindowsExeTextField;
-	IBOutlet NSTextField *cEXEFlagsTextField;
-	IBOutlet NSButton *cEXEUseStartExeCheckmark;
-	IBOutlet NSImageView *cEXEIconImageView;
+	IBOutlet NSDropIconView *cEXEIconImageView;
 	IBOutlet NSButton *cEXEBrowseButton;
 	IBOutlet NSButton *cEXEIconBrowseButton;
 	IBOutlet NSMatrix *cEXEautoOrOvverrideDesktopToggle;
@@ -195,13 +196,6 @@
 - (NSString *)systemCommandWithOutputReturned:(NSString *)command;
 - (IBAction)topMenuHelpSelected:(id)sender;
 - (IBAction)aboutWindow:(id)sender;
-/* Functions deactivated, not currently being used
-- (NSString *)OSVersion;
-- (BOOL)theOSVersionIs105;
-- (BOOL)theOSVersionIs106;
-- (BOOL)theOSVersionIs107;
-- (BOOL)theOSVersionIs108;
-*/
 
 //main menu methods
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender;
@@ -214,7 +208,6 @@
 - (IBAction)copyAFolderInsideButtonPressed:(id)sender;
 - (IBAction)moveAFolderInsideButtonPressed:(id)sender;
 - (IBAction)installerCancelButtonPressed:(id)sender;
-- (void)copyMoveFolder:(NSString *)command;
 
 //Screen Options window methods
 - (void)saveScreenOptionsData;
@@ -241,7 +234,6 @@
 - (void)saveAllData;
 - (void)loadAllData;
 - (IBAction)windowsExeBrowseButtonPressed:(id)sender;
-- (IBAction)iconToUseBrowseButtonPressed:(id)sender;
 - (IBAction)extPlusButtonPressed:(id)sender;
 - (IBAction)extMinusButtonPressed:(id)sender;
 - (IBAction)extEditButtonPressed:(id)sender;
@@ -324,7 +316,5 @@
 - (IBAction)modifyMappingsMyPicturesBrowseButtonPressed:(id)sender;
 //ICE
 - (void)installEngine;
-// TESTS
-- (void)ds:(NSString *)input;
 
 @end

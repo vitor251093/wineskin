@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "121A670901F416B984980294338E127021538EA0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "121A670901F416B984980294338E127021538EA0" : 0,
+    "55EE576BCD41C77EE044492E6FAD2FDDF306522D" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "DA31DD74-1A3E-418D-AD37-48548AA402A4",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "121A670901F416B984980294338E127021538EA0" : "wineskin-code\/",
+    "55EE576BCD41C77EE044492E6FAD2FDDF306522D" : "..\/..\/Porting%20Kit"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Wineskin",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "WineskinApp\/Wineskin.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/git.code.sf.net\/p\/wineskin\/code",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "121A670901F416B984980294338E127021538EA0"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/VitorMMiranda\/portingkit.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "55EE576BCD41C77EE044492E6FAD2FDDF306522D"
+    }
+  ]
+}

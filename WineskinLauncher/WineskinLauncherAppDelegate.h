@@ -8,9 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "WineStart.h"
+#import "NSPortManager.h"
 
 @interface WineskinLauncherAppDelegate : NSObject <NSApplicationDelegate>
 {
+    NSPortManager* portManager;
+    
     BOOL primaryRun;
     BOOL wrapperRunning;
 	IBOutlet NSWindow *window;
@@ -23,7 +26,6 @@
     NSString *appName;                              //name of our app/wrapper
 	NSString *lockfile;                             //lockfile being used to know if the app is already in use
     NSString *tmpFolder;                            //where tmp files can be made and used to be specific to just this wrapper
-	NSString *infoPlistFile;                        //the Info.plist file in the wrapper
 	NSString *winePrefix;                           //the $WINEPREFIX
 	NSMutableString *theDisplayNumber;              //the Display Number to use
     NSString *wineLogFile;                          //location of wine log file
@@ -58,9 +60,6 @@
 //run system command with output returned
 - (NSString *)systemCommand:(NSString *)command;
 
-// display string for troubleshooting
-- (void)ds:(NSString *)input;
-
 //the main running of the program...
 - (void)mainRun:(NSArray*)filesToOpen;
 
@@ -77,7 +76,7 @@
 - (void)setResolution:(NSString *)reso;
 
 //returns the current screen resolution
-- (NSString *)getResolution;
+- (NSString *)getScreenResolution;
 
 //Makes an Array with a list of PIDs that match the process name
 - (NSArray *)makePIDArray:(NSString *)processToLookFor;
