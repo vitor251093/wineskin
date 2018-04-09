@@ -1010,6 +1010,7 @@ NSFileManager *fm;
 	[modifyMappingsMyVideosTextField    setStringValue:[portManager plistObjectForKey:@"Symlink My Videos"]];
 	[modifyMappingsMyMusicTextField     setStringValue:[portManager plistObjectForKey:@"Symlink My Music"]];
 	[modifyMappingsMyPicturesTextField  setStringValue:[portManager plistObjectForKey:@"Symlink My Pictures"]];
+    [modifyMappingsDownloadsTextField  setStringValue:[portManager plistObjectForKey:@"Symlink Downloads"]];
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
@@ -1080,13 +1081,14 @@ NSFileManager *fm;
 		//delete files
 		[busyWindow makeKeyAndOrderFront:self];
 		[advancedWindow orderOut:self];
-        
-        for (NSString* fileToRemove in @[@".update-timestamp", @"drive_c", @"dosdevices", @"harddiskvolume0",
-                                         @"system.reg", @"user.reg", @"userdef.reg", @"winetricksInstalled.plist"])
-        {
-            if ([fm fileExistsAtPath:fileToRemove])
-                [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/%@",self.wrapperPath,fileToRemove]];
-        }
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/.update-timestamp",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/dosdevices",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/harddiskvolume0",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/system.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/userdef.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
         
 		//refresh
 		[self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreate"]];
@@ -2156,6 +2158,7 @@ NSFileManager *fm;
 	[portManager setPlistObject:[modifyMappingsMyVideosTextField stringValue]    forKey:@"Symlink My Videos"];
 	[portManager setPlistObject:[modifyMappingsMyMusicTextField stringValue]     forKey:@"Symlink My Music"];
 	[portManager setPlistObject:[modifyMappingsMyPicturesTextField stringValue]  forKey:@"Symlink My Pictures"];
+    [portManager setPlistObject:[modifyMappingsDownloadsTextField stringValue]  forKey:@"Symlink Downloads"];
     [portManager synchronizePlist];
 	
 	[advancedWindow makeKeyAndOrderFront:self];
@@ -2175,6 +2178,8 @@ NSFileManager *fm;
 	[modifyMappingsMyVideosTextField    setStringValue:@"$HOME/Movies"];
 	[modifyMappingsMyMusicTextField     setStringValue:@"$HOME/Music"];
 	[modifyMappingsMyPicturesTextField  setStringValue:@"$HOME/Pictures"];
+    [modifyMappingsDownloadsTextField  setStringValue:@"$HOME/Downloads"];
+
 }
 
 -(NSString*)newPathForMappingOfFolder:(NSString*)folder
@@ -2243,6 +2248,15 @@ NSFileManager *fm;
     if (newPath)
     {
         [modifyMappingsMyPicturesTextField setStringValue:newPath];
+    }
+}
+- (IBAction)modifyMappingsDownloadsBrowseButtonPressed:(id)sender
+{
+    NSString* newPath = [self newPathForMappingOfFolder:@"Downloads"];
+    
+    if (newPath)
+    {
+        [modifyMappingsDownloadsTextField setStringValue:newPath];
     }
 }
 
