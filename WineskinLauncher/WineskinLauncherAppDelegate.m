@@ -1324,62 +1324,59 @@ static NSPortManager* portManager;
 	 *recheck and retry different ways until it is the frontmost, or just fail with a NSLog.
 	 *only attempt if WineskinX11 is still actually running
 	 */
-	if ([self isPID:thePid named:appNameWithPath])
-	{
-        NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
-		int i=0;
-		for (i = 0; i < 10; ++i)
-		{
-			//get frontmost application information
-			NSDictionary* frontMostAppInfo = [workspace activeApplication];
-			
-            //get the PSN of the frontmost app
-			UInt32 lowLong  = [frontMostAppInfo[@"NSApplicationProcessSerialNumberLow"]  unsignedIntValue];
-			UInt32 highLong = [frontMostAppInfo[@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
-			ProcessSerialNumber currentAppPSN = {highLong,lowLong};
-            
-			//Get Apple Process for WineskinX11 PID
-			ProcessSerialNumber PSN = {kNoProcess, kNoProcess};
-			GetProcessForPID((pid_t)[thePid intValue], &PSN);
-			
-            //check if we are in the front
-			if (PSN.lowLongOfPSN == currentAppPSN.lowLongOfPSN && PSN.highLongOfPSN == currentAppPSN.highLongOfPSN)
-			{
-				break;
-			}
-			else
-			{
-                if (i==0)
-                {
-                    [[NSRunningApplication runningApplicationWithProcessIdentifier:[thePid intValue]] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
-                }
-				else if (i==1)
-                {
-					[workspace launchApplication:appNameWithPath];
-                }
-				else if (i==2)
-                {
-					[self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
-                }
-				else if (i==3)
-				{
-					NSString *theScript = [NSString stringWithFormat:@"tell Application \"%@\" to activate",appNameWithPath];
-					NSAppleScript *bringToFrontScript = [[NSAppleScript alloc] initWithSource:theScript];
-					[bringToFrontScript executeAndReturnError:nil];
-				}
-				else if (i==4)
-                {
-					[self systemCommand:[NSString stringWithFormat:@"arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
-                }
-				else
-				{
-					//only gets here if app never front most and breaks
-					NSLog(@"Application PID %@ may have failed to become front most",thePid);
-					break;
-				}
-			}
-		}
-	}
+    if ([self isPID:thePid named:appNameWithPath] == false) return;
+	
+    NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
+    int i=0;
+    for (i = 0; i < 10; ++i)
+    {
+        //get frontmost application information
+        NSDictionary* frontMostAppInfo = [workspace activeApplication];
+        
+        //get the PSN of the frontmost app
+        UInt32 lowLong  = [frontMostAppInfo[@"NSApplicationProcessSerialNumberLow"]  unsignedIntValue];
+        UInt32 highLong = [frontMostAppInfo[@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
+        ProcessSerialNumber currentAppPSN = {highLong,lowLong};
+        
+        //Get Apple Process for WineskinX11 PID
+        ProcessSerialNumber PSN = {kNoProcess, kNoProcess};
+        GetProcessForPID((pid_t)[thePid intValue], &PSN);
+        
+        //check if we are in the front
+        if (PSN.lowLongOfPSN == currentAppPSN.lowLongOfPSN && PSN.highLongOfPSN == currentAppPSN.highLongOfPSN)
+        {
+            return;
+        }
+        
+        if (i==0)
+        {
+            [[NSRunningApplication runningApplicationWithProcessIdentifier:[thePid intValue]] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
+        }
+        else if (i==1)
+        {
+            [workspace launchApplication:appNameWithPath];
+        }
+        else if (i==2)
+        {
+            [self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
+        }
+        else if (i==3)
+        {
+            NSString *theScript = [NSString stringWithFormat:@"tell Application \"%@\" to activate",appNameWithPath];
+            NSAppleScript *bringToFrontScript = [[NSAppleScript alloc] initWithSource:theScript];
+            [bringToFrontScript executeAndReturnError:nil];
+        }
+        else if (i==4)
+        {
+            [self systemCommand:[NSString stringWithFormat:@"arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
+        }
+        else
+        {
+            //only gets here if app never front most and breaks
+            NSLog(@"Application PID %@ may have failed to become front most",thePid);
+            break;
+        }
+    }
 }
 
 - (void)installEngine
@@ -1641,6 +1638,7 @@ static NSPortManager* portManager;
     }
 }
 
+
 - (void)startWine:(WineStart *)wineStartInfo
 {
     @autoreleasepool
@@ -1661,6 +1659,7 @@ static NSPortManager* portManager;
             [fm createDirectoryAtPath:pathToWineLockFolder withIntermediateDirectories:YES];
             [self systemCommand:[NSString stringWithFormat:@"chmod -R 700 \"/tmp/.wine-%@\"",uid]];
         }
+        
         if ([wineStartInfo isNonStandardRun])
         {
             [self setToNoVirtualDesktop];
@@ -1682,40 +1681,58 @@ static NSPortManager* portManager;
             
             //launch monitor thread for killing stuck wineboots (work-a-round Macdriver bug for 1.5.28)
             [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
-            [self systemCommand:[NSString stringWithFormat:@"%@export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine wineboot 2>&1",mshtmlLine,dyldFallBackLibraryPath,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath]];
+            NSArray* command = @[mshtmlLine,
+                                 [NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                                 [NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
+                                 [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
+                                 [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                                 [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                                 [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                                 @"wine wineboot"];
+            [self systemCommand:[command componentsJoinedByString:@" "]];
             usleep(3000000);
             
             if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
             {
                 //make sure windows/profiles is using users folder
-                [fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix]];
-                [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix] withDestinationPath:@"../users" error:nil];
-                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/windows/profiles\"",winePrefix]];
+                NSString* profilesFolderPath = [NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix];
+                [fm removeItemAtPath:profilesFolderPath];
+                [fm createSymbolicLinkAtPath:profilesFolderPath withDestinationPath:@"../users" error:nil];
+                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",profilesFolderPath]];
                 
                 //rename new user folder to Wineskin and make symlinks
-                if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()]])
+                NSString* usersUserFolderPath = [NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()];
+                NSString* usersWineskinFolderPath = [NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix];
+                NSString* usersCrossOverFolderPath = [NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix];
+                
+                if ([fm fileExistsAtPath:usersUserFolderPath])
                 {
-                    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()]
-                                toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix]];
-                    [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
-                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
+                    [fm moveItemAtPath:usersUserFolderPath toPath:usersWineskinFolderPath];
+                    [fm createSymbolicLinkAtPath:usersUserFolderPath withDestinationPath:@"Wineskin" error:nil];
+                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersUserFolderPath]];
                 }
-                else if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix]])
+                else if ([fm fileExistsAtPath:usersCrossOverFolderPath])
                 {
-                    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix]
-                                toPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix]];
-                    [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:@"Wineskin" error:nil];
-                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/crossover\"",winePrefix]];
+                    [fm moveItemAtPath:usersCrossOverFolderPath toPath:usersWineskinFolderPath];
+                    [fm createSymbolicLinkAtPath:usersCrossOverFolderPath withDestinationPath:@"Wineskin" error:nil];
+                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersCrossOverFolderPath]];
                 }
                 else //this shouldn't ever happen.. but what the heck
                 {
-                    [fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix] withIntermediateDirectories:YES];
-                    [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
-                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
+                    [fm createDirectoryAtPath:usersWineskinFolderPath withIntermediateDirectories:YES];
+                    [fm createSymbolicLinkAtPath:usersUserFolderPath withDestinationPath:@"Wineskin" error:nil];
+                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersUserFolderPath]];
                 }
                 
                 //load Wineskin default reg entries
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,contentsFold]];
+                NSArray* loadRegCommand = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                                            [NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
+                                            [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
+                                            [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                                            [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                                            [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                                            [NSString stringWithFormat:@"wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\"", contentsFold]];
+                [self systemCommand:[loadRegCommand componentsJoinedByString:@" "]];
                 usleep(5000000);
             }
             
@@ -2006,10 +2023,10 @@ static NSPortManager* portManager;
 	//fix user folders back
     for (NSString* userFolder in @[@"My Documents", @"Desktop", @"Downloads", @"My Videos", @"My Music", @"My Pictures"])
     {
-        if ([[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/%@",winePrefix,userFolder]
-                                   error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
+        NSString* userFolderPath = [NSString stringWithFormat:@"%@/drive_c/users/Wineskin/%@",winePrefix,userFolder];
+        if ([[[fm attributesOfItemAtPath:userFolderPath error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
         {
-            [fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/%@",winePrefix,userFolder]];
+            [fm removeItemAtPath:userFolderPath];
         }
     }
     
