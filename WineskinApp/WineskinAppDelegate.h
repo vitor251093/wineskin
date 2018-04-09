@@ -180,6 +180,7 @@
 	IBOutlet NSTextField *modifyMappingsMyVideosTextField;
 	IBOutlet NSTextField *modifyMappingsMyMusicTextField;
 	IBOutlet NSTextField *modifyMappingsMyPicturesTextField;
+    IBOutlet NSTextField *modifyMappingsDownloadsTextField;
 }
 
 @property (unsafe_unretained) IBOutlet NSWindow *window;
@@ -314,6 +315,7 @@
 - (IBAction)modifyMappingsMyVideosBrowseButtonPressed:(id)sender;
 - (IBAction)modifyMappingsMyMusicBrowseButtonPressed:(id)sender;
 - (IBAction)modifyMappingsMyPicturesBrowseButtonPressed:(id)sender;
+- (IBAction)modifyMappingsDownloadsBrowseButtonPressed:(id)sender;
 //ICE
 - (void)installEngine;
 
