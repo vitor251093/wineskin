@@ -1081,14 +1081,13 @@ NSFileManager *fm;
 		//delete files
 		[busyWindow makeKeyAndOrderFront:self];
 		[advancedWindow orderOut:self];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/.update-timestamp",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/drive_c",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/dosdevices",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/harddiskvolume0",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/system.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/user.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/userdef.reg",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent]] error:nil];
+        
+        for (NSString* fileToRemove in @[@".update-timestamp", @"drive_c", @"dosdevices", @"harddiskvolume0",
+                                         @"system.reg", @"user.reg", @"userdef.reg", @"winetricksInstalled.plist"])
+        {
+            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/%@",self.wrapperPath,fileToRemove];
+            if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
+        }
         
 		//refresh
 		[self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreate"]];
