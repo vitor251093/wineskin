@@ -954,6 +954,7 @@ static NSPortManager* portManager;
 {
     NSString* symlinkMyDocuments = [self createWrapperHomeSymlinkFolder:@"My Documents" forMacFolder:@"Documents"];
     NSString* symlinkDesktop     = [self createWrapperHomeSymlinkFolder:@"Desktop"      forMacFolder:@"Desktop"];
+    NSString* symlinkDownloads     = [self createWrapperHomeSymlinkFolder:@"Downloads"      forMacFolder:@"Downloads"];
     NSString* symlinkMyVideos    = [self createWrapperHomeSymlinkFolder:@"My Videos"    forMacFolder:@"Movies"];
     NSString* symlinkMyMusic     = [self createWrapperHomeSymlinkFolder:@"My Music"     forMacFolder:@"Music"];
     NSString* symlinkMyPictures  = [self createWrapperHomeSymlinkFolder:@"My Pictures"  forMacFolder:@"Pictures"];
@@ -966,7 +967,10 @@ static NSPortManager* portManager;
         
         if (!doSymlinks || symlinkDesktop.length == 0) symlinkDesktop = nil;
         [self createWrapperHomeFolder:@"Desktop" withSymlinkTo:symlinkDesktop];
-        
+
+        if (!doSymlinks || symlinkDownloads.length == 0) symlinkDownloads = nil;
+        [self createWrapperHomeFolder:@"Downloads" withSymlinkTo:symlinkDownloads];
+
         if (!doSymlinks || symlinkMyVideos.length == 0) symlinkMyVideos = nil;
         [self createWrapperHomeFolder:@"My Videos" withSymlinkTo:symlinkMyVideos];
         
@@ -2000,7 +2004,7 @@ static NSPortManager* portManager;
     }
     
 	//fix user folders back
-    for (NSString* userFolder in @[@"My Documents", @"Desktop", @"My Videos", @"My Music", @"My Pictures"])
+    for (NSString* userFolder in @[@"My Documents", @"Desktop", @"Downloads", @"My Videos", @"My Music", @"My Pictures"])
     {
         if ([[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/%@",winePrefix,userFolder]
                                    error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])

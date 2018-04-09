@@ -1009,6 +1009,7 @@ NSFileManager *fm;
 	[modifyMappingsMyVideosTextField    setStringValue:[portManager plistObjectForKey:@"Symlink My Videos"]];
 	[modifyMappingsMyMusicTextField     setStringValue:[portManager plistObjectForKey:@"Symlink My Music"]];
 	[modifyMappingsMyPicturesTextField  setStringValue:[portManager plistObjectForKey:@"Symlink My Pictures"]];
+    [modifyMappingsDownloadsTextField  setStringValue:[portManager plistObjectForKey:@"Symlink Downloads"]];
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
@@ -2155,6 +2156,7 @@ NSFileManager *fm;
 	[portManager setPlistObject:[modifyMappingsMyVideosTextField stringValue]    forKey:@"Symlink My Videos"];
 	[portManager setPlistObject:[modifyMappingsMyMusicTextField stringValue]     forKey:@"Symlink My Music"];
 	[portManager setPlistObject:[modifyMappingsMyPicturesTextField stringValue]  forKey:@"Symlink My Pictures"];
+    [portManager setPlistObject:[modifyMappingsDownloadsTextField stringValue]  forKey:@"Symlink Downloads"];
     [portManager synchronizePlist];
 	
 	[advancedWindow makeKeyAndOrderFront:self];
@@ -2174,6 +2176,8 @@ NSFileManager *fm;
 	[modifyMappingsMyVideosTextField    setStringValue:@"$HOME/Movies"];
 	[modifyMappingsMyMusicTextField     setStringValue:@"$HOME/Music"];
 	[modifyMappingsMyPicturesTextField  setStringValue:@"$HOME/Pictures"];
+    [modifyMappingsDownloadsTextField  setStringValue:@"$HOME/Downloads"];
+
 }
 
 -(NSString*)newPathForMappingOfFolder:(NSString*)folder
@@ -2242,6 +2246,15 @@ NSFileManager *fm;
     if (newPath)
     {
         [modifyMappingsMyPicturesTextField setStringValue:newPath];
+    }
+}
+- (IBAction)modifyMappingsDownloadsBrowseButtonPressed:(id)sender
+{
+    NSString* newPath = [self newPathForMappingOfFolder:@"Downloads"];
+    
+    if (newPath)
+    {
+        [modifyMappingsDownloadsTextField setStringValue:newPath];
     }
 }
 
