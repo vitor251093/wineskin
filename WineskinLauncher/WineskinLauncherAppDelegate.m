@@ -2023,10 +2023,10 @@ static NSPortManager* portManager;
 	//fix user folders back
     for (NSString* userFolder in @[@"My Documents", @"Desktop", @"Downloads", @"My Videos", @"My Music", @"My Pictures"])
     {
-        if ([[[fm attributesOfItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/%@",winePrefix,userFolder]
-                                   error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
+        NSString* userFolderPath = [NSString stringWithFormat:@"%@/drive_c/users/Wineskin/%@",winePrefix,userFolder];
+        if ([[[fm attributesOfItemAtPath:userFolderPath error:nil] fileType] isEqualToString:@"NSFileTypeSymbolicLink"])
         {
-            [fm removeItemAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/%@",winePrefix,userFolder]];
+            [fm removeItemAtPath:userFolderPath];
         }
     }
     
