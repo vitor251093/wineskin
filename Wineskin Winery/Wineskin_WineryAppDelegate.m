@@ -911,25 +911,11 @@ static NSInteger localizedComparator(id a, id b, void* context)
 - (IBAction)createWrapperOkButtonPressed:(id)sender
 {
 	//replace common symbols...
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"&" withString:@"and"]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"!" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"#" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"$" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"%" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"^" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"*" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"(" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@")" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"+" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"=" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"|" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"?" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@">" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"<" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@";" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@":" withString:@""]];
-	[createWrapperName setStringValue:[[createWrapperName stringValue] stringByReplacingOccurrencesOfString:@"@" withString:@""]];
+    NSString* wrapperName = [createWrapperName stringValue];
+    wrapperName = [wrapperName stringByReplacingOccurrencesOfString:@"&" withString:@"and"];
+    wrapperName = [wrapperName stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"!#$%%^*()+=|\\?><;:@"]];
+    [createWrapperName setStringValue:wrapperName];
+    
 	//make sure wrapper name is unique
 	if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]]])
 	{
