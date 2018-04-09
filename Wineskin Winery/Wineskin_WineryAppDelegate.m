@@ -80,38 +80,52 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[busyWindow makeKeyAndOrderFront:self];
 	[window orderOut:self];
 	NSFileManager *fm = [NSFileManager defaultManager];
-	for (NSString *item in enginesToConvert)
+    NSString* enginesFolderPath = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
+    for (NSString *item in enginesToConvert)
 	{
-		//remove extra left over junk that might mess things up
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),item] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WS8%@.tar",NSHomeDirectory(),[item substringFromIndex:3]] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] error:nil];
+        //remove extra left over junk that might mess things up
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar",enginesFolderPath,item] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WS8%@.tar",enginesFolderPath,[item substringFromIndex:3]] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle",enginesFolderPath] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle",enginesFolderPath] error:nil];
+        
 		//decompress engine
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z\" \"-o/%@/Library/Application Support/Wineskin/Engines\"", NSHomeDirectory(),NSHomeDirectory(),item,NSHomeDirectory()] UTF8String]);
-		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/Library/Application Support/Wineskin/Engines\" -xf \"%@/Library/Application Support/Wineskin/Engines/%@.tar\"",NSHomeDirectory(),NSHomeDirectory(),item] UTF8String]);
-		//remove tar
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),item] error:nil];
-		//trash X11 folder
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/X11",NSHomeDirectory()] error:nil];
-		//make wswine.bundle
-		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] withIntermediateDirectories:YES attributes:nil error:nil];
-		//move contents of Wine to wswine.bundle
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/bin",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/bin",NSHomeDirectory()] error:nil];
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/lib",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/lib",NSHomeDirectory()] error:nil];
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle/Wine/share",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/share",NSHomeDirectory()] error:nil];
-		//put engine version in wswine.bundle
-		system([[NSString stringWithFormat:@"echo \"WS8%@\" > \"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/version\"",[item substringFromIndex:3],NSHomeDirectory()] UTF8String]);
-		//trash WineskinEngine.bundle
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WineskinEngine.bundle",NSHomeDirectory()] error:nil];
-		//compress wswine.bundle to engine.tar.7z
-		system([[NSString stringWithFormat:@"cd \"%@/Library/Application Support/Wineskin/Engines\";tar -cf WS8%@.tar wswine.bundle",NSHomeDirectory(),[item substringFromIndex:3]] UTF8String]);
-		system([[NSString stringWithFormat:@"cd \"%@/Library/Application Support/Wineskin/Engines\";\"%@/Library/Application Support/Wineskin/7za\" a -mx9 WS8%@.tar.7z WS8%@.tar", NSHomeDirectory(),NSHomeDirectory(),[item substringFromIndex:3],[item substringFromIndex:3]] UTF8String]);
-		//clean up engine junk now that its in a .tar.7z
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/WS8%@.tar",NSHomeDirectory(),[item substringFromIndex:3]] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] error:nil];
-		//trash the old engine
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),item] error:nil];
+		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"%@/%@.tar.7z\" \"-o/%@\"", NSHomeDirectory(),enginesFolderPath,item,enginesFolderPath] UTF8String]);
+		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@\" -xf \"%@/%@.tar\"",enginesFolderPath,enginesFolderPath,item] UTF8String]);
+		
+        //remove tar
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar",enginesFolderPath,item] error:nil];
+		
+        //trash X11 folder
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",enginesFolderPath] error:nil];
+		
+        //make wswine.bundle
+		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/wswine.bundle",enginesFolderPath] withIntermediateDirectories:YES attributes:nil error:nil];
+		
+        //move contents of Wine to wswine.bundle
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine/bin",enginesFolderPath]
+                    toPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",enginesFolderPath] error:nil];
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine/lib",enginesFolderPath]
+                    toPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",enginesFolderPath] error:nil];
+		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine/share",enginesFolderPath]
+                    toPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",enginesFolderPath] error:nil];
+		
+        //put engine version in wswine.bundle
+		system([[NSString stringWithFormat:@"echo \"WS8%@\" > \"%@/wswine.bundle/version\"",[item substringFromIndex:3],enginesFolderPath] UTF8String]);
+		
+        //trash WineskinEngine.bundle
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle",enginesFolderPath] error:nil];
+		
+        //compress wswine.bundle to engine.tar.7z
+		system([[NSString stringWithFormat:@"cd \"%@\";tar -cf WS8%@.tar wswine.bundle",enginesFolderPath,[item substringFromIndex:3]] UTF8String]);
+		system([[NSString stringWithFormat:@"cd \"%@\";\"%@/Library/Application Support/Wineskin/7za\" a -mx9 WS8%@.tar.7z WS8%@.tar", enginesFolderPath,NSHomeDirectory(),[item substringFromIndex:3],[item substringFromIndex:3]] UTF8String]);
+		
+        //clean up engine junk now that its in a .tar.7z
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WS8%@.tar",enginesFolderPath,[item substringFromIndex:3]] error:nil];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle",enginesFolderPath] error:nil];
+		
+        //trash the old engine
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar.7z",enginesFolderPath,item] error:nil];
 	}
 	[window makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
@@ -131,18 +145,27 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	NSString *applicationPath = [[NSBundle mainBundle] bundlePath];
 	NSFileManager *filemgr = [NSFileManager defaultManager];
-	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/Engines"] withIntermediateDirectories:YES attributes:nil error:nil];
-	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/Wrapper"] withIntermediateDirectories:YES attributes:nil error:nil];
-	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/EngineBase"] withIntermediateDirectories:YES attributes:nil error:nil];
-	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Applications/Wineskin"] withIntermediateDirectories:YES attributes:nil error:nil];
-	if (!([filemgr fileExistsAtPath:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/7za"]]))
-		[filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/7za"] toPath:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/7za"] error:nil];
+    NSString* wineskinFolder = [NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin"];
+	
+    [filemgr createDirectoryAtPath:[wineskinFolder stringByAppendingString:@"/Engines"] withIntermediateDirectories:YES
+                        attributes:nil error:nil];
+	[filemgr createDirectoryAtPath:[wineskinFolder stringByAppendingString:@"/Wrapper"] withIntermediateDirectories:YES
+                        attributes:nil error:nil];
+	[filemgr createDirectoryAtPath:[wineskinFolder stringByAppendingString:@"/EngineBase"] withIntermediateDirectories:YES
+                        attributes:nil error:nil];
+	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Applications/Wineskin"] withIntermediateDirectories:YES
+                        attributes:nil error:nil];
+    
+	if (!([filemgr fileExistsAtPath:[wineskinFolder stringByAppendingString:@"/7za"]]))
+		[filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/7za"]
+                         toPath:[wineskinFolder stringByAppendingString:@"/7za"] error:nil];
 }
 - (void)checkForUpdates
 {
 	//get current version number
 	NSString *currentVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-	//get latest available version number
+	
+    //get latest available version number
 	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Winery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
@@ -197,22 +220,28 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	//make sure files and folders are created
 	[self makeFoldersAndFiles];
-	//set installed engines list
+	
+    //set installed engines list
 	[self getInstalledEngines:@""];
 	[installedEngines setAllowsEmptySelection:NO];
 	[installedEngines reloadData];
-	//check if engine updates are available
+	
+    //check if engine updates are available
 	[self setEnginesAvailablePrompt];
-	//set current wrapper version blank
+	
+    //set current wrapper version blank
 	[wrapperVersion setStringValue:[self getCurrentWrapperVersion]];
-	//check if wrapper update is available
+	
+    //check if wrapper update is available
 	[self setWrapperAvailablePrompt];
-	// make sure an engine and master wrapper are both installed first, or have CREATE button disabled!
+	
+    // make sure an engine and master wrapper are both installed first, or have CREATE button disabled!
 	if (([installedEnginesList count] == 0) || ([[wrapperVersion stringValue] isEqualToString:@"No Wrapper Installed"]))
 		[createWrapperButton setEnabled:NO];
 	else
 		[createWrapperButton setEnabled:YES];
-	//check wrapper version is 2.5+, if not then do not enable button
+	
+    //check wrapper version is 2.5+, if not then do not enable button
 	int numToCheckMajor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(9,1)] intValue];
 	int numToCheckMinor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(11,1)] intValue];
 	if (numToCheckMajor < 3 && numToCheckMinor < 5) [createWrapperButton setEnabled:NO];
