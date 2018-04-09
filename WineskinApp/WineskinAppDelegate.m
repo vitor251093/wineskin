@@ -530,7 +530,8 @@ NSFileManager *fm;
     [useD3DBoostIfAvailableCheckBoxButton   setState:[NSPortDataLoader direct3DBoostIsEnabledAtPort:self.wrapperPath]];
     [windowManagerCheckBoxButton            setState:[NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
     
-    [autoDetectGPUInfoCheckBoxButton setState:NO];
+    BOOL autoDetectGPUEnabled = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] boolValue];
+    [autoDetectGPUInfoCheckBoxButton setState:autoDetectGPUEnabled];
 	
     [automaticOverrideToggle deselectAllCells];
     NSNumber* automatic = [portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_ARE_AUTOMATIC];
