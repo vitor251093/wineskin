@@ -1638,6 +1638,7 @@ static NSPortManager* portManager;
     }
 }
 
+
 - (void)startWine:(WineStart *)wineStartInfo
 {
     @autoreleasepool
@@ -1686,9 +1687,9 @@ static NSPortManager* portManager;
                                  [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
                                  [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
                                  [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
-                                 [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\" ",dyldFallBackLibraryPath],
+                                 [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
                                  @"wine wineboot"];
-            [self systemCommand:[command componentsJoinedByString:@""]];
+            [self systemCommand:[command componentsJoinedByString:@" "]];
             usleep(3000000);
             
             if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
@@ -1724,7 +1725,14 @@ static NSPortManager* portManager;
                 }
                 
                 //load Wineskin default reg entries
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,contentsFold]];
+                NSArray* loadRegCommand = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                                            [NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
+                                            [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
+                                            [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                                            [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                                            [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                                            [NSString stringWithFormat:@"wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\"", contentsFold]];
+                [self systemCommand:[loadRegCommand componentsJoinedByString:@" "]];
                 usleep(5000000);
             }
             
