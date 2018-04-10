@@ -1731,7 +1731,7 @@ static NSPortManager* portManager;
                                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
                                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
                                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                                            [NSString stringWithFormat:@"wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\"", contentsFold]];
+                                            [NSString stringWithFormat:@"wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\" 2>&1", contentsFold]];
                 [self systemCommand:[loadRegCommand componentsJoinedByString:@" "]];
                 usleep(5000000);
             }
