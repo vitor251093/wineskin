@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-#define SYSTEM_REG @"system"
-#define USER_REG   @"user"
+#define SYSTEM_REG  @"system"
+#define USER_REG    @"user"
+#define USERDEF_REG @"userdef"
 
 @interface NSPortManager : NSObject
 {
