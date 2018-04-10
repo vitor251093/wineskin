@@ -1744,7 +1744,7 @@ static NSPortManager* portManager;
             {
                 [newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
             }
-            [self writeStringArray:@[newUserReg] toFile:userRegPath];
+            [self writeStringArray:newUserReg toFile:userRegPath];
             [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
             
             NSString* userDefRegPath = [NSString stringWithFormat:@"%@/userdef.reg",winePrefix];
@@ -1754,7 +1754,7 @@ static NSPortManager* portManager;
             {
                 [newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
             }
-            [self writeStringArray:@[newUserDefReg] toFile:userDefRegPath];
+            [self writeStringArray:newUserDefReg toFile:userDefRegPath];
             
             // need Temp folder in Wineskin folder
             [fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Temp",winePrefix] withIntermediateDirectories:YES];
