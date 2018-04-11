@@ -547,9 +547,9 @@ NSFileManager *fm;
     }
     
     
-	//set override section stuff
 	if ([automaticOverrideToggleAutomaticButton intValue] != 0)
     {
+        // Automatic
         [forceNormalWindowsUseTheseSettingsToggle setEnabled:NO];
         [fullscreenRootlessToggle setEnabled:NO];
         [normalWindowsVirtualDesktopToggle setEnabled:NO];
@@ -560,7 +560,7 @@ NSFileManager *fm;
         return;
     }
     
-    //enable all override options
+    // Override
     [forceNormalWindowsUseTheseSettingsToggle setEnabled:YES];
     [fullscreenRootlessToggle setEnabled:YES];
     [normalWindowsVirtualDesktopToggle setEnabled:YES];
