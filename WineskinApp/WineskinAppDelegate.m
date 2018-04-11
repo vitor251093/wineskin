@@ -526,9 +526,12 @@ NSFileManager *fm;
 {
     NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     
-    [useMacDriverInsteadOfX11CheckBoxButton setState:[NSPortDataLoader macDriverIsEnabledAtPort:self.wrapperPath withEngine:engine]];
+    BOOL macDriver = [NSPortDataLoader macDriverIsEnabledAtPort:self.wrapperPath withEngine:engine];
+    [useMacDriverInsteadOfX11CheckBoxButton setState:macDriver];
     [useD3DBoostIfAvailableCheckBoxButton   setState:[NSPortDataLoader direct3DBoostIsEnabledAtPort:self.wrapperPath]];
-    [windowManagerCheckBoxButton            setState:[NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
+    
+    [windowManagerCheckBoxButton setEnabled:!macDriver];
+    [windowManagerCheckBoxButton setState:!macDriver && [NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
     
     BOOL autoDetectGPUEnabled = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] boolValue];
     [autoDetectGPUInfoCheckBoxButton setState:autoDetectGPUEnabled];
@@ -647,15 +650,17 @@ NSFileManager *fm;
 	[forceNormalWindowsUseTheseSettingsToggle setEnabled:YES];
 	[fullscreenRootlessToggle setEnabled:YES];
 	[normalWindowsVirtualDesktopToggle setEnabled:YES];
-	[fullscreenResolution setEnabled:YES];
+    [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
+    [fullscreenResolution setEnabled:YES];
 	[colorDepth setEnabled:YES];
 	[switchPause setEnabled:YES];
-    [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    [useMacDriverInsteadOfX11CheckBoxButton setIntegerValue:0];
-    [NSWineskinPortDataWriter saveMacDriver:useMacDriverInsteadOfX11CheckBoxButton.state atPort:portManager];
-    [windowManagerCheckBoxButton setIntegerValue:1];
-    [NSWineskinPortDataWriter saveDecorateWindow:windowManagerCheckBoxButton.state atPort:portManager];
+    
+    [useMacDriverInsteadOfX11CheckBoxButton setState:NO];
+    [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
+    
+    [windowManagerCheckBoxButton setState:YES];
+    [NSWineskinPortDataWriter saveDecorateWindow:YES atPort:portManager];
 }
 - (IBAction)rootlessClicked:(id)sender
 {
@@ -687,7 +692,9 @@ NSFileManager *fm;
 
 - (IBAction)useMacDriverInsteadOfX11CheckBoxClicked:(id)sender
 {
-    [NSWineskinPortDataWriter saveMacDriver:useMacDriverInsteadOfX11CheckBoxButton.state atPort:portManager];
+    BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
+    [windowManagerCheckBoxButton setEnabled:!macDriver];
+    [NSWineskinPortDataWriter saveMacDriver:macDriver atPort:portManager];
 }
 
 - (IBAction)useD3DBoostIfAvailableCheckBoxClicked:(id)sender
