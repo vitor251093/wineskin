@@ -713,7 +713,6 @@ static NSPortManager* portManager;
         [wineStartInfo setWinetricksCommands:winetricksCommands];
         [wineStartInfo setWineRunFile:wineRunFile];
         [self startWine:wineStartInfo];
-        return;
 	}
 }
 
@@ -740,29 +739,19 @@ static NSPortManager* portManager;
     NSArray *otherCommands = [wineStart getWinetricksCommands];
     NSString *theFileToRun;
     
-    if ([wssCommand isEqualToString:@"WSS-installer"])
+    NSDictionary* fileToRunForCommand = @{
+                                @"WSS-installer":   otherCommands[0],
+                                @"WSS-winecfg":     [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix],
+                                @"WSS-cmd":         [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix],
+                                @"WSS-regedit":     [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix],
+                                @"WSS-taskmgr":     [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix],
+                                @"WSS-uninstaller": [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix]};
+    
+    NSString* path = fileToRunForCommand[wssCommand];
+    
+    if (path != nil)
     {
-        theFileToRun = [otherCommands objectAtIndex:0];
-    }
-    else if ([wssCommand isEqualToString:@"WSS-winecfg"])
-    {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix];
-    }
-    else if ([wssCommand isEqualToString:@"WSS-cmd"])
-    {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix];
-    }
-    else if ([wssCommand isEqualToString:@"WSS-regedit"])
-    {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix];
-    }
-    else if ([wssCommand isEqualToString:@"WSS-taskmgr"])
-    {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix];
-    }
-    else if ([wssCommand isEqualToString:@"WSS-uninstaller"])
-    {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix];
+        theFileToRun = path;
     }
     else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] ||
              [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] ||
@@ -775,7 +764,7 @@ static NSPortManager* portManager;
     }
     else if ([wssCommand isEqualToString:@"CustomEXE"])
     {
-        NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[otherCommands objectAtIndex:0]]];
+        NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,otherCommands[0]]];
         NSString* programNameAndPath = [NSString stringWithFormat:@"C:%@",cexePlistDictionary[WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH]];
         theFileToRun = [NSPathUtilities getMacPathForWindowsPath:programNameAndPath ofWrapper:self.portManager.path];
     }
@@ -817,7 +806,9 @@ static NSPortManager* portManager;
 	CGGammaValue gammaSettingsRED = gamma;
 	CGGammaValue gammaSettingsGREEN = gamma;
 	CGGammaValue gammaSettingsBLUE = gamma;
-	CGSetDisplayTransferByFormula(*activeDisplays,gammaMin,gammaMax,gammaSettingsRED,gammaMin,gammaMax,gammaSettingsGREEN,gammaMin,gammaMax,gammaSettingsBLUE);
+    
+    CGSetDisplayTransferByFormula(*activeDisplays, gammaMin, gammaMax, gammaSettingsRED, gammaMin,
+                                  gammaMax, gammaSettingsGREEN, gammaMin, gammaMax, gammaSettingsBLUE);
 }
 
 - (void)setResolution:(NSString *)reso
@@ -827,7 +818,15 @@ static NSPortManager* portManager;
     
     //if XxY doesn't exist, we will ignore for now... in the future maybe add way to find the closest reso that is available.
 	//change the resolution using Xrandr
-	system([[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" xrandr -s %@x%@ > /dev/null 2>&1",dyldFallBackLibraryPath,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,dyldFallBackLibraryPath,xRes,yRes] UTF8String]);
+    NSArray* command = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                         [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
+                         [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                         [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                         [NSString stringWithFormat:@"cd \"%@/wswine.bundle/bin\";",frameworksFold],
+                         [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                         [NSString stringWithFormat:@"xrandr -s %@x%@ > /dev/null 2>&1",xRes,yRes]];
+    
+	system([[command componentsJoinedByString:@" "] UTF8String]);
 }
 
 - (NSString *)getScreenResolution
@@ -848,6 +847,7 @@ static NSPortManager* portManager;
     //do loop compare to find correct PID, try 8 times, doubling the delay each try ... up to 102.2 secs of total waiting
     int i = 0;
     int sleep_duration = 200000; // start off w/ 0.2 secs and double each iteration
+    
     //re-usable array
     NSMutableArray *secondPIDlist = [[NSMutableArray alloc] init];
     for (i = 0; i < 9; ++i)
@@ -857,6 +857,7 @@ static NSPortManager* portManager;
         {
             NSLog(@"Wineskin: Waiting %d seconds for %@ to start.", sleep_duration / 1000000, processToLookFor);
         }
+        
         // sleep a bit before checking for current pid list
         usleep(sleep_duration);
         sleep_duration = sleep_duration * 2;
@@ -945,17 +946,16 @@ static NSPortManager* portManager;
         [fm removeItemAtPath:folderPath];
         [fm createSymbolicLinkAtPath:folderPath withDestinationPath:symlink error:nil];
         [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",folderPath]];
+        return;
     }
-    else
-    {
-        [fm createDirectoryAtPath:folderPath withIntermediateDirectories:NO];
-    }
+    
+    [fm createDirectoryAtPath:folderPath withIntermediateDirectories:NO];
 }
 - (void)setUserFolders:(BOOL)doSymlinks
 {
     NSString* symlinkMyDocuments = [self createWrapperHomeSymlinkFolder:@"My Documents" forMacFolder:@"Documents"];
     NSString* symlinkDesktop     = [self createWrapperHomeSymlinkFolder:@"Desktop"      forMacFolder:@"Desktop"];
-    NSString* symlinkDownloads     = [self createWrapperHomeSymlinkFolder:@"Downloads"      forMacFolder:@"Downloads"];
+    NSString* symlinkDownloads   = [self createWrapperHomeSymlinkFolder:@"Downloads"    forMacFolder:@"Downloads"];
     NSString* symlinkMyVideos    = [self createWrapperHomeSymlinkFolder:@"My Videos"    forMacFolder:@"Movies"];
     NSString* symlinkMyMusic     = [self createWrapperHomeSymlinkFolder:@"My Music"     forMacFolder:@"Music"];
     NSString* symlinkMyPictures  = [self createWrapperHomeSymlinkFolder:@"My Pictures"  forMacFolder:@"Pictures"];
@@ -982,11 +982,14 @@ static NSPortManager* portManager;
         [self createWrapperHomeFolder:@"My Pictures" withSymlinkTo:symlinkMyPictures];
 	}
     
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()] withDestinationPath:@"Wineskin" error:nil];
-	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/%@\"",winePrefix,NSUserName()]];
+    NSString* usersFolder     = [NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()];
+    NSString* crossoverFolder = [NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix];
     
-	[fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix] withDestinationPath:@"Wineskin" error:nil];
-	[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/drive_c/users/crossover\"",winePrefix]];
+    for (NSString* folder in @[usersFolder, crossoverFolder])
+    {
+        [fm createSymbolicLinkAtPath:folder withDestinationPath:@"Wineskin" error:nil];
+        [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",folder]];
+    }
 }
 
 - (void)fixWinePrefixForCurrentUser
@@ -1016,21 +1019,36 @@ static NSPortManager* portManager;
 	[fm removeItemAtPath:winePrefix];
 	
     //rename ResoTemp to Resources
-	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/ResoTemp",contentsFold] toPath:[NSString stringWithFormat:@"%@/Resources",contentsFold]];
+	[fm moveItemAtPath:[NSString stringWithFormat:@"%@/ResoTemp",contentsFold]
+                toPath:[NSString stringWithFormat:@"%@/Resources",contentsFold]];
 	
     //fix Resources to 777
 	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
 }
 
-- (void)tryToUseGPUInfo
+- (void)setGpuInfoVendorID:(NSString*)nvendorID deviceID:(NSString*)ndeviceID memorySize:(NSString*)nVRAM
 {
-	//if user.reg doesn't exist, don't do anything
-	if (!([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]]))
+    //if user.reg doesn't exist, don't do anything
+    if (!([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/user.reg",winePrefix]]))
     {
         return;
     }
-	
-    NSMutableString *deviceID = [[VMMComputerInformation mainVideoCard].deviceID mutableCopy];
+    
+    NSString* direct3dHeader = @"[Software\\\\Wine\\\\Direct3D]";
+    NSMutableString* direct3dReg = [[self.portManager getRegistryEntry:direct3dHeader fromRegistryFileNamed:USER_REG] mutableCopy];
+    
+    [self.portManager setValue:nVRAM     forKey:@"\"VideoMemorySize\""  atRegistryEntryString:direct3dReg];
+    [self.portManager setValue:ndeviceID forKey:@"\"VideoPciDeviceID\"" atRegistryEntryString:direct3dReg];
+    [self.portManager setValue:nvendorID forKey:@"\"VideoPciVendorID\"" atRegistryEntryString:direct3dReg];
+    
+    [self.portManager deleteRegistry:direct3dHeader fromRegistryFileNamed:USER_REG];
+    [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n%@\n",direct3dHeader,direct3dReg] fromRegistryFileNamed:USER_REG];
+    
+    [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+}
+- (void)tryToUseGPUInfo
+{
+	NSMutableString *deviceID = [[VMMComputerInformation mainVideoCard].deviceID mutableCopy];
     NSMutableString *vendorID = [[VMMComputerInformation mainVideoCard].vendorID mutableCopy];
     NSString *VRAM = [NSString stringWithFormat:@"%d",[VMMComputerInformation mainVideoCard].memorySizeInMegabytes.intValue];
     
@@ -1054,39 +1072,17 @@ static NSPortManager* portManager;
         }
     }
 	
-	// write each of the 3 in the Registry
-    NSString* direct3dHeader = @"[Software\\\\Wine\\\\Direct3D]";
-    NSMutableString* direct3dReg = [[self.portManager getRegistryEntry:direct3dHeader fromRegistryFileNamed:USER_REG] mutableCopy];
-    
     NSString* nVRAM = VRAM ? [NSString stringWithFormat:@"\"%@\"",VRAM] : nil;
-    [self.portManager setValue:nVRAM forKey:@"\"VideoMemorySize\""  atRegistryEntryString:direct3dReg];
-    
     NSString* ndeviceID = deviceID ? [NSString stringWithFormat:@"dword:%@",deviceID] : nil;
-    [self.portManager setValue:ndeviceID forKey:@"\"VideoPciDeviceID\"" atRegistryEntryString:direct3dReg];
-    
     NSString* nvendorID = vendorID ? [NSString stringWithFormat:@"dword:%@",vendorID] : nil;
-    [self.portManager setValue:nvendorID forKey:@"\"VideoPciVendorID\"" atRegistryEntryString:direct3dReg];
     
-    [self.portManager deleteRegistry:direct3dHeader fromRegistryFileNamed:USER_REG];
-    [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n%@\n",direct3dHeader,direct3dReg] fromRegistryFileNamed:USER_REG];
-	
-	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+    [self setGpuInfoVendorID:nvendorID deviceID:ndeviceID memorySize:nVRAM];
 }
-
 - (void)removeGPUInfo
 {
-    NSString* direct3dHeader = @"[Software\\\\Wine\\\\Direct3D]";
-    NSMutableString* direct3dReg = [[self.portManager getRegistryEntry:direct3dHeader fromRegistryFileNamed:USER_REG] mutableCopy];
-    
-    [self.portManager setValue:nil forKey:@"\"VideoMemorySize\""  atRegistryEntryString:direct3dReg];
-    [self.portManager setValue:nil forKey:@"\"VideoPciDeviceID\"" atRegistryEntryString:direct3dReg];
-    [self.portManager setValue:nil forKey:@"\"VideoPciVendorID\"" atRegistryEntryString:direct3dReg];
-    
-    [self.portManager deleteRegistry:direct3dHeader fromRegistryFileNamed:USER_REG];
-    [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n%@\n",direct3dHeader,direct3dReg] fromRegistryFileNamed:USER_REG];
-    
-	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+    [self setGpuInfoVendorID:nil deviceID:nil memorySize:nil];
 }
+
 - (void)fixFrameworksLibraries
 {
     //fix to have the right libXplugin for the OS version
