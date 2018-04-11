@@ -557,6 +557,7 @@ NSFileManager *fm;
         [fullscreenResolution setEnabled:NO];
         [colorDepth setEnabled:NO];
         [switchPause setEnabled:NO];
+        [useMacDriverInsteadOfX11CheckBoxButton setEnabled:YES];
         return;
     }
     
@@ -568,6 +569,7 @@ NSFileManager *fm;
     [fullscreenResolution setEnabled:YES];
     [colorDepth setEnabled:YES];
     [switchPause setEnabled:YES];
+    [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
     
     //on override, need to load all options
     [forceNormalWindowsUseTheseSettingsToggle deselectAllCells];
@@ -638,6 +640,7 @@ NSFileManager *fm;
 	[fullscreenResolution setEnabled:NO];
 	[colorDepth setEnabled:NO];
 	[switchPause setEnabled:NO];
+    [useMacDriverInsteadOfX11CheckBoxButton setEnabled:YES];
 }
 - (IBAction)overrideClicked:(id)sender
 {
@@ -648,6 +651,11 @@ NSFileManager *fm;
 	[colorDepth setEnabled:YES];
 	[switchPause setEnabled:YES];
     [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
+    [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
+    [useMacDriverInsteadOfX11CheckBoxButton setIntegerValue:0];
+    [NSWineskinPortDataWriter saveMacDriver:useMacDriverInsteadOfX11CheckBoxButton.state atPort:portManager];
+    [windowManagerCheckBoxButton setIntegerValue:1];
+    [NSWineskinPortDataWriter saveDecorateWindow:windowManagerCheckBoxButton.state atPort:portManager];
 }
 - (IBAction)rootlessClicked:(id)sender
 {
