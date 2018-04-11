@@ -95,86 +95,61 @@ NSFileManager *fm;
 	if (![[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:seconds]])
 		sleep(seconds); // Fallback, should never happen
 }
+- (void)setButtonsState:(BOOL)state
+{
+    [windowsExeTextField setEnabled:state];
+    [exeBrowseButton setEnabled:state];
+    [customCommandsTextField setEnabled:state];
+    [menubarNameTextField setEnabled:state];
+    [versionTextField setEnabled:state];
+    [wineDebugTextField setEnabled:state];
+    [extPopUpButton setEnabled:state];
+    [extEditButton setEnabled:state];
+    [extPlusButton setEnabled:state];
+    [extMinusButton setEnabled:state];
+    [iconImageView setEditable:state];
+    [iconBrowseButton setEnabled:state];
+    [advancedInstallSoftwareButton setEnabled:state];
+    [advancedSetScreenOptionsButton setEnabled:state];
+    [testRunButton setEnabled:state];
+    [winetricksButton setEnabled:state];
+    [customExeButton setEnabled:state];
+    [refreshWrapperButton setEnabled:state];
+    [rebuildWrapperButton setEnabled:state];
+    [updateWrapperButton setEnabled:state];
+    [changeEngineButton setEnabled:state];
+    [alwaysMakeLogFilesCheckBoxButton setEnabled:state];
+    [setMaxFilesCheckBoxButton setEnabled:state];
+    [optSendsAltCheckBoxButton setEnabled:state];
+    [emulateThreeButtonMouseCheckBoxButton setEnabled:state];
+    [mapUserFoldersCheckBoxButton setEnabled:state];
+    [modifyMappingsButton setEnabled:state];
+    [confirmQuitCheckBoxButton setEnabled:state];
+    [focusFollowsMouseCheckBoxButton setEnabled:state];
+    [disableCPUsCheckBoxButton setEnabled:state];
+    [forceWrapperQuartzWMButton setEnabled:state];
+    [forceSystemXQuartzButton setEnabled:state];
+    
+    if (state) {
+        [toolRunningPI stopAnimation:self];
+    }
+    else {
+        [toolRunningPI startAnimation:self];
+    }
+    
+    [toolRunningPIText setHidden:state];
+    disableXButton = !state;
+}
 - (void)enableButtons
 {
 	disableButtonCounter--;
-	if (disableButtonCounter < 1)
-	{
-		[windowsExeTextField setEnabled:YES];
-        [exeBrowseButton setEnabled:YES];
-        [customCommandsTextField setEnabled:YES];
-        [menubarNameTextField setEnabled:YES];
-        [versionTextField setEnabled:YES];
-        [wineDebugTextField setEnabled:YES];
-        [extPopUpButton setEnabled:YES];
-        [extEditButton setEnabled:YES];
-        [extPlusButton setEnabled:YES];
-        [extMinusButton setEnabled:YES];
-        [iconImageView setEditable:YES];
-        [iconBrowseButton setEnabled:YES];
-        [advancedInstallSoftwareButton setEnabled:YES];
-        [advancedSetScreenOptionsButton setEnabled:YES];
-        [testRunButton setEnabled:YES];
-        [winetricksButton setEnabled:YES];
-        [customExeButton setEnabled:YES];
-        [refreshWrapperButton setEnabled:YES];
-        [rebuildWrapperButton setEnabled:YES];
-        [updateWrapperButton setEnabled:YES];
-        [changeEngineButton setEnabled:YES];
-        [alwaysMakeLogFilesCheckBoxButton setEnabled:YES];
-        [setMaxFilesCheckBoxButton setEnabled:YES];
-        [optSendsAltCheckBoxButton setEnabled:YES];
-        [emulateThreeButtonMouseCheckBoxButton setEnabled:YES];
-        [mapUserFoldersCheckBoxButton setEnabled:YES];
-        [modifyMappingsButton setEnabled:YES];
-        [confirmQuitCheckBoxButton setEnabled:YES];
-        [focusFollowsMouseCheckBoxButton setEnabled:YES];
-        [disableCPUsCheckBoxButton setEnabled:YES];
-        [forceWrapperQuartzWMButton setEnabled:YES];
-        [forceSystemXQuartzButton setEnabled:YES];
-		[toolRunningPI stopAnimation:self];
-		[toolRunningPIText setHidden:YES];
-		disableXButton=NO;
-	}
+    if (disableButtonCounter >= 1) return;
+    [self setButtonsState:YES];
 }
 - (void)disableButtons
 {
-	[windowsExeTextField setEnabled:NO];
-    [exeBrowseButton setEnabled:NO];
-    [customCommandsTextField setEnabled:NO];
-	[menubarNameTextField setEnabled:NO];
-	[versionTextField setEnabled:NO];
-    [wineDebugTextField setEnabled:NO];
-    [extPopUpButton setEnabled:NO];
-    [extEditButton setEnabled:NO];
-    [extPlusButton setEnabled:NO];
-    [extMinusButton setEnabled:NO];
-	[iconImageView setEditable:NO];
-	[iconBrowseButton setEnabled:NO];
-    [advancedInstallSoftwareButton setEnabled:NO];
-    [advancedSetScreenOptionsButton setEnabled:NO];
-    [testRunButton setEnabled:NO];
-    [winetricksButton setEnabled:NO];
-    [customExeButton setEnabled:NO];
-    [refreshWrapperButton setEnabled:NO];
-    [rebuildWrapperButton setEnabled:NO];
-    [updateWrapperButton setEnabled:NO];
-	[changeEngineButton setEnabled:NO];
-	[alwaysMakeLogFilesCheckBoxButton setEnabled:NO];
-    [setMaxFilesCheckBoxButton setEnabled:NO];
-	[optSendsAltCheckBoxButton setEnabled:NO];
-	[emulateThreeButtonMouseCheckBoxButton setEnabled:NO];
-	[mapUserFoldersCheckBoxButton setEnabled:NO];
-	[modifyMappingsButton setEnabled:NO];
-	[confirmQuitCheckBoxButton setEnabled:NO];
-	[focusFollowsMouseCheckBoxButton setEnabled:NO];
-	[disableCPUsCheckBoxButton setEnabled:NO];
-	[forceWrapperQuartzWMButton setEnabled:NO];
-	[forceSystemXQuartzButton setEnabled:NO];
-	[toolRunningPI startAnimation:self];
-	[toolRunningPIText setHidden:NO];
+	[self setButtonsState:NO];
 	disableButtonCounter++;
-	disableXButton=YES;
 }
 - (void)systemCommand:(NSString *)commandToRun withArgs:(NSArray *)args
 {
@@ -328,13 +303,13 @@ NSFileManager *fm;
 {
 	[self copyFolderRemovingOriginal:YES];
 }
-- (void)copyFolderRemovingOriginal:(BOOL)copyIt
+- (void)copyFolderRemovingOriginal:(BOOL)removeOriginal
 {
 	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
-	if (copyIt)
-		[panel setWindowTitle:NSLocalizedString(@"Please choose the Folder to COPY in",nil)];
-	else
+	if (removeOriginal)
 		[panel setWindowTitle:NSLocalizedString(@"Please choose the Folder to MOVE in",nil)];
+	else
+        [panel setWindowTitle:NSLocalizedString(@"Please choose the Folder to COPY in",nil)];
 	[panel setPrompt:NSLocalizedString(@"Choose",nil)];
 	[panel setCanChooseDirectories:YES];
 	[panel setCanChooseFiles:NO];
@@ -358,14 +333,14 @@ NSFileManager *fm;
 	NSString *theFileNamePath = [[[panel URLs] objectAtIndex:0] path];
 	NSString *theFileName = [theFileNamePath substringFromIndex:[theFileNamePath rangeOfString:@"/" options:NSBackwardsSearch].location];
 	BOOL success;
-	if (copyIt)
+	if (removeOriginal)
     {
-		success = [fm copyItemAtPath:theFileNamePath
+        success = [fm moveItemAtPath:theFileNamePath
                               toPath:[NSString stringWithFormat:@"%@Program Files%@",self.cDrivePathForWrapper,theFileName]];
     }
 	else
     {
-		success = [fm moveItemAtPath:theFileNamePath
+        success = [fm copyItemAtPath:theFileNamePath
                               toPath:[NSString stringWithFormat:@"%@Program Files%@",self.cDrivePathForWrapper,theFileName]];
     }
     
@@ -395,15 +370,15 @@ NSFileManager *fm;
 	//display warning if final array is 0 length and exit method
 	if (finalList.count == 0)
 	{
-		if (copyIt)
+		if (removeOriginal)
         {
             [NSAlert showAlertOfType:NSAlertTypeWarning
-                         withMessage:@"No new executables found after copying the selected folder inside the wrapper!"];
+                         withMessage:@"No new executables found after moving the selected folder inside the wrapper!"];
         }
 		else
         {
-			[NSAlert showAlertOfType:NSAlertTypeWarning
-                         withMessage:@"No new executables found after moving the selected folder inside the wrapper!"];
+            [NSAlert showAlertOfType:NSAlertTypeWarning
+                         withMessage:@"No new executables found after copying the selected folder inside the wrapper!"];
         }
 		
 		if (usingAdvancedWindow)
@@ -526,9 +501,12 @@ NSFileManager *fm;
 {
     NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     
-    [useMacDriverInsteadOfX11CheckBoxButton setState:[NSPortDataLoader macDriverIsEnabledAtPort:self.wrapperPath withEngine:engine]];
+    BOOL macDriver = [NSPortDataLoader macDriverIsEnabledAtPort:self.wrapperPath withEngine:engine];
+    [useMacDriverInsteadOfX11CheckBoxButton setState:macDriver];
     [useD3DBoostIfAvailableCheckBoxButton   setState:[NSPortDataLoader direct3DBoostIsEnabledAtPort:self.wrapperPath]];
-    [windowManagerCheckBoxButton            setState:[NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
+    
+    [windowManagerCheckBoxButton setEnabled:!macDriver];
+    [windowManagerCheckBoxButton setState:!macDriver && [NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
     
     BOOL autoDetectGPUEnabled = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] boolValue];
     [autoDetectGPUInfoCheckBoxButton setState:autoDetectGPUEnabled];
@@ -547,9 +525,9 @@ NSFileManager *fm;
     }
     
     
-	//set override section stuff
 	if ([automaticOverrideToggleAutomaticButton intValue] != 0)
     {
+        // Automatic
         [forceNormalWindowsUseTheseSettingsToggle setEnabled:NO];
         [fullscreenRootlessToggle setEnabled:NO];
         [normalWindowsVirtualDesktopToggle setEnabled:NO];
@@ -561,7 +539,7 @@ NSFileManager *fm;
         return;
     }
     
-    //enable all override options
+    // Override
     [forceNormalWindowsUseTheseSettingsToggle setEnabled:YES];
     [fullscreenRootlessToggle setEnabled:YES];
     [normalWindowsVirtualDesktopToggle setEnabled:YES];
@@ -647,15 +625,17 @@ NSFileManager *fm;
 	[forceNormalWindowsUseTheseSettingsToggle setEnabled:YES];
 	[fullscreenRootlessToggle setEnabled:YES];
 	[normalWindowsVirtualDesktopToggle setEnabled:YES];
-	[fullscreenResolution setEnabled:YES];
+    [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
+    [fullscreenResolution setEnabled:YES];
 	[colorDepth setEnabled:YES];
 	[switchPause setEnabled:YES];
-    [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    [useMacDriverInsteadOfX11CheckBoxButton setIntegerValue:0];
-    [NSWineskinPortDataWriter saveMacDriver:useMacDriverInsteadOfX11CheckBoxButton.state atPort:portManager];
-    [windowManagerCheckBoxButton setIntegerValue:1];
-    [NSWineskinPortDataWriter saveDecorateWindow:windowManagerCheckBoxButton.state atPort:portManager];
+    
+    [useMacDriverInsteadOfX11CheckBoxButton setState:NO];
+    [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
+    
+    [windowManagerCheckBoxButton setState:YES];
+    [NSWineskinPortDataWriter saveDecorateWindow:YES atPort:portManager];
 }
 - (IBAction)rootlessClicked:(id)sender
 {
@@ -687,7 +667,9 @@ NSFileManager *fm;
 
 - (IBAction)useMacDriverInsteadOfX11CheckBoxClicked:(id)sender
 {
-    [NSWineskinPortDataWriter saveMacDriver:useMacDriverInsteadOfX11CheckBoxButton.state atPort:portManager];
+    BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
+    [windowManagerCheckBoxButton setEnabled:!macDriver];
+    [NSWineskinPortDataWriter saveMacDriver:macDriver atPort:portManager];
 }
 
 - (IBAction)useD3DBoostIfAvailableCheckBoxClicked:(id)sender

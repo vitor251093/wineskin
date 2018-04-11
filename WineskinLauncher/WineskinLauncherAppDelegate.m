@@ -1491,6 +1491,7 @@ static NSPortManager* portManager;
     
     NSString* quotedDesktopName = [NSString stringWithFormat:@"\"%@\"",desktopName];
     NSString* resolutionX = [resolution stringByReplacingOccurrencesOfString:@" " withString:@"x"];
+    resolutionX = [NSString stringWithFormat:@"\"%@\"",resolutionX];
     
     [self.portManager setValue:quotedDesktopName forKey:@"Desktop" atRegistryEntryString:explorerReg];
     [self.portManager setValue:resolutionX forKey:desktopName atRegistryEntryString:desktopsReg];
