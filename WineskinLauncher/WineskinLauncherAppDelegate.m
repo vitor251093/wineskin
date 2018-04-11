@@ -1485,11 +1485,13 @@ static NSPortManager* portManager;
     
     NSString* explorerRegHeader = @"[Software\\\\Wine\\\\Explorer]";
     NSString* desktopsRegHeader = @"[Software\\\\Wine\\\\Explorer\\\\Desktops]";
+    
     NSMutableString* explorerReg = [[self.portManager getRegistryEntry:explorerRegHeader fromRegistryFileNamed:USER_REG] mutableCopy];
     NSMutableString* desktopsReg = [[self.portManager getRegistryEntry:desktopsRegHeader fromRegistryFileNamed:USER_REG] mutableCopy];
     
     NSString* quotedDesktopName = [NSString stringWithFormat:@"\"%@\"",desktopName];
     NSString* resolutionX = [resolution stringByReplacingOccurrencesOfString:@" " withString:@"x"];
+    
     [self.portManager setValue:quotedDesktopName forKey:@"\"Desktop\"" atRegistryEntryString:explorerReg];
     [self.portManager setValue:resolutionX forKey:quotedDesktopName atRegistryEntryString:desktopsReg];
     
@@ -1615,10 +1617,10 @@ static NSPortManager* portManager;
     
     NSString *wineBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
                           binBash,dyldFallbackLibraryPath,wineName];
-    [wineBash writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
-    
     NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
+    
+    [wineBash       writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
@@ -1750,30 +1752,38 @@ static NSPortManager* portManager;
                 usleep(5000000);
             }
             
+            NSString* userFolderWindowsPath = [NSString stringWithFormat:@"C:\\users\\%@",NSUserName()];
+            NSString* wineskinUserFolderWindowsPath = @"C:\\users\\Wineskin";
+            
+            
             //fix user name entires over to Wineskin
             NSString* userRegPath = [NSString stringWithFormat:@"%@/user.reg",winePrefix];
             NSArray *userReg = [self readFileToStringArray:userRegPath];
-            NSMutableArray *newUserReg = [NSMutableArray arrayWithCapacity:[userReg count]];
+            NSMutableArray *newUserReg = [NSMutableArray arrayWithCapacity:userReg.count];
             for (NSString *item in userReg)
             {
-                [newUserReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
+                [newUserReg addObject:[item stringByReplacingOccurrencesOfString:userFolderWindowsPath
+                                                                      withString:wineskinUserFolderWindowsPath]];
             }
             [self writeStringArray:newUserReg toFile:userRegPath];
-            [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+            [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@\"",userRegPath]];
+            
             
             NSString* userDefRegPath = [NSString stringWithFormat:@"%@/userdef.reg",winePrefix];
             NSArray *userDefReg = [self readFileToStringArray:userDefRegPath];
-            NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:[userDefReg count]];
+            NSMutableArray *newUserDefReg = [NSMutableArray arrayWithCapacity:userDefReg.count];
             for (NSString *item in userDefReg)
             {
-                [newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"C:\\users\\%@",NSUserName()] withString:@"C:\\users\\Wineskin"]];
+                [newUserDefReg addObject:[item stringByReplacingOccurrencesOfString:userFolderWindowsPath
+                                                                         withString:wineskinUserFolderWindowsPath]];
             }
             [self writeStringArray:newUserDefReg toFile:userDefRegPath];
+            
             
             // need Temp folder in Wineskin folder
             [fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Temp",winePrefix] withIntermediateDirectories:YES];
             
-            // do a chmod on the whole wrapper to 755... shouldn't breka anything but should prevent issues.
+            // do a chmod on the whole wrapper to 755... shouldn't break anything but should prevent issues.
             // Task Number 3221715 Fix Wrapper Permissions
             //cocoa command don't seem to be working right, but chmod system command works fine.
             // cannot 755 the whole wrapper and then change to 777s or this can break the wrapper for non-Admin users.
@@ -1789,10 +1799,11 @@ static NSPortManager* portManager;
             {
                 [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,item]];
             }
-            NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix]];
+            NSString* dosdevicesPath = [NSString stringWithFormat:@"%@/dosdevices",winePrefix];
+            NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:dosdevicesPath];
             for (NSString *item in tmpy3)
             {
-                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/dosdevices/%@\"",winePrefix,item]];
+                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/%@\"",dosdevicesPath,item]];
             }
             return;
         }
