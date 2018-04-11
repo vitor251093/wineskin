@@ -95,86 +95,61 @@ NSFileManager *fm;
 	if (![[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:seconds]])
 		sleep(seconds); // Fallback, should never happen
 }
+- (void)setButtonsState:(BOOL)state
+{
+    [windowsExeTextField setEnabled:state];
+    [exeBrowseButton setEnabled:state];
+    [customCommandsTextField setEnabled:state];
+    [menubarNameTextField setEnabled:state];
+    [versionTextField setEnabled:state];
+    [wineDebugTextField setEnabled:state];
+    [extPopUpButton setEnabled:state];
+    [extEditButton setEnabled:state];
+    [extPlusButton setEnabled:state];
+    [extMinusButton setEnabled:state];
+    [iconImageView setEditable:state];
+    [iconBrowseButton setEnabled:state];
+    [advancedInstallSoftwareButton setEnabled:state];
+    [advancedSetScreenOptionsButton setEnabled:state];
+    [testRunButton setEnabled:state];
+    [winetricksButton setEnabled:state];
+    [customExeButton setEnabled:state];
+    [refreshWrapperButton setEnabled:state];
+    [rebuildWrapperButton setEnabled:state];
+    [updateWrapperButton setEnabled:state];
+    [changeEngineButton setEnabled:state];
+    [alwaysMakeLogFilesCheckBoxButton setEnabled:state];
+    [setMaxFilesCheckBoxButton setEnabled:state];
+    [optSendsAltCheckBoxButton setEnabled:state];
+    [emulateThreeButtonMouseCheckBoxButton setEnabled:state];
+    [mapUserFoldersCheckBoxButton setEnabled:state];
+    [modifyMappingsButton setEnabled:state];
+    [confirmQuitCheckBoxButton setEnabled:state];
+    [focusFollowsMouseCheckBoxButton setEnabled:state];
+    [disableCPUsCheckBoxButton setEnabled:state];
+    [forceWrapperQuartzWMButton setEnabled:state];
+    [forceSystemXQuartzButton setEnabled:state];
+    
+    if (state) {
+        [toolRunningPI stopAnimation:self];
+    }
+    else {
+        [toolRunningPI startAnimation:self];
+    }
+    
+    [toolRunningPIText setHidden:state];
+    disableXButton = !state;
+}
 - (void)enableButtons
 {
 	disableButtonCounter--;
-	if (disableButtonCounter < 1)
-	{
-		[windowsExeTextField setEnabled:YES];
-        [exeBrowseButton setEnabled:YES];
-        [customCommandsTextField setEnabled:YES];
-        [menubarNameTextField setEnabled:YES];
-        [versionTextField setEnabled:YES];
-        [wineDebugTextField setEnabled:YES];
-        [extPopUpButton setEnabled:YES];
-        [extEditButton setEnabled:YES];
-        [extPlusButton setEnabled:YES];
-        [extMinusButton setEnabled:YES];
-        [iconImageView setEditable:YES];
-        [iconBrowseButton setEnabled:YES];
-        [advancedInstallSoftwareButton setEnabled:YES];
-        [advancedSetScreenOptionsButton setEnabled:YES];
-        [testRunButton setEnabled:YES];
-        [winetricksButton setEnabled:YES];
-        [customExeButton setEnabled:YES];
-        [refreshWrapperButton setEnabled:YES];
-        [rebuildWrapperButton setEnabled:YES];
-        [updateWrapperButton setEnabled:YES];
-        [changeEngineButton setEnabled:YES];
-        [alwaysMakeLogFilesCheckBoxButton setEnabled:YES];
-        [setMaxFilesCheckBoxButton setEnabled:YES];
-        [optSendsAltCheckBoxButton setEnabled:YES];
-        [emulateThreeButtonMouseCheckBoxButton setEnabled:YES];
-        [mapUserFoldersCheckBoxButton setEnabled:YES];
-        [modifyMappingsButton setEnabled:YES];
-        [confirmQuitCheckBoxButton setEnabled:YES];
-        [focusFollowsMouseCheckBoxButton setEnabled:YES];
-        [disableCPUsCheckBoxButton setEnabled:YES];
-        [forceWrapperQuartzWMButton setEnabled:YES];
-        [forceSystemXQuartzButton setEnabled:YES];
-		[toolRunningPI stopAnimation:self];
-		[toolRunningPIText setHidden:YES];
-		disableXButton=NO;
-	}
+    if (disableButtonCounter >= 1) return;
+    [self setButtonsState:YES];
 }
 - (void)disableButtons
 {
-	[windowsExeTextField setEnabled:NO];
-    [exeBrowseButton setEnabled:NO];
-    [customCommandsTextField setEnabled:NO];
-	[menubarNameTextField setEnabled:NO];
-	[versionTextField setEnabled:NO];
-    [wineDebugTextField setEnabled:NO];
-    [extPopUpButton setEnabled:NO];
-    [extEditButton setEnabled:NO];
-    [extPlusButton setEnabled:NO];
-    [extMinusButton setEnabled:NO];
-	[iconImageView setEditable:NO];
-	[iconBrowseButton setEnabled:NO];
-    [advancedInstallSoftwareButton setEnabled:NO];
-    [advancedSetScreenOptionsButton setEnabled:NO];
-    [testRunButton setEnabled:NO];
-    [winetricksButton setEnabled:NO];
-    [customExeButton setEnabled:NO];
-    [refreshWrapperButton setEnabled:NO];
-    [rebuildWrapperButton setEnabled:NO];
-    [updateWrapperButton setEnabled:NO];
-	[changeEngineButton setEnabled:NO];
-	[alwaysMakeLogFilesCheckBoxButton setEnabled:NO];
-    [setMaxFilesCheckBoxButton setEnabled:NO];
-	[optSendsAltCheckBoxButton setEnabled:NO];
-	[emulateThreeButtonMouseCheckBoxButton setEnabled:NO];
-	[mapUserFoldersCheckBoxButton setEnabled:NO];
-	[modifyMappingsButton setEnabled:NO];
-	[confirmQuitCheckBoxButton setEnabled:NO];
-	[focusFollowsMouseCheckBoxButton setEnabled:NO];
-	[disableCPUsCheckBoxButton setEnabled:NO];
-	[forceWrapperQuartzWMButton setEnabled:NO];
-	[forceSystemXQuartzButton setEnabled:NO];
-	[toolRunningPI startAnimation:self];
-	[toolRunningPIText setHidden:NO];
+	[self setButtonsState:NO];
 	disableButtonCounter++;
-	disableXButton=YES;
 }
 - (void)systemCommand:(NSString *)commandToRun withArgs:(NSArray *)args
 {
