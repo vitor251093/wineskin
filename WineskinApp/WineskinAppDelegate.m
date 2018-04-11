@@ -328,13 +328,13 @@ NSFileManager *fm;
 {
 	[self copyFolderRemovingOriginal:YES];
 }
-- (void)copyFolderRemovingOriginal:(BOOL)copyIt
+- (void)copyFolderRemovingOriginal:(BOOL)removeOriginal
 {
 	NSOpenPanel *panel = [[NSOpenPanel alloc] init];
-	if (copyIt)
-		[panel setWindowTitle:NSLocalizedString(@"Please choose the Folder to COPY in",nil)];
-	else
+	if (removeOriginal)
 		[panel setWindowTitle:NSLocalizedString(@"Please choose the Folder to MOVE in",nil)];
+	else
+        [panel setWindowTitle:NSLocalizedString(@"Please choose the Folder to COPY in",nil)];
 	[panel setPrompt:NSLocalizedString(@"Choose",nil)];
 	[panel setCanChooseDirectories:YES];
 	[panel setCanChooseFiles:NO];
@@ -358,14 +358,14 @@ NSFileManager *fm;
 	NSString *theFileNamePath = [[[panel URLs] objectAtIndex:0] path];
 	NSString *theFileName = [theFileNamePath substringFromIndex:[theFileNamePath rangeOfString:@"/" options:NSBackwardsSearch].location];
 	BOOL success;
-	if (copyIt)
+	if (removeOriginal)
     {
-		success = [fm copyItemAtPath:theFileNamePath
+        success = [fm moveItemAtPath:theFileNamePath
                               toPath:[NSString stringWithFormat:@"%@Program Files%@",self.cDrivePathForWrapper,theFileName]];
     }
 	else
     {
-		success = [fm moveItemAtPath:theFileNamePath
+        success = [fm copyItemAtPath:theFileNamePath
                               toPath:[NSString stringWithFormat:@"%@Program Files%@",self.cDrivePathForWrapper,theFileName]];
     }
     
@@ -395,15 +395,15 @@ NSFileManager *fm;
 	//display warning if final array is 0 length and exit method
 	if (finalList.count == 0)
 	{
-		if (copyIt)
+		if (removeOriginal)
         {
             [NSAlert showAlertOfType:NSAlertTypeWarning
-                         withMessage:@"No new executables found after copying the selected folder inside the wrapper!"];
+                         withMessage:@"No new executables found after moving the selected folder inside the wrapper!"];
         }
 		else
         {
-			[NSAlert showAlertOfType:NSAlertTypeWarning
-                         withMessage:@"No new executables found after moving the selected folder inside the wrapper!"];
+            [NSAlert showAlertOfType:NSAlertTypeWarning
+                         withMessage:@"No new executables found after copying the selected folder inside the wrapper!"];
         }
 		
 		if (usingAdvancedWindow)
