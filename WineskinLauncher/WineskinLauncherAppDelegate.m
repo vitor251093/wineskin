@@ -1037,9 +1037,9 @@ static NSPortManager* portManager;
     NSString* direct3dHeader = @"[Software\\\\Wine\\\\Direct3D]";
     NSMutableString* direct3dReg = [[self.portManager getRegistryEntry:direct3dHeader fromRegistryFileNamed:USER_REG] mutableCopy];
     
-    [self.portManager setValue:nVRAM     forKey:@"\"VideoMemorySize\""  atRegistryEntryString:direct3dReg];
-    [self.portManager setValue:ndeviceID forKey:@"\"VideoPciDeviceID\"" atRegistryEntryString:direct3dReg];
-    [self.portManager setValue:nvendorID forKey:@"\"VideoPciVendorID\"" atRegistryEntryString:direct3dReg];
+    [self.portManager setValue:nVRAM     forKey:@"VideoMemorySize"  atRegistryEntryString:direct3dReg];
+    [self.portManager setValue:ndeviceID forKey:@"VideoPciDeviceID" atRegistryEntryString:direct3dReg];
+    [self.portManager setValue:nvendorID forKey:@"VideoPciVendorID" atRegistryEntryString:direct3dReg];
     
     [self.portManager deleteRegistry:direct3dHeader fromRegistryFileNamed:USER_REG];
     [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n%@\n",direct3dHeader,direct3dReg] fromRegistryFileNamed:USER_REG];
@@ -1492,8 +1492,8 @@ static NSPortManager* portManager;
     NSString* quotedDesktopName = [NSString stringWithFormat:@"\"%@\"",desktopName];
     NSString* resolutionX = [resolution stringByReplacingOccurrencesOfString:@" " withString:@"x"];
     
-    [self.portManager setValue:quotedDesktopName forKey:@"\"Desktop\"" atRegistryEntryString:explorerReg];
-    [self.portManager setValue:resolutionX forKey:quotedDesktopName atRegistryEntryString:desktopsReg];
+    [self.portManager setValue:quotedDesktopName forKey:@"Desktop" atRegistryEntryString:explorerReg];
+    [self.portManager setValue:resolutionX forKey:desktopName atRegistryEntryString:desktopsReg];
     
     [self.portManager deleteRegistry:explorerRegHeader fromRegistryFileNamed:USER_REG];
     [self.portManager deleteRegistry:desktopsRegHeader fromRegistryFileNamed:USER_REG];
