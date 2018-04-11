@@ -1380,7 +1380,8 @@ static NSPortManager* portManager;
 	NSMutableArray *wswineBundleContentsList = [[NSMutableArray alloc] init];
 	
     //get directory contents of wswine.bundle
-	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/",frameworksFold]];
+    NSString* wswineBundlePath = [NSString stringWithFormat:@"%@/wswine.bundle",frameworksFold];
+	NSArray *files = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/",wswineBundlePath]];
     if (files.count == 0) [NSApp terminate:nil];
     
 	for (NSString *file in files)
@@ -1420,7 +1421,8 @@ static NSPortManager* portManager;
 	}
     
 	//get md5
-	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@/wswine.bundle/%@.tar.7z\"",frameworksFold,wineFile]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@/wswine.bundle/%@.tar.7z",frameworksFold,wineFile] withString:@""];
+    NSString* wineTar7zFilePath = [NSString stringWithFormat:@"%@/%@.tar.7z",wswineBundlePath,wineFile];
+	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@\"",wineTar7zFilePath]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@",wineTar7zFilePath] withString:@""];
 	NSString *wineFileInstalledName = [NSString stringWithFormat:@"%@%@.bundle",[wineFile stringByReplacingOccurrencesOfString:@"bundle" withString:@""],wineFileMd5];
     
 	//make ICE folder if it doesn't exist
@@ -1431,8 +1433,8 @@ static NSPortManager* portManager;
     }
     
 	// delete out extra bundles or tars in engine bundle first
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@.tar",frameworksFold,wineFile]];
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",    frameworksFold,wineFile]];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar",wswineBundlePath,wineFile]];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",    wswineBundlePath,wineFile]];
     
 	NSArray *iceFiles = [fm contentsOfDirectoryAtPath:iceFolder];
     
@@ -1448,21 +1450,24 @@ static NSPortManager* portManager;
 	if (!wineInstalled)
 	{
 		//if the Wine bundle is not located in the install folder, then uncompress it and move it over there.
-		system([[NSString stringWithFormat:@"\"%@/wswine.bundle/7za\" x \"%@/wswine.bundle/%@.tar.7z\" \"-o/%@/wswine.bundle\"",frameworksFold,frameworksFold,wineFile,frameworksFold] UTF8String]);
-		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/wswine.bundle\" -xf \"%@/wswine.bundle/%@.tar\"",frameworksFold,frameworksFold,wineFile] UTF8String]);
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@.tar",frameworksFold,wineFile]];
-		//have uncompressed version now, move it to ICE folder.
-        [fm moveItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,wineFile]
+		system([[NSString stringWithFormat:@"\"%@/7za\" x \"%@/%@.tar.7z\" \"-o/%@\"",
+                 wswineBundlePath,wswineBundlePath,wineFile,wswineBundlePath] UTF8String]);
+		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@\" -xf \"%@/%@.tar\"",
+                 wswineBundlePath,wswineBundlePath,wineFile] UTF8String]);
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar",wswineBundlePath,wineFile]];
+		
+        //have uncompressed version now, move it to ICE folder.
+        [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",wswineBundlePath,wineFile]
                     toPath:[NSString stringWithFormat:@"%@/%@",iceFolder,wineFileInstalledName]];
 	}
     
 	//make/remake the symlink in wswine.bundle to point to the correct location
     for (NSString* folder in @[@"bin", @"lib", @"share", @"version"])
     {
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,folder]];
-        [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/wswine.bundle/%@",frameworksFold,folder]
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",wswineBundlePath,folder]];
+        [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/%@",wswineBundlePath,folder]
                  withDestinationPath:[NSString stringWithFormat:@"%@/%@/%@",iceFolder,wineFileInstalledName,folder] error:nil];
-        [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/wswine.bundle/%@\"",frameworksFold,folder]];
+        [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/%@\"",wswineBundlePath,folder]];
     }
     
     [window orderOut:self];
