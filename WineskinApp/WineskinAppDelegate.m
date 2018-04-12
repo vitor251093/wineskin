@@ -548,6 +548,7 @@ NSFileManager *fm;
     [colorDepth setEnabled:YES];
     [switchPause setEnabled:YES];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
+    [windowManagerCheckBoxButton setEnabled:YES];
     
     //on override, need to load all options
     [forceNormalWindowsUseTheseSettingsToggle deselectAllCells];
@@ -619,6 +620,9 @@ NSFileManager *fm;
 	[colorDepth setEnabled:NO];
 	[switchPause setEnabled:NO];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:YES];
+    
+    BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
+    [windowManagerCheckBoxButton setEnabled:!macDriver];
 }
 - (IBAction)overrideClicked:(id)sender
 {
@@ -630,6 +634,8 @@ NSFileManager *fm;
 	[colorDepth setEnabled:YES];
 	[switchPause setEnabled:YES];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
+    
+    [windowManagerCheckBoxButton setEnabled:YES];
     
     [useMacDriverInsteadOfX11CheckBoxButton setState:NO];
     [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
