@@ -1555,9 +1555,10 @@ static NSPortManager* portManager;
     return ([[self systemCommand:[NSString stringWithFormat:@"killall -0 \"%@\" 2>&1",wineServerName]] length] < 1);
 }
 
-
-
-
+// Now checks to find out if what engine is being build/run
+// staging64 does not rename or even make terminal scripts to launch as it broke staging even with lib redirecion disabled
+// Staging no longer does lib redirection incase something broke doing so
+// wine64/wine to name still does lib redirection without issue
 - (void)fixWineExecutableNames
 {
     NSString *pathToWineBinFolder = [NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold];
@@ -1746,6 +1747,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
+// No lib redirection as it might break staging32bit, offically they only work correctly on 10.8+ according to wine-staging.com
 - (void)fixWineStagingExecutableNames
 {
     BOOL fixWine=YES;
@@ -1839,6 +1841,8 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
+// Staging64 engines fail to load when changing names, so only rename wineserver so WineSkin knows when wine has ended fully, can still use kill command to clean up if needed
+// No lib redirection as it will break staging64 engine building, staging engines only work correctly on 10.8+ systems according to wine-staging.com
 - (void)fixWineStaging64ExecutableNames
 {
     BOOL fixWine=YES;
@@ -1861,7 +1865,6 @@ static NSPortManager* portManager;
         fixWine=NO;
         wineServerName = [NSString stringWithFormat:@"%@",oldWineServerName];
     }
-    
     if (fixWine == false) return;
     
     // set CFBundleID too
@@ -1892,10 +1895,6 @@ static NSPortManager* portManager;
     
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
-
-
-
-
 
 - (void)wineBootStuckProcess
 {
