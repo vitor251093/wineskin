@@ -718,6 +718,9 @@ NSFileManager *fm;
 {
     //get name of wine and wineserver
     NSString *wineName = @"wine";
+    NSString *wineStagingName = @"wine-preloader";
+    NSString *wine64Name = @"wine64";
+    NSString *wine64StagingName= @"wine64-preloader";
     NSString *wineserverName = @"wineserver";
     NSArray *filesTEMP1 = [fm subpathsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/bin",self.wswineBundlePath] error:nil];
     for (NSString *item in filesTEMP1)
@@ -725,6 +728,18 @@ NSFileManager *fm;
 		if ([item hasSuffix:@"Wine"])
         {
             wineName = [item copy];
+        }
+        if ([item hasSuffix:@"Wine64"])
+        {
+            wine64Name = [item copy];
+        }
+        if ([item hasSuffix:@"WineStagingName"])
+        {
+            wineStagingName = [item copy];
+        }
+        if ([item hasSuffix:@"Wine64-preloader"])
+        {
+            wine64StagingName = [item copy];
         }
         else if ([item hasSuffix:@"Wineserver"])
         {
@@ -736,6 +751,9 @@ NSFileManager *fm;
     {
     	//kill WineskinLauncher WineskinX11 wine wineserver
         [self systemCommand:[NSString stringWithFormat:@"killall -9 %@",wineName]];
+        [self systemCommand:[NSString stringWithFormat:@"killall -9 %@",wineStagingName]];
+        [self systemCommand:[NSString stringWithFormat:@"killall -9 %@",wine64Name]];
+        [self systemCommand:[NSString stringWithFormat:@"killall -9 %@",wine64StagingName]];
         [self systemCommand:[NSString stringWithFormat:@"killall -9 %@",wineserverName]];
         
         NSMutableArray *pidsToKill = [[NSMutableArray alloc] init];
