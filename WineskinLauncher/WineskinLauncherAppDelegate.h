@@ -50,6 +50,9 @@
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
     NSString *wineServerName;                       //the name of the Wineserver we'll be launching
     NSString *wineName;                             //the name of the Wine process we'll be launching
+    NSString *wine64Name;                             //the name of the Wine64 process we'll be launching
+    NSString *wineStagingName;                        //the name of the Wine-preloader process we'll be launching
+    NSString *wineStaging64Name;                      //the name of the Wine64-preloader process we'll be launching
 	int bundleRandomInt1;
     int bundleRandomInt2;
     
@@ -137,6 +140,15 @@
 
 //fix wine and wineserver names in engines to be unique for launch
 - (void)fixWineExecutableNames;
+
+//fix standard wine and wineserver names
+- (void)fixWine32ExecutableNames;
+
+//fix standard wine and wineserver names
+- (void)fixWine64ExecutableNames;
+
+//fix staging64 names
+- (void)fixWineStaging64ExecutableNames;
 
 //start wine
 - (void)startWine:(WineStart *)wineStart;
