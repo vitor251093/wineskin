@@ -1751,8 +1751,7 @@ static NSPortManager* portManager;
 - (void)fixWineStagingExecutableNames
 {
     BOOL fixWine=YES;
-    NSString *oldWineName = nil;
-
+    NSString *oldWineServerName = nil;
     NSString *pathToWineBinFolder = [NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold];
     NSArray *engineBinContents = [fm contentsOfDirectoryAtPath:pathToWineBinFolder];
     for (NSString *item in engineBinContents)
@@ -1794,8 +1793,6 @@ static NSPortManager* portManager;
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                          
     NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
     
