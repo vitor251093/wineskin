@@ -548,7 +548,7 @@ NSFileManager *fm;
     [colorDepth setEnabled:YES];
     [switchPause setEnabled:YES];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    [windowManagerCheckBoxButton setEnabled:YES];
+    [windowManagerCheckBoxButton setEnabled:NO];
     
     //on override, need to load all options
     [forceNormalWindowsUseTheseSettingsToggle deselectAllCells];
@@ -624,6 +624,7 @@ NSFileManager *fm;
     BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
     [windowManagerCheckBoxButton setEnabled:!macDriver];
 }
+
 - (IBAction)overrideClicked:(id)sender
 {
 	[forceNormalWindowsUseTheseSettingsToggle setEnabled:YES];
@@ -634,38 +635,41 @@ NSFileManager *fm;
 	[colorDepth setEnabled:YES];
 	[switchPause setEnabled:YES];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    
-    [windowManagerCheckBoxButton setEnabled:YES];
-    
+    [windowManagerCheckBoxButton setEnabled:NO];
     [useMacDriverInsteadOfX11CheckBoxButton setState:NO];
     [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
-    
     [windowManagerCheckBoxButton setState:YES];
     [NSWineskinPortDataWriter saveDecorateWindow:YES atPort:portManager];
 }
+
 - (IBAction)rootlessClicked:(id)sender
 {
 	[fullscreenRootlesToggleTabView selectFirstTabViewItem:self];
     [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
 }
+
 - (IBAction)fullscreenClicked:(id)sender
 {
 	[fullscreenRootlesToggleTabView selectLastTabViewItem:self];
 }
+
 - (IBAction)normalWindowsClicked:(id)sender
 {
 	[virtualDesktopResolution setEnabled:NO];
 }
+
 - (IBAction)virtualDesktopClicked:(id)sender
 {
 	[virtualDesktopResolution setEnabled:YES];
 }
+
 - (IBAction)gammaChanged:(id)sender
 {
 	if ([gammaSlider doubleValue] != 60.0)
 		[self systemCommand:[NSString stringWithFormat:@"%@/Contents/Resources/WSGamma",[[NSBundle mainBundle] bundlePath]]
                    withArgs:@[[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-60))/100]]];
 }
+
 - (IBAction)windowManagerCheckBoxClicked:(id)sender
 {
     [NSWineskinPortDataWriter saveDecorateWindow:windowManagerCheckBoxButton.state atPort:portManager];
@@ -708,11 +712,13 @@ NSFileManager *fm;
         }
 	}
 }
+
 - (IBAction)commandLineWineTestButtonPressed:(id)sender
 {
 	[self saveAllData];
 	[NSThread detachNewThreadSelector:@selector(runACommandLineTestRun) toTarget:self withObject:nil];
 }
+
 - (void)runACommandLineTestRun
 {
 	@autoreleasepool
@@ -720,6 +726,7 @@ NSFileManager *fm;
 		system([[NSString stringWithFormat: @"export PATH=\"%@/bin:$PATH\";open -a Terminal.app \"%@/Contents/Resources/Command Line Wine Test\"",self.wswineBundlePath,[[NSBundle mainBundle] bundlePath]] UTF8String]);
 	}
 }
+
 - (IBAction)killWineskinProcessesButtonPressed:(id)sender
 {
     //get name of wine and wineserver
@@ -813,6 +820,7 @@ NSFileManager *fm;
     [portManager setPlistObject:wineDebugTextField.stringValue      forKey:@"WINEDEBUG="];
     [portManager synchronizePlist];
 }
+
 - (void)loadAllData
 {
 	//get wrapper version and put on Advanced Page wrapperVersionText

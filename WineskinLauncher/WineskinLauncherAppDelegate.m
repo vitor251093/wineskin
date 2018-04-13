@@ -222,11 +222,11 @@ static NSPortManager* portManager;
         //set correct dyldFallBackLibraryPath
         if (useXQuartz)
         {
-            dyldFallBackLibraryPath = [NSString stringWithFormat:@"/opt/X11/lib:/opt/local/lib:%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold];
+            dyldFallBackLibraryPath = [NSString stringWithFormat:@"/opt/X11/lib:/opt/local/lib:%@:%@/wswine.bundle/lib:%@/wswine.bundle/lib64:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold,frameworksFold];
         }
         else
         {
-            dyldFallBackLibraryPath = [NSString stringWithFormat:@"%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/opt/X11/lib:/opt/local/lib:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold];
+            dyldFallBackLibraryPath = [NSString stringWithFormat:@"%@:%@/wswine.bundle/lib:%@/wswine.bundle/lib64:/usr/lib:/usr/libexec:/usr/lib/system:/opt/X11/lib:/opt/local/lib:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold,frameworksFold];
         }
         
         [gammaCorrection setString:[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION]];
@@ -1752,44 +1752,23 @@ static NSPortManager* portManager;
 {
     BOOL fixWine=YES;
     NSString *oldWineName = nil;
-    NSString *oldWineStagingName = nil;
-    NSString *oldWineServerName = nil;
+
     NSString *pathToWineBinFolder = [NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold];
     NSArray *engineBinContents = [fm contentsOfDirectoryAtPath:pathToWineBinFolder];
     for (NSString *item in engineBinContents)
     {
-        if ([item hasSuffix:@"Wine"])
-        {
-            oldWineName = [NSString stringWithFormat:@"%@",item];
-            
-        }
-        if ([item hasSuffix:@"Wine-preloader"])
-        {
-            oldWineStagingName = [NSString stringWithFormat:@"%@",item];
-            
-        }
-        else if ([item hasSuffix:@"Wineserver"])
+        if ([item hasSuffix:@"Wineserver"])
         {
             oldWineServerName = [NSString stringWithFormat:@"%@",item];
         }
-    }
-    if (oldWineName == nil)
-    {
-        oldWineName=@"wine";
-    }
-    if (oldWineStagingName == nil)
-    {
-        oldWineStagingName=@"wine-preloader";
     }
     if (oldWineServerName == nil)
     {
         oldWineServerName=@"wineserver";
     }
-    if ([oldWineName hasPrefix:appName] && [oldWineStagingName hasPrefix:appName] && [oldWineServerName hasPrefix:appName])
+    if ([oldWineServerName hasPrefix:appName])
     {
         fixWine=NO;
-        wineName = [NSString stringWithFormat:@"%@",oldWineName];
-        wineStagingName = [NSString stringWithFormat:@"%@",oldWineStagingName];
         wineServerName = [NSString stringWithFormat:@"%@",oldWineServerName];
     }
     
@@ -1805,37 +1784,21 @@ static NSPortManager* portManager;
     
     //set names for wine and wineserver
     wineServerName = [NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
-    wineName = [NSString stringWithFormat:@"%@%dWine",appName,bundleRandomInt1];
-    wineStagingName = [NSString stringWithFormat:@"%@%dWine-preloader",appName,bundleRandomInt1];
-    
-    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineName]];
-    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineName]
-                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineName]];
-    
-    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineStagingName]];
-    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineStagingName]
-                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineStagingName]];
     
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
     [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineServerName]
                 toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
     
-    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]];
-    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]];
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
     
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
     NSString *wineBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                          binBash,dyldFallbackLibraryPath,wineName];
-    NSString *wineStagingBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                                 binBash,dyldFallbackLibraryPath,wineStagingName];
+                          
     NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
     
-    [wineBash       writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
-    [wineStagingBash       writeToFile:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];

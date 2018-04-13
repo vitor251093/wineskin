@@ -1221,8 +1221,8 @@ Gw
                                                 <action selector="winetricksButtonPressed:" target="494" id="807"/>
                                             </connections>
                                         </button>
-                                        <button id="737">
-                                            <rect key="frame" x="222" y="84" width="194" height="36"/>
+                                        <button misplaced="YES" id="737">
+                                            <rect key="frame" x="222" y="122" width="194" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Custom EXE Creator" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="738">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1232,10 +1232,10 @@ Gw
                                                 <action selector="createCustomExeLauncherButtonPressed:" target="494" id="808"/>
                                             </connections>
                                         </button>
-                                        <button id="1644">
-                                            <rect key="frame" x="222" y="122" width="194" height="36"/>
+                                        <button misplaced="YES" id="1644">
+                                            <rect key="frame" x="16" y="46" width="194" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="Command Line Shell" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1645">
+                                            <buttonCell key="cell" type="bevel" title="Command Line (cmd)" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1645">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1265,8 +1265,8 @@ Gw
                                                 <action selector="taskmgrButtonPressed:" target="494" id="804"/>
                                             </connections>
                                         </button>
-                                        <button id="1475">
-                                            <rect key="frame" x="15" y="46" width="194" height="36"/>
+                                        <button misplaced="YES" id="1475">
+                                            <rect key="frame" x="16" y="8" width="194" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Uninstaller (uninstaller)" bezelStyle="regularSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1476">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1320,8 +1320,8 @@ Gw
                                                 <action selector="updateWrapperButtonPressed:" target="494" id="810"/>
                                             </connections>
                                         </button>
-                                        <button id="778">
-                                            <rect key="frame" x="222" y="46" width="194" height="36"/>
+                                        <button misplaced="YES" id="778">
+                                            <rect key="frame" x="223" y="84" width="194" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="View Last Run Log Files" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="779">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1362,19 +1362,8 @@ Gw
                                             <rect key="frame" x="213" y="12" width="5" height="210"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
-                                        <button id="1918">
-                                            <rect key="frame" x="15" y="8" width="194" height="36"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="Command Line Wine Test" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1919">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="commandLineWineTestButtonPressed:" target="494" id="1922"/>
-                                            </connections>
-                                        </button>
-                                        <button id="687">
-                                            <rect key="frame" x="222" y="8" width="194" height="36"/>
+                                        <button misplaced="YES" id="687">
+                                            <rect key="frame" x="223" y="8" width="194" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Kill Wineskin Processes" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="688">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1388,6 +1377,17 @@ Gw
                                             <rect key="frame" x="420" y="12" width="5" height="210"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
+                                        <button misplaced="YES" id="1918">
+                                            <rect key="frame" x="223" y="46" width="194" height="36"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="Command Line Wine Test" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1919">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="commandLineWineTestButtonPressed:" target="494" id="1922"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
