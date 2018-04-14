@@ -535,7 +535,6 @@ NSFileManager *fm;
         [fullscreenResolution setEnabled:NO];
         [colorDepth setEnabled:NO];
         [switchPause setEnabled:NO];
-        [useMacDriverInsteadOfX11CheckBoxButton setEnabled:YES];
         return;
     }
     
@@ -548,7 +547,7 @@ NSFileManager *fm;
     [colorDepth setEnabled:YES];
     [switchPause setEnabled:YES];
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    [windowManagerCheckBoxButton setEnabled:NO];
+    [windowManagerCheckBoxButton setEnabled:YES];
     
     //on override, need to load all options
     [forceNormalWindowsUseTheseSettingsToggle deselectAllCells];
@@ -573,13 +572,17 @@ NSFileManager *fm;
                 [normalWindowsVirtualDesktopToggle deselectAllCells];
                 [normalWindowsVirtualDesktopToggle selectCellWithTag:1];
                 [virtualDesktopResolution setEnabled:NO];
+                
+                [windowManagerCheckBoxButton setEnabled:YES];
             }
             else
             {
-                [virtualDesktopResolution setEnabled:YES];
                 [normalWindowsVirtualDesktopToggle deselectAllCells];
                 [normalWindowsVirtualDesktopToggle selectCellWithTag:0];
+                [virtualDesktopResolution setEnabled:YES];
                 [virtualDesktopResolution selectItemWithTitle:resolution];
+                
+                [windowManagerCheckBoxButton setEnabled:NO];
             }
         }
         else
@@ -598,6 +601,8 @@ NSFileManager *fm;
             [normalWindowsVirtualDesktopToggle deselectAllCells];
             [normalWindowsVirtualDesktopToggle selectCellWithTag:1];
             [virtualDesktopResolution setEnabled:NO];
+            
+            [windowManagerCheckBoxButton setEnabled:NO];
         }
     }];
 }
@@ -619,10 +624,13 @@ NSFileManager *fm;
 	[fullscreenResolution setEnabled:NO];
 	[colorDepth setEnabled:NO];
 	[switchPause setEnabled:NO];
+    
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:YES];
+    [NSWineskinPortDataWriter saveMacDriver:useMacDriverInsteadOfX11CheckBoxButton.state atPort:portManager];
     
     BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
     [windowManagerCheckBoxButton setEnabled:!macDriver];
+    [NSWineskinPortDataWriter saveDecorateWindow:!macDriver atPort:portManager];
 }
 
 - (IBAction)overrideClicked:(id)sender
@@ -634,10 +642,12 @@ NSFileManager *fm;
     [fullscreenResolution setEnabled:YES];
 	[colorDepth setEnabled:YES];
 	[switchPause setEnabled:YES];
+    
     [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    [windowManagerCheckBoxButton setEnabled:NO];
     [useMacDriverInsteadOfX11CheckBoxButton setState:NO];
     [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
+    
+    [windowManagerCheckBoxButton setEnabled:YES];
     [windowManagerCheckBoxButton setState:YES];
     [NSWineskinPortDataWriter saveDecorateWindow:YES atPort:portManager];
 }
@@ -646,21 +656,28 @@ NSFileManager *fm;
 {
 	[fullscreenRootlesToggleTabView selectFirstTabViewItem:self];
     [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
+    
+    BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
+    [windowManagerCheckBoxButton setEnabled:!macDriver];
 }
 
 - (IBAction)fullscreenClicked:(id)sender
 {
 	[fullscreenRootlesToggleTabView selectLastTabViewItem:self];
+    
+    [windowManagerCheckBoxButton setEnabled:NO];
 }
 
 - (IBAction)normalWindowsClicked:(id)sender
 {
 	[virtualDesktopResolution setEnabled:NO];
+    [windowManagerCheckBoxButton setEnabled:YES];
 }
 
 - (IBAction)virtualDesktopClicked:(id)sender
 {
 	[virtualDesktopResolution setEnabled:YES];
+    [windowManagerCheckBoxButton setEnabled:NO];
 }
 
 - (IBAction)gammaChanged:(id)sender
