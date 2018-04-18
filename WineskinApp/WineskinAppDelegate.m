@@ -763,7 +763,7 @@ NSFileManager *fm;
         {
             wine64Name = [item copy];
         }
-        if ([item hasSuffix:@"WineStagingName"])
+        if ([item hasSuffix:@"Wine-preloader"])
         {
             wineStagingName = [item copy];
         }
