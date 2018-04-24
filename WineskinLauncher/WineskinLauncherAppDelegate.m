@@ -1096,7 +1096,7 @@ static NSPortManager* portManager;
     
     if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",frameworksFold,mainFile]])
     {
-        [mainFile setString:@"/usr/lib/libXplugin.1.10.8.dylib"];//default to 10.8 for 10.9+
+        [mainFile setString:@"libXplugin.1.10.8.dylib"];//default to 10.8 for 10.9+
     }
     
     [fm removeItemAtPath:symlinkName];
@@ -1640,8 +1640,11 @@ static NSPortManager* portManager;
         [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]];
         [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
         
+        
+        dyldFallBackLibraryPath = [NSString stringWithFormat:@"/opt/X11/lib:/opt/local/lib:%@:%@/wswine.bundle/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib",frameworksFold,frameworksFold];
+        
         NSString* binBash = @"#!/bin/bash\n";
-        NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
+        NSString *dyldFallbackLibraryPath =  [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath];
         
         NSString *wineBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
                               binBash,dyldFallbackLibraryPath,wineName];
