@@ -67,6 +67,10 @@ REGEDIT4
 "StartUp"="C:\\users\\Wineskin\\Start Menu\\Programs\\StartUp"
 "Templates"="C:\\users\\Wineskin\\Templates"
 
+[HKEY_CURRENT_USER\Environment]
+"TEMP"="C:\\users\\Wineskin\\Temp"
+"TMP"="C:\\users\\Wineskin\\Temp"
+
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders]
 "AppData"=str(2):"%USERPROFILE%\\Application Data"
 "Cache"=str(2):"%USERPROFILE%\\Local Settings\\Temporary Internet Files"
