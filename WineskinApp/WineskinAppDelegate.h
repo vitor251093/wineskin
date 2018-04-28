@@ -31,29 +31,32 @@
 	
 	//Screen Options window
 	IBOutlet NSWindow *screenOptionsWindow;
-	IBOutlet NSMatrix *automaticOverrideToggle;
-	IBOutlet NSButtonCell *automaticOverrideToggleOverrideButton;
-	IBOutlet NSButtonCell *fullscreenRootlessToggleFullscreenButton;
-	IBOutlet NSButtonCell *normalWindowsVirtualDesktopToggleVirtualDesktopButton;
-	IBOutlet NSButtonCell *forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton;
-	IBOutlet NSButtonCell *automaticOverrideToggleAutomaticButton;
-	IBOutlet NSMatrix *fullscreenRootlessToggle;
-	IBOutlet NSTabView *fullscreenRootlesToggleTabView;
-	IBOutlet NSButtonCell *fullscreenRootlessToggleRootlessButton;
-	IBOutlet NSMatrix *normalWindowsVirtualDesktopToggle;
-	IBOutlet NSButtonCell *normalWindowsVirtualDesktopToggleNormalWindowsButton;
-	IBOutlet NSMatrix *forceNormalWindowsUseTheseSettingsToggle;
-	IBOutlet NSButtonCell *forceNormalWindowsUseTheseSettingsToggleForceButton;
-	IBOutlet NSPopUpButton *virtualDesktopResolution;
-	IBOutlet NSPopUpButton *fullscreenResolution;
-	IBOutlet NSPopUpButton *colorDepth;
-	IBOutlet NSPopUpButton *switchPause;
-	IBOutlet NSSlider *gammaSlider;
-	IBOutlet NSButton *windowManagerCheckBoxButton;
-    IBOutlet NSButton *useMacDriverInsteadOfX11CheckBoxButton;
-    IBOutlet NSButton *useD3DBoostIfAvailableCheckBoxButton;
-	IBOutlet NSButton *autoDetectGPUInfoCheckBoxButton;
 	
+    IBOutlet NSButton *useD3DBoostIfAvailableCheckBoxButton;
+    IBOutlet NSButton *autoDetectGPUInfoCheckBoxButton;
+    IBOutlet NSSlider *gammaSlider;
+    
+    IBOutlet NSButton *useMacDriverRadioButton;
+    IBOutlet NSButton *useX11RadioButton;
+    IBOutlet NSTabView *macDriverX11TabView;
+    
+    IBOutlet NSPopUpButton *colorDepth;
+    
+    IBOutlet NSButton *defaultSettingsOverrideRadioButton;
+    IBOutlet NSButton *defaultSettingsAutomaticRadioButton;
+    
+    IBOutlet NSButton *installerSettingsOverrideRadioButton;
+    IBOutlet NSButton *installerSettingsAutomaticRadioButton;
+    
+    IBOutlet NSButton *windowModeNormalWindowsRadioButton;
+    IBOutlet NSButton *windowModeVirtualDesktopRadioButton;
+	
+	IBOutlet NSButton *virtualDesktopFullscreenRadioButton;
+    IBOutlet NSButton *virtualDesktopWindowedRadioButton;
+	IBOutlet NSPopUpButton *virtualDesktopResolution;
+    
+	IBOutlet NSButton *windowManagerCheckBoxButton;
+    
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
 	IBOutlet NSButton *testRunButton;
@@ -216,13 +219,16 @@
 - (IBAction)doneButtonPressed:(id)sender;
 - (IBAction)automaticClicked:(id)sender;
 - (IBAction)overrideClicked:(id)sender;
-- (IBAction)rootlessClicked:(id)sender;
-- (IBAction)fullscreenClicked:(id)sender;
+- (IBAction)installerAutomaticClicked:(id)sender;
+- (IBAction)installerOverrideClicked:(id)sender;
 - (IBAction)normalWindowsClicked:(id)sender;
 - (IBAction)virtualDesktopClicked:(id)sender;
+- (IBAction)fullscreenClicked:(id)sender;
+- (IBAction)windowedClicked:(id)sender;
 - (IBAction)gammaChanged:(id)sender;
 - (IBAction)windowManagerCheckBoxClicked:(id)sender;
-- (IBAction)useMacDriverInsteadOfX11CheckBoxClicked:(id)sender;
+- (IBAction)useMacDriverCheckBoxClicked:(id)sender;
+- (IBAction)useX11CheckBoxClicked:(id)sender;
 - (IBAction)useD3DBoostIfAvailableCheckBoxClicked:(id)sender;
 
 //advanced menu

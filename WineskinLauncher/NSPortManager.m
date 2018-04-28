@@ -316,12 +316,10 @@
         
         [batFileContent writeToFile:batFileLocation atomically:YES encoding:NSASCIIStringEncoding];
         
-        NSDebugLog(@"Running \"%@ %@\" in %@",installerFileWindowsPath,flags,self.path);
         fileToRun = batFileLocation;
     }
     else
     {
-        NSDebugLog(@"Running %@ in %@",installerFileWindowsPath,self.path);
         fileToRun = [NSPathUtilities getMacPathForWindowsPath:installerFileWindowsPath ofWrapper:self.path];
     }
     

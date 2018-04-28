@@ -28,13 +28,6 @@
     #import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 #endif
 
-// That defines if the logs in the program will appear or not
-#ifdef DEBUG
-#define NSDebugLog NSLog
-#else
-#define NSDebugLog(...)
-#endif
-
 #define WINESKIN_APP_NAME @"Wineskin Launcher"
 #define WINESKIN_VERSION  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]
 #define RETINA_SCALE      [NSScreen mainScreen].userSpaceScaleFactor

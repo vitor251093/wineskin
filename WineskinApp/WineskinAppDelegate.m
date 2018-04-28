@@ -71,12 +71,6 @@ NSFileManager *fm;
 	usingAdvancedWindow=NO;
     
 	//clear out cells in Screen Options, They need to be blank but IB likes putting them back to defaults by just opening it and resaving
-	[fullscreenRootlessToggleRootlessButton setIntegerValue:0];
-	[fullscreenRootlessToggleFullscreenButton setIntegerValue:0];
-	[normalWindowsVirtualDesktopToggleNormalWindowsButton setIntegerValue:0];
-	[normalWindowsVirtualDesktopToggleVirtualDesktopButton setIntegerValue:0];
-	[forceNormalWindowsUseTheseSettingsToggleForceButton setIntegerValue:0];
-	[forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton setIntegerValue:0];	
 	[self installEngine];
 	[self loadAllData];
 	[self loadScreenOptionsData];
@@ -442,6 +436,8 @@ NSFileManager *fm;
 	usingAdvancedWindow=YES;
 	[window orderOut:self];
 }
+
+
 //*************************************************************
 //************* Screen Options window methods *****************
 //*************************************************************
@@ -460,15 +456,15 @@ NSFileManager *fm;
 - (void)saveScreenOptionsData
 {
     int colorInt = [[[[colorDepth selectedItem] title] stringByReplacingOccurrencesOfString:@" bit" withString:@""] intValue];
-    NSString* sleep = [[[switchPause selectedItem] title] stringByReplacingOccurrencesOfString:@" sec." withString:@""];
+    NSString* sleep = @"0";
     
-    BOOL vd = !([fullscreenRootlessToggleRootlessButton intValue] && [normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]);
-    NSString* resolution = [fullscreenRootlessToggleRootlessButton intValue] ? [[virtualDesktopResolution selectedItem] title] :
-                                                                               [[fullscreenResolution     selectedItem] title];
+    BOOL vd = ([windowModeVirtualDesktopRadioButton isEnabled] && [windowModeVirtualDesktopRadioButton state]);
+    BOOL fullscreen = [virtualDesktopFullscreenRadioButton isEnabled] && [virtualDesktopFullscreenRadioButton intValue];
+    NSString* resolution = [[virtualDesktopResolution selectedItem] title];
     
-    [NSWineskinPortDataWriter setAutomaticScreenOptions:([automaticOverrideToggleAutomaticButton intValue] == 1)
-                                             fullscreen:[fullscreenRootlessToggleFullscreenButton intValue]
-                                         virtualDesktop:vd resolution:resolution colors:colorInt sleep:sleep atPort:portManager];
+    [NSWineskinPortDataWriter setAutomaticScreenOptions:([defaultSettingsAutomaticRadioButton intValue] == 1)
+                                             fullscreen:fullscreen virtualDesktop:vd resolution:resolution colors:colorInt
+                                                  sleep:sleep atPort:portManager];
     
     //gamma always set the same, set it first
 	if ([gammaSlider doubleValue] == 60.0)
@@ -481,7 +477,7 @@ NSFileManager *fm;
                              forKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION];
     }
     
-    if ([automaticOverrideToggleAutomaticButton intValue] == 1)
+    if ([defaultSettingsAutomaticRadioButton intValue] == 1)
 	{
 		//set to automatic
 		[portManager setPlistObject:@FALSE forKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS];
@@ -489,7 +485,7 @@ NSFileManager *fm;
 	else
 	{
 		//set to override
-		[portManager setPlistObject:@([forceNormalWindowsUseTheseSettingsToggleForceButton intValue])
+		[portManager setPlistObject:@([installerSettingsAutomaticRadioButton intValue])
                              forKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS];
 	}
     
@@ -502,108 +498,87 @@ NSFileManager *fm;
     NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     
     BOOL macDriver = [NSPortDataLoader macDriverIsEnabledAtPort:self.wrapperPath withEngine:engine];
-    [useMacDriverInsteadOfX11CheckBoxButton setState:macDriver];
-    [useD3DBoostIfAvailableCheckBoxButton   setState:[NSPortDataLoader direct3DBoostIsEnabledAtPort:self.wrapperPath]];
+    [useMacDriverRadioButton setState: macDriver];
+    [useX11RadioButton       setState:!macDriver];
+    [macDriverX11TabView selectTabViewItemAtIndex:macDriver ? 0 : 1];
     
-    [windowManagerCheckBoxButton setEnabled:!macDriver];
-    [windowManagerCheckBoxButton setState:!macDriver && [NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
+    [useD3DBoostIfAvailableCheckBoxButton setEnabled:[NSWineskinEngine isCsmtCompatibleWithEngine:engine]];
+    [useD3DBoostIfAvailableCheckBoxButton setState:[NSPortDataLoader direct3DBoostIsEnabledAtPort:self.wrapperPath]];
+    
+    [windowManagerCheckBoxButton setState:[NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
     
     BOOL autoDetectGPUEnabled = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] boolValue];
     [autoDetectGPUInfoCheckBoxButton setState:autoDetectGPUEnabled];
 	
-    [automaticOverrideToggle deselectAllCells];
-    NSNumber* automatic = [portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_ARE_AUTOMATIC];
-    [automaticOverrideToggle selectCellWithTag:[automatic intValue]];
-    
-    if ([[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION] isEqualToString:@"default"])
-    {
-		[gammaSlider setDoubleValue:60.0];
+    if ([[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION] isEqualToString:@"default"]) {
+        [gammaSlider setDoubleValue:60.0];
     }
-	else
-    {
-		[gammaSlider setDoubleValue:(-100*[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION] doubleValue])+160];
+    else {
+        [gammaSlider setDoubleValue:(-100*[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION] doubleValue])+160];
     }
     
+    BOOL automatic = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_ARE_AUTOMATIC] boolValue];
+    [defaultSettingsOverrideRadioButton  setState:!automatic];
+    [defaultSettingsAutomaticRadioButton setState: automatic];
     
-	if ([automaticOverrideToggleAutomaticButton intValue] != 0)
+    BOOL forceInstallerNormalWindows = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS] boolValue];
+    [installerSettingsOverrideRadioButton  setState:!forceInstallerNormalWindows];
+    [installerSettingsAutomaticRadioButton setState: forceInstallerNormalWindows];
+    
+    
+	if (automatic)
     {
         // Automatic
-        [forceNormalWindowsUseTheseSettingsToggle setEnabled:NO];
-        [fullscreenRootlessToggle setEnabled:NO];
-        [normalWindowsVirtualDesktopToggle setEnabled:NO];
-        [virtualDesktopResolution setEnabled:NO];
-        [fullscreenResolution setEnabled:NO];
+        [installerSettingsOverrideRadioButton  setEnabled:NO];
+        [installerSettingsAutomaticRadioButton setEnabled:NO];
+        
+        [windowModeNormalWindowsRadioButton  setEnabled:NO];
+        [windowModeVirtualDesktopRadioButton setEnabled:NO];
+        
+        [virtualDesktopFullscreenRadioButton setEnabled:NO];
+        [virtualDesktopWindowedRadioButton   setEnabled:NO];
+        [virtualDesktopResolution            setEnabled:NO];
+        
         [colorDepth setEnabled:NO];
-        [switchPause setEnabled:NO];
-        return;
+        [windowManagerCheckBoxButton setEnabled:YES];
+    }
+    else
+    {
+        // Override
+        [installerSettingsOverrideRadioButton  setEnabled:YES];
+        [installerSettingsAutomaticRadioButton setEnabled:YES];
+        
+        [windowModeNormalWindowsRadioButton  setEnabled:YES];
+        [windowModeVirtualDesktopRadioButton setEnabled:YES];
+        
+        [colorDepth setEnabled:YES];
     }
     
-    // Override
-    [forceNormalWindowsUseTheseSettingsToggle setEnabled:YES];
-    [fullscreenRootlessToggle setEnabled:YES];
-    [normalWindowsVirtualDesktopToggle setEnabled:YES];
-    [virtualDesktopResolution setEnabled:NO];
-    [fullscreenResolution setEnabled:YES];
-    [colorDepth setEnabled:YES];
-    [switchPause setEnabled:YES];
-    [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    [windowManagerCheckBoxButton setEnabled:YES];
-    
     //on override, need to load all options
-    [forceNormalWindowsUseTheseSettingsToggle deselectAllCells];
-    NSNumber* forceInstallerNormalWindows = [portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS];
-    [forceNormalWindowsUseTheseSettingsToggle selectCellWithTag:[forceInstallerNormalWindows intValue]];
-    
-    [fullscreenRootlessToggle deselectAllCells];
-    NSNumber* fullscreen = [portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_IS_FULLSCREEN];
-    [fullscreenRootlessToggle selectCellWithTag:1-[fullscreen intValue]];
+    BOOL fullscreen = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_IS_FULLSCREEN] boolValue];
+    [virtualDesktopFullscreenRadioButton setState: fullscreen];
+    [virtualDesktopWindowedRadioButton   setState:!fullscreen];
     
     NSString* screenConfigurations = [portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_CONFIGURATIONS];
     [NSPortDataLoader getValuesFromResolutionString:screenConfigurations inBlock:
      ^(BOOL virtualDesktop, NSString *resolution, int colors, int sleep)
     {
-        if ([fullscreenRootlessToggleRootlessButton intValue] == 1)
-        {
-            //do rootless options
-            [fullscreenRootlesToggleTabView selectFirstTabViewItem:self];
-            
-            if (!resolution)
-            {
-                [normalWindowsVirtualDesktopToggle deselectAllCells];
-                [normalWindowsVirtualDesktopToggle selectCellWithTag:1];
-                [virtualDesktopResolution setEnabled:NO];
-                
-                [windowManagerCheckBoxButton setEnabled:YES];
-            }
-            else
-            {
-                [normalWindowsVirtualDesktopToggle deselectAllCells];
-                [normalWindowsVirtualDesktopToggle selectCellWithTag:0];
-                [virtualDesktopResolution setEnabled:YES];
-                [virtualDesktopResolution selectItemWithTitle:resolution];
-                
-                [windowManagerCheckBoxButton setEnabled:NO];
-            }
+        [windowModeNormalWindowsRadioButton  setState:!virtualDesktop];
+        [windowModeVirtualDesktopRadioButton setState: virtualDesktop];
+        
+        BOOL enabledVDOptions = !automatic && virtualDesktop;
+        [virtualDesktopFullscreenRadioButton setEnabled:enabledVDOptions];
+        [virtualDesktopWindowedRadioButton   setEnabled:enabledVDOptions];
+        [virtualDesktopResolution            setEnabled:enabledVDOptions];
+        [windowManagerCheckBoxButton         setEnabled:automatic || (!automatic && !virtualDesktop)];
+        
+        if (resolution != nil) {
+            [virtualDesktopResolution selectItemWithTitle:resolution];
+        } else {
+            [virtualDesktopResolution selectItemWithTitle:WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_CURRENT_RESOLUTION];
         }
-        else
-        {
-            //do fullscreen options
-            [fullscreenRootlesToggleTabView selectLastTabViewItem:self];
-            [fullscreenResolution selectItemWithTitle:resolution];
-            
-            // colorDepth
-            [colorDepth selectItemWithTitle:[NSString stringWithFormat:@"%d bit",colors]];
-            
-            // switchPause
-            [switchPause selectItemWithTitle:[NSString stringWithFormat:@"%d sec.",sleep]];
-            
-            //fix the rootless window to a selection, so its not left blank when changed later
-            [normalWindowsVirtualDesktopToggle deselectAllCells];
-            [normalWindowsVirtualDesktopToggle selectCellWithTag:1];
-            [virtualDesktopResolution setEnabled:NO];
-            
-            [windowManagerCheckBoxButton setEnabled:NO];
-        }
+        
+        [colorDepth selectItemWithTitle:[NSString stringWithFormat:@"%d bit",colors]];
     }];
 }
 - (IBAction)doneButtonPressed:(id)sender
@@ -617,67 +592,78 @@ NSFileManager *fm;
 }
 - (IBAction)automaticClicked:(id)sender
 {
-	[forceNormalWindowsUseTheseSettingsToggle setEnabled:NO];
-	[fullscreenRootlessToggle setEnabled:NO];
-	[normalWindowsVirtualDesktopToggle setEnabled:NO];
-	[virtualDesktopResolution setEnabled:NO];
-	[fullscreenResolution setEnabled:NO];
-	[colorDepth setEnabled:NO];
-	[switchPause setEnabled:NO];
+    [defaultSettingsOverrideRadioButton setState:false];
     
-    [useMacDriverInsteadOfX11CheckBoxButton setEnabled:YES];
-    [NSWineskinPortDataWriter saveMacDriver:useMacDriverInsteadOfX11CheckBoxButton.state atPort:portManager];
+    [installerSettingsOverrideRadioButton  setEnabled:NO];
+    [installerSettingsAutomaticRadioButton setEnabled:NO];
     
-    BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
-    [windowManagerCheckBoxButton setEnabled:!macDriver];
-    [NSWineskinPortDataWriter saveDecorateWindow:!macDriver atPort:portManager];
+    [windowModeNormalWindowsRadioButton  setEnabled:NO];
+    [windowModeVirtualDesktopRadioButton setEnabled:NO];
+    
+    [virtualDesktopFullscreenRadioButton setEnabled:NO];
+    [virtualDesktopWindowedRadioButton   setEnabled:NO];
+    [virtualDesktopResolution            setEnabled:NO];
+    
+    [colorDepth setEnabled:NO];
+    [windowManagerCheckBoxButton setEnabled:YES];
 }
 
 - (IBAction)overrideClicked:(id)sender
 {
-	[forceNormalWindowsUseTheseSettingsToggle setEnabled:YES];
-	[fullscreenRootlessToggle setEnabled:YES];
-	[normalWindowsVirtualDesktopToggle setEnabled:YES];
-    [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
-    [fullscreenResolution setEnabled:YES];
-	[colorDepth setEnabled:YES];
-	[switchPause setEnabled:YES];
+    [defaultSettingsAutomaticRadioButton setState:false];
     
-    [useMacDriverInsteadOfX11CheckBoxButton setEnabled:NO];
-    [useMacDriverInsteadOfX11CheckBoxButton setState:NO];
-    [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
+    [installerSettingsOverrideRadioButton  setEnabled:YES];
+    [installerSettingsAutomaticRadioButton setEnabled:YES];
     
-    [windowManagerCheckBoxButton setEnabled:YES];
-    [windowManagerCheckBoxButton setState:YES];
-    [NSWineskinPortDataWriter saveDecorateWindow:YES atPort:portManager];
+    [windowModeNormalWindowsRadioButton  setEnabled:YES];
+    [windowModeVirtualDesktopRadioButton setEnabled:YES];
+    
+    BOOL vd = windowModeVirtualDesktopRadioButton.state;
+    [virtualDesktopFullscreenRadioButton setEnabled:vd];
+    [virtualDesktopWindowedRadioButton   setEnabled:vd];
+    [virtualDesktopResolution            setEnabled:vd];
+    
+    [colorDepth setEnabled:YES];
+    [windowManagerCheckBoxButton setEnabled:!vd];
 }
-
-- (IBAction)rootlessClicked:(id)sender
+- (IBAction)installerAutomaticClicked:(id)sender
 {
-	[fullscreenRootlesToggleTabView selectFirstTabViewItem:self];
-    [virtualDesktopResolution setEnabled:![normalWindowsVirtualDesktopToggleNormalWindowsButton intValue]];
-    
-    BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
-    [windowManagerCheckBoxButton setEnabled:!macDriver];
+    [installerSettingsOverrideRadioButton setState:false];
 }
-
-- (IBAction)fullscreenClicked:(id)sender
+- (IBAction)installerOverrideClicked:(id)sender
 {
-	[fullscreenRootlesToggleTabView selectLastTabViewItem:self];
-    
-    [windowManagerCheckBoxButton setEnabled:NO];
+    [installerSettingsAutomaticRadioButton setState:false];
 }
 
 - (IBAction)normalWindowsClicked:(id)sender
 {
-	[virtualDesktopResolution setEnabled:NO];
+    [windowModeVirtualDesktopRadioButton setState:false];
+    
+    [virtualDesktopWindowedRadioButton   setEnabled:NO];
+    [virtualDesktopFullscreenRadioButton setEnabled:NO];
+    [virtualDesktopResolution            setEnabled:NO];
+    
     [windowManagerCheckBoxButton setEnabled:YES];
 }
 
 - (IBAction)virtualDesktopClicked:(id)sender
 {
-	[virtualDesktopResolution setEnabled:YES];
+    [windowModeNormalWindowsRadioButton setState:false];
+    
+    [virtualDesktopWindowedRadioButton   setEnabled:YES];
+    [virtualDesktopFullscreenRadioButton setEnabled:YES];
+    [virtualDesktopResolution            setEnabled:YES];
+    
     [windowManagerCheckBoxButton setEnabled:NO];
+}
+
+- (IBAction)fullscreenClicked:(id)sender
+{
+    [virtualDesktopWindowedRadioButton setState:false];
+}
+- (IBAction)windowedClicked:(id)sender
+{
+    [virtualDesktopFullscreenRadioButton setState:false];
 }
 
 - (IBAction)gammaChanged:(id)sender
@@ -692,11 +678,19 @@ NSFileManager *fm;
     [NSWineskinPortDataWriter saveDecorateWindow:windowManagerCheckBoxButton.state atPort:portManager];
 }
 
-- (IBAction)useMacDriverInsteadOfX11CheckBoxClicked:(id)sender
+- (IBAction)useMacDriverCheckBoxClicked:(id)sender
 {
-    BOOL macDriver = useMacDriverInsteadOfX11CheckBoxButton.state;
-    [windowManagerCheckBoxButton setEnabled:!macDriver];
-    [NSWineskinPortDataWriter saveMacDriver:macDriver atPort:portManager];
+    [useX11RadioButton setState:false];
+    
+    [NSWineskinPortDataWriter saveMacDriver:YES atPort:portManager];
+    [macDriverX11TabView selectTabViewItemAtIndex:0];
+}
+- (IBAction)useX11CheckBoxClicked:(id)sender
+{
+    [useMacDriverRadioButton setState:false];
+    
+    [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
+    [macDriverX11TabView selectTabViewItemAtIndex:1];
 }
 
 - (IBAction)useD3DBoostIfAvailableCheckBoxClicked:(id)sender
@@ -704,6 +698,7 @@ NSFileManager *fm;
     NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     [NSWineskinPortDataWriter saveDirect3DBoost:useD3DBoostIfAvailableCheckBoxButton.state withEngine:engine atPort:portManager];
 }
+
 
 //*************************************************************
 //********************* Advanced Menu *************************
