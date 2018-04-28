@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -511,81 +511,101 @@ Gw
         </window>
         <window title="Screen Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="553">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="645" y="530" width="596" height="296"/>
+            <rect key="contentRect" x="645" y="530" width="692" height="326"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2880" height="1778"/>
-            <view key="contentView" id="554">
-                <rect key="frame" x="0.0" y="0.0" width="596" height="296"/>
+            <view key="contentView" misplaced="YES" id="554">
+                <rect key="frame" x="0.0" y="0.0" width="692" height="326"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <box autoresizesSubviews="NO" borderType="line" title="Override Wine control of Screen Settings?" id="562">
-                        <rect key="frame" x="338" y="216" width="241" height="72"/>
+                    <box misplaced="YES" title="Window System" id="JbT-kI-Xjn">
+                        <rect key="frame" x="17" y="218" width="124" height="88"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="cxS-10-Srg">
-                            <rect key="frame" x="1" y="1" width="239" height="56"/>
+                        <view key="contentView" id="gzC-2N-adY">
+                            <rect key="frame" x="2" y="2" width="120" height="71"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="555">
-                                    <rect key="frame" x="18" y="14" width="203" height="32"/>
+                                <button verticalHuggingPriority="750" misplaced="YES" id="9gn-50-Z8Y">
+                                    <rect key="frame" x="12" y="38" width="118" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="99" height="32"/>
-                                    <size key="intercellSpacing" width="4" height="2"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="558">
+                                    <buttonCell key="cell" type="radio" title="Mac Driver" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="dZM-UO-CkT">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="system"/>
                                     </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Automatic" imagePosition="above" alignment="center" controlSize="small" state="on" tag="1" inset="2" id="556">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <connections>
-                                                    <action selector="automaticClicked:" target="494" id="666"/>
-                                                </connections>
-                                            </buttonCell>
-                                        </column>
-                                        <column>
-                                            <buttonCell type="radio" title="Override" bezelStyle="regularSquare" imagePosition="above" alignment="center" controlSize="small" inset="2" id="559">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <connections>
-                                                    <action selector="overrideClicked:" target="494" id="667"/>
-                                                </connections>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                </matrix>
+                                    <connections>
+                                        <action selector="useMacDriverCheckBoxClicked:" target="494" id="zWX-6F-wzI"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" misplaced="YES" id="Ucr-hh-f51">
+                                    <rect key="frame" x="12" y="16" width="118" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="radio" title="X11" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Rf7-ob-dU3">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="useX11CheckBoxClicked:" target="494" id="as9-RE-gZt"/>
+                                    </connections>
+                                </button>
                             </subviews>
                         </view>
                     </box>
-                    <box autoresizesSubviews="NO" borderType="line" title="Extra Gamma Correction" id="563">
-                        <rect key="frame" x="338" y="150" width="241" height="67"/>
+                    <box misplaced="YES" title="General Options" id="atO-6J-6cp">
+                        <rect key="frame" x="143" y="218" width="289" height="88"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="VAv-4X-XRr">
-                            <rect key="frame" x="1" y="1" width="239" height="51"/>
+                        <view key="contentView" id="kex-0y-Pm2">
+                            <rect key="frame" x="2" y="2" width="285" height="71"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <slider focusRingType="none" verticalHuggingPriority="750" id="564">
-                                    <rect key="frame" x="16" y="21" width="207" height="21"/>
+                                <button misplaced="YES" id="1534">
+                                    <rect key="frame" x="18" y="41" width="258" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Auto Detect GPU Info for Direct3D" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1535">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                </button>
+                                <button misplaced="YES" id="jzg-hU-Fza">
+                                    <rect key="frame" x="18" y="18" width="258" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Use Direct3D Boost (if available)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="cNO-KK-sIw">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="useD3DBoostIfAvailableCheckBoxClicked:" target="494" id="jFh-eq-Qxp"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </view>
+                    </box>
+                    <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Extra Gamma Correction" id="563">
+                        <rect key="frame" x="434" y="218" width="241" height="88"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <view key="contentView" id="VAv-4X-XRr">
+                            <rect key="frame" x="1" y="1" width="239" height="72"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <slider focusRingType="none" verticalHuggingPriority="750" misplaced="YES" id="564">
+                                    <rect key="frame" x="16" y="34" width="207" height="21"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <sliderCell key="cell" state="on" focusRingType="none" alignment="left" minValue="60" maxValue="100" doubleValue="60" tickMarkPosition="below" sliderType="linear" id="565"/>
                                     <connections>
                                         <action selector="gammaChanged:" target="494" id="926"/>
                                     </connections>
                                 </slider>
-                                <textField verticalHuggingPriority="750" id="573">
-                                    <rect key="frame" x="15" y="6" width="32" height="11"/>
+                                <textField verticalHuggingPriority="750" misplaced="YES" id="573">
+                                    <rect key="frame" x="15" y="19" width="71" height="11"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="None" id="574">
+                                    <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="None" id="574">
                                         <font key="font" metaFont="miniSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="575">
-                                    <rect key="frame" x="171" y="6" width="53" height="11"/>
+                                <textField verticalHuggingPriority="750" misplaced="YES" id="575">
+                                    <rect key="frame" x="130" y="19" width="94" height="11"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Very Bright" id="576">
+                                    <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Very Bright" id="576">
                                         <font key="font" metaFont="miniSystem"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -594,8 +614,259 @@ Gw
                             </subviews>
                         </view>
                     </box>
-                    <button verticalHuggingPriority="750" id="571">
-                        <rect key="frame" x="335" y="13" width="247" height="32"/>
+                    <tabView misplaced="YES" type="noTabsBezelBorder" initialItem="vIY-Re-DEn" id="qU5-eT-wgq">
+                        <rect key="frame" x="16" y="46" width="660" height="170"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <tabViewItems>
+                            <tabViewItem label="Mac Driver" identifier="" id="ptO-Vm-aU3">
+                                <view key="view" id="gpV-rM-qo9">
+                                    <rect key="frame" x="10" y="7" width="640" height="150"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="X11" identifier="" id="vIY-Re-DEn">
+                                <view key="view" id="Zf0-hb-S1s">
+                                    <rect key="frame" x="10" y="7" width="640" height="150"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box misplaced="YES" title="Default Settings" id="ecU-Yz-VUg">
+                                            <rect key="frame" x="3" y="62" width="147" height="80"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="DgE-uN-27l">
+                                                <rect key="frame" x="2" y="2" width="143" height="63"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="d8j-7E-Otb">
+                                                        <rect key="frame" x="12" y="35" width="115" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Automatic" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="014-Bc-aB8">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="automaticClicked:" target="494" id="YN1-gW-Rbs"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="c2t-uK-gSa">
+                                                        <rect key="frame" x="12" y="13" width="115" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Override" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="6Wh-rQ-DkH">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="overrideClicked:" target="494" id="A6S-Kh-JMb"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box misplaced="YES" title="Window Mode" id="P9D-92-Apa">
+                                            <rect key="frame" x="311" y="61" width="167" height="81"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="8e6-8y-mFy">
+                                                <rect key="frame" x="2" y="2" width="163" height="64"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="2Q6-ss-YuF">
+                                                        <rect key="frame" x="12" y="35" width="133" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Normal windows" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="V2p-vU-1nC">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="normalWindowsClicked:" target="494" id="3E0-gE-JZb"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="7i5-PZ-V8H">
+                                                        <rect key="frame" x="12" y="13" width="133" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Virtual Desktop" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="biX-hX-cMI">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="virtualDesktopClicked:" target="494" id="kPT-Bs-k5p"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box misplaced="YES" title="Installer Settings" id="kQL-hv-aQp">
+                                            <rect key="frame" x="152" y="62" width="157" height="79"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="omO-AJ-JNe">
+                                                <rect key="frame" x="2" y="2" width="153" height="62"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="mVA-v5-mQG">
+                                                        <rect key="frame" x="12" y="34" width="115" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Automatic" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="b2f-kE-7m3">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="installerAutomaticClicked:" target="494" id="dbI-hj-RBb"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="6mg-EK-7fX">
+                                                        <rect key="frame" x="12" y="12" width="115" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Override" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="wt1-4o-zzd">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="installerOverrideClicked:" target="494" id="tSs-BY-amr"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box misplaced="YES" title="Virtual Desktop" id="Ekz-rT-kdj">
+                                            <rect key="frame" x="480" y="0.0" width="157" height="142"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="wbx-Zi-Bib">
+                                                <rect key="frame" x="2" y="2" width="153" height="125"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="SSl-pl-ZO1">
+                                                        <rect key="frame" x="12" y="96" width="122" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Fullscreen" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="a3e-bV-lUF">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="fullscreenClicked:" target="494" id="Scr-Aw-cWz"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="OIx-bs-5cl">
+                                                        <rect key="frame" x="12" y="74" width="122" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="radio" title="Windowed" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="GWD-5t-wDG">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="windowedClicked:" target="494" id="6UK-bh-ZSd"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="632">
+                                                        <rect key="frame" x="11" y="40" width="134" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Resolution:" id="633">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" misplaced="YES" id="631">
+                                                        <rect key="frame" x="10" y="11" width="134" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" title="Current Resolution" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="2069" id="634">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <menu key="menu" title="OtherViews" id="635">
+                                                                <items>
+                                                                    <menuItem title="Current Resolution" state="on" id="2069"/>
+                                                                    <menuItem title="640x480" id="2070"/>
+                                                                    <menuItem title="720x480" id="2071"/>
+                                                                    <menuItem title="800x600" id="2072"/>
+                                                                    <menuItem title="960x720" id="2073"/>
+                                                                    <menuItem title="1024x640" id="2074"/>
+                                                                    <menuItem title="1024x768" id="2075"/>
+                                                                    <menuItem title="1152x720" id="2076"/>
+                                                                    <menuItem title="1152x864" id="2077"/>
+                                                                    <menuItem title="1280x800" id="2078"/>
+                                                                    <menuItem title="1280x1024" id="2079"/>
+                                                                    <menuItem title="1344x840" id="2080"/>
+                                                                    <menuItem title="1440x900" id="2081"/>
+                                                                    <menuItem title="1600x900" id="2082"/>
+                                                                    <menuItem title="1600x1200" id="2083"/>
+                                                                    <menuItem title="1680x1050" id="2084"/>
+                                                                    <menuItem title="1920x1080" id="2085"/>
+                                                                    <menuItem title="1920x1200" id="2086"/>
+                                                                    <menuItem title="2048x1280" id="2087"/>
+                                                                    <menuItem title="2560x1440" id="2088"/>
+                                                                    <menuItem title="2560x1600" id="2089"/>
+                                                                    <menuItem title="2880x1620" id="2090"/>
+                                                                    <menuItem title="2880x1800" id="2091"/>
+                                                                    <menuItem title="3360x2100" id="2092"/>
+                                                                    <menuItem title="3840x2160" id="2093"/>
+                                                                    <menuItem title="3840x2400" id="2094"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                    </popUpButton>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box misplaced="YES" title="Normal windows" id="Or7-cK-aUR">
+                                            <rect key="frame" x="311" y="0.0" width="166" height="57"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="2Xd-gQ-kQJ">
+                                                <rect key="frame" x="2" y="2" width="162" height="40"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button misplaced="YES" id="931">
+                                                        <rect key="frame" x="11" y="14" width="141" height="16"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Decorate windows" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="932">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="windowManagerCheckBoxClicked:" target="494" id="978"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box misplaced="YES" title="Override Options" id="nT9-v2-5oq">
+                                            <rect key="frame" x="3" y="0.0" width="306" height="58"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="IA2-dc-IPj">
+                                                <rect key="frame" x="2" y="2" width="302" height="41"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <popUpButton verticalHuggingPriority="750" misplaced="YES" id="643">
+                                                        <rect key="frame" x="132" y="7" width="125" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="644">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                            <menu key="menu" title="OtherViews" id="645">
+                                                                <items>
+                                                                    <menuItem title="24 bit" id="646"/>
+                                                                    <menuItem title="15 bit" id="eZ2-vA-bhi"/>
+                                                                    <menuItem title="8 bit" id="Q4A-eo-4PU"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                    </popUpButton>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="639">
+                                                        <rect key="frame" x="14" y="12" width="114" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Color Depth:" id="640">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                        </tabViewItems>
+                    </tabView>
+                    <button verticalHuggingPriority="750" misplaced="YES" id="571">
+                        <rect key="frame" x="14" y="13" width="664" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="572">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -608,330 +879,12 @@ Gw
                             <action selector="doneButtonPressed:" target="494" id="675"/>
                         </connections>
                     </button>
-                    <tabView focusRingType="none" type="noTabsBezelBorder" initialItem="567" id="566">
-                        <rect key="frame" x="16" y="110" width="312" height="96"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <font key="font" metaFont="system"/>
-                        <tabViewItems>
-                            <tabViewItem label="Rootless" identifier="1" id="567">
-                                <view key="view" id="570">
-                                    <rect key="frame" x="10" y="7" width="292" height="76"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="617">
-                                            <rect key="frame" x="17" y="17" width="125" height="42"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="125" height="20"/>
-                                            <size key="intercellSpacing" width="4" height="2"/>
-                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" enabled="NO" inset="2" id="619">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <cells>
-                                                <column>
-                                                    <buttonCell type="radio" title="Normal windows" imagePosition="left" alignment="left" controlSize="small" enabled="NO" state="on" tag="1" inset="2" id="620">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="smallSystem"/>
-                                                        <connections>
-                                                            <action selector="normalWindowsClicked:" target="494" id="670"/>
-                                                        </connections>
-                                                    </buttonCell>
-                                                    <buttonCell type="radio" title="Virtual Desktop at:" imagePosition="left" alignment="left" controlSize="small" enabled="NO" inset="2" id="659">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="smallSystem"/>
-                                                        <connections>
-                                                            <action selector="virtualDesktopClicked:" target="494" id="671"/>
-                                                        </connections>
-                                                    </buttonCell>
-                                                </column>
-                                            </cells>
-                                        </matrix>
-                                        <popUpButton verticalHuggingPriority="750" id="623">
-                                            <rect key="frame" x="137" y="15" width="139" height="22"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="push" title="Current Resolution" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="626" id="624">
-                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <menu key="menu" title="OtherViews" id="625">
-                                                    <items>
-                                                        <menuItem title="Current Resolution" state="on" id="626"/>
-                                                        <menuItem title="640x480" id="627"/>
-                                                        <menuItem title="720x480" id="628"/>
-                                                        <menuItem title="800x600" id="890"/>
-                                                        <menuItem title="960x720" id="891"/>
-                                                        <menuItem title="1024x640" id="892"/>
-                                                        <menuItem title="1024x768" id="893"/>
-                                                        <menuItem title="1152x720" id="894"/>
-                                                        <menuItem title="1152x864" id="895"/>
-                                                        <menuItem title="1280x800" id="896"/>
-                                                        <menuItem title="1280x1024" id="897"/>
-                                                        <menuItem title="1344x840" id="898"/>
-                                                        <menuItem title="1440x900" id="899"/>
-                                                        <menuItem title="1600x900" id="900"/>
-                                                        <menuItem title="1600x1200" id="2036"/>
-                                                        <menuItem title="1680x1050" id="901"/>
-                                                        <menuItem title="1920x1080" id="902"/>
-                                                        <menuItem title="1920x1200" id="903"/>
-                                                        <menuItem title="2048x1280" id="2037"/>
-                                                        <menuItem title="2560x1440" id="904"/>
-                                                        <menuItem title="2560x1600" id="905"/>
-                                                        <menuItem title="2880x1620" id="2038"/>
-                                                        <menuItem title="2880x1800" id="2040"/>
-                                                        <menuItem title="3360x2100" id="2041"/>
-                                                        <menuItem title="3840x2160" id="906"/>
-                                                        <menuItem title="3840x2400" id="2042"/>
-                                                    </items>
-                                                </menu>
-                                            </popUpButtonCell>
-                                        </popUpButton>
-                                    </subviews>
-                                </view>
-                            </tabViewItem>
-                            <tabViewItem label="Fullscreen" identifier="2" id="568">
-                                <view key="view" id="569">
-                                    <rect key="frame" x="10" y="7" width="292" height="76"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <popUpButton verticalHuggingPriority="750" id="631">
-                                            <rect key="frame" x="115" y="51" width="136" height="22"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="push" title="Current Resolution" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="2069" id="634">
-                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <menu key="menu" title="OtherViews" id="635">
-                                                    <items>
-                                                        <menuItem title="Current Resolution" state="on" id="2069"/>
-                                                        <menuItem title="640x480" id="2070"/>
-                                                        <menuItem title="720x480" id="2071"/>
-                                                        <menuItem title="800x600" id="2072"/>
-                                                        <menuItem title="960x720" id="2073"/>
-                                                        <menuItem title="1024x640" id="2074"/>
-                                                        <menuItem title="1024x768" id="2075"/>
-                                                        <menuItem title="1152x720" id="2076"/>
-                                                        <menuItem title="1152x864" id="2077"/>
-                                                        <menuItem title="1280x800" id="2078"/>
-                                                        <menuItem title="1280x1024" id="2079"/>
-                                                        <menuItem title="1344x840" id="2080"/>
-                                                        <menuItem title="1440x900" id="2081"/>
-                                                        <menuItem title="1600x900" id="2082"/>
-                                                        <menuItem title="1600x1200" id="2083"/>
-                                                        <menuItem title="1680x1050" id="2084"/>
-                                                        <menuItem title="1920x1080" id="2085"/>
-                                                        <menuItem title="1920x1200" id="2086"/>
-                                                        <menuItem title="2048x1280" id="2087"/>
-                                                        <menuItem title="2560x1440" id="2088"/>
-                                                        <menuItem title="2560x1600" id="2089"/>
-                                                        <menuItem title="2880x1620" id="2090"/>
-                                                        <menuItem title="2880x1800" id="2091"/>
-                                                        <menuItem title="3360x2100" id="2092"/>
-                                                        <menuItem title="3840x2160" id="2093"/>
-                                                        <menuItem title="3840x2400" id="2094"/>
-                                                    </items>
-                                                </menu>
-                                            </popUpButtonCell>
-                                        </popUpButton>
-                                        <textField verticalHuggingPriority="750" id="632">
-                                            <rect key="frame" x="37" y="56" width="76" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Resolution:" id="633">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" id="639">
-                                            <rect key="frame" x="37" y="31" width="76" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Color Depth:" id="640">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" id="641">
-                                            <rect key="frame" x="37" y="6" width="76" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Switch Pause:" id="642">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <popUpButton verticalHuggingPriority="750" id="643">
-                                            <rect key="frame" x="115" y="26" width="136" height="22"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="644">
-                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <menu key="menu" title="OtherViews" id="645">
-                                                    <items>
-                                                        <menuItem title="24 bit" id="646"/>
-                                                        <menuItem title="15 bit" id="eZ2-vA-bhi"/>
-                                                        <menuItem title="8 bit" id="Q4A-eo-4PU"/>
-                                                    </items>
-                                                </menu>
-                                            </popUpButtonCell>
-                                        </popUpButton>
-                                        <popUpButton verticalHuggingPriority="750" id="649">
-                                            <rect key="frame" x="115" y="1" width="136" height="22"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="push" title="0 sec." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="652" id="650">
-                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <menu key="menu" title="OtherViews" id="651">
-                                                    <items>
-                                                        <menuItem title="0 sec." state="on" id="652"/>
-                                                        <menuItem title="1 sec." id="653"/>
-                                                        <menuItem title="2 sec." id="654"/>
-                                                        <menuItem title="3 sec." id="656"/>
-                                                        <menuItem title="4 sec." id="657"/>
-                                                        <menuItem title="5 sec." id="658"/>
-                                                    </items>
-                                                </menu>
-                                            </popUpButtonCell>
-                                        </popUpButton>
-                                    </subviews>
-                                </view>
-                            </tabViewItem>
-                        </tabViewItems>
-                    </tabView>
-                    <box horizontalHuggingPriority="750" boxType="separator" id="589">
-                        <rect key="frame" x="330" y="20" width="5" height="268"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    </box>
-                    <box autoresizesSubviews="NO" borderType="line" title="Override Settings" id="596">
-                        <rect key="frame" x="17" y="216" width="310" height="72"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="VCd-CF-i03">
-                            <rect key="frame" x="1" y="1" width="308" height="56"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="597">
-                                    <rect key="frame" x="18" y="14" width="272" height="32"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="134" height="32"/>
-                                    <size key="intercellSpacing" width="4" height="2"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" enabled="NO" inset="2" id="599">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Rootless (windowed)" imagePosition="above" alignment="center" controlSize="small" enabled="NO" state="on" tag="1" inset="2" id="598">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <connections>
-                                                    <action selector="rootlessClicked:" target="494" id="668"/>
-                                                </connections>
-                                            </buttonCell>
-                                        </column>
-                                        <column>
-                                            <buttonCell type="radio" title="Fullscreen" bezelStyle="regularSquare" imagePosition="above" alignment="center" controlSize="small" enabled="NO" inset="2" id="600">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <connections>
-                                                    <action selector="fullscreenClicked:" target="494" id="669"/>
-                                                </connections>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                </matrix>
-                            </subviews>
-                        </view>
-                    </box>
-                    <box autoresizesSubviews="NO" borderType="line" title="Installer Options" id="607">
-                        <rect key="frame" x="17" y="27" width="310" height="74"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="RgW-0l-UwQ">
-                            <rect key="frame" x="1" y="1" width="308" height="58"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="608">
-                                    <rect key="frame" x="18" y="14" width="272" height="34"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="134" height="34"/>
-                                    <size key="intercellSpacing" width="4" height="2"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" enabled="NO" inset="2" id="615">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Force normal windows" imagePosition="above" alignment="center" controlSize="small" enabled="NO" state="on" tag="1" inset="2" id="614">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                        </column>
-                                        <column>
-                                            <buttonCell type="radio" title="Use these settings" bezelStyle="regularSquare" imagePosition="above" alignment="center" controlSize="small" enabled="NO" inset="2" id="616">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                </matrix>
-                            </subviews>
-                        </view>
-                    </box>
-                    <box autoresizesSubviews="NO" borderType="line" title="Other Options" id="933">
-                        <rect key="frame" x="338" y="45" width="241" height="108"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="Vdt-Ml-jhq">
-                            <rect key="frame" x="1" y="1" width="239" height="92"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <button id="931">
-                                    <rect key="frame" x="15" y="51" width="142" height="18"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Decorate windows" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="932">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="windowManagerCheckBoxClicked:" target="494" id="978"/>
-                                    </connections>
-                                </button>
-                                <button id="1534">
-                                    <rect key="frame" x="15" y="33" width="204" height="18"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Auto Detect GPU Info for Direct3D" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="1535">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                </button>
-                                <button id="jzg-hU-Fza">
-                                    <rect key="frame" x="15" y="15" width="193" height="18"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Use Direct3D Boost (if available)" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="cNO-KK-sIw">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="useD3DBoostIfAvailableCheckBoxClicked:" target="494" id="jFh-eq-Qxp"/>
-                                    </connections>
-                                </button>
-                                <button id="2100">
-                                    <rect key="frame" x="15" y="69" width="183" height="18"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Use Mac Driver instead of X11" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="2101">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="useMacDriverInsteadOfX11CheckBoxClicked:" target="494" id="2104"/>
-                                    </connections>
-                                </button>
-                            </subviews>
-                        </view>
-                    </box>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="494" id="817"/>
             </connections>
+            <point key="canvasLocation" x="187" y="-136"/>
         </window>
         <window title="Wineskin Advanced" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="680">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
@@ -2143,14 +2096,14 @@ DQ
                                             <rect key="frame" x="0.0" y="-3" width="754" height="273"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="6iJ-NR-9eg">
-                                                <rect key="frame" x="1" y="1" width="737" height="271"/>
+                                                <rect key="frame" x="1" y="1" width="752" height="271"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <textView focusRingType="none" editable="NO" importsGraphics="NO" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="1695">
                                                         <rect key="frame" x="0.0" y="0.0" width="752" height="271"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <size key="minSize" width="737" height="271"/>
+                                                        <size key="minSize" width="752" height="271"/>
                                                         <size key="maxSize" width="761" height="10000000"/>
                                                         <color key="insertionPointColor" red="0.27450981740000002" green="0.23529411850000001" blue="0.23529411850000001" alpha="1" colorSpace="calibratedRGB"/>
                                                     </textView>
@@ -3014,9 +2967,6 @@ Gw
                 <outlet property="advancedWindow" destination="680" id="782"/>
                 <outlet property="alwaysMakeLogFilesCheckBoxButton" destination="1923" id="1926"/>
                 <outlet property="autoDetectGPUInfoCheckBoxButton" destination="1534" id="1537"/>
-                <outlet property="automaticOverrideToggle" destination="555" id="821"/>
-                <outlet property="automaticOverrideToggleAutomaticButton" destination="556" id="884"/>
-                <outlet property="automaticOverrideToggleOverrideButton" destination="559" id="1522"/>
                 <outlet property="busyWindow" destination="859" id="864"/>
                 <outlet property="cEXEBrowseButton" destination="1011" id="1194"/>
                 <outlet property="cEXEColorDepth" destination="1122" id="1208"/>
@@ -3046,6 +2996,8 @@ Gw
                 <outlet property="currentVersionTextField" destination="1507" id="1509"/>
                 <outlet property="customCommandsTextField" destination="1517" id="1521"/>
                 <outlet property="customExeButton" destination="737" id="823"/>
+                <outlet property="defaultSettingsAutomaticRadioButton" destination="d8j-7E-Otb" id="p53-V0-scb"/>
+                <outlet property="defaultSettingsOverrideRadioButton" destination="c2t-uK-gSa" id="gu2-zK-hdk"/>
                 <outlet property="disableCPUsCheckBoxButton" destination="1654" id="1657"/>
                 <outlet property="emulateThreeButtonMouseCheckBoxButton" destination="1649" id="1652"/>
                 <outlet property="engineVersionText" destination="1562" id="1570"/>
@@ -3060,21 +3012,16 @@ Gw
                 <outlet property="extPlusButton" destination="1406" id="2033"/>
                 <outlet property="extPopUpButton" destination="1398" id="1460"/>
                 <outlet property="focusFollowsMouseCheckBoxButton" destination="1572" id="1576"/>
-                <outlet property="forceNormalWindowsUseTheseSettingsToggle" destination="608" id="663"/>
-                <outlet property="forceNormalWindowsUseTheseSettingsToggleForceButton" destination="614" id="886"/>
-                <outlet property="forceNormalWindowsUseTheseSettingsToggleUseTheseSettingsButton" destination="616" id="1523"/>
                 <outlet property="forceSystemXQuartzButton" destination="1910" id="1913"/>
                 <outlet property="forceWrapperQuartzWMButton" destination="1899" id="1903"/>
-                <outlet property="fullscreenResolution" destination="631" id="818"/>
-                <outlet property="fullscreenRootlesToggleTabView" destination="566" id="889"/>
-                <outlet property="fullscreenRootlessToggle" destination="597" id="662"/>
-                <outlet property="fullscreenRootlessToggleFullscreenButton" destination="600" id="1524"/>
-                <outlet property="fullscreenRootlessToggleRootlessButton" destination="598" id="887"/>
                 <outlet property="gammaSlider" destination="564" id="677"/>
                 <outlet property="helpWindow" destination="1352" id="1360"/>
                 <outlet property="iconBrowseButton" destination="718" id="825"/>
                 <outlet property="iconImageView" destination="716" id="784"/>
+                <outlet property="installerSettingsAutomaticRadioButton" destination="mVA-v5-mQG" id="FZ8-BO-Acq"/>
+                <outlet property="installerSettingsOverrideRadioButton" destination="6mg-EK-7fX" id="Ely-iM-kXr"/>
                 <outlet property="installerWindow" destination="1928" id="1979"/>
+                <outlet property="macDriverX11TabView" destination="qU5-eT-wgq" id="anz-xb-1cP"/>
                 <outlet property="mapUserFoldersCheckBoxButton" destination="1541" id="1544"/>
                 <outlet property="menubarNameTextField" destination="722" id="786"/>
                 <outlet property="modifyMappingsButton" destination="1577" id="1643"/>
@@ -3085,16 +3032,12 @@ Gw
                 <outlet property="modifyMappingsMyPicturesTextField" destination="1606" id="1631"/>
                 <outlet property="modifyMappingsMyVideosTextField" destination="1598" id="1632"/>
                 <outlet property="modifyMappingsWindow" destination="1579" id="1633"/>
-                <outlet property="normalWindowsVirtualDesktopToggle" destination="617" id="664"/>
-                <outlet property="normalWindowsVirtualDesktopToggleNormalWindowsButton" destination="620" id="888"/>
-                <outlet property="normalWindowsVirtualDesktopToggleVirtualDesktopButton" destination="659" id="1525"/>
                 <outlet property="optSendsAltCheckBoxButton" destination="1528" id="1532"/>
                 <outlet property="rebuildWrapperButton" destination="739" id="826"/>
                 <outlet property="refreshWrapperButton" destination="741" id="827"/>
                 <outlet property="regeditButton" destination="733" id="851"/>
                 <outlet property="screenOptionsWindow" destination="553" id="661"/>
                 <outlet property="setMaxFilesCheckBoxButton" destination="2095" id="2098"/>
-                <outlet property="switchPause" destination="649" id="820"/>
                 <outlet property="tab" destination="682" id="928"/>
                 <outlet property="taskmgrButton" destination="735" id="852"/>
                 <outlet property="testRunButton" destination="689" id="831"/>
@@ -3103,12 +3046,17 @@ Gw
                 <outlet property="uninstallerButton" destination="1475" id="1487"/>
                 <outlet property="updateWrapperButton" destination="745" id="828"/>
                 <outlet property="useD3DBoostIfAvailableCheckBoxButton" destination="jzg-hU-Fza" id="rlM-fk-rsl"/>
-                <outlet property="useMacDriverInsteadOfX11CheckBoxButton" destination="2100" id="2103"/>
+                <outlet property="useMacDriverRadioButton" destination="9gn-50-Z8Y" id="0xK-tg-cqo"/>
+                <outlet property="useX11RadioButton" destination="Ucr-hh-f51" id="agZ-sk-38d"/>
                 <outlet property="versionTextField" destination="724" id="788"/>
-                <outlet property="virtualDesktopResolution" destination="623" id="665"/>
+                <outlet property="virtualDesktopFullscreenRadioButton" destination="SSl-pl-ZO1" id="w8R-05-pH3"/>
+                <outlet property="virtualDesktopResolution" destination="631" id="f3D-oy-gPo"/>
+                <outlet property="virtualDesktopWindowedRadioButton" destination="OIx-bs-5cl" id="4DQ-rt-NtB"/>
                 <outlet property="waitWheel" destination="863" id="865"/>
                 <outlet property="window" destination="371" id="532"/>
                 <outlet property="windowManagerCheckBoxButton" destination="931" id="979"/>
+                <outlet property="windowModeNormalWindowsRadioButton" destination="2Q6-ss-YuF" id="Ket-0G-JS0"/>
+                <outlet property="windowModeVirtualDesktopRadioButton" destination="7i5-PZ-V8H" id="h5b-Nf-Fe4"/>
                 <outlet property="windowsExeTextField" destination="705" id="790"/>
                 <outlet property="wineDebugTextField" destination="1493" id="1495"/>
                 <outlet property="winecfgButton" destination="729" id="853"/>
