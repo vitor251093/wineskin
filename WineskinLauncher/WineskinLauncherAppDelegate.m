@@ -1462,7 +1462,7 @@ static NSPortManager* portManager;
 	}
     
 	//make/remake the symlink in wswine.bundle to point to the correct location
-    for (NSString* folder in @[@"bin", @"lib", @"share", @"version"])
+    for (NSString* folder in @[@"bin", @"lib", @"lib64", @"share", @"version"])
     {
         [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",wswineBundlePath,folder]];
         [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/%@",wswineBundlePath,folder]
