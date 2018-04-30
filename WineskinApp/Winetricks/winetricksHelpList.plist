@@ -256,13 +256,6 @@
 			<key>WS-Name</key>
 			<string>openwatcom</string>
 		</dict>
-		<key>picasa39</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Picasa 3.9</string>
-			<key>WS-Name</key>
-			<string>picasa39</string>
-		</dict>
 		<key>protectionid</key>
 		<dict>
 			<key>WS-Description</key>
@@ -2381,13 +2374,6 @@
 			<string>Pen-Pen Xmas Olympics</string>
 			<key>WS-Name</key>
 			<string>penpenxmas</string>
-		</dict>
-		<key>plantsvszombies</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Plants vs. Zombies</string>
-			<key>WS-Name</key>
-			<string>plantsvszombies</string>
 		</dict>
 		<key>popfs</key>
 		<dict>
