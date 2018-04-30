@@ -2399,7 +2399,10 @@ static NSPortManager* portManager;
     
     //kill processes
     [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineName]];
-    
+    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wine64Name]];
+    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineStagingName]];
+    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineStaging64Name]];
+
     //get rid of OS X saved state file
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/%@%@.wineskin.prefs.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]]];
     
