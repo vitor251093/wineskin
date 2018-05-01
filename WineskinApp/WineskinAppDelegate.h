@@ -236,6 +236,10 @@
 - (IBAction)commandLineWineTestButtonPressed:(id)sender;
 - (void)runATestRun;
 - (IBAction)killWineskinProcessesButtonPressed:(id)sender;
+- (void)killWine32;
+- (void)killWine64;
+- (void)killStaging;
+- (void)killStaging64;
 
 //advanced menu - Configuration Tab
 - (void)saveAllData;
