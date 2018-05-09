@@ -183,7 +183,7 @@ static NSPortManager* portManager;
         NSPortManager *cexeManager = nil;
         NSString *resolutionTemp;
         
-        //check to make sure CFBundleName is not WineskinWineskinDefault3345, if it is, change it to current wrapper name
+        //check to make sure CFBundleName is not WineskinNavyWrapper, if it is, change it to current wrapper name
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_NAME] isEqualToString:@"WineskinNavyWrapper"])
         {
             [self.portManager setPlistObject:appName forKey:WINESKIN_WRAPPER_PLIST_KEY_NAME];
@@ -1579,7 +1579,7 @@ static NSPortManager* portManager;
     
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 - (void)fixWine32ExecutableNames
 {
     BOOL fixWine=YES;
@@ -1651,7 +1651,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 - (void)fixWine64ExecutableNames
 {
     BOOL fixWine=YES;
@@ -1744,7 +1744,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 // Wine-Staging engines only work correctly on 10.8+ systems according to wine-staging.com
 // Renaming can only apply to wine-preloader for staging engines
 - (void)fixWineStagingExecutableNames
@@ -1818,7 +1818,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 // Wine-Staging engines only work correctly on 10.8+ systems according to wine-staging.com
 // Renaming can only apply to wine-preloader/wine64-preloader for staging engines
 - (void)fixWineStaging64ExecutableNames
@@ -1938,7 +1938,6 @@ static NSPortManager* portManager;
         usleep(1000000);
     }
 }
-
 
 - (void)startWine:(WineStart *)wineStartInfo
 {
