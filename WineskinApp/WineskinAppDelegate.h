@@ -105,7 +105,6 @@
 	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
 	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
-	IBOutlet NSButton *disableCPUsCheckBoxButton;
 	IBOutlet NSButton *forceWrapperQuartzWMButton;
 	IBOutlet NSButton *forceSystemXQuartzButton;
 		
@@ -279,7 +278,6 @@
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 - (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
-- (IBAction)disableCPUsButtonPressed:(id)sender;
 - (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender;
 - (IBAction)forceSystemXQuartzButtonPressed:(id)sender;
 

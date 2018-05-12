@@ -1374,17 +1374,6 @@ Gw
                                         <button id="1654">
                                             <rect key="frame" x="14" y="46" width="610" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Limit to 1 CPU core (set at an OS level for all apps.  Only works if you have hwprefs installed)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1655">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="disableCPUsButtonPressed:" target="494" id="1658"/>
-                                            </connections>
-                                        </button>
-                                        <button id="1899">
-                                            <rect key="frame" x="14" y="24" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Force use of wrappers quartz-wm for window decorations and not what is on the system" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1900">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -1394,7 +1383,7 @@ Gw
                                             </connections>
                                         </button>
                                         <button id="1910">
-                                            <rect key="frame" x="14" y="3" width="610" height="23"/>
+                                            <rect key="frame" x="14" y="24" width="610" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Force use of system installed XQuartz instead of using built in WineskinX11" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1911">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2096,14 +2085,14 @@ DQ
                                             <rect key="frame" x="0.0" y="-3" width="754" height="273"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="6iJ-NR-9eg">
-                                                <rect key="frame" x="1" y="1" width="752" height="271"/>
+                                                <rect key="frame" x="1" y="1" width="737" height="271"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <textView focusRingType="none" editable="NO" importsGraphics="NO" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="1695">
                                                         <rect key="frame" x="0.0" y="0.0" width="752" height="271"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <size key="minSize" width="752" height="271"/>
+                                                        <size key="minSize" width="737" height="271"/>
                                                         <size key="maxSize" width="761" height="10000000"/>
                                                         <color key="insertionPointColor" red="0.27450981740000002" green="0.23529411850000001" blue="0.23529411850000001" alpha="1" colorSpace="calibratedRGB"/>
                                                     </textView>
@@ -2998,7 +2987,6 @@ Gw
                 <outlet property="customExeButton" destination="737" id="823"/>
                 <outlet property="defaultSettingsAutomaticRadioButton" destination="d8j-7E-Otb" id="p53-V0-scb"/>
                 <outlet property="defaultSettingsOverrideRadioButton" destination="c2t-uK-gSa" id="gu2-zK-hdk"/>
-                <outlet property="disableCPUsCheckBoxButton" destination="1654" id="1657"/>
                 <outlet property="emulateThreeButtonMouseCheckBoxButton" destination="1649" id="1652"/>
                 <outlet property="engineVersionText" destination="1562" id="1570"/>
                 <outlet property="engineWindowOkButton" destination="992" id="1207"/>

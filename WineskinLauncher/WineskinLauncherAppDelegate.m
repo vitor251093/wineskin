@@ -396,18 +396,6 @@ static NSPortManager* portManager;
         }
         //********** Wineskin Customizer start up script
         system([[NSString stringWithFormat:@"\"%@/WineskinStartupScript\"",winePrefix] UTF8String]);
-            
-        //****** if CPUs Disabled, disable all but 1 CPU
-        NSString *cpuCountInput;
-        if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue] == 1)
-        {
-            cpuCountInput = [self systemCommand:@"hwprefs cpu_count 2>/dev/null"];
-            int i, cpuCount = [cpuCountInput intValue];
-            for (i = 2; i <= cpuCount; ++i)
-            {
-                [self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_disable %d",i]];
-            }
-        }
         
         if (lockFileAlreadyExisted)
         {
@@ -537,16 +525,6 @@ static NSPortManager* portManager;
         
         //**********sleep and monitor in background while app is running
         [self sleepAndMonitor];
-        
-        //****** if CPUs Disabled, re-enable them
-        if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue] == 1)
-        {
-            int i, cpuCount = [cpuCountInput intValue];
-            for ( i = 2; i <= cpuCount; ++i)
-            {
-                [self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_enable %d",i]];
-            }
-        }
             
         //********** Wineskin Customizer shut down script
         system([[NSString stringWithFormat:@"\"%@/WineskinShutdownScript\"",winePrefix] UTF8String]);

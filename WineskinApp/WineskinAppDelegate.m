@@ -1070,7 +1070,6 @@ NSFileManager *fm;
 	[mapUserFoldersCheckBoxButton setState:[[portManager plistObjectForKey:@"Symlinks In User Folder"] intValue]];
     [modifyMappingsButton         setEnabled:[mapUserFoldersCheckBoxButton state]];
     
-	[disableCPUsCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue]];
 	[forceWrapperQuartzWMButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue]];
     if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
     {
@@ -1258,11 +1257,6 @@ NSFileManager *fm;
     [modifyMappingsDownloadsTextField  setStringValue:[portManager plistObjectForKey:@"Symlink Downloads"]];
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
-}
-- (IBAction)disableCPUsButtonPressed:(id)sender
-{
-    [portManager setPlistObject:@([disableCPUsCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU];
-    [portManager synchronizePlist];
 }
 - (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender
 {
