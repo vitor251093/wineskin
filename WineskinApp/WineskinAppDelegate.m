@@ -120,9 +120,15 @@ NSFileManager *fm;
     [modifyMappingsButton setEnabled:state];
     [confirmQuitCheckBoxButton setEnabled:state];
     [focusFollowsMouseCheckBoxButton setEnabled:state];
-    [disableCPUsCheckBoxButton setEnabled:state];
     [forceWrapperQuartzWMButton setEnabled:state];
-    [forceSystemXQuartzButton setEnabled:state];
+    if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+    {
+        [forceSystemXQuartzButton setEnabled:NO];
+    }
+    else
+    {
+        [forceSystemXQuartzButton setEnabled:state];
+    }
     
     if (state) {
         [toolRunningPI stopAnimation:self];
