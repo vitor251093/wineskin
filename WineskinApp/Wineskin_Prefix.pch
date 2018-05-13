@@ -41,7 +41,6 @@
 #define WINESKIN_WRAPPER_PLIST_KEY_ICON_PATH                     @"CFBundleIconFile"
 #define WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER                    @"CFBundleIdentifier"
 #define WINESKIN_WRAPPER_PLIST_KEY_EXECUTABLE                    @"CFBundleExecutable"
-#define WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU                    @"Disable CPUs"
 #define WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW               @"force wrapper quartz-wm"
 #define WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ                   @"Use XQuartz"
 #define WINESKIN_WRAPPER_PLIST_KEY_MAX_OF_10240_FILES            @"set max files"
