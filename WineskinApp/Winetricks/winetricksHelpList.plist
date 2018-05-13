@@ -46,6 +46,13 @@
 			<key>WS-Name</key>
 			<string>autohotkey</string>
 		</dict>
+		<key>busybox</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>BusyBox FRP-2121</string>
+			<key>WS-Name</key>
+			<string>busybox</string>
+		</dict>
 		<key>cmake</key>
 		<dict>
 			<key>WS-Description</key>
@@ -934,13 +941,6 @@
 			<key>WS-Name</key>
 			<string>dotnet35</string>
 		</dict>
-		<key>dotnet35sp1</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS .NET 3.5 SP1</string>
-			<key>WS-Name</key>
-			<string>dotnet35sp1</string>
-		</dict>
 		<key>dotnet40</key>
 		<dict>
 			<key>WS-Description</key>
@@ -968,13 +968,6 @@
 			<string>MS .NET 4.6</string>
 			<key>WS-Name</key>
 			<string>dotnet46</string>
-		</dict>
-		<key>dotnet461</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS .NET 4.6.1</string>
-			<key>WS-Name</key>
-			<string>dotnet461</string>
 		</dict>
 		<key>dotnet462</key>
 		<dict>
@@ -1916,7 +1909,7 @@
 		<key>acreedbro</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Assassin's Creed Brotherhood</string>
+			<string>Assassin&apos;s Creed Brotherhood</string>
 			<key>WS-Name</key>
 			<string>acreedbro</string>
 		</dict>

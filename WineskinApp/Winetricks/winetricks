@@ -41,7 +41,10 @@ WINETRICKS_VERSION=20180217-next
 # On Ubuntu, the following lines can be used to install all the prerequisites:
 #    sudo add-apt-repository ppa:ubuntu-wine/ppa
 #    sudo apt-get update
-#    sudo apt-get install binutils cabextract p7zip unrar unzip wget wine zenity
+#    sudo apt-get install binutils cabextract p7zip-full unrar unzip wget wine zenity
+# On Fedora, these commands can be used (RPM Fusion is used to install unrar):
+#    sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+#    sudo dnf install binutils cabextract p7zip-plugins unrar unzip wget wine zenity
 #
 # See http://winetricks.org for documentation and tutorials, including
 # how to contribute changes to winetricks.
@@ -192,7 +195,15 @@ w_askpermission()
     case $WINETRICKS_GUI in
         zenity) $WINETRICKS_GUI "$_W_timeout" --question --title=winetricks --text="$(echo "$@" | sed 's,\\\\,\\\\\\\\,g')" --no-wrap;;
         kdialog) $WINETRICKS_GUI --title winetricks --warningcontinuecancel "$@" ;;
-        none) printf %s "Press Y or N, then Enter: " ; read -r response ; test "$response" = Y || test "$response" = y;;
+        none)
+            if [ -n "$_W_timeout" ]; then
+                # -t / TMOUT don't seem to be portable, so just assume yes in unattended mode
+                w_info "Unattended mode, not prompting for confirmation"
+            else
+                printf %s "Press Y or N, then Enter: "
+                read -r response
+                test "$response" = Y || test "$response" = y
+            fi
     esac
 
     if test $? -ne 0; then
@@ -380,7 +391,7 @@ w_try_7z()
     if test -x "$(which 7z 2>/dev/null)"; then
         w_try 7z x "$filename" -o"$destdir" "$@"
     else
-        w_warn "Cannot find 7z.  Using Windows 7-Zip instead. (You can avoid this by installing 7z, e.g. 'sudo apt-get install p7zip-full' or 'sudo yum install p7zip p7zip-plugins')."
+        w_warn "Cannot find 7z.  Using Windows 7-Zip instead. (You can avoid this by installing 7z, e.g. 'sudo apt-get install p7zip-full' or 'sudo yum install p7zip-plugins')."
         WINETRICKS_OPT_SHAREDPREFIX=1 w_call 7zip
         # errors out if there is a space between -o and path
         w_try "$WINE" "$W_PROGRAMS_X86_WIN\\7-Zip\\7z.exe" x "$(w_pathconv -w "$filename")" -o"$(w_pathconv -w "$destdir")" "$@"
@@ -851,12 +862,10 @@ w_dotnet_verify()
         dotnet30) version="3.0" ;;
         dotnet30sp1) version="3.0 SP1" ;;
         dotnet35) version="3.5" ;;
-        dotnet35sp1) version="3.5 SP1" ;;
         dotnet40) version="4 Client" ;;
         dotnet45) version="4.5" ;;
         dotnet452) version="4.5.2" ;;
         dotnet46) version="4.6" ;;
-        dotnet461) version="4.6.1" ;;
         dotnet462) version="4.6.2" ;;
         *) echo error ; exit 1 ;;
     esac
@@ -3145,17 +3154,23 @@ winetricks_detect_gui()
 {
     if test -x "$(which zenity 2>/dev/null)"; then
         WINETRICKS_GUI=zenity
-
+        WINETRICKS_GUI_VERSION="$(zenity --version)"
         WINETRICKS_MENU_HEIGHT=500
         WINETRICKS_MENU_WIDTH=1010
     elif test -x "$(which kdialog 2>/dev/null)"; then
         echo "Zenity not found!  Using kdialog as poor substitute."
         WINETRICKS_GUI=kdialog
+        WINETRICKS_GUI_VERSION="$(kdialog --version)"
     else
         echo "No arguments given, so tried to start GUI, but zenity not found."
         echo "Please install zenity if you want a graphical interface, or "
         echo "run with --help for more options."
         exit 1
+    fi
+
+    # Print zenity/dialog version info for debugging:
+    if [ ! "$WINETRICKS_SUPER_QUIET" ] ; then
+       echo "winetricks GUI enabled, using $WINETRICKS_GUI $WINETRICKS_GUI_VERSION"
     fi
 }
 
@@ -3987,6 +4002,7 @@ winetricks_metadata_exists()
 winetricks_is_cached()
 {
     # FIXME: also check file2... if given
+    # https://github.com/Winetricks/winetricks/issues/989
     # shellcheck disable=SC2154
     _W_path="$W_CACHE/$1/$file1"
     case "$_W_path" in
@@ -4809,10 +4825,14 @@ winetricks_set_wineprefix()
         W_32BIT_DLLS="$W_WINDIR_UNIX/syswow64"
 
         # Probably need fancier handling/checking, but for a basic start:
+        # Note 'wine' may be named 'wine-stable'/'wine-staging'/etc.):
         # WINE64 = wine64, available on 64-bit prefixes
         # WINE_ARCH = the native wine for the prefix (wine for 32-bit, wine64 for 64-bit)
         # WINE_MULTI = generic wine, new name
-        WINE64="${WINE}64"
+        case "$WINE" in
+            *64) WINE64="${WINE}" ;;
+            *) WINE64="${WINE}64" ;;
+        esac
         WINE_ARCH="${WINE64}"
         WINE_MULTI="${WINE}"
 
@@ -5090,6 +5110,7 @@ list-cached: vis en liste over verber for allerede-hentede installationsprogramm
 list-download: vis en liste over verber for programmer der kan hentes
 list-manual-download: list applications which can be downloaded with some help from the user
 list-installed: list already-installed applications
+annihilate            Delete ALL DATA AND APPLICATIONS INSIDE THIS WINEPREFIX
 _EOF_
             ;;
         de*)
@@ -5126,6 +5147,7 @@ list-download         Verben für automatisch herunterladbare Anwendungen auflis
 list-manual-download  Verben für vom Benutzer herunterladbare Anwendungen auflisten
 list-installed        Bereits installierte Verben auflisten
 prefix=foobar         WINEPREFIX=$W_PREFIXES_ROOT/foobar auswählen
+annihilate            ALLE DATEIEN UND PROGRAMME IN DIESEM WINEPREFIX Löschen
 _EOF_
             ;;
         *)
@@ -5164,6 +5186,7 @@ list-download         list verbs which download automatically
 list-manual-download  list verbs which download with some help from the user
 list-installed        list already-installed verbs
 prefix=foobar         select WINEPREFIX=$W_PREFIXES_ROOT/foobar
+annihilate            Delete ALL DATA AND APPLICATIONS INSIDE THIS WINEPREFIX
 _EOF_
             ;;
     esac
@@ -6679,7 +6702,7 @@ w_metadata dotnet11 dlls \
     publisher="Microsoft" \
     year="2003" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet30 dotnet30sp1 dotnet35 dotnet35sp1 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet30 dotnet30sp1 dotnet35 vjrun20" \
     file1="dotnetfx.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v1.1.4322/ndpsetup.ico"
 
@@ -6906,7 +6929,7 @@ w_metadata dotnet20sp1 dlls \
     publisher="Microsoft" \
     year="2008" \
     media="download" \
-    conflicts="dotnet11 dotnet20sp2 dotnet35sp1" \
+    conflicts="dotnet11 dotnet20sp2" \
     file1="NetFx20SP1_x86.exe" \
     installed_file1="c:/windows/winsxs/manifests/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.1433_x-ww_5cf844d2.cat"
 
@@ -7035,7 +7058,7 @@ w_metadata dotnet30 dlls \
     publisher="Microsoft" \
     year="2006" \
     media="download" \
-    conflicts="dotnet11 dotnet20sp1 dotnet20sp2 dotnet30sp1 dotnet35 dotnet35sp1 dotnet45 dotnet452" \
+    conflicts="dotnet11 dotnet20sp1 dotnet20sp2 dotnet30sp1 dotnet35 dotnet45 dotnet452" \
     file1="dotnetfx3.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v3.0/Microsoft .NET Framework 3.0/logo.bmp"
 
@@ -7177,10 +7200,6 @@ load_dotnet35()
     w_call dotnet30sp1
     w_wineserver -w
 
-    if w_workaround_wine_bug 33450 "Installing msxml3"  ,1.5.28; then
-        w_call msxml3
-    fi
-
     # See also https://blogs.msdn.microsoft.com/astebner/2008/07/17/scenarios-where-net-framework-3-5-setup-tries-to-connect-to-the-internet-and-how-to-avoid-them/
     w_try_cd "$W_TMP"
     w_try_cabextract $W_UNATTENDED_DASH_Q "$W_CACHE"/dotnet35/dotnetfx35.exe
@@ -7194,73 +7213,6 @@ load_dotnet35()
 verify_dotnet35()
 {
     w_dotnet_verify dotnet35
-}
-
-#----------------------------------------------------------------
-
-w_metadata dotnet35sp1 dlls \
-    title="MS .NET 3.5 SP1" \
-    publisher="Microsoft" \
-    year="2008" \
-    media="download" \
-    conflicts="dotnet11 dotnet20sp1 dotnet20sp2" \
-    file1="dotnetfx35.exe" \
-    installed_file1="c:/windows/Microsoft.NET/Framework/v3.5/Microsoft .NET Framework 3.5 SP1/logo.bmp"
-
-load_dotnet35sp1()
-{
-    w_package_unsupported_win64
-
-    case "$W_PLATFORM" in
-        windows_cmd) ;;
-        *) w_warn "dotnet35sp1 does not yet fully work or install on wine.  Caveat emptor." ;;
-    esac
-
-    w_verify_cabextract_available
-
-    # https://www.microsoft.com/en-us/download/details.aspx?id=25150
-    w_download https://download.microsoft.com/download/2/0/e/20e90413-712f-438c-988e-fdaa79a8ac3d/dotnetfx35.exe 0582515bde321e072f8673e829e175ed2e7a53e803127c50253af76528e66bc1
-
-    w_call remove_mono
-
-    w_call dotnet35
-    w_wineserver -w
-    w_call dotnet20sp2
-    w_wineserver -w
-
-    # Work around hang in https://bugs.winehq.org/show_bug.cgi?id=25060#c19
-    WINEDLLOVERRIDES=ngen.exe,mscorsvw.exe=b
-    export WINEDLLOVERRIDES
-
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-    w_ahk_do "
-        SetTitleMatchMode, 2
-        run, dotnetfx35.exe /lang:ENU $W_UNATTENDED_SLASH_Q
-
-        Loop
-        {
-            sleep 1000
-            ifwinexist,, cannot be uninstalled
-            {
-                WinClose,, cannot be uninstalled
-                continue
-            }
-            Process, exist, dotnetfx35.exe
-            dotnet_pid = %ErrorLevel%
-            if dotnet_pid = 0
-            {
-                break
-            }
-        }
-    "
-
-    # Doesn't install any ngen.exe
-    # W_NGEN_CMD=""
-}
-
-verify_dotnet35sp1()
-{
-    w_dotnet_verify dotnet35sp1
 }
 
 #----------------------------------------------------------------
@@ -7320,7 +7272,7 @@ w_metadata dotnet45 dlls \
     publisher="Microsoft" \
     year="2012" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 vjrun20" \
     file1="dotnetfx45_full_x86_x64.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v4.0.30319/Microsoft.Windows.ApplicationServer.Applications.45.man"
 
@@ -7372,7 +7324,7 @@ w_metadata dotnet452 dlls \
     publisher="Microsoft" \
     year="2012" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 dotnet45 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 dotnet45 vjrun20" \
     file1="dotnetfx45_full_x86_x64.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v4.0.30319/Microsoft.Windows.ApplicationServer.Applications.45.man"
 
@@ -7425,7 +7377,7 @@ w_metadata dotnet46 dlls \
     year="2015" \
     media="download" \
     file1="NDP46-KB3045557-x86-x64-AllOS-ENU.exe" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 vjrun20" \
     installed_file1="c:/windows/Migration/WTR/netfx45_upgradecleanup.inf"
 
 load_dotnet46()
@@ -7469,57 +7421,12 @@ verify_dotnet46()
 
 #----------------------------------------------------------------
 
-w_metadata dotnet461 dlls \
-    title="MS .NET 4.6.1" \
-    publisher="Microsoft" \
-    year="2015" \
-    media="download" \
-    file1="NDP461-KB3102436-x86-x64-AllOS-ENU.exe" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 dotnet46 vjrun20" \
-    installed_file1="c:/users/$LOGNAME/Temp/dd_NDP461-KB3102436-x86-x64-AllOS-ENU_decompression_log.txt"
-
-load_dotnet461()
-{
-    w_package_warn_win64
-
-    # https://www.microsoft.com/en-us/download/details.aspx?id=49982
-    w_download https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe beaa901e07347d056efe04e8961d5546c7518fab9246892178505a7ba631c301
-
-    w_call remove_mono
-
-    w_call dotnet46
-    w_set_winver win7
-
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-
-    WINEDLLOVERRIDES=fusion=b "$WINE" "$file1" ${W_OPT_UNATTENDED:+/q /norestart}
-    status=$?
-
-    echo "exit status: $status"
-
-    case $status in
-        0) ;;
-        105) echo "exit status $status - normal, user selected 'restart now'" ;;
-        194) echo "exit status $status - normal, user selected 'restart later'" ;;
-        *) w_die "exit status $status - $W_PACKAGE installation failed" ;;
-    esac
-
-    w_override_dlls native mscoree
-}
-
-verify_dotnet461()
-{
-    w_dotnet_verify dotnet461
-}
-
-#----------------------------------------------------------------
-
 w_metadata dotnet462 dlls \
     title="MS .NET 4.6.2" \
     publisher="Microsoft" \
     year="2016" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 dotnet46 dotnet461 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 dotnet46 vjrun20" \
     installed_file1="c:/windows/dotnet462.installed.workaround"
 
 load_dotnet462()
@@ -7540,7 +7447,7 @@ load_dotnet462()
 
     w_call remove_mono
 
-    w_call dotnet461
+    w_call dotnet46
     w_set_winver win7
 
     w_try_cd "$W_CACHE/$W_PACKAGE"
@@ -7684,6 +7591,7 @@ load_esent()
 #----------------------------------------------------------------
 
 # FIXME: update winetricks_is_installed to look at installed_file2..n
+# https://github.com/Winetricks/winetricks/issues/988
 w_metadata flash dlls \
     title="Flash Player 14" \
     publisher="Adobe" \
@@ -8096,11 +8004,14 @@ load_icodecs()
             controlclick, Button4  ; Finish
         }
         winwaitclose
-        ; Dangling explorer window
-        winwait, Wine Explorer
-        sleep 1000
-        winclose, Wine Explorer
     "
+        # Note, this leaves a dangling explorer window. The window name changed at some point
+        # because of a fixed wine bug that I'm too lazy to find. Since AHK doesn't make command line
+        # arguments easily accessible, we'd have to just kill all explorer.exe processes.
+        #
+        # So instead, use system kill
+        inode_pid="$(pgrep -f 'explorer.exe C:\\Program Files\\Ligos\\Indeo')"
+        kill -HUP "$inode_pid"
 }
 
 #----------------------------------------------------------------
@@ -8141,7 +8052,12 @@ w_metadata jet40 dlls \
 
 load_jet40()
 {
-    w_call mdac27
+    # mdac27 is 32-bit only, so use mdac28 for win64:
+    if [ "$W_ARCH" = "win64" ] ; then
+        w_call mdac28
+    else
+        w_call mdac27
+    fi
     w_call wsh57
 
     # https://support.microsoft.com/kb/239114
@@ -9136,6 +9052,9 @@ load_remove_mono()
     "${WINE_ARCH}" reg delete "HKLM\\Software\\Microsoft\\NET Framework Setup\\NDP\\v4" /f || true
 
     w_try rm -f "$W_WINDIR_UNIX/system32/mscoree.dll"
+    if [ "$W_ARCH" = "win64" ]; then
+        w_try rm -f "$W_WINDIR_UNIX/syswow64/mscoree.dll"
+    fi
 }
 
 #----------------------------------------------------------------
@@ -11037,7 +10956,7 @@ w_metadata opensymbol fonts \
     publisher="OpenOffice.org" \
     year="2017" \
     media="download" \
-    file1="fonts-opensymbol_102.2+LibO3.5.4+dfsg2-0+deb7u10_all.deb" \
+    file1="fonts-opensymbol_102.2+LibO3.5.4+dfsg2-0+deb7u11_all.deb" \
     installed_file1="$W_FONTSDIR_WIN/opens___.ttf"
 
 load_opensymbol()
@@ -11045,7 +10964,7 @@ load_opensymbol()
     # The OpenSymbol fonts are a replacement for the Windows Wingdings font from OpenOffice.org.
     # Need to w_download Debian since I can't find a standalone download from OpenOffice
     # Note: The source download package on debian is for _all_ of OpenOffice, which is 266 MB.
-    w_download "http://security.debian.org/debian-security/pool/updates/main/libr/libreoffice/fonts-opensymbol_102.2+LibO3.5.4+dfsg2-0+deb7u10_all.deb" 33fe227786ae6dd89d265199bf3c03f09e540a5d2b96a38d7a581b4a039db696
+    w_download "http://security.debian.org/debian-security/pool/updates/main/libr/libreoffice/fonts-opensymbol_102.2+LibO3.5.4+dfsg2-0+deb7u11_all.deb" b105ec27c738f92bd9801962f10fd05125c38224c92e702f84b00cbb482dfce7
 
     w_try_cd "$W_TMP"
     w_try_ar "$W_CACHE/$W_PACKAGE/$file1" data.tar.xz
@@ -11361,6 +11280,30 @@ load_autohotkey()
 
 #----------------------------------------------------------------
 
+w_metadata busybox apps \
+    title="BusyBox FRP-2121" \
+    publisher="Ron Yorston / Busybox authors" \
+    year="2015" \
+    media="download" \
+    file1="busybox-w32-FRP-2121-ga316078ad.exe" \
+    installed_exe1=""
+
+load_busybox()
+{
+    # Could use https://frippery.org/files/busybox/busybox.exe, but it hasn't updated in last 3 years..
+    w_download https://frippery.org/files/busybox/busybox-w32-FRP-2121-ga316078ad.exe 1bab530f2fd2a9d69528bc2b35ba1f9f75481ae053443b47cb23ad2c2740d887
+
+    if test "$W_ARCH" = "win64"; then
+        w_download https://frippery.org/files/busybox/busybox-w64-FRP-2121-ga316078ad.exe dcb2faf17f996fda8d273d513bc195aec615ef468e3d55b8b4dc9c089b22e035
+        w_try cp "${W_CACHE}/${W_PACKAGE}/${file1}" "$W_SYSTEM32_DLLS/busybox.exe"
+        w_try cp "${W_CACHE}/${W_PACKAGE}/busybox-w64-FRP-2121-ga316078ad.exe" "$W_SYSTEM64_DLLS/busybox.exe"
+    else
+        w_try cp "${W_CACHE}/${W_PACKAGE}/${file1}" "$W_SYSTEM32_DLLS/busybox.exe"
+    fi
+}
+
+#----------------------------------------------------------------
+
 w_metadata cmake apps \
     title="CMake 2.8" \
     publisher="Kitware" \
@@ -11530,10 +11473,6 @@ load_ev3()
 
     if w_workaround_wine_bug 40729 "Setting override for urlmon.dll to native to avoid crash"; then
         w_override_dlls native urlmon
-    fi
-
-    if w_workaround_wine_bug 34897 "Installing update KB2936068 to work around bug 34897" 1.9.10,1.9.12; then
-        w_call ie8_kb2936068
     fi
 }
 
