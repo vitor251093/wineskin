@@ -3001,7 +3001,7 @@ Gw
                 <outlet property="extPopUpButton" destination="1398" id="1460"/>
                 <outlet property="focusFollowsMouseCheckBoxButton" destination="1572" id="1576"/>
                 <outlet property="forceSystemXQuartzButton" destination="1910" id="1913"/>
-                <outlet property="forceWrapperQuartzWMButton" destination="1899" id="1903"/>
+                <outlet property="forceWrapperQuartzWMButton" destination="1654" id="Zjy-eU-QAk"/>
                 <outlet property="gammaSlider" destination="564" id="677"/>
                 <outlet property="helpWindow" destination="1352" id="1360"/>
                 <outlet property="iconBrowseButton" destination="718" id="825"/>
