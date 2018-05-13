@@ -120,14 +120,17 @@ NSFileManager *fm;
     [modifyMappingsButton setEnabled:state];
     [confirmQuitCheckBoxButton setEnabled:state];
     [focusFollowsMouseCheckBoxButton setEnabled:state];
-    [forceWrapperQuartzWMButton setEnabled:state];
+    
+    //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
     {
         [forceSystemXQuartzButton setEnabled:NO];
+        [forceWrapperQuartzWMButton setEnabled:NO];
     }
     else
     {
         [forceSystemXQuartzButton setEnabled:state];
+        [forceWrapperQuartzWMButton setEnabled:state];
     }
     
     if (state) {
@@ -1070,16 +1073,25 @@ NSFileManager *fm;
 	[mapUserFoldersCheckBoxButton setState:[[portManager plistObjectForKey:@"Symlinks In User Folder"] intValue]];
     [modifyMappingsButton         setEnabled:[mapUserFoldersCheckBoxButton state]];
     
-	[forceWrapperQuartzWMButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue]];
+    //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
     {
         [forceSystemXQuartzButton setEnabled:NO];
+        [forceSystemXQuartzButton setState:0];
+        [portManager setPlistObject:@([forceSystemXQuartzButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ];
+        [forceWrapperQuartzWMButton setEnabled:NO];
+        [forceWrapperQuartzWMButton setState:0];
+        [portManager setPlistObject:@([forceWrapperQuartzWMButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW];
+        [portManager synchronizePlist];
     }
     else
     {
         [forceSystemXQuartzButton setEnabled:YES];
+        [forceSystemXQuartzButton         setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ] intValue]];
+        [forceWrapperQuartzWMButton setEnabled:YES];
+        [forceWrapperQuartzWMButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue]];
     }
-	[forceSystemXQuartzButton         setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ] intValue]];
+    
 	[alwaysMakeLogFilesCheckBoxButton setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE] intValue]];
     [setMaxFilesCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_MAX_OF_10240_FILES] intValue]];
     
