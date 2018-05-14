@@ -1714,54 +1714,12 @@
 			<key>WS-Name</key>
 			<string>baekmuk</string>
 		</dict>
-		<key>calibri</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS Calibri font</string>
-			<key>WS-Name</key>
-			<string>calibri</string>
-		</dict>
-		<key>cambria</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS Cambria font</string>
-			<key>WS-Name</key>
-			<string>cambria</string>
-		</dict>
-		<key>candara</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS Candara font</string>
-			<key>WS-Name</key>
-			<string>candara</string>
-		</dict>
 		<key>cjkfonts</key>
 		<dict>
 			<key>WS-Description</key>
 			<string>All Chinese, Japanese, Korean fonts and aliases</string>
 			<key>WS-Name</key>
 			<string>cjkfonts</string>
-		</dict>
-		<key>consolas</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS Consolas console font</string>
-			<key>WS-Name</key>
-			<string>consolas</string>
-		</dict>
-		<key>constantia</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS Constantia font</string>
-			<key>WS-Name</key>
-			<string>constantia</string>
-		</dict>
-		<key>corbel</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS Corbel font</string>
-			<key>WS-Name</key>
-			<string>corbel</string>
 		</dict>
 		<key>corefonts</key>
 		<dict>
@@ -1840,26 +1798,12 @@
 			<key>WS-Name</key>
 			<string>lucida</string>
 		</dict>
-		<key>meiryo</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>MS Meiryo font</string>
-			<key>WS-Name</key>
-			<string>meiryo</string>
-		</dict>
 		<key>opensymbol</key>
 		<dict>
 			<key>WS-Description</key>
 			<string>OpenSymbol fonts (replacement for Wingdings)</string>
 			<key>WS-Name</key>
 			<string>opensymbol</string>
-		</dict>
-		<key>pptfonts</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>All MS PowerPoint Viewer fonts</string>
-			<key>WS-Name</key>
-			<string>pptfonts</string>
 		</dict>
 		<key>tahoma</key>
 		<dict>
