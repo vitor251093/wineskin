@@ -1459,6 +1459,17 @@ Gw
                                                 <action selector="setMaxFilesCheckBoxButtonPressed:" target="494" id="2099"/>
                                             </connections>
                                         </button>
+                                        <button misplaced="YES" id="ySz-ju-fJS">
+                                            <rect key="frame" x="14" y="2" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Enable winetricks silent mode (Advance Users Only!)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="m2x-Lg-caS">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="systemBold"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="enableWinetricksSilentButtonPressed:" target="494" id="MLQ-pa-haq"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -2988,6 +2999,7 @@ Gw
                 <outlet property="defaultSettingsAutomaticRadioButton" destination="d8j-7E-Otb" id="p53-V0-scb"/>
                 <outlet property="defaultSettingsOverrideRadioButton" destination="c2t-uK-gSa" id="gu2-zK-hdk"/>
                 <outlet property="emulateThreeButtonMouseCheckBoxButton" destination="1649" id="1652"/>
+                <outlet property="enableWinetricksSilentButton" destination="ySz-ju-fJS" id="b8F-7T-071"/>
                 <outlet property="engineVersionText" destination="1562" id="1570"/>
                 <outlet property="engineWindowOkButton" destination="992" id="1207"/>
                 <outlet property="exeBrowseButton" destination="707" id="824"/>

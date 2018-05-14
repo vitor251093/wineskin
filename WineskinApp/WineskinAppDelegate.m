@@ -120,6 +120,7 @@ NSFileManager *fm;
     [modifyMappingsButton setEnabled:state];
     [confirmQuitCheckBoxButton setEnabled:state];
     [focusFollowsMouseCheckBoxButton setEnabled:state];
+    [enableWinetricksSilentButton setEnabled:state];
     
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
@@ -1072,7 +1073,8 @@ NSFileManager *fm;
     
 	[mapUserFoldersCheckBoxButton setState:[[portManager plistObjectForKey:@"Symlinks In User Folder"] intValue]];
     [modifyMappingsButton         setEnabled:[mapUserFoldersCheckBoxButton state]];
-    
+    [enableWinetricksSilentButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue]];
+
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
     {
@@ -1280,6 +1282,11 @@ NSFileManager *fm;
     [portManager setPlistObject:@([forceSystemXQuartzButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ];
     [portManager synchronizePlist];
 }
+- (IBAction)enableWinetricksSilentButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([enableWinetricksSilentButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT];
+    [portManager synchronizePlist];
+}
 //*************************************************************
 //**************** Advanced Menu - Tools Tab ******************
 //*************************************************************
@@ -1359,7 +1366,16 @@ NSFileManager *fm;
 }
 - (IBAction)winetricksButtonPressed:(id)sender
 {
-	[self winetricksRefreshButtonPressed:self];
+    //Warning User if Winetricks Silent mode is enabled, Custom Title instead of Warning?
+    if (([enableWinetricksSilentButton intValue] == 1) && [NSAlert showBooleanAlertOfType:NSAlertTypeWinetricks withMessage:[NSString stringWithFormat:@"\nDisable Unless You Know Exactly What Your Doing!\nContinue with Winetricks Silent Mode Enabled?"] withDefault:NO] == false)
+    {
+        //Disables "wineskin silent mode" if user picks No, then continues
+        [enableWinetricksSilentButton setState:0];
+        [portManager setPlistObject:@([enableWinetricksSilentButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT];
+        [portManager synchronizePlist];
+        [self winetricksRefreshButtonPressed:self];
+    }
+    [self winetricksRefreshButtonPressed:self];
 }
 - (IBAction)winetricksDoneButtonPressed:(id)sender
 {

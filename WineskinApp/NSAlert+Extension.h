@@ -15,6 +15,7 @@ typedef enum NSAlertType
 {
     NSAlertTypeSuccess,
     NSAlertTypeWarning,
+    NSAlertTypeWinetricks,
     NSAlertTypeError,
     NSAlertTypeCritical,
     NSAlertTypeCustom
