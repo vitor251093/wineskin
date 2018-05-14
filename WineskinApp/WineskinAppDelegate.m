@@ -789,7 +789,7 @@ NSFileManager *fm;
         }
     }
 	//give warning message
-    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:[NSString stringWithFormat:@"This will kill the following processes (if running) from this wrapper...\n\nWineskinLauncher\nWineskinX11\n%@\n%@\n\nAre you sure that you want to kill these processes TESTING?",wineName,wineserverName] withDefault:NO])
+    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:[NSString stringWithFormat:@"This will kill the following processes (if running) from this wrapper...\n\nWineskinLauncher\nWineskinX11\n%@\n%@\n\nAre you sure that you want to kill these processes?",wineName,wineserverName] withDefault:NO])
     {
     	//kill WineskinLauncher WineskinX11 wine wineserver
         [self systemCommand:[NSString stringWithFormat:@"killall -m %@",wineName]];
