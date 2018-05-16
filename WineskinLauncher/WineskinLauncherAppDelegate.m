@@ -286,6 +286,7 @@ static NSPortManager* portManager;
         //WSS-wineprefixcreatenoregs- same as above, doesn't load default regs
         //WSS-wineboot				- run simple wineboot, no deletions or loading regs. mshtml=disabled
         //WSS-winetricks {command}	- winetricks is being run
+        //WSS-wineserverkill        - tell winesever to kill all wine processes from wrapper
         //debug 					- run in debug mode, keep logs
         //CustomEXE {appname}		- running a custom EXE with appname
         //starts with a"/" 			- will be 1+ path/filename to open
@@ -310,6 +311,15 @@ static NSPortManager* portManager;
             {
                 debugEnabled = YES; //need logs in special commands
                 useGamma = NO;
+                if ([wssCommand isEqualToString:@"WSS-wineserverkill"])
+                [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
+                NSArray* command = @[
+                                     [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
+                                     [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                                     [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                                     @"wineserver -k"];
+                [self systemCommand:[command componentsJoinedByString:@" "]];
+                usleep(3000000);
                 if ([wssCommand isEqualToString:@"WSS-installer"]) //if its in the installer, need to know if normal windows are forced
                 {
                     if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS] intValue] == 1)
@@ -607,6 +617,7 @@ static NSPortManager* portManager;
         //WSS-wineprefixcreatenoregs- same as above, doesn't load default regs
         //WSS-wineboot				- run simple wineboot, no deletions or loading regs. mshtml=disabled
         //WSS-winetricks {command}	- winetricks is being run
+        //WSS-wineserverkill        - tell winesever to kill all wine processes from wrapper
         //debug 					- run in debug mode, keep logs
         //CustomEXE {appname}		- running a custom EXE with appname
         //starts with a"/" 			- will be 1+ path/filename to open
@@ -708,6 +719,7 @@ static NSPortManager* portManager;
     //WSS-wineprefixcreatenoregs- need to error, saying this cannot run while the wrapper is running
     //WSS-wineboot				- need to error, saying this cannot run while the wrapper is running
     //WSS-winetricks {command}	- need to error, saying this cannot run while the wrapper is running
+    //WSS-wineserverkill        - tell winesever to kill all wine processes from wrapper
     //debug 					- need to error, saying this cannot run while the wrapper is running
     //CustomEXE {appname}		- need to send path to cexe to main
     //starts with a"/" 			- need to just pass this one to main
@@ -719,6 +731,7 @@ static NSPortManager* portManager;
     
     NSDictionary* fileToRunForCommand = @{
                                 @"WSS-installer":   otherCommands[0],
+                                @"WSS-wineserverkill":   otherCommands[0],
                                 @"WSS-winecfg":     [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix],
                                 @"WSS-cmd":         [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix],
                                 @"WSS-regedit":     [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix],
