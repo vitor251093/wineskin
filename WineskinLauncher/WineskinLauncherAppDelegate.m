@@ -61,6 +61,7 @@ static NSPortManager* portManager;
     
     appName = appNameWithPath.lastPathComponent.stringByDeletingPathExtension;
     tmpFolder = [NSString stringWithFormat:@"/tmp/%@",[appNameWithPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
+    tmpwineFolder = [NSString stringWithFormat:@"/tmp/.wine-501/"];
     
     globalFilesToOpen = [[NSMutableArray alloc] init];
     fm = [NSFileManager defaultManager];
@@ -402,6 +403,7 @@ static NSPortManager* portManager;
             system([[NSString stringWithFormat:@"open \"%@/Wineskin.app\"",appNameWithPath] UTF8String]);
             [fm removeItemAtPath:lockfile];
             [fm removeItemAtPath:tmpFolder];
+            [fm removeItemAtPath:tmpwineFolder];
             exit(0);
         }
         //********** Wineskin Customizer start up script
@@ -459,6 +461,7 @@ static NSPortManager* portManager;
                     {
                         [fm removeItemAtPath:lockfile];
                         [fm removeItemAtPath:tmpFolder];
+                        [fm removeItemAtPath:tmpwineFolder];
                         return;
                     }
                 }
@@ -1282,6 +1285,7 @@ static NSPortManager* portManager;
         CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: XQuartz cannot already be running if using Override Fullscreen option!\n\nPlease close XQuartz and try again!"), NULL);
         [fm removeItemAtPath:lockfile];
         [fm removeItemAtPath:tmpFolder];
+        [fm removeItemAtPath:tmpwineFolder];
         [NSApp terminate:nil];
     }
     
@@ -2403,6 +2407,7 @@ static NSPortManager* portManager;
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@.lockfile",x11PListFile]];
     [fm removeItemAtPath:lockfile];
     [fm removeItemAtPath:tmpFolder];
+    [fm removeItemAtPath:tmpwineFolder];
     
     //kill processes
     [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineName]];

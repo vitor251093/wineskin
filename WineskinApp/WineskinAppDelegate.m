@@ -791,8 +791,10 @@ NSFileManager *fm;
     //delete lockfile
     NSString *tmpFolder=[NSString stringWithFormat:@"/tmp/%@",[self.wrapperPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
     NSString *lockfile=[NSString stringWithFormat:@"%@/lockfile",tmpFolder];
+    NSString *tempwineFolder=[NSString stringWithFormat:@"/tmp/.wine-501/"];
     [fm removeItemAtPath:lockfile];
     [fm removeItemAtPath:tmpFolder];
+    [fm removeItemAtPath:tempwineFolder];
 }
 
 //*************************************************************
