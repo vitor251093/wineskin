@@ -21,6 +21,7 @@
 #import "NSPortDataLoader.h"
 #import "NSWineskinEngine.h"
 #import "NSWineskinPortDataWriter.h"
+#import "NSComputerInformation.h"
 
 #define WINETRICK_NAME        @"WS-Name"
 #define WINETRICK_DESCRIPTION @"WS-Description"
@@ -123,7 +124,7 @@ NSFileManager *fm;
     [WinetricksNoLogsButton setEnabled:state];
     
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
-    if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+    if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"] && ![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
     {
         [forceSystemXQuartzButton setEnabled:NO];
         [forceWrapperQuartzWMButton setEnabled:NO];
@@ -1077,7 +1078,7 @@ NSFileManager *fm;
     [WinetricksNoLogsButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue]];
 
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
-    if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+    if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"] && ![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
     {
         [forceSystemXQuartzButton setEnabled:NO];
         [forceSystemXQuartzButton setState:0];
