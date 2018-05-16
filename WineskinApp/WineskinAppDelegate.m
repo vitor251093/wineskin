@@ -120,7 +120,7 @@ NSFileManager *fm;
     [modifyMappingsButton setEnabled:state];
     [confirmQuitCheckBoxButton setEnabled:state];
     [focusFollowsMouseCheckBoxButton setEnabled:state];
-    [enableWinetricksSilentButton setEnabled:state];
+    [WinetricksNoLogsButton setEnabled:state];
     
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
@@ -1074,6 +1074,7 @@ NSFileManager *fm;
 	[mapUserFoldersCheckBoxButton setState:[[portManager plistObjectForKey:@"Symlinks In User Folder"] intValue]];
     [modifyMappingsButton         setEnabled:[mapUserFoldersCheckBoxButton state]];
     [enableWinetricksSilentButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue]];
+    [WinetricksNoLogsButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue]];
 
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
@@ -1287,6 +1288,11 @@ NSFileManager *fm;
     [portManager setPlistObject:@([enableWinetricksSilentButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT];
     [portManager synchronizePlist];
 }
+- (IBAction)WinetricksNoLogsButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([WinetricksNoLogsButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS];
+    [portManager synchronizePlist];
+}
 //*************************************************************
 //**************** Advanced Menu - Tools Tab ******************
 //*************************************************************
@@ -1366,12 +1372,12 @@ NSFileManager *fm;
 }
 - (IBAction)winetricksButtonPressed:(id)sender
 {
-    //Warning User if Winetricks Silent mode is enabled, Custom Title instead of Warning?
-    if (([enableWinetricksSilentButton intValue] == 1) && [NSAlert showBooleanAlertOfType:NSAlertTypeWinetricks withMessage:[NSString stringWithFormat:@"\nDisable Unless You Know Exactly What Your Doing!\nContinue with Winetricks Silent Mode Enabled?"] withDefault:NO] == false)
+    //Warning User if Winetricks No Logs Mode is enabled, Custom Title instead of Warning?
+    if (([WinetricksNoLogsButton intValue] == 1) && [NSAlert showBooleanAlertOfType:NSAlertTypeWinetricks withMessage:[NSString stringWithFormat:@"\nDisable winetricks logs only if you know exactly what you're doing\nAre you sure that you want to proceed?"] withDefault:NO] == false)
     {
-        //Disables "wineskin silent mode" if user picks No, then continues
-        [enableWinetricksSilentButton setState:0];
-        [portManager setPlistObject:@([enableWinetricksSilentButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT];
+        //Disables "Wineskin No Logs mode" if user picks No, then continues
+        [WinetricksNoLogsButton setState:0];
+        [portManager setPlistObject:@([WinetricksNoLogsButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS];
         [portManager synchronizePlist];
         [self winetricksRefreshButtonPressed:self];
     }
@@ -1582,6 +1588,7 @@ NSFileManager *fm;
     BOOL useCustomLine = [sender state];
     BOOL hideCustomLine = !useCustomLine;
     
+    [enableWinetricksSilentButton setHidden:useCustomLine];
     [winetricksCustomLine setEnabled:useCustomLine];
     [winetricksCustomLine setHidden:hideCustomLine];
     [winetricksCustomLineLabel setHidden:hideCustomLine];
@@ -1792,6 +1799,7 @@ NSFileManager *fm;
 	[winetricksRefreshButton setEnabled:!isBusy];
 	[winetricksDoneButton setEnabled:!isBusy];
 	[winetricksSearchField setEnabled:!isBusy];
+    [enableWinetricksSilentButton setEnabled:!isBusy];
 	[winetricksCustomCheckbox setEnabled:!isBusy];
 	[winetricksActionPopup setEnabled:!isBusy];
 	

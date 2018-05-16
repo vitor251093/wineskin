@@ -2120,9 +2120,26 @@ static NSPortManager* portManager;
             startExeLine = @" start /unix";
         }
         //Wine start section
+        NSString *silentMode;
         if ([wssCommand isEqualToString:@"WSS-winetricks"])
         {
-            NSString *wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
+            if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue] == 1)
+            {
+                wineDebugLine = @"err-all,warn-all,fixme-all,trace-all";
+            }
+            else
+            {
+                wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
+            }
+            
+            if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue] == 1)
+            {
+                silentMode = @"-q";
+            }
+            else
+            {
+                silentMode = @"";
+            }
             NSArray *winetricksCommands = [wineStartInfo getWinetricksCommands];
             if ((winetricksCommands.count == 2 &&  [winetricksCommands[1] isEqualToString:@"list"]) ||
                 (winetricksCommands.count == 1 && ([winetricksCommands[0] isEqualToString:@"list"]  ||
@@ -2131,16 +2148,9 @@ static NSPortManager* portManager;
                 //just getting a list of packages... X should NOT be running.
                 [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@/Logs/WinetricksTemp.log\"",dyldFallBackLibraryPath,wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],winePrefix]];
             }
-            //Launch winetricks silent mode "Winetricks -q"
-            if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue] == 1)
-            {
-                //Disable Winedebug when running silent mode
-                NSString *wineDebugLine2 = @"err-all,warn-all,fixme-all,trace-all";
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks -q --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",dyldFallBackLibraryPath,wineDebugLine2,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
-            }
             else
             {
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
+                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks %@ --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,silentMode,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
             }
             usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
             return;

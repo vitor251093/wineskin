@@ -1462,12 +1462,12 @@ Gw
                                         <button misplaced="YES" id="ySz-ju-fJS">
                                             <rect key="frame" x="14" y="2" width="610" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Enable winetricks silent mode (Advance Users Only!)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="m2x-Lg-caS">
+                                            <buttonCell key="cell" type="check" title="Run winetricks with no logs (Advance Users Only!)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="m2x-Lg-caS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="systemBold"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="enableWinetricksSilentButtonPressed:" target="494" id="MLQ-pa-haq"/>
+                                                <action selector="WinetricksNoLogsButtonPressed:" target="494" id="YGS-hu-nIi"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -2119,6 +2119,17 @@ DQ
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                         </scrollView>
+                                        <button misplaced="YES" id="Les-bd-aEF">
+                                            <rect key="frame" x="152" y="276" width="57" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Silent" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="XfQ-js-tzV">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="enableWinetricksSilentButtonPressed:" target="494" id="lZT-dk-Ek0"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -2960,6 +2971,7 @@ Gw
         </window>
         <customObject id="494" userLabel="Wineskin App Delegate" customClass="WineskinAppDelegate">
             <connections>
+                <outlet property="WinetricksNoLogsButton" destination="ySz-ju-fJS" id="nD8-q0-1nd"/>
                 <outlet property="aboutWindow" destination="1364" id="1379"/>
                 <outlet property="aboutWindowVersionNumber" destination="1368" id="1381"/>
                 <outlet property="advancedInstallSoftwareButton" destination="1985" id="2034"/>
@@ -2999,7 +3011,7 @@ Gw
                 <outlet property="defaultSettingsAutomaticRadioButton" destination="d8j-7E-Otb" id="p53-V0-scb"/>
                 <outlet property="defaultSettingsOverrideRadioButton" destination="c2t-uK-gSa" id="gu2-zK-hdk"/>
                 <outlet property="emulateThreeButtonMouseCheckBoxButton" destination="1649" id="1652"/>
-                <outlet property="enableWinetricksSilentButton" destination="ySz-ju-fJS" id="b8F-7T-071"/>
+                <outlet property="enableWinetricksSilentButton" destination="Les-bd-aEF" id="qe5-TL-7QP"/>
                 <outlet property="engineVersionText" destination="1562" id="1570"/>
                 <outlet property="engineWindowOkButton" destination="992" id="1207"/>
                 <outlet property="exeBrowseButton" destination="707" id="824"/>

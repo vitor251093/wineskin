@@ -107,8 +107,8 @@
 	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
 	IBOutlet NSButton *forceWrapperQuartzWMButton;
 	IBOutlet NSButton *forceSystemXQuartzButton;
-    IBOutlet NSButton *enableWinetricksSilentButton;
-		
+    IBOutlet NSButton *WinetricksNoLogsButton;
+
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
 	IBOutlet NSPopUpButton *changeEngineWindowPopUpButton;
@@ -164,13 +164,14 @@
 	IBOutlet NSTableColumn *winetricksTableColumnName;
 	IBOutlet NSTableColumn *winetricksTableColumnDescription;
 	IBOutlet NSSearchField *winetricksSearchField;
+    IBOutlet NSButton *enableWinetricksSilentButton;
 	IBOutlet NSButton *winetricksCustomCheckbox;
 	IBOutlet NSTextField *winetricksCustomLine;
 	IBOutlet NSTextField *winetricksCustomLineLabel;
 	IBOutlet NSButton *winetricksActionPopup;
 	IBOutlet NSMenuItem *winetricksShowDownloadedColumn;
 	IBOutlet NSMenuItem *winetricksShowInstalledColumn;
-	
+
 	//extensions window
 	IBOutlet NSWindow *extAddEditWindow;
 	IBOutlet NSTextField *extExtensionTextField;
@@ -281,7 +282,7 @@
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
 - (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender;
 - (IBAction)forceSystemXQuartzButtonPressed:(id)sender;
-- (IBAction)enableWinetricksSilentButtonPressed:(id)sender;
+- (IBAction)WinetricksNoLogsButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;
@@ -293,6 +294,7 @@
 - (IBAction)winetricksSelectAllButtonPressed:(id)sender;
 - (IBAction)winetricksSelectNoneButtonPressed:(id)sender;
 - (IBAction)winetricksSearchFilter:(id)sender;
+- (IBAction)enableWinetricksSilentButtonPressed:(id)sender;
 - (IBAction)winetricksCustomCommandToggled:(id)sender;
 - (IBAction)winetricksToggleColumn:(id)sender;
 - (void)winetricksLoadPackageLists;

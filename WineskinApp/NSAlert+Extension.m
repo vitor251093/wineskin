@@ -56,7 +56,7 @@
             return NSLocalizedString(@"Warning",nil);
             
         case NSAlertTypeWinetricks:
-            return NSLocalizedString(@"Winetricks Silent Mode Enabled!",nil);
+            return NSLocalizedString(@"Winetricks No Logs Mode",nil);
             
         case NSAlertTypeError:
             return NSLocalizedString(@"Error",nil);

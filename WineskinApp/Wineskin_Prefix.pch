@@ -55,7 +55,8 @@
 #define WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE                    @"Debug Mode"
 #define WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION              @"Gamma Correction"
 #define WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS @"force Installer to normal windows"
-#define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT             @"Winetricks runs unattended"
+#define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT             @"Winetricks silent"
+#define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS             @"Winetricks disable logging"
 
 #define WINESKIN_WRAPPER_X11_PLIST_KEY_EMULATE_THREE_BUTTONS     @"enable_fake_buttons"
 #define WINESKIN_WRAPPER_X11_PLIST_KEY_OPTION_WORKS_LIKE_ALT     @"option_sends_alt"
