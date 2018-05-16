@@ -1347,7 +1347,7 @@ NSFileManager *fm;
 		[advancedWindow orderOut:self];
         
         for (NSString* fileToRemove in @[@".update-timestamp", @"drive_c", @"dosdevices", @"harddiskvolume0",
-                                         @"system.reg", @"user.reg", @"userdef.reg", @"winetricksInstalled.plist"])
+                                         @"system.reg", @"user.reg", @"userdef.reg", @"winetricksInstalled.plist", @"winetricks.log"])
         {
             NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/%@",self.wrapperPath,fileToRemove];
             if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
