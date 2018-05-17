@@ -342,6 +342,8 @@ w_package_warn_win64()
     fi
 }
 
+### w_try and w_try wrappers ###
+
 # Execute with error checking
 # Put this in front of any command that might fail
 w_try()
@@ -431,6 +433,52 @@ w_try_cd()
     w_try cd "$@"
 }
 
+# Copy font files matching a glob pattern from source directory to destination directory.
+# Also remove any file in the destination directory that has the same name as
+# any of the files that we're trying to copy, but with different case letters.
+# Note: it converts font file names to lower case to avoid inconsistencies due to paths
+#       being case-insensitive under Wine.
+w_try_cp_font_files()
+{
+    # $1 - source directory
+    # $2 - destination directory
+    # $3 - optional font file glob pattern (default: "*.ttf")
+
+    _W_src_dir="$1"
+    _W_dest_dir="$2"
+    _W_pattern="$3"
+    shift 2
+
+    if test ! -d "$_W_src_dir"; then
+        w_die "bug: missing source dir"
+    fi
+
+    if test ! -d "$_W_dest_dir"; then
+        w_die "bug: missing destination dir"
+    fi
+
+    if test -z "$_W_pattern"; then
+        _W_pattern="*.ttf"
+    fi
+
+    _W_src_files=$(find "$_W_src_dir" -maxdepth 1 -type f -iname "$_W_pattern")
+
+    for _W_src_file in $_W_src_files; do
+        # Extract the file name and lower case it
+        _W_file_name=$(basename "$_W_src_file" | tr "[:upper:]" "[:lower:]")
+
+        # Remove any existing font files that might have the same name, but with different case characters
+        find "$_W_dest_dir" -maxdepth 1 -type f -iname "$_W_file_name" -exec rm '{}' ';'
+
+        w_try cp -f "$_W_src_file" "$_W_dest_dir/$_W_file_name"
+    done
+
+    # Wait for Wine to add the new font to the registry under HKCU\Software\Wine\Fonts\Cache
+    w_wineserver -w
+
+    unset _W_src_files _W_dest_dir _W_src_file _W_file_name
+}
+
 w_try_msiexec64()
 {
     if test "$W_ARCH" != "win64"; then
@@ -439,6 +487,19 @@ w_try_msiexec64()
 
     # shellcheck disable=SC2086
     w_try "$WINE" start /wait "$W_SYSTEM64_DLLS_WIN32/msiexec.exe" $W_UNATTENDED_SLASH_Q "$@"
+}
+
+w_try_regedit()
+{
+    # If on wow64, run under both wine and wine64 (otherwise they only go in the 32-bit registry afaict)
+
+    # shellcheck disable=SC2086
+    if [ "$W_ARCH" = "win32" ]; then
+        w_try_regedit32 "$@"
+    elif [ "$W_ARCH" = "win64" ]; then
+        w_try_regedit32 "$@"
+        w_try_regedit64 "$@"
+    fi
 }
 
 # fixme: cleanup. For wow64 registries, some/all entries need to be duplicated.
@@ -465,19 +526,6 @@ w_try_regedit64()
 
     # shellcheck disable=SC2086
     w_try "$WINE64" $cmdc regedit $W_UNATTENDED_SLASH_S "$@"
-}
-
-w_try_regedit()
-{
-    # If on wow64, run under both wine and wine64 (otherwise they only go in the 32-bit registry afaict)
-
-    # shellcheck disable=SC2086
-    if [ "$W_ARCH" = "win32" ]; then
-        w_try_regedit32 "$@"
-    elif [ "$W_ARCH" = "win64" ]; then
-        w_try_regedit32 "$@"
-        w_try_regedit64 "$@"
-    fi
 }
 
 w_try_regsvr()
@@ -529,51 +577,7 @@ w_try_unzip()
     w_try "$WINE" "$W_PROGRAMS_X86_WIN\\7-Zip\\7z.exe" x "$(w_pathconv -w "$zipfile")" -o"$(w_pathconv -w "$destdir")" "$@"
 }
 
-# Copy font files matching a glob pattern from source directory to destination directory.
-# Also remove any file in the destination directory that has the same name as
-# any of the files that we're trying to copy, but with different case letters.
-# Note: it converts font file names to lower case to avoid inconsistencies due to paths
-#       being case-insensitive under Wine.
-w_try_cp_font_files()
-{
-    # $1 - source directory
-    # $2 - destination directory
-    # $3 - optional font file glob pattern (default: "*.ttf")
-
-    _W_src_dir="$1"
-    _W_dest_dir="$2"
-    _W_pattern="$3"
-    shift 2
-
-    if test ! -d "$_W_src_dir"; then
-        w_die "bug: missing source dir"
-    fi
-
-    if test ! -d "$_W_dest_dir"; then
-        w_die "bug: missing destination dir"
-    fi
-
-    if test -z "$_W_pattern"; then
-        _W_pattern="*.ttf"
-    fi
-
-    _W_src_files=$(find "$_W_src_dir" -maxdepth 1 -type f -iname "$_W_pattern")
-
-    for _W_src_file in $_W_src_files; do
-        # Extract the file name and lower case it
-        _W_file_name=$(basename "$_W_src_file" | tr "[:upper:]" "[:lower:]")
-
-        # Remove any existing font files that might have the same name, but with different case characters
-        find "$_W_dest_dir" -maxdepth 1 -type f -iname "$_W_file_name" -exec rm '{}' ';'
-
-        w_try cp -f "$_W_src_file" "$_W_dest_dir/$_W_file_name"
-    done
-
-    # Wait for Wine to add the new font to the registry under HKCU\Software\Wine\Fonts\Cache
-    w_wineserver -w
-
-    unset _W_src_files _W_dest_dir _W_src_file _W_file_name
-}
+### End of w_try ###
 
 w_read_key()
 {
@@ -862,10 +866,12 @@ w_dotnet_verify()
         dotnet30) version="3.0" ;;
         dotnet30sp1) version="3.0 SP1" ;;
         dotnet35) version="3.5" ;;
+        dotnet35sp1) version="3.5 SP1" ;;
         dotnet40) version="4 Client" ;;
         dotnet45) version="4.5" ;;
         dotnet452) version="4.5.2" ;;
         dotnet46) version="4.6" ;;
+        dotnet461) version="4.6.1" ;;
         dotnet462) version="4.6.2" ;;
         *) echo error ; exit 1 ;;
     esac
@@ -5379,6 +5385,10 @@ helper_win7sp1_x64()
     w_try_cabextract -d "$W_TMP" -L -F "$filename" "$W_CACHE"/win7sp1/windows6.1-KB976932-X64.exe
 }
 
+#######################
+# dlls
+#######################
+
 #---------------------------------------------------------
 
 w_metadata adobeair dlls \
@@ -6688,7 +6698,7 @@ w_metadata dotnet11 dlls \
     publisher="Microsoft" \
     year="2003" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet30 dotnet30sp1 dotnet35 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet30 dotnet30sp1 dotnet35 dotnet35sp1 vjrun20" \
     file1="dotnetfx.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v1.1.4322/ndpsetup.ico"
 
@@ -6915,7 +6925,7 @@ w_metadata dotnet20sp1 dlls \
     publisher="Microsoft" \
     year="2008" \
     media="download" \
-    conflicts="dotnet11 dotnet20sp2" \
+    conflicts="dotnet11 dotnet20sp2 dotnet35sp1" \
     file1="NetFx20SP1_x86.exe" \
     installed_file1="c:/windows/winsxs/manifests/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.1433_x-ww_5cf844d2.cat"
 
@@ -7044,7 +7054,7 @@ w_metadata dotnet30 dlls \
     publisher="Microsoft" \
     year="2006" \
     media="download" \
-    conflicts="dotnet11 dotnet20sp1 dotnet20sp2 dotnet30sp1 dotnet35 dotnet45 dotnet452" \
+    conflicts="dotnet11 dotnet20sp1 dotnet20sp2 dotnet30sp1 dotnet35 dotnet35sp1 dotnet45 dotnet452" \
     file1="dotnetfx3.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v3.0/Microsoft .NET Framework 3.0/logo.bmp"
 
@@ -7203,6 +7213,73 @@ verify_dotnet35()
 
 #----------------------------------------------------------------
 
+w_metadata dotnet35sp1 dlls \
+    title="MS .NET 3.5 SP1" \
+    publisher="Microsoft" \
+    year="2008" \
+    media="download" \
+    conflicts="dotnet11 dotnet20sp1 dotnet20sp2" \
+    file1="dotnetfx35.exe" \
+    installed_file1="c:/windows/Microsoft.NET/Framework/v3.5/Microsoft .NET Framework 3.5 SP1/logo.bmp"
+
+load_dotnet35sp1()
+{
+    w_package_unsupported_win64
+
+    case "$W_PLATFORM" in
+        windows_cmd) ;;
+        *) w_warn "dotnet35sp1 does not yet fully work or install on wine.  Caveat emptor." ;;
+    esac
+
+    w_verify_cabextract_available
+
+    # https://www.microsoft.com/en-us/download/details.aspx?id=25150
+    w_download https://download.microsoft.com/download/2/0/e/20e90413-712f-438c-988e-fdaa79a8ac3d/dotnetfx35.exe 0582515bde321e072f8673e829e175ed2e7a53e803127c50253af76528e66bc1
+
+    w_call remove_mono
+
+    w_call dotnet35
+    w_wineserver -w
+    w_call dotnet20sp2
+    w_wineserver -w
+
+    # Work around hang in https://bugs.winehq.org/show_bug.cgi?id=25060#c19
+    WINEDLLOVERRIDES=ngen.exe,mscorsvw.exe=b
+    export WINEDLLOVERRIDES
+
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        run, dotnetfx35.exe /lang:ENU $W_UNATTENDED_SLASH_Q
+
+        Loop
+        {
+            sleep 1000
+            ifwinexist,, cannot be uninstalled
+            {
+                WinClose,, cannot be uninstalled
+                continue
+            }
+            Process, exist, dotnetfx35.exe
+            dotnet_pid = %ErrorLevel%
+            if dotnet_pid = 0
+            {
+                break
+            }
+        }
+    "
+
+    # Doesn't install any ngen.exe
+    # W_NGEN_CMD=""
+}
+
+verify_dotnet35sp1()
+{
+    w_dotnet_verify dotnet35sp1
+}
+
+#----------------------------------------------------------------
+
 w_metadata dotnet40 dlls \
     title="MS .NET 4.0" \
     publisher="Microsoft" \
@@ -7258,7 +7335,7 @@ w_metadata dotnet45 dlls \
     publisher="Microsoft" \
     year="2012" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 vjrun20" \
     file1="dotnetfx45_full_x86_x64.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v4.0.30319/Microsoft.Windows.ApplicationServer.Applications.45.man"
 
@@ -7310,7 +7387,7 @@ w_metadata dotnet452 dlls \
     publisher="Microsoft" \
     year="2012" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 dotnet45 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 dotnet45 vjrun20" \
     file1="dotnetfx45_full_x86_x64.exe" \
     installed_file1="c:/windows/Microsoft.NET/Framework/v4.0.30319/Microsoft.Windows.ApplicationServer.Applications.45.man"
 
@@ -7363,7 +7440,7 @@ w_metadata dotnet46 dlls \
     year="2015" \
     media="download" \
     file1="NDP46-KB3045557-x86-x64-AllOS-ENU.exe" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 vjrun20" \
     installed_file1="c:/windows/Migration/WTR/netfx45_upgradecleanup.inf"
 
 load_dotnet46()
@@ -7407,12 +7484,57 @@ verify_dotnet46()
 
 #----------------------------------------------------------------
 
+w_metadata dotnet461 dlls \
+    title="MS .NET 4.6.1" \
+    publisher="Microsoft" \
+    year="2015" \
+    media="download" \
+    file1="NDP461-KB3102436-x86-x64-AllOS-ENU.exe" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 dotnet46 vjrun20" \
+    installed_file1="c:/users/$LOGNAME/Temp/dd_NDP461-KB3102436-x86-x64-AllOS-ENU_decompression_log.txt"
+
+load_dotnet461()
+{
+    w_package_warn_win64
+
+    # https://www.microsoft.com/en-us/download/details.aspx?id=49982
+    w_download https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe beaa901e07347d056efe04e8961d5546c7518fab9246892178505a7ba631c301
+
+    w_call remove_mono
+
+    w_call dotnet46
+    w_set_winver win7
+
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+
+    WINEDLLOVERRIDES=fusion=b "$WINE" "$file1" ${W_OPT_UNATTENDED:+/q /norestart}
+    status=$?
+
+    echo "exit status: $status"
+
+    case $status in
+        0) ;;
+        105) echo "exit status $status - normal, user selected 'restart now'" ;;
+        194) echo "exit status $status - normal, user selected 'restart later'" ;;
+        *) w_die "exit status $status - $W_PACKAGE installation failed" ;;
+    esac
+
+    w_override_dlls native mscoree
+}
+
+verify_dotnet461()
+{
+    w_dotnet_verify dotnet461
+}
+
+#----------------------------------------------------------------
+
 w_metadata dotnet462 dlls \
     title="MS .NET 4.6.2" \
     publisher="Microsoft" \
     year="2016" \
     media="download" \
-    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet40 dotnet46 vjrun20" \
+    conflicts="dotnet20 dotnet20sdk dotnet20sp1 dotnet20sp2 dotnet35sp1 dotnet40 dotnet46 dotnet461 vjrun20" \
     installed_file1="c:/windows/dotnet462.installed.workaround"
 
 load_dotnet462()
@@ -7433,7 +7555,7 @@ load_dotnet462()
 
     w_call remove_mono
 
-    w_call dotnet46
+    w_call dotnet461
     w_set_winver win7
 
     w_try_cd "$W_CACHE/$W_PACKAGE"
@@ -7778,17 +7900,15 @@ w_metadata gmdls dlls \
     publisher="Microsoft / Roland" \
     year="1999" \
     media="download" \
-    file1="../directx8/DX81Redist.exe" \
+    file1="../directx9/directx_apr2006_redist.exe" \
     installed_file1="$W_SYSTEM32_DLLS_WIN/drivers/gm.dls"
 
 load_gmdls()
 {
-    # Originally at https://download.microsoft.com/download/whistler/Update/8.1/W982KMeXP/EN-US/DX81Redist.exe
-    # Only archive.org seems to have it now
-    w_download_to directx8 https://web.archive.org/web/20070105100243if_/download.microsoft.com/download/whistler/Update/8.1/W982KMeXP/EN-US/DX81Redist.exe 5ddc1a8e204381254dc5d65f406584787155983adf245a75000dcd0d2efb04c6
+    w_download_to directx9 https://download.microsoft.com/download/3/9/7/3972f80c-5711-4e14-9483-959d48a2d03b/directx_apr2006_redist.exe dd8c3d401efe4561b67bd88475201b2f62f43cd23e4acc947bb34a659fa74952
 
-    w_try_unzip "$W_TMP" "$W_CACHE"/directx8/DX81Redist.exe "*/*/DirectX.cab"
-    w_try_cabextract -d "$W_TMP" -F gm16.dls "$W_TMP"/*/*/DirectX.cab
+    w_try_cabextract -d "$W_TMP" -F DirectX.cab "$W_CACHE"/directx9/directx_apr2006_redist.exe
+    w_try_cabextract -d "$W_TMP" -F gm16.dls "$W_TMP"/DirectX.cab
     w_try mv "$W_TMP"/gm16.dls "$W_SYSTEM32_DLLS"/drivers/gm.dls
     if test "$W_ARCH" = "win64"; then
         w_try_cd "$W_SYSTEM64_DLLS"/drivers
@@ -8096,61 +8216,6 @@ load_ie8_kb2936068()
 
 #----------------------------------------------------------------
 
-w_metadata kde apps \
-    title="KDE on Windows" \
-    publisher="various" \
-    year="2013" \
-    media="download" \
-    file1="kdewin-installer-gui-1.0.0.exe" \
-    installed_exe1="$W_PROGRAMS_WIN/kde/etc/installer.ini" \
-    homepage="https://community.kde.org/Windows" \
-    unattended="no"
-
-load_kde()
-{
-    w_download http://mirrors.mit.edu/kde/stable/kdewin/installer/kdewin-installer-gui-1.0.0.exe 6bc5e0cc9e3418c08b6545300f68de0652ac297cbcdc81fd0ebe04f5934006f5
-    mkdir -p "$W_PROGRAMS_UNIX/kde"
-    w_try cp "$W_CACHE/kde/${file1}" "$W_PROGRAMS_UNIX/kde"
-    w_try_cd "$W_PROGRAMS_UNIX/kde"
-    # There's no unattended option, probably because there are so many choices,
-    # it's like Cygwin
-    w_try "$WINE" "${file1}"
-}
-
-#----------------------------------------------------------------
-
-w_metadata kindle apps \
-    title="Amazon Kindle" \
-    publisher="Amazon" \
-    year="2017" \
-    media="download" \
-    file1="KindleForPC-installer-1.16.44025.exe" \
-    installed_exe1="$W_PROGRAMS_WIN/Amazon/Kindle/Kindle.exe" \
-    homepage="https://www.amazon.com/kindle-dbs/fd/kcp"
-
-load_kindle()
-{
-    if w_workaround_wine_bug 43508; then
-        w_warn "Using an older version of Kindle (1.16.44025) to work around https://bugs.winehq.org/show_bug.cgi?id=43508"
-    fi
-
-    w_download https://s3.amazonaws.com/kindleforpc/44025/KindleForPC-installer-1.16.44025.exe
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-    w_try "$WINE" "$file1" ${W_OPT_UNATTENDED:+ /S}
-
-    if w_workaround_wine_bug 35041 && [ ! -z "$W_TASKSET" ] ; then
-        w_warn "You may need to run with $W_TASKSET to avoid a libX11 crash."
-    fi
-
-    if w_workaround_wine_bug 29045; then
-        w_call corefonts
-    fi
-
-    w_warn "If kindle does not load for you, try increasing your open file limit"
-}
-
-#----------------------------------------------------------------
-
 w_metadata l3codecx dlls \
     title="MPEG Layer-3 Audio Codec for Microsoft DirectShow" \
     publisher="Microsoft" \
@@ -8343,24 +8408,6 @@ load_mfc40()
 
     helper_win7sp1 x86_microsoft-windows-mfc40u_31bf3856ad364e35_6.1.7601.17514_none_f51a7bf0b3d25294/mfc40u.dll
     w_try cp "$W_TMP/x86_microsoft-windows-mfc40u_31bf3856ad364e35_6.1.7601.17514_none_f51a7bf0b3d25294/mfc40u.dll" "$W_SYSTEM32_DLLS/mfc40u.dll"
-}
-
-#----------------------------------------------------------------
-
-w_metadata mozillabuild apps \
-    title="Mozilla build environment" \
-    publisher="Mozilla Foundation" \
-    year="2015" \
-    media="download" \
-    file1="MozillaBuildSetup-2.0.0.exe" \
-    installed_file1="c:/mozilla-build/moztools/bin/nsinstall.exe" \
-    homepage="https://wiki.mozilla.org/MozillaBuild"
-
-load_mozillabuild()
-{
-    w_download https://ftp.mozilla.org/pub/mozilla.org/mozilla/libraries/win32/MozillaBuildSetup-2.0.0.exe d5ffe52fe634fb7ed02e61041cc183c3af92039ee74e794f7ae83a408e4cf3f5
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-    w_try "$WINE" MozillaBuildSetup-2.0.0.exe $W_UNATTENDED_SLASH_S
 }
 
 #----------------------------------------------------------------
@@ -8711,107 +8758,6 @@ load_ole32()
 
 #----------------------------------------------------------------
 
-w_metadata ollydbg110 apps \
-    title="OllyDbg" \
-    publisher="ollydbg.de" \
-    year="2004" \
-    media="download" \
-    file1="odbg110.zip" \
-    installed_file1="c:/ollydbg110/OLLYDBG.EXE" \
-    homepage="http://ollydbg.de"
-
-load_ollydbg110()
-{
-    # The GUI is unreadable without having corefonts installed.
-    w_call corefonts
-
-    w_download http://www.ollydbg.de/odbg110.zip 73b1770f28893dab22196eb58d45ede8ddf5444009960ccc0107d09881a7cd1e
-    w_try_unzip "$W_DRIVE_C/ollydbg110" "$W_CACHE/$W_PACKAGE"/odbg110.zip
-}
-
-#----------------------------------------------------------------
-
-w_metadata ollydbg200 apps \
-    title="OllyDbg" \
-    publisher="ollydbg.de" \
-    year="2010" \
-    media="download" \
-    file1="odbg200.zip" \
-    installed_file1="c:/ollydbg200/ollydbg.exe" \
-    homepage="http://ollydbg.de"
-
-load_ollydbg200()
-{
-    # The GUI is unreadable without having corefonts installed.
-    w_call corefonts
-
-    w_download http://www.ollydbg.de/odbg200.zip 93dfd6348323db33f2005fc1fb8ff795256ae91d464dd186adc29c4314ed647c
-    w_try_unzip "$W_DRIVE_C/ollydbg200" "$W_CACHE/$W_PACKAGE"/odbg200.zip
-}
-
-#----------------------------------------------------------------
-
-w_metadata ollydbg201 apps \
-    title="OllyDbg" \
-    publisher="ollydbg.de" \
-    year="2013" \
-    media="download" \
-    file1="odbg201.zip" \
-    installed_file1="c:/ollydbg201/ollydbg.exe" \
-    homepage="http://ollydbg.de"
-
-load_ollydbg201()
-{
-    # The GUI is unreadable without having corefonts installed.
-    w_call corefonts
-
-    w_download http://www.ollydbg.de/odbg201.zip 29244e551be31f347db00503c512058086f55b43c93c1ae93729b15ce6e087a5
-    w_try_unzip "$W_DRIVE_C/ollydbg201" "$W_CACHE/$W_PACKAGE"/odbg201.zip
-
-    # ollydbg201 is affected by Wine bug 36012 if debug symbols are available.
-    # As a workaround native 'dbghelp' can be installed. We don't do this automatically
-    # because for some people it might work even without additional workarounds.
-    # Older versions of OllyDbg were not affected by this bug.
-}
-
-#----------------------------------------------------------------
-
-w_metadata openwatcom apps \
-    title="Open Watcom C/C++ compiler (can compile win16 code!)" \
-    publisher="Watcom" \
-    year="2010" \
-    media="download" \
-    file1="open-watcom-c-win32-1.9.exe" \
-    installed_file1="c:/WATCOM/owsetenv.bat" \
-    homepage="http://www.openwatcom.org"
-
-load_openwatcom()
-{
-    # 2016/03/11: upstream http://www.openwatcom.org appears to be dead (404)
-    w_download "http://openwatcom.mirror.fr/open-watcom-c-win32-1.9.exe" 040c910aba304fdb5f39b8fe508cd3c772b1da1f91a58179fa0895e0b2bf190b
-
-    if [ $W_UNATTENDED_SLASH_Q ]; then
-        # Options documented at http://bugzilla.openwatcom.org/show_bug.cgi?id=898
-        # But they don't seem to work on Wine, so jam them into setup.inf
-        # Pick smallest installation that supports 16-bit C and C++
-        w_try_cd "$W_TMP"
-        cp "$W_CACHE"/openwatcom/open-watcom-c-win32-1.9.exe .
-        w_try_unzip . open-watcom-c-win32-1.9.exe setup.inf
-        sed -i 's/tools16=.*/tools16=true/' setup.inf
-        w_try zip -f open-watcom-c-win32-1.9.exe
-        w_try "$WINE" open-watcom-c-win32-1.9.exe -s
-    else
-        w_try_cd "$W_CACHE/$W_PACKAGE"
-        w_try "$WINE" open-watcom-c-win32-1.9.exe
-    fi
-
-    if test ! -f "$W_DRIVE_C"/WATCOM/binnt/wcc.exe; then
-        w_warn "c:/watcom/binnt/wcc.exe not found; you probably didn't select 16-bit tools, and won't be able to build win16test."
-    fi
-}
-
-#----------------------------------------------------------------
-
 w_metadata pdh dlls \
     title="MS pdh.dll (Performance Data Helper)" \
     publisher="Microsoft" \
@@ -8868,6 +8814,41 @@ load_pngfilt()
     helper_winxpsp3 i386/pngfilt.dl_
     w_try_cabextract --directory="$W_SYSTEM32_DLLS" "$W_TMP"/i386/pngfilt.dl_
     w_try_regsvr pngfilt.dll
+}
+
+#----------------------------------------------------------------
+
+w_metadata python26 dlls \
+    title="Python interpreter 2.6.2" \
+    publisher="Python Software Foundaton" \
+    year="2009" \
+    media="download" \
+    file1="python-2.6.2.msi" \
+    installed_exe1="c:/Python26/python.exe"
+
+load_python26()
+{
+    w_download https://www.python.org/ftp/python/2.6.2/python-2.6.2.msi c2276b398864b822c25a7c240cb12ddb178962afd2e12d602f1a961e31ad52ff
+    w_download $WINETRICKS_SOURCEFORGE/project/pywin32/pywin32/Build%20214/pywin32-214.win32-py2.6.exe dc311bbdc5868e3dd139dfc46136221b7f55c5613a98a5a48fa725a6c681cd40
+
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+    w_try "$WINE" msiexec /i python-2.6.2.msi ALLUSERS=1 $W_UNATTENDED_SLASH_Q
+
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        run pywin32-214.win32-py2.6.exe
+        WinWait, Setup, Wizard will install pywin32
+        if ( w_opt_unattended > 0 ) {
+             ControlClick Button2   ; next
+             WinWait, Setup, Python 2.6 is required
+             ControlClick Button3   ; next
+             WinWait, Setup, Click Next to begin
+             ControlClick Button3   ; next
+             WinWait, Setup, finished
+             ControlClick Button4   ; Finish
+        }
+        WinWaitClose
+        "
 }
 
 #----------------------------------------------------------------
@@ -9011,35 +8992,6 @@ load_quicktime76()
             # the format isn't known, so we'd have to override all other settings, too.
             :
         fi
-    fi
-}
-
-#----------------------------------------------------------------
-
-w_metadata remove_mono settings \
-    title_uk="Видалити вбудоване wine-mono" \
-    title="Remove builtin wine-mono"
-
-load_remove_mono()
-{
-    mono_uuid="$("${WINE_ARCH}" uninstaller --list | grep Mono | cut -f1 -d\|)"
-    if test "$mono_uuid"; then
-         "${WINE_ARCH}" uninstaller --remove "$mono_uuid"
-    else
-        w_warn "Mono does not appear to be installed."
-    fi
-
-    # FIXME: verify on pristine Windows XP:
-    if w_workaround_wine_bug 34803; then
-        "${WINE_ARCH}" reg delete 'HKLM\\Software\\Microsoft\\.NETFramework\\v2.0.50727\\SBSDisabled' /f
-    fi
-
-    "${WINE_ARCH}" reg delete "HKLM\\Software\\Microsoft\\NET Framework Setup\\NDP\\v3.5" /f || true
-    "${WINE_ARCH}" reg delete "HKLM\\Software\\Microsoft\\NET Framework Setup\\NDP\\v4" /f || true
-
-    w_try rm -f "$W_WINDIR_UNIX/system32/mscoree.dll"
-    if [ "$W_ARCH" = "win64" ]; then
-        w_try rm -f "$W_WINDIR_UNIX/syswow64/mscoree.dll"
     fi
 }
 
@@ -10310,9 +10262,9 @@ load_xvid()
     w_try "$WINE" "$file1" ${W_OPT_UNATTENDED:+ --mode unattended --decode_divx 1 --decode_3ivx 1 --decode_other 1}
 }
 
-#----------------------------------------------------------------
-# Fonts
-#----------------------------------------------------------------
+#######################
+# fonts
+#######################
 
 w_metadata baekmuk fonts \
     title="Baekmuk Korean fonts" \
@@ -10352,6 +10304,192 @@ load_cjkfonts()
     w_call fakejapanese_vlgothic
     w_call fakekorean
     w_call unifont
+}
+
+#----------------------------------------------------------------
+
+w_metadata calibri fonts \
+    title="MS Calibri font" \
+    publisher="Microsoft" \
+    year="2007" \
+    media="download" \
+    file1="PowerPointViewer.exe" \
+    installed_file1="$W_FONTSDIR_WIN/calibri.ttf"
+
+load_calibri()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=13
+    # Originally at https://download.microsoft.com/download/E/6/7/E675FFFC-2A6D-4AB0-B3EB-27C9F8C8F696/PowerPointViewer.exe
+    w_download_to PowerPointViewer "http://www.business.uwm.edu/gdrive/Dietenberger_E/PowerPointViewer.exe" 249473568eba7a1e4f95498acba594e0f42e6581add4dead70c1dfb908a09423
+    w_try_cabextract -d "$W_TMP" -F "ppviewer.cab" "$W_CACHE/PowerPointViewer/$file1"
+    w_try_cabextract -d "$W_TMP" -F "CALIBRI*.TTF" "$W_TMP/ppviewer.cab"
+    w_try_cp_font_files "$W_TMP" "$W_FONTSDIR_UNIX" "CALIBRI*.TTF"
+    w_register_font calibri.ttf "Calibri"
+    w_register_font calibrib.ttf "Calibri Bold"
+    w_register_font calibrii.ttf "Calibri Italic"
+    w_register_font calibriz.ttf "Calibri Bold Italic"
+}
+
+#----------------------------------------------------------------
+
+w_metadata cambria fonts \
+    title="MS Cambria font" \
+    publisher="Microsoft" \
+    year="2009" \
+    media="download" \
+    file1="PowerPointViewer.exe" \
+    installed_file1="$W_FONTSDIR_WIN/cambria.ttc"
+
+load_cambria()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=13
+    # Originally at https://download.microsoft.com/download/E/6/7/E675FFFC-2A6D-4AB0-B3EB-27C9F8C8F696/PowerPointViewer.exe
+    w_download_to PowerPointViewer "http://www.business.uwm.edu/gdrive/Dietenberger_E/PowerPointViewer.exe" 249473568eba7a1e4f95498acba594e0f42e6581add4dead70c1dfb908a09423
+    w_try_cabextract -d "$W_TMP" -F "ppviewer.cab" "$W_CACHE/PowerPointViewer/$file1"
+    w_try_cabextract -d "$W_TMP" -F "CAMBRIA*.TT*" "$W_TMP/ppviewer.cab"
+    w_try_cp_font_files "$W_TMP" "$W_FONTSDIR_UNIX" "CAMBRIA*.TT*"
+    w_register_font cambria.ttc "Cambria & Cambria Math"
+    w_register_font cambriab.ttf "Cambria Bold"
+    w_register_font cambriai.ttf "Cambria Italic"
+    w_register_font cambriaz.ttf "Cambria Bold Italic"
+}
+
+#----------------------------------------------------------------
+
+w_metadata candara fonts \
+    title="MS Candara font" \
+    publisher="Microsoft" \
+    year="2009" \
+    media="download" \
+    file1="PowerPointViewer.exe" \
+    installed_file1="$W_FONTSDIR_WIN/candara.ttf"
+
+load_candara()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=13
+    # Originally at https://download.microsoft.com/download/E/6/7/E675FFFC-2A6D-4AB0-B3EB-27C9F8C8F696/PowerPointViewer.exe
+    w_download_to PowerPointViewer "http://www.business.uwm.edu/gdrive/Dietenberger_E/PowerPointViewer.exe" 249473568eba7a1e4f95498acba594e0f42e6581add4dead70c1dfb908a09423
+    w_try_cabextract -d "$W_TMP" -F "ppviewer.cab" "$W_CACHE/PowerPointViewer/$file1"
+    w_try_cabextract -d "$W_TMP" -F "CANDARA*.TTF" "$W_TMP/ppviewer.cab"
+    w_try_cp_font_files "$W_TMP" "$W_FONTSDIR_UNIX" "CANDARA*.TTF"
+    w_register_font candara.ttf "Candara"
+    w_register_font candarab.ttf "Candara Bold"
+    w_register_font candarai.ttf "Candara Italic"
+    w_register_font candaraz.ttf "Candara Bold Italic"
+}
+
+#----------------------------------------------------------------
+
+w_metadata consolas fonts \
+    title="MS Consolas console font" \
+    publisher="Microsoft" \
+    year="2011" \
+    media="download" \
+    file1="PowerPointViewer.exe" \
+    installed_file1="$W_FONTSDIR_WIN/consola.ttf"
+
+load_consolas()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=13
+    # Originally at https://download.microsoft.com/download/E/6/7/E675FFFC-2A6D-4AB0-B3EB-27C9F8C8F696/PowerPointViewer.exe
+    w_download_to PowerPointViewer "http://www.business.uwm.edu/gdrive/Dietenberger_E/PowerPointViewer.exe" 249473568eba7a1e4f95498acba594e0f42e6581add4dead70c1dfb908a09423
+    w_try_cabextract -d "$W_TMP" -F "ppviewer.cab" "$W_CACHE/PowerPointViewer/$file1"
+    w_try_cabextract -d "$W_TMP" -F "CONSOLA*.TTF" "$W_TMP/ppviewer.cab"
+    w_try_cp_font_files "$W_TMP" "$W_FONTSDIR_UNIX" "CONSOLA*.TTF"
+    w_register_font consola.ttf "Consolas"
+    w_register_font consolab.ttf "Consolas Bold"
+    w_register_font consolai.ttf "Consolas Italic"
+    w_register_font consolaz.ttf "Consolas Bold Italic"
+}
+
+#----------------------------------------------------------------
+
+w_metadata constantia fonts \
+    title="MS Constantia font" \
+    publisher="Microsoft" \
+    year="2009" \
+    media="download" \
+    file1="PowerPointViewer.exe" \
+    installed_file1="$W_FONTSDIR_WIN/constan.ttf"
+
+load_constantia()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=13
+    # Originally at https://download.microsoft.com/download/E/6/7/E675FFFC-2A6D-4AB0-B3EB-27C9F8C8F696/PowerPointViewer.exe
+    w_download_to PowerPointViewer "http://www.business.uwm.edu/gdrive/Dietenberger_E/PowerPointViewer.exe" 249473568eba7a1e4f95498acba594e0f42e6581add4dead70c1dfb908a09423
+    w_try_cabextract -d "$W_TMP" -F "ppviewer.cab" "$W_CACHE/PowerPointViewer/$file1"
+    w_try_cabextract -d "$W_TMP" -F "CONSTAN*.TTF" "$W_TMP/ppviewer.cab"
+    w_try_cp_font_files "$W_TMP" "$W_FONTSDIR_UNIX" "CONSTAN*.TTF"
+    w_register_font constan.ttf "Constantia"
+    w_register_font constanb.ttf "Constantia Bold"
+    w_register_font constani.ttf "Constantia Italic"
+    w_register_font constanz.ttf "Constantia Bold Italic"
+}
+
+#----------------------------------------------------------------
+
+w_metadata corbel fonts \
+    title="MS Corbel font" \
+    publisher="Microsoft" \
+    year="2009" \
+    media="download" \
+    file1="PowerPointViewer.exe" \
+    installed_file1="$W_FONTSDIR_WIN/corbel.ttf"
+
+load_corbel()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=13
+    # Originally at https://download.microsoft.com/download/E/6/7/E675FFFC-2A6D-4AB0-B3EB-27C9F8C8F696/PowerPointViewer.exe
+    w_download_to PowerPointViewer "http://www.business.uwm.edu/gdrive/Dietenberger_E/PowerPointViewer.exe" 249473568eba7a1e4f95498acba594e0f42e6581add4dead70c1dfb908a09423
+    w_try_cabextract -d "$W_TMP" -F "ppviewer.cab" "$W_CACHE/PowerPointViewer/$file1"
+    w_try_cabextract -d "$W_TMP" -F "CORBEL*.TTF" "$W_TMP/ppviewer.cab"
+    w_try_cp_font_files "$W_TMP" "$W_FONTSDIR_UNIX" "CORBEL*.TTF"
+    w_register_font corbel.ttf "Corbel"
+    w_register_font corbelb.ttf "Corbel Bold"
+    w_register_font corbeli.ttf "Corbel Italic"
+    w_register_font corbelz.ttf "Corbel Bold Italic"
+}
+
+#----------------------------------------------------------------
+
+w_metadata meiryo fonts \
+    title="MS Meiryo font" \
+    publisher="Microsoft" \
+    year="2009" \
+    media="download" \
+    conflicts="fakejapanese_vlgothic" \
+    file1="PowerPointViewer.exe" \
+    installed_file1="$W_FONTSDIR_WIN/meiryo.ttc"
+
+load_meiryo()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=13
+    # Originally at https://download.microsoft.com/download/E/6/7/E675FFFC-2A6D-4AB0-B3EB-27C9F8C8F696/PowerPointViewer.exe
+    w_download_to PowerPointViewer "http://www.business.uwm.edu/gdrive/Dietenberger_E/PowerPointViewer.exe" 249473568eba7a1e4f95498acba594e0f42e6581add4dead70c1dfb908a09423
+    w_try_cabextract -d "$W_TMP" -F "ppviewer.cab" "$W_CACHE/PowerPointViewer/$file1"
+    w_try_cabextract -d "$W_TMP" -F "MEIRYO*.TTC" "$W_TMP/ppviewer.cab"
+    w_try_cp_font_files "$W_TMP" "$W_FONTSDIR_UNIX" "MEIRYO*.TTC"
+    w_register_font meiryo.ttc "Meiryo & Meiryo Italic & Meiryo UI & Meiryo UI Italic"
+    w_register_font meiryob.ttc "Meiryo Bold & Meiryo Bold Italic & Meiryo UI Bold & Meiryo UI Bold Italic"
+}
+
+#----------------------------------------------------------------
+
+w_metadata pptfonts fonts \
+    title="All MS PowerPoint Viewer fonts" \
+    publisher="various" \
+    date="2007-2009" \
+    media="download"
+
+load_pptfonts()
+{
+    w_call calibri
+    w_call cambria
+    w_call candara
+    w_call consolas
+    w_call constantia
+    w_call corbel
+    w_call meiryo
 }
 
 #----------------------------------------------------------------
@@ -10652,28 +10790,6 @@ load_fakekorean()
 
 #----------------------------------------------------------------
 
-w_metadata fontfix settings \
-    title_uk="Перевірка шрифтів" \
-    title="Check for broken fonts"
-
-load_fontfix()
-{
-    # Focht says Samyak is bad news, and font substitution isn't a good workaround.
-    # I've seen psdkwin7 setup crash because of this; the symptom was a messagebox saying
-    # SDKSetup encountered an error: The type initializer for 'Microsoft.WizardFramework.WizardSettings' threw an exception
-    # and WINEDEBUG=+relay,+seh shows an exception very quickly after
-    # Call KERNEL32.CreateFileW(0c83b36c L"Z:\\USR\\SHARE\\FONTS\\TRUETYPE\\TTF-ORIYA-FONTS\\SAMYAK-ORIYA.TTF",80000000,00000001,00000000,00000003,00000080,00000000) ret=70d44091
-    if [ -x "$(which xlsfonts 2>/dev/null)" ] ; then
-        if xlsfonts 2>/dev/null | grep -E -i "samyak.*oriya" ; then
-            w_die "Please uninstall the Samyak/Oriya font, e.g. 'sudo dpkg -r ttf-oriya-fonts', then log out and log in again.  That font causes strange crashes in .net programs."
-        fi
-    else
-        w_warn "xlsfonts not found. If you have (older versions of) Samyak/Oriya fonts installed, you may get crashes/bugs. If so, uninstall, then logout/login again to resolve."
-    fi
-}
-
-#----------------------------------------------------------------
-
 w_metadata ipamona fonts \
     title="IPAMona Japanese fonts" \
     publisher="Jun Kobayashi" \
@@ -10960,8 +11076,10 @@ load_allfonts()
     done
 }
 
-#----------------------------------------------------------------
-# Apps
+#######################
+# apps
+#######################
+
 #----------------------------------------------------------------
 
 w_metadata 3m_library apps \
@@ -11737,6 +11855,61 @@ _EOF_
 
 #----------------------------------------------------------------
 
+w_metadata kde apps \
+    title="KDE on Windows" \
+    publisher="various" \
+    year="2013" \
+    media="download" \
+    file1="kdewin-installer-gui-1.0.0.exe" \
+    installed_exe1="$W_PROGRAMS_WIN/kde/etc/installer.ini" \
+    homepage="https://community.kde.org/Windows" \
+    unattended="no"
+
+load_kde()
+{
+    w_download http://mirrors.mit.edu/kde/stable/kdewin/installer/kdewin-installer-gui-1.0.0.exe 6bc5e0cc9e3418c08b6545300f68de0652ac297cbcdc81fd0ebe04f5934006f5
+    mkdir -p "$W_PROGRAMS_UNIX/kde"
+    w_try cp "$W_CACHE/kde/${file1}" "$W_PROGRAMS_UNIX/kde"
+    w_try_cd "$W_PROGRAMS_UNIX/kde"
+    # There's no unattended option, probably because there are so many choices,
+    # it's like Cygwin
+    w_try "$WINE" "${file1}"
+}
+
+#----------------------------------------------------------------
+
+w_metadata kindle apps \
+    title="Amazon Kindle" \
+    publisher="Amazon" \
+    year="2017" \
+    media="download" \
+    file1="KindleForPC-installer-1.16.44025.exe" \
+    installed_exe1="$W_PROGRAMS_WIN/Amazon/Kindle/Kindle.exe" \
+    homepage="https://www.amazon.com/kindle-dbs/fd/kcp"
+
+load_kindle()
+{
+    if w_workaround_wine_bug 43508; then
+        w_warn "Using an older version of Kindle (1.16.44025) to work around https://bugs.winehq.org/show_bug.cgi?id=43508"
+    fi
+
+    w_download https://s3.amazonaws.com/kindleforpc/44025/KindleForPC-installer-1.16.44025.exe
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+    w_try "$WINE" "$file1" ${W_OPT_UNATTENDED:+ /S}
+
+    if w_workaround_wine_bug 35041 && [ ! -z "$W_TASKSET" ] ; then
+        w_warn "You may need to run with $W_TASKSET to avoid a libX11 crash."
+    fi
+
+    if w_workaround_wine_bug 29045; then
+        w_call corefonts
+    fi
+
+    w_warn "If kindle does not load for you, try increasing your open file limit"
+}
+
+#----------------------------------------------------------------
+
 w_metadata kobo apps \
     title="Kobo e-book reader" \
     publisher="Kobo" \
@@ -11774,6 +11947,24 @@ load_mingw()
     w_append_path 'C:\MinGW\bin'
     w_try "$WINE" mingw-get update
     w_try "$WINE" mingw-get install gcc msys-base
+}
+
+#----------------------------------------------------------------
+
+w_metadata mozillabuild apps \
+    title="Mozilla build environment" \
+    publisher="Mozilla Foundation" \
+    year="2015" \
+    media="download" \
+    file1="MozillaBuildSetup-2.0.0.exe" \
+    installed_file1="c:/mozilla-build/moztools/bin/nsinstall.exe" \
+    homepage="https://wiki.mozilla.org/MozillaBuild"
+
+load_mozillabuild()
+{
+    w_download https://ftp.mozilla.org/pub/mozilla.org/mozilla/libraries/win32/MozillaBuildSetup-2.0.0.exe d5ffe52fe634fb7ed02e61041cc183c3af92039ee74e794f7ae83a408e4cf3f5
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+    w_try "$WINE" MozillaBuildSetup-2.0.0.exe $W_UNATTENDED_SLASH_S
 }
 
 #----------------------------------------------------------------
@@ -11850,6 +12041,76 @@ load_mt4()
         Process, Wait, terminal.exe
         Process, Close, terminal.exe
     "
+}
+
+#----------------------------------------------------------------
+
+w_metadata njcwp_trial apps \
+    title="NJStar Chinese Word Processor trial" \
+    publisher="NJStar" \
+    year="2015" \
+    media="download" \
+    file1="njcwp610sw15918.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/NJStar Chinese WP6/NJStar.exe" \
+    homepage="https://www.njstar.com/cms/njstar-chinese-word-processor"
+
+load_njcwp_trial()
+{
+    w_download http://ftp.njstar.com/sw/njcwp610sw15918.exe 7afa6dfc431f058d1397ac7100d5650b97347e1f37f81a2e2d2ee5dfdff4660b
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+    if test "$W_OPT_UNATTENDED"; then
+        w_ahk_do "
+        SetTitleMatchMode, 2
+        run $file1
+        WinWait, Setup, Welcome
+        ControlClick Button2 ; next
+        WinWait, Setup, License
+        ControlClick Button2 ; agree
+        WinWait, Setup, Install
+        ControlClick Button2 ; install
+        WinWait, Setup, Completing
+        ControlClick Button4 ; do not launch
+        ControlClick Button2 ; finish
+        WinWaitClose
+        "
+    else
+        w_try "$WINE" "$file1"
+    fi
+}
+
+#----------------------------------------------------------------
+
+w_metadata njjwp_trial apps \
+    title="NJStar Japanese Word Processor trial" \
+    publisher="NJStar" \
+    year="2009" \
+    media="download" \
+    file1="njjwp610sw15918.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/NJStar Japanese WP6/NJStarJ.exe" \
+    homepage="https://www.njstar.com/cms/njstar-japanese-word-processor"
+
+load_njjwp_trial()
+{
+    w_download http://ftp.njstar.com/sw/njjwp610sw15918.exe 7f36138c3d19539cb73d757cd42a6f7afebdaf9cfed0cf9bc483c33e519e2a26
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+    if test "$W_OPT_UNATTENDED"; then
+        w_ahk_do "
+        SetTitleMatchMode, 2
+        run $file1
+        WinWait, Setup, Welcome
+        ControlClick Button2 ; next
+        WinWait, Setup, License
+        ControlClick Button2 ; agree
+        WinWait, Setup, Install
+        ControlClick Button2 ; install
+        WinWait, Setup, Completing
+        ControlClick Button4 ; do not launch
+        ControlClick Button2 ; finish
+        WinWaitClose
+        "
+    else
+        w_try "$WINE" "$file1"
+    fi
 }
 
 #----------------------------------------------------------------
@@ -12068,6 +12329,107 @@ _EOF_
 
 #----------------------------------------------------------------
 
+w_metadata ollydbg110 apps \
+    title="OllyDbg" \
+    publisher="ollydbg.de" \
+    year="2004" \
+    media="download" \
+    file1="odbg110.zip" \
+    installed_file1="c:/ollydbg110/OLLYDBG.EXE" \
+    homepage="http://ollydbg.de"
+
+load_ollydbg110()
+{
+    # The GUI is unreadable without having corefonts installed.
+    w_call corefonts
+
+    w_download http://www.ollydbg.de/odbg110.zip 73b1770f28893dab22196eb58d45ede8ddf5444009960ccc0107d09881a7cd1e
+    w_try_unzip "$W_DRIVE_C/ollydbg110" "$W_CACHE/$W_PACKAGE"/odbg110.zip
+}
+
+#----------------------------------------------------------------
+
+w_metadata ollydbg200 apps \
+    title="OllyDbg" \
+    publisher="ollydbg.de" \
+    year="2010" \
+    media="download" \
+    file1="odbg200.zip" \
+    installed_file1="c:/ollydbg200/ollydbg.exe" \
+    homepage="http://ollydbg.de"
+
+load_ollydbg200()
+{
+    # The GUI is unreadable without having corefonts installed.
+    w_call corefonts
+
+    w_download http://www.ollydbg.de/odbg200.zip 93dfd6348323db33f2005fc1fb8ff795256ae91d464dd186adc29c4314ed647c
+    w_try_unzip "$W_DRIVE_C/ollydbg200" "$W_CACHE/$W_PACKAGE"/odbg200.zip
+}
+
+#----------------------------------------------------------------
+
+w_metadata ollydbg201 apps \
+    title="OllyDbg" \
+    publisher="ollydbg.de" \
+    year="2013" \
+    media="download" \
+    file1="odbg201.zip" \
+    installed_file1="c:/ollydbg201/ollydbg.exe" \
+    homepage="http://ollydbg.de"
+
+load_ollydbg201()
+{
+    # The GUI is unreadable without having corefonts installed.
+    w_call corefonts
+
+    w_download http://www.ollydbg.de/odbg201.zip 29244e551be31f347db00503c512058086f55b43c93c1ae93729b15ce6e087a5
+    w_try_unzip "$W_DRIVE_C/ollydbg201" "$W_CACHE/$W_PACKAGE"/odbg201.zip
+
+    # ollydbg201 is affected by Wine bug 36012 if debug symbols are available.
+    # As a workaround native 'dbghelp' can be installed. We don't do this automatically
+    # because for some people it might work even without additional workarounds.
+    # Older versions of OllyDbg were not affected by this bug.
+}
+
+#----------------------------------------------------------------
+
+w_metadata openwatcom apps \
+    title="Open Watcom C/C++ compiler (can compile win16 code!)" \
+    publisher="Watcom" \
+    year="2010" \
+    media="download" \
+    file1="open-watcom-c-win32-1.9.exe" \
+    installed_file1="c:/WATCOM/owsetenv.bat" \
+    homepage="http://www.openwatcom.org"
+
+load_openwatcom()
+{
+    # 2016/03/11: upstream http://www.openwatcom.org appears to be dead (404)
+    w_download "http://openwatcom.mirror.fr/open-watcom-c-win32-1.9.exe" 040c910aba304fdb5f39b8fe508cd3c772b1da1f91a58179fa0895e0b2bf190b
+
+    if [ $W_UNATTENDED_SLASH_Q ]; then
+        # Options documented at http://bugzilla.openwatcom.org/show_bug.cgi?id=898
+        # But they don't seem to work on Wine, so jam them into setup.inf
+        # Pick smallest installation that supports 16-bit C and C++
+        w_try_cd "$W_TMP"
+        cp "$W_CACHE"/openwatcom/open-watcom-c-win32-1.9.exe .
+        w_try_unzip . open-watcom-c-win32-1.9.exe setup.inf
+        sed -i 's/tools16=.*/tools16=true/' setup.inf
+        w_try zip -f open-watcom-c-win32-1.9.exe
+        w_try "$WINE" open-watcom-c-win32-1.9.exe -s
+    else
+        w_try_cd "$W_CACHE/$W_PACKAGE"
+        w_try "$WINE" open-watcom-c-win32-1.9.exe
+    fi
+
+    if test ! -f "$W_DRIVE_C"/WATCOM/binnt/wcc.exe; then
+        w_warn "c:/watcom/binnt/wcc.exe not found; you probably didn't select 16-bit tools, and won't be able to build win16test."
+    fi
+}
+
+#----------------------------------------------------------------
+
 w_metadata protectionid apps \
     title="Protection ID" \
     publisher="CDKiLLER & TippeX" \
@@ -12229,37 +12591,93 @@ _EOF_
 
 #----------------------------------------------------------------
 
-w_metadata python26 dlls \
-    title="Python interpreter 2.6.2" \
-    publisher="Python Software Foundaton" \
-    year="2009" \
-    media="download" \
-    file1="python-2.6.2.msi" \
-    installed_exe1="c:/Python26/python.exe"
+w_metadata qq apps \
+ title="QQ 8.9.1(Chinese chat app)" \
+ publisher="Tencent" \
+ year="2017" \
+ media="download" \
+ file1="QQ8.9.1.exe" \
+ file2="QQ.tar.gz"\
+ installed_exe1="$W_PROGRAMS_X86_WIN/Tencent/QQ/Bin/QQScLauncher.exe" \
+ homepage="http://www.qq.com" \
+ unattended="no"
 
-load_python26()
+load_qq()
 {
-    w_download https://www.python.org/ftp/python/2.6.2/python-2.6.2.msi c2276b398864b822c25a7c240cb12ddb178962afd2e12d602f1a961e31ad52ff
-    w_download $WINETRICKS_SOURCEFORGE/project/pywin32/pywin32/Build%20214/pywin32-214.win32-py2.6.exe dc311bbdc5868e3dd139dfc46136221b7f55c5613a98a5a48fa725a6c681cd40
+    w_download https://dldir1.qq.com/qqfile/qq/QQ8.9.1/20437/QQ8.9.1.exe 8e0d3ff5264da2d77e2fc011c21048edeebcf082f55f68a301f763c3a15c0d3f
+    w_download http://hillwoodhome.net/wine/QQ.tar.gz eb5cd6371eb75ec9e2fc0271199df05cbb9f38a60c2e81d5d8ac7daeb40aba62
+
+    if w_workaround_wine_bug 5162 "Installing native riched20 to work around can't input username."; then
+        w_call riched20
+    fi
+
+    # Make sure chinese fonts are available
+    w_call fakechinese
+
+    # uses mfc42u.dll
+    w_call mfc42
+
+    if w_workaround_wine_bug 38171 "Installing desktop file to work around bug"; then
+        w_try_cd "$W_TMP/"
+        tar -zxf "$W_CACHE/qq/QQ.tar.gz"
+        mkdir -p "$HOME/.local/share/applications/wine/Programs/腾讯软件/QQ"
+        mkdir -p "$HOME/.local/share/icons/hicolor/48x48/apps"
+        mkdir -p "$HOME/.local/share/icons/hicolor/256x256/apps"
+        w_try mv QQ/腾讯QQ.desktop ~/.local/share/applications/wine/Programs/腾讯软件/QQ
+        w_try mv QQ/48x48/QQ.png ~/.local/share/icons/hicolor/48x48/apps
+        w_try mv QQ/256x256/QQ.png ~/.local/share/icons/hicolor/256x256/apps
+        # shellcheck disable=SC1001
+        echo Exec=env WINEPREFIX="$WINEPREFIX" "$WINE" "$W_PROGRAMS_X86_WIN"\/Tencent\/QQ\/bin\/QQScLauncher.exe >> "$HOME/.local/share/applications/wine/Programs/腾讯软件/QQ/腾讯QQ.desktop"
+    fi
+
+    if w_workaround_wine_bug 39657 "Disable ntoskrnl.exe to work around can't be started bug"; then
+        w_override_dlls disabled ntoskrnl.exe
+    fi
+
+    if w_workaround_wine_bug 37680 "Disable txplatform.exe to work around QQ can't be quit cleanly"; then
+        w_override_dlls disabled txplatform.exe
+    fi
 
     w_try_cd "$W_CACHE/$W_PACKAGE"
-    w_try "$WINE" msiexec /i python-2.6.2.msi ALLUSERS=1 $W_UNATTENDED_SLASH_Q
+    w_try "$WINE" "$file1"
+}
 
-    w_ahk_do "
-        SetTitleMatchMode, 2
-        run pywin32-214.win32-py2.6.exe
-        WinWait, Setup, Wizard will install pywin32
-        if ( w_opt_unattended > 0 ) {
-             ControlClick Button2   ; next
-             WinWait, Setup, Python 2.6 is required
-             ControlClick Button3   ; next
-             WinWait, Setup, Click Next to begin
-             ControlClick Button3   ; next
-             WinWait, Setup, finished
-             ControlClick Button4   ; Finish
-        }
-        WinWaitClose
-        "
+#----------------------------------------------------------------
+
+w_metadata qqintl apps \
+    title="QQ International Instant Messenger 2.11" \
+    publisher="Tencent" \
+    year="2014" \
+    media="download" \
+    file1="QQIntl2.11.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Tencent/QQIntl/Bin/QQ.exe" \
+    homepage="http://www.imqq.com" \
+    unattended="no"
+
+load_qqintl()
+{
+    w_download https://dldir1.qq.com/qqfile/QQIntl/QQi_PC/QQIntl2.11.exe a08e5d8432ad41745cfe92479a9a0c3328a546c27f05486392ca7b77b1cb02a8
+
+    if w_workaround_wine_bug 33086 "Installing native riched20 to allow typing in username"; then
+        w_call riched20
+    fi
+
+    if w_workaround_wine_bug 37617 "Installing native wininet to work around crash"; then
+        w_call wininet
+    fi
+
+    if w_workaround_wine_bug 37680 "Disable txplatform.exe to work around QQ can't be quit cleanly"; then
+        w_override_dlls disabled txplatform.exe
+    fi
+
+    # Make sure chinese fonts are available
+    w_call fakechinese
+
+    # wants mfc80u.dll
+    w_call vcrun2005
+
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+    w_try "$WINE" "$file1"
 }
 
 #----------------------------------------------------------------
@@ -13083,6 +13501,66 @@ load_3dmark06()
 
 #----------------------------------------------------------------
 
+w_metadata stalker_pripyat_bench benchmarks \
+    title="S.T.A.L.K.E.R.: Call of Pripyat benchmark" \
+    publisher="GSC Game World" \
+    year="2009" \
+    media="manual_download" \
+    file1="stkcop-bench-setup.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/Call Of Pripyat Benchmark/Benchmark.exe"
+
+load_stalker_pripyat_bench()
+{
+    # Much faster
+    w_download_manual http://www.bigdownload.com/games/stalker-call-of-pripyat/pc/stalker-call-of-pripyat-benchmark stkcop-bench-setup.exe 8c810fba1bbb9c58fc01f4f602479886680c9f4b491dd0afe935e27083f54845
+    #w_download http://files.gsc-game.com/st/bench/stkcop-bench-setup.exe 8c810fba1bbb9c58fc01f4f602479886680c9f4b491dd0afe935e27083f54845
+
+    w_try_cd "$W_CACHE/$W_PACKAGE"
+
+    # FIXME: a bit fragile, if you're browsing the web while installing, it sometimes gets stuck.
+    w_ahk_do "
+        SetTitleMatchMode, 2
+        run $file1
+        WinWait,Setup - Call Of Pripyat Benchmark
+        if ( w_opt_unattended > 0 ) {
+            sleep 1000
+            ControlClick TNewButton1 ; Next
+            WinWait,Setup - Call Of Pripyat Benchmark,License
+            sleep 1000
+            ControlClick TNewRadioButton1 ; accept
+            sleep 1000
+            ControlClick TNewButton2 ; Next
+            WinWait,Setup - Call Of Pripyat Benchmark,Destination
+            sleep 1000
+            ControlClick TNewButton3 ; Next
+            WinWait,Setup - Call Of Pripyat Benchmark,shortcuts
+            sleep 1000
+            ControlClick TNewButton4 ; Next
+            WinWait,Setup - Call Of Pripyat Benchmark,performed
+            sleep 1000
+            ControlClick TNewButton4 ; Next
+            WinWait,Setup - Call Of Pripyat Benchmark,ready
+            sleep 1000
+            ControlClick, TNewButton4 ; Next  (nah, who reads doc?)
+        }
+        WinWait,Setup - Call Of Pripyat Benchmark,finished
+        if ( w_opt_unattended > 0 ) {
+            sleep 1000
+            Send {Space}  ; uncheck launch
+            sleep 1000
+            ControlClick TNewButton4 ; Finish
+        }
+        WinWaitClose,Setup - Call Of Pripyat Benchmark,finished
+    "
+
+    if w_workaround_wine_bug 24868; then
+        w_call d3dx9_31
+        w_call d3dx9_42
+    fi
+}
+
+#----------------------------------------------------------------
+
 w_metadata unigine_heaven benchmarks \
     title="Unigen Heaven 2.1 Benchmark" \
     publisher="Unigen" \
@@ -13124,6 +13602,24 @@ load_unigine_heaven()
         }
         winwaitclose
     "
+}
+
+#----------------------------------------------------------------
+
+w_metadata wglgears benchmarks \
+    title="wglgears" \
+    publisher="Clinton L. Jeffery" \
+    year="2005" \
+    media="download" \
+    file1="wglgears.exe" \
+    installed_exe1="$W_PROGRAMS_X86_WIN/misc/wglgears.exe"
+
+load_wglgears()
+{
+    w_download http://www2.cs.uidaho.edu/~jeffery/win32/wglgears.exe 858ba95ea3c9af4ded1f4100e59b6e8e57024f3efef56304dbd48106e8f2f6f7
+    mkdir -p "$W_PROGRAMS_X86_UNIX/misc"
+    cp "$W_CACHE"/wglgears/wglgears.exe "$W_PROGRAMS_X86_UNIX/misc"
+    chmod +x "$W_PROGRAMS_X86_UNIX/misc/wglgears.exe"
 }
 
 #----------------------------------------------------------------
@@ -16318,76 +16814,6 @@ load_nfsshift_demo()
 
 #----------------------------------------------------------------
 
-w_metadata njcwp_trial apps \
-    title="NJStar Chinese Word Processor trial" \
-    publisher="NJStar" \
-    year="2015" \
-    media="download" \
-    file1="njcwp610sw15918.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/NJStar Chinese WP6/NJStar.exe" \
-    homepage="https://www.njstar.com/cms/njstar-chinese-word-processor"
-
-load_njcwp_trial()
-{
-    w_download http://ftp.njstar.com/sw/njcwp610sw15918.exe 7afa6dfc431f058d1397ac7100d5650b97347e1f37f81a2e2d2ee5dfdff4660b
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-    if test "$W_OPT_UNATTENDED"; then
-        w_ahk_do "
-        SetTitleMatchMode, 2
-        run $file1
-        WinWait, Setup, Welcome
-        ControlClick Button2 ; next
-        WinWait, Setup, License
-        ControlClick Button2 ; agree
-        WinWait, Setup, Install
-        ControlClick Button2 ; install
-        WinWait, Setup, Completing
-        ControlClick Button4 ; do not launch
-        ControlClick Button2 ; finish
-        WinWaitClose
-        "
-    else
-        w_try "$WINE" "$file1"
-    fi
-}
-
-#----------------------------------------------------------------
-
-w_metadata njjwp_trial apps \
-    title="NJStar Japanese Word Processor trial" \
-    publisher="NJStar" \
-    year="2009" \
-    media="download" \
-    file1="njjwp610sw15918.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/NJStar Japanese WP6/NJStarJ.exe" \
-    homepage="https://www.njstar.com/cms/njstar-japanese-word-processor"
-
-load_njjwp_trial()
-{
-    w_download http://ftp.njstar.com/sw/njjwp610sw15918.exe 7f36138c3d19539cb73d757cd42a6f7afebdaf9cfed0cf9bc483c33e519e2a26
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-    if test "$W_OPT_UNATTENDED"; then
-        w_ahk_do "
-        SetTitleMatchMode, 2
-        run $file1
-        WinWait, Setup, Welcome
-        ControlClick Button2 ; next
-        WinWait, Setup, License
-        ControlClick Button2 ; agree
-        WinWait, Setup, Install
-        ControlClick Button2 ; install
-        WinWait, Setup, Completing
-        ControlClick Button4 ; do not launch
-        ControlClick Button2 ; finish
-        WinWaitClose
-        "
-    else
-        w_try "$WINE" "$file1"
-    fi
-}
-
-#----------------------------------------------------------------
-
 w_metadata oblivion games \
     title="Elder Scrolls: Oblivion" \
     publisher="Bethesda Game Studios" \
@@ -16506,97 +16932,6 @@ load_popfs()
             ControlClick, Button4
         }
     "
-}
-
-#----------------------------------------------------------------
-
-w_metadata qq apps \
- title="QQ 8.9.1(Chinese chat app)" \
- publisher="Tencent" \
- year="2017" \
- media="download" \
- file1="QQ8.9.1.exe" \
- file2="QQ.tar.gz"\
- installed_exe1="$W_PROGRAMS_X86_WIN/Tencent/QQ/Bin/QQScLauncher.exe" \
- homepage="http://www.qq.com" \
- unattended="no"
-
-load_qq()
-{
-    w_download https://dldir1.qq.com/qqfile/qq/QQ8.9.1/20437/QQ8.9.1.exe 8e0d3ff5264da2d77e2fc011c21048edeebcf082f55f68a301f763c3a15c0d3f
-    w_download http://hillwoodhome.net/wine/QQ.tar.gz eb5cd6371eb75ec9e2fc0271199df05cbb9f38a60c2e81d5d8ac7daeb40aba62
-
-    if w_workaround_wine_bug 5162 "Installing native riched20 to work around can't input username."; then
-        w_call riched20
-    fi
-
-    # Make sure chinese fonts are available
-    w_call fakechinese
-
-    # uses mfc42u.dll
-    w_call mfc42
-
-    if w_workaround_wine_bug 38171 "Installing desktop file to work around bug"; then
-        w_try_cd "$W_TMP/"
-        tar -zxf "$W_CACHE/qq/QQ.tar.gz"
-        mkdir -p "$HOME/.local/share/applications/wine/Programs/腾讯软件/QQ"
-        mkdir -p "$HOME/.local/share/icons/hicolor/48x48/apps"
-        mkdir -p "$HOME/.local/share/icons/hicolor/256x256/apps"
-        w_try mv QQ/腾讯QQ.desktop ~/.local/share/applications/wine/Programs/腾讯软件/QQ
-        w_try mv QQ/48x48/QQ.png ~/.local/share/icons/hicolor/48x48/apps
-        w_try mv QQ/256x256/QQ.png ~/.local/share/icons/hicolor/256x256/apps
-        # shellcheck disable=SC1001
-        echo Exec=env WINEPREFIX="$WINEPREFIX" "$WINE" "$W_PROGRAMS_X86_WIN"\/Tencent\/QQ\/bin\/QQScLauncher.exe >> "$HOME/.local/share/applications/wine/Programs/腾讯软件/QQ/腾讯QQ.desktop"
-    fi
-
-    if w_workaround_wine_bug 39657 "Disable ntoskrnl.exe to work around can't be started bug"; then
-        w_override_dlls disabled ntoskrnl.exe
-    fi
-
-    if w_workaround_wine_bug 37680 "Disable txplatform.exe to work around QQ can't be quit cleanly"; then
-        w_override_dlls disabled txplatform.exe
-    fi
-
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-    w_try "$WINE" "$file1"
-}
-
-#----------------------------------------------------------------
-
-w_metadata qqintl apps \
-    title="QQ International Instant Messenger 2.11" \
-    publisher="Tencent" \
-    year="2014" \
-    media="download" \
-    file1="QQIntl2.11.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/Tencent/QQIntl/Bin/QQ.exe" \
-    homepage="http://www.imqq.com" \
-    unattended="no"
-
-load_qqintl()
-{
-    w_download https://dldir1.qq.com/qqfile/QQIntl/QQi_PC/QQIntl2.11.exe a08e5d8432ad41745cfe92479a9a0c3328a546c27f05486392ca7b77b1cb02a8
-
-    if w_workaround_wine_bug 33086 "Installing native riched20 to allow typing in username"; then
-        w_call riched20
-    fi
-
-    if w_workaround_wine_bug 37617 "Installing native wininet to work around crash"; then
-        w_call wininet
-    fi
-
-    if w_workaround_wine_bug 37680 "Disable txplatform.exe to work around QQ can't be quit cleanly"; then
-        w_override_dlls disabled txplatform.exe
-    fi
-
-    # Make sure chinese fonts are available
-    w_call fakechinese
-
-    # wants mfc80u.dll
-    w_call vcrun2005
-
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-    w_try "$WINE" "$file1"
 }
 
 #----------------------------------------------------------------
@@ -17584,84 +17919,6 @@ load_singularity()
 
 #----------------------------------------------------------------
 
-w_metadata wglgears benchmarks \
-    title="wglgears" \
-    publisher="Clinton L. Jeffery" \
-    year="2005" \
-    media="download" \
-    file1="wglgears.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/misc/wglgears.exe"
-
-load_wglgears()
-{
-    w_download http://www2.cs.uidaho.edu/~jeffery/win32/wglgears.exe 858ba95ea3c9af4ded1f4100e59b6e8e57024f3efef56304dbd48106e8f2f6f7
-    mkdir -p "$W_PROGRAMS_X86_UNIX/misc"
-    cp "$W_CACHE"/wglgears/wglgears.exe "$W_PROGRAMS_X86_UNIX/misc"
-    chmod +x "$W_PROGRAMS_X86_UNIX/misc/wglgears.exe"
-}
-
-#----------------------------------------------------------------
-
-w_metadata stalker_pripyat_bench benchmarks \
-    title="S.T.A.L.K.E.R.: Call of Pripyat benchmark" \
-    publisher="GSC Game World" \
-    year="2009" \
-    media="manual_download" \
-    file1="stkcop-bench-setup.exe" \
-    installed_exe1="$W_PROGRAMS_X86_WIN/Call Of Pripyat Benchmark/Benchmark.exe"
-
-load_stalker_pripyat_bench()
-{
-    # Much faster
-    w_download_manual http://www.bigdownload.com/games/stalker-call-of-pripyat/pc/stalker-call-of-pripyat-benchmark stkcop-bench-setup.exe 8c810fba1bbb9c58fc01f4f602479886680c9f4b491dd0afe935e27083f54845
-    #w_download http://files.gsc-game.com/st/bench/stkcop-bench-setup.exe 8c810fba1bbb9c58fc01f4f602479886680c9f4b491dd0afe935e27083f54845
-
-    w_try_cd "$W_CACHE/$W_PACKAGE"
-
-    # FIXME: a bit fragile, if you're browsing the web while installing, it sometimes gets stuck.
-    w_ahk_do "
-        SetTitleMatchMode, 2
-        run $file1
-        WinWait,Setup - Call Of Pripyat Benchmark
-        if ( w_opt_unattended > 0 ) {
-            sleep 1000
-            ControlClick TNewButton1 ; Next
-            WinWait,Setup - Call Of Pripyat Benchmark,License
-            sleep 1000
-            ControlClick TNewRadioButton1 ; accept
-            sleep 1000
-            ControlClick TNewButton2 ; Next
-            WinWait,Setup - Call Of Pripyat Benchmark,Destination
-            sleep 1000
-            ControlClick TNewButton3 ; Next
-            WinWait,Setup - Call Of Pripyat Benchmark,shortcuts
-            sleep 1000
-            ControlClick TNewButton4 ; Next
-            WinWait,Setup - Call Of Pripyat Benchmark,performed
-            sleep 1000
-            ControlClick TNewButton4 ; Next
-            WinWait,Setup - Call Of Pripyat Benchmark,ready
-            sleep 1000
-            ControlClick, TNewButton4 ; Next  (nah, who reads doc?)
-        }
-        WinWait,Setup - Call Of Pripyat Benchmark,finished
-        if ( w_opt_unattended > 0 ) {
-            sleep 1000
-            Send {Space}  ; uncheck launch
-            sleep 1000
-            ControlClick TNewButton4 ; Finish
-        }
-        WinWaitClose,Setup - Call Of Pripyat Benchmark,finished
-    "
-
-    if w_workaround_wine_bug 24868; then
-        w_call d3dx9_31
-        w_call d3dx9_42
-    fi
-}
-
-#----------------------------------------------------------------
-
 w_metadata torchlight games \
     title="Torchlight - boxed version" \
     publisher="Runic Games" \
@@ -18125,204 +18382,12 @@ load_wormsreloaded_demo_steam()
     w_steam_install_game 22690 "Worms Reloaded Demo"
 }
 
-#----------------------------------------------------------------
-# Settings
-#----------------------------------------------------------------
-# Direct3D settings
+#######################
+# settings
+#######################
 
-winetricks_set_wined3d_var()
-{
-    # Filter out/correct bad or partial values
-    # Confusing because dinput uses 'disable', but d3d uses 'disabled'
-    # see wined3d_dll_init() in dlls/wined3d/wined3d_main.c
-    # and DllMain() in dlls/ddraw/main.c
-    case $2 in
-        disable*) arg=disabled;;
-        enable*) arg=enabled;;
-        hard*) arg=hardware;;
-        repack) arg=repack;;
-        backbuffer|fbo|gdi|none|opengl|readdraw|readtex|texdraw|textex|auto) arg=$2;;
-        [0-9]*) arg=$2;;
-        *) w_die "illegal value $2 for $1";;
-    esac
-
-    echo "Setting Direct3D/$1 to $arg"
-    cat > "$W_TMP"/set-wined3d.reg <<_EOF_
-REGEDIT4
-
-[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
-"$1"="$arg"
-
-_EOF_
-    w_try_regedit "$W_TMP_WIN"\\set-wined3d.reg
-}
-
-#----------------------------------------------------------------
-
-w_metadata glsl=enabled settings \
-    title_uk="Увімкнути GLSL шейдери (за замовчуванням)" \
-    title="Enable GLSL shaders (default)"
-w_metadata glsl=disabled settings \
-    title_uk="Вимкнути GLSL шейдери та використовувати ARB шейдери (іноді впливає на швидкодію)" \
-    title="Disable GLSL shaders, use ARB shaders (faster, but sometimes breaks)"
-
-load_glsl()
-{
-    winetricks_set_wined3d_var UseGLSL "$1"
-}
-
-#----------------------------------------------------------------
-
-w_metadata multisampling=enabled settings \
-    title_uk="Увімкнути Direct3D мультисемплінг" \
-    title="Enable Direct3D multisampling"
-w_metadata multisampling=disabled settings \
-    title_uk="Вимкнути Direct3D мультисемплінг" \
-    title="Disable Direct3D multisampling"
-
-load_multisampling()
-{
-    winetricks_set_wined3d_var Multisampling "$1"
-}
-
-#----------------------------------------------------------------
-
-w_metadata npm=repack settings \
-    title_uk="Встановити NonPower2Mode на repack" \
-    title="Set NonPower2Mode to repack"
-
-load_npm()
-{
-    winetricks_set_wined3d_var NonPower2Mode "$1"
-}
-
-#----------------------------------------------------------------
-
-w_metadata orm=fbo settings \
-    title_uk="Встановити OffscreenRenderingMode=fbo (за замовчуванням)" \
-    title="Set OffscreenRenderingMode=fbo (default)"
-w_metadata orm=backbuffer settings \
-    title_uk="Встановити OffscreenRenderingMode=backbuffer" \
-    title="Set OffscreenRenderingMode=backbuffer"
-
-load_orm()
-{
-    winetricks_set_wined3d_var OffscreenRenderingMode "$1"
-}
-
-#----------------------------------------------------------------
-
-w_metadata strictdrawordering=enabled settings \
-    title_uk="Увімкнути StrictDrawOrdering" \
-    title="Enable StrictDrawOrdering"
-w_metadata strictdrawordering=disabled settings \
-    title_uk="Вимкнути StrictDrawOrdering (за замовчуванням)" \
-    title="Disable StrictDrawOrdering (default)"
-
-load_strictdrawordering()
-{
-    winetricks_set_wined3d_var StrictDrawOrdering "$1"
-}
-
-#----------------------------------------------------------------
-
-w_metadata rtlm=auto settings \
-    title_uk="Встановити RenderTargetLockMode на авто (за замовчуванням)" \
-    title="Set RenderTargetLockMode to auto (default)"
-w_metadata rtlm=disabled settings \
-    title_uk="Вимкнути RenderTargetLockMode" \
-    title="Set RenderTargetLockMode to disabled"
-w_metadata rtlm=readdraw settings \
-    title_uk="Встановити RenderTargetLockMode на readdraw" \
-    title="Set RenderTargetLockMode to readdraw"
-w_metadata rtlm=readtex settings \
-    title_uk="Встановити RenderTargetLockMode на readtex" \
-    title="Set RenderTargetLockMode to readtex"
-w_metadata rtlm=texdraw settings \
-    title_uk="Встановити RenderTargetLockMode на texdraw" \
-    title="Set RenderTargetLockMode to texdraw"
-w_metadata rtlm=textex settings \
-    title_uk="Встановити RenderTargetLockMode на textex" \
-    title="Set RenderTargetLockMode to textex"
-
-load_rtlm()
-{
-    winetricks_set_wined3d_var RenderTargetLockMode "$1"
-}
-
-#----------------------------------------------------------------
-# AlwaysOffscreen settings
-
-w_metadata ao=enabled settings \
-    title_uk="Увімкнути AlwaysOffscreen" \
-    title="Enable AlwaysOffscreen"
-w_metadata ao=disabled settings \
-    title_uk="Вимкнути AlwaysOffscreen (за замовчуванням)" \
-    title="Disable AlwaysOffscreen (default)"
-
-load_ao()
-{
-    winetricks_set_wined3d_var AlwaysOffscreen "$1"
-}
-
-#----------------------------------------------------------------
-# CheckFloatConstants settings
-
-w_metadata cfc=enabled settings \
-    title_uk="Увімкнути CheckFloatConstants" \
-    title="Enable CheckFloatConstants"
-w_metadata cfc=disable settings \
-    title_uk="Вимкнути CheckFloatConstants (за замовчуванням)" \
-    title="Disable CheckFloatConstants (default)"
-
-load_cfc()
-{
-    winetricks_set_wined3d_var CheckFloatConstants "$1"
-}
-#----------------------------------------------------------------
-# CSMT settings
-
-w_metadata csmt=on settings \
-    title_uk="Увімкнути Command Stream Multithreading (за замовчуванням)" \
-    title="Enable Command Stream Multithreading (default)"
-w_metadata csmt=off settings \
-    title_uk="Вимкнути Command Stream Multithreading"\
-    title="Disable Command Stream Multithreading"
-
-load_csmt()
-{
-    case "$1" in
-        off) arg=0;;
-        on)  arg=1;;
-        *) w_die "illegal value $1 for csmt";;
-    esac
-
-    echo "Setting csmt to $arg"
-    cat > "$W_TMP"/set-csmt.reg <<_EOF_
-REGEDIT4
-
-[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
-"csmt"=dword:$arg
-
-_EOF_
-    w_try_regedit "$W_TMP"/set-csmt.reg
-}
-
-#----------------------------------------------------------------
-# DirectDraw settings
-
-w_metadata ddr=gdi settings \
-    title_uk="Встановити DirectDrawRenderer на gdi" \
-    title="Set DirectDrawRenderer to gdi"
-w_metadata ddr=opengl settings \
-    title_uk="Встановити DirectDrawRenderer на opengl" \
-    title="Set DirectDrawRenderer to opengl"
-
-load_ddr()
-{
-    winetricks_set_wined3d_var DirectDrawRenderer "$1"
-}
-
+####
+# settings->desktop
 #----------------------------------------------------------------
 # DirectInput settings
 
@@ -18357,6 +18422,68 @@ REGEDIT4
 
 _EOF_
     w_try_regedit "$W_TMP"/set-mwo.reg
+}
+
+#----------------------------------------------------------------
+
+w_metadata fontfix settings \
+    title_uk="Перевірка шрифтів" \
+    title="Check for broken fonts"
+
+load_fontfix()
+{
+    # Focht says Samyak is bad news, and font substitution isn't a good workaround.
+    # I've seen psdkwin7 setup crash because of this; the symptom was a messagebox saying
+    # SDKSetup encountered an error: The type initializer for 'Microsoft.WizardFramework.WizardSettings' threw an exception
+    # and WINEDEBUG=+relay,+seh shows an exception very quickly after
+    # Call KERNEL32.CreateFileW(0c83b36c L"Z:\\USR\\SHARE\\FONTS\\TRUETYPE\\TTF-ORIYA-FONTS\\SAMYAK-ORIYA.TTF",80000000,00000001,00000000,00000003,00000080,00000000) ret=70d44091
+    if [ -x "$(which xlsfonts 2>/dev/null)" ] ; then
+        if xlsfonts 2>/dev/null | grep -E -i "samyak.*oriya" ; then
+            w_die "Please uninstall the Samyak/Oriya font, e.g. 'sudo dpkg -r ttf-oriya-fonts', then log out and log in again.  That font causes strange crashes in .net programs."
+        fi
+    else
+        w_warn "xlsfonts not found. If you have (older versions of) Samyak/Oriya fonts installed, you may get crashes/bugs. If so, uninstall, then logout/login again to resolve."
+    fi
+}
+
+#----------------------------------------------------------------
+
+w_metadata fontsmooth=disable settings \
+    title_uk="Вимкнути згладжування шрифту" \
+    title="Disable font smoothing"
+w_metadata fontsmooth=bgr settings \
+    title_uk="Увімкнути субпіксельне згладжування шрифту для BGR LCD моніторів" \
+    title="Enable subpixel font smoothing for BGR LCDs"
+w_metadata fontsmooth=rgb settings \
+    title_uk="Увімкнути субпіксельне згладжування шрифту для RGB LCD моніторів" \
+    title="Enable subpixel font smoothing for RGB LCDs"
+w_metadata fontsmooth=gray settings \
+    title_uk="Увімкнути субпіксельне згладжування шрифту" \
+    title="Enable subpixel font smoothing"
+
+load_fontsmooth()
+{
+    case "$1" in
+        disable)   FontSmoothing=0; FontSmoothingOrientation=1; FontSmoothingType=0;;
+        gray|grey) FontSmoothing=2; FontSmoothingOrientation=1; FontSmoothingType=1;;
+        bgr)       FontSmoothing=2; FontSmoothingOrientation=0; FontSmoothingType=2;;
+        rgb)       FontSmoothing=2; FontSmoothingOrientation=1; FontSmoothingType=2;;
+        *) w_die "unknown font smoothing type $1";;
+    esac
+
+    echo "Setting font smoothing to $1"
+
+    cat > "$W_TMP"/fontsmooth.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Control Panel\\Desktop]
+"FontSmoothing"="$FontSmoothing"
+"FontSmoothingGamma"=dword:00000578
+"FontSmoothingOrientation"=dword:0000000$FontSmoothingOrientation
+"FontSmoothingType"=dword:0000000$FontSmoothingType
+
+_EOF_
+    w_try_regedit "$W_TMP_WIN"\\fontsmooth.reg
 }
 
 #----------------------------------------------------------------
@@ -18461,23 +18588,360 @@ _EOF_
 }
 
 #----------------------------------------------------------------
-# Other settings
+
+w_metadata vd=off settings \
+    title_uk="Вимкнути віртуальний робочий стіл" \
+    title="Disable virtual desktop"
+w_metadata vd=640x480 settings \
+    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 640x480" \
+    title="Enable virtual desktop, set size to 640x480"
+w_metadata vd=800x600 settings \
+    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 800x600" \
+    title="Enable virtual desktop, set size to 800x600"
+w_metadata vd=1024x768 settings \
+    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 1024x768" \
+    title="Enable virtual desktop, set size to 1024x768"
+w_metadata vd=1280x1024 settings \
+    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 1280x1024" \
+    title="Enable virtual desktop, set size to 1280x1024"
+w_metadata vd=1440x900 settings \
+    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 1440x900" \
+    title="Enable virtual desktop, set size to 1440x900"
+
+load_vd()
+{
+    size="$1"
+    case $size in
+        off|disabled)
+        cat > "$W_TMP"/vd.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Software\\Wine\\Explorer]
+"Desktop"=-
+[HKEY_CURRENT_USER\\Software\\Wine\\Explorer\\Desktops]
+"Default"=-
+
+_EOF_
+        ;;
+        [1-9]*x[1-9]*)
+        cat > "$W_TMP"/vd.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Software\\Wine\\Explorer]
+"Desktop"="Default"
+[HKEY_CURRENT_USER\\Software\\Wine\\Explorer\\Desktops]
+"Default"="$size"
+
+_EOF_
+        ;;
+        *)
+        w_die "you want a virtual desktop of $size? I don't understand."
+        ;;
+    esac
+    w_try_regedit "$W_TMP_WIN"/vd.reg
+}
+
+####
+# settings->direct3d
+
+winetricks_set_wined3d_var()
+{
+    # Filter out/correct bad or partial values
+    # Confusing because dinput uses 'disable', but d3d uses 'disabled'
+    # see wined3d_dll_init() in dlls/wined3d/wined3d_main.c
+    # and DllMain() in dlls/ddraw/main.c
+    case $2 in
+        disable*) arg=disabled;;
+        enable*) arg=enabled;;
+        hard*) arg=hardware;;
+        repack) arg=repack;;
+        backbuffer|fbo|gdi|none|opengl|readdraw|readtex|texdraw|textex|auto) arg=$2;;
+        [0-9]*) arg=$2;;
+        *) w_die "illegal value $2 for $1";;
+    esac
+
+    echo "Setting Direct3D/$1 to $arg"
+    cat > "$W_TMP"/set-wined3d.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
+"$1"="$arg"
+
+_EOF_
+    w_try_regedit "$W_TMP_WIN"\\set-wined3d.reg
+}
+
 #----------------------------------------------------------------
+# AlwaysOffscreen settings
 
-w_metadata alldlls=default settings \
-    title_uk="Видалити всі перевизначення DLL" \
-    title="Remove all DLL overrides"
-w_metadata alldlls=builtin settings \
-    title_uk="Перевизначити найбільш поширені DLL на вбудовані" \
-    title="Override most common DLLs to builtin"
+w_metadata ao=enabled settings \
+    title_uk="Увімкнути AlwaysOffscreen" \
+    title="Enable AlwaysOffscreen"
+w_metadata ao=disabled settings \
+    title_uk="Вимкнути AlwaysOffscreen (за замовчуванням)" \
+    title="Disable AlwaysOffscreen (default)"
 
-load_alldlls()
+load_ao()
+{
+    winetricks_set_wined3d_var AlwaysOffscreen "$1"
+}
+
+#----------------------------------------------------------------
+# CheckFloatConstants settings
+
+w_metadata cfc=enabled settings \
+    title_uk="Увімкнути CheckFloatConstants" \
+    title="Enable CheckFloatConstants"
+w_metadata cfc=disable settings \
+    title_uk="Вимкнути CheckFloatConstants (за замовчуванням)" \
+    title="Disable CheckFloatConstants (default)"
+
+load_cfc()
+{
+    winetricks_set_wined3d_var CheckFloatConstants "$1"
+}
+#----------------------------------------------------------------
+# CSMT settings
+
+w_metadata csmt=on settings \
+    title_uk="Увімкнути Command Stream Multithreading (за замовчуванням)" \
+    title="Enable Command Stream Multithreading (default)"
+w_metadata csmt=off settings \
+    title_uk="Вимкнути Command Stream Multithreading"\
+    title="Disable Command Stream Multithreading"
+
+load_csmt()
 {
     case "$1" in
-        default) w_override_no_dlls ;;
-        builtin) w_override_all_dlls ;;
+        off) arg=0;;
+        on)  arg=1;;
+        *) w_die "illegal value $1 for csmt";;
     esac
+
+    echo "Setting csmt to $arg"
+    cat > "$W_TMP"/set-csmt.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
+"csmt"=dword:$arg
+
+_EOF_
+    w_try_regedit "$W_TMP"/set-csmt.reg
 }
+
+#----------------------------------------------------------------
+# DirectDraw settings
+
+w_metadata ddr=gdi settings \
+    title_uk="Встановити DirectDrawRenderer на gdi" \
+    title="Set DirectDrawRenderer to gdi"
+w_metadata ddr=opengl settings \
+    title_uk="Встановити DirectDrawRenderer на opengl" \
+    title="Set DirectDrawRenderer to opengl"
+
+load_ddr()
+{
+    winetricks_set_wined3d_var DirectDrawRenderer "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata glsl=enabled settings \
+    title_uk="Увімкнути GLSL шейдери (за замовчуванням)" \
+    title="Enable GLSL shaders (default)"
+w_metadata glsl=disabled settings \
+    title_uk="Вимкнути GLSL шейдери та використовувати ARB шейдери (іноді впливає на швидкодію)" \
+    title="Disable GLSL shaders, use ARB shaders (faster, but sometimes breaks)"
+
+load_glsl()
+{
+    winetricks_set_wined3d_var UseGLSL "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata gsm=0 settings \
+    title_uk="Встановити MaxShaderModelGS на 0" \
+    title="Set MaxShaderModelGS to 0"
+w_metadata gsm=1 settings \
+    title_uk="Встановити MaxShaderModelGS на 1" \
+    title="Set MaxShaderModelGS to 1"
+w_metadata gsm=2 settings \
+    title_uk="Встановити MaxShaderModelGS на 2" \
+    title="Set MaxShaderModelGS to 2"
+w_metadata gsm=3 settings \
+    title_uk="Встановити MaxShaderModelGS на 3" \
+    title="Set MaxShaderModelGS to 3"
+
+load_gsm()
+{
+    winetricks_set_wined3d_var MaxShaderModelGS "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata multisampling=enabled settings \
+    title_uk="Увімкнути Direct3D мультисемплінг" \
+    title="Enable Direct3D multisampling"
+w_metadata multisampling=disabled settings \
+    title_uk="Вимкнути Direct3D мультисемплінг" \
+    title="Disable Direct3D multisampling"
+
+load_multisampling()
+{
+    winetricks_set_wined3d_var Multisampling "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata npm=repack settings \
+    title_uk="Встановити NonPower2Mode на repack" \
+    title="Set NonPower2Mode to repack"
+
+load_npm()
+{
+    winetricks_set_wined3d_var NonPower2Mode "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata orm=fbo settings \
+    title_uk="Встановити OffscreenRenderingMode=fbo (за замовчуванням)" \
+    title="Set OffscreenRenderingMode=fbo (default)"
+w_metadata orm=backbuffer settings \
+    title_uk="Встановити OffscreenRenderingMode=backbuffer" \
+    title="Set OffscreenRenderingMode=backbuffer"
+
+load_orm()
+{
+    winetricks_set_wined3d_var OffscreenRenderingMode "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata psm=0 settings \
+    title_uk="Встановити MaxShaderModelPS на 0" \
+    title="Set MaxShaderModelPS to 0"
+w_metadata psm=1 settings \
+    title_uk="Встановити MaxShaderModelPS на 1" \
+    title="Set MaxShaderModelPS to 1"
+w_metadata psm=2 settings \
+    title_uk="Встановити MaxShaderModelPS на 2" \
+    title="Set MaxShaderModelPS to 2"
+w_metadata psm=3 settings \
+    title_uk="Встановити MaxShaderModelPS на 3" \
+    title="Set MaxShaderModelPS to 3"
+
+load_psm()
+{
+    winetricks_set_wined3d_var MaxShaderModelPS "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata strictdrawordering=enabled settings \
+    title_uk="Увімкнути StrictDrawOrdering" \
+    title="Enable StrictDrawOrdering"
+w_metadata strictdrawordering=disabled settings \
+    title_uk="Вимкнути StrictDrawOrdering (за замовчуванням)" \
+    title="Disable StrictDrawOrdering (default)"
+
+load_strictdrawordering()
+{
+    winetricks_set_wined3d_var StrictDrawOrdering "$1"
+}
+
+#----------------------------------------------------------------
+
+w_metadata rtlm=auto settings \
+    title_uk="Встановити RenderTargetLockMode на авто (за замовчуванням)" \
+    title="Set RenderTargetLockMode to auto (default)"
+w_metadata rtlm=disabled settings \
+    title_uk="Вимкнути RenderTargetLockMode" \
+    title="Set RenderTargetLockMode to disabled"
+w_metadata rtlm=readdraw settings \
+    title_uk="Встановити RenderTargetLockMode на readdraw" \
+    title="Set RenderTargetLockMode to readdraw"
+w_metadata rtlm=readtex settings \
+    title_uk="Встановити RenderTargetLockMode на readtex" \
+    title="Set RenderTargetLockMode to readtex"
+w_metadata rtlm=texdraw settings \
+    title_uk="Встановити RenderTargetLockMode на texdraw" \
+    title="Set RenderTargetLockMode to texdraw"
+w_metadata rtlm=textex settings \
+    title_uk="Встановити RenderTargetLockMode на textex" \
+    title="Set RenderTargetLockMode to textex"
+
+load_rtlm()
+{
+    winetricks_set_wined3d_var RenderTargetLockMode "$1"
+}
+#----------------------------------------------------------------
+
+w_metadata videomemorysize=default settings \
+    title_uk="Дати можливість Wine визначити розмір відеопам'яті" \
+    title="Let Wine detect amount of video card memory"
+w_metadata videomemorysize=512 settings \
+    title_uk="Повідомити Wine про 512МБ відеопам'яті" \
+    title="Tell Wine your video card has 512MB RAM"
+w_metadata videomemorysize=1024 settings \
+    title_uk="Повідомити Wine про 1024МБ відеопам'яті" \
+    title="Tell Wine your video card has 1024MB RAM"
+w_metadata videomemorysize=2048 settings \
+    title_uk="Повідомити Wine про 2048МБ відеопам'яті" \
+    title="Tell Wine your video card has 2048MB RAM"
+
+load_videomemorysize()
+{
+    size="$1"
+    echo "Setting video memory size to $size"
+
+    case $size in
+        default)
+
+    cat > "$W_TMP"/set-video.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
+"VideoMemorySize"=-
+
+_EOF_
+    ;;
+        *)
+    cat > "$W_TMP"/set-video.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
+"VideoMemorySize"="$size"
+
+_EOF_
+    ;;
+    esac
+    w_try_regedit "$W_TMP_WIN"\\set-video.reg
+}
+
+#----------------------------------------------------------------
+
+w_metadata vsm=0 settings \
+    title_uk="Встановити MaxShaderModelVS на 0" \
+    title="Set MaxShaderModelVS to 0"
+w_metadata vsm=1 settings \
+    title_uk="Встановити MaxShaderModelVS на 1" \
+    title="Set MaxShaderModelVS to 1"
+w_metadata vsm=2 settings \
+    title_uk="Встановити MaxShaderModelVS на 2" \
+    title="Set MaxShaderModelVS to 2"
+w_metadata vsm=3 settings \
+    title_uk="Встановити MaxShaderModelVS на 3" \
+    title="Set MaxShaderModelVS to 3"
+
+load_vsm()
+{
+    winetricks_set_wined3d_var MaxShaderModelVS "$1"
+}
+
+####
+# settings->debug
 
 #----------------------------------------------------------------
 
@@ -18510,42 +18974,68 @@ _EOF_
 
 #----------------------------------------------------------------
 
-w_metadata fontsmooth=disable settings \
-    title_uk="Вимкнути згладжування шрифту" \
-    title="Disable font smoothing"
-w_metadata fontsmooth=bgr settings \
-    title_uk="Увімкнути субпіксельне згладжування шрифту для BGR LCD моніторів" \
-    title="Enable subpixel font smoothing for BGR LCDs"
-w_metadata fontsmooth=rgb settings \
-    title_uk="Увімкнути субпіксельне згладжування шрифту для RGB LCD моніторів" \
-    title="Enable subpixel font smoothing for RGB LCDs"
-w_metadata fontsmooth=gray settings \
-    title_uk="Увімкнути субпіксельне згладжування шрифту" \
-    title="Enable subpixel font smoothing"
+w_metadata heapcheck settings \
+    title_uk="Увімкнути накопичувальну перевірку GlobalFlag" \
+    title="Enable heap checking with GlobalFlag"
 
-load_fontsmooth()
+load_heapcheck()
 {
-    case "$1" in
-        disable)   FontSmoothing=0; FontSmoothingOrientation=1; FontSmoothingType=0;;
-        gray|grey) FontSmoothing=2; FontSmoothingOrientation=1; FontSmoothingType=1;;
-        bgr)       FontSmoothing=2; FontSmoothingOrientation=0; FontSmoothingType=2;;
-        rgb)       FontSmoothing=2; FontSmoothingOrientation=1; FontSmoothingType=2;;
-        *) w_die "unknown font smoothing type $1";;
-    esac
-
-    echo "Setting font smoothing to $1"
-
-    cat > "$W_TMP"/fontsmooth.reg <<_EOF_
+    cat > "$W_TMP"/heapcheck.reg <<_EOF_
 REGEDIT4
 
-[HKEY_CURRENT_USER\\Control Panel\\Desktop]
-"FontSmoothing"="$FontSmoothing"
-"FontSmoothingGamma"=dword:00000578
-"FontSmoothingOrientation"=dword:0000000$FontSmoothingOrientation
-"FontSmoothingType"=dword:0000000$FontSmoothingType
+[HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager]
+"GlobalFlag"=dword:00200030
 
 _EOF_
-    w_try_regedit "$W_TMP_WIN"\\fontsmooth.reg
+    w_try_regedit "$W_TMP_WIN"\\heapcheck.reg
+}
+
+#----------------------------------------------------------------
+
+w_metadata nocrashdialog settings \
+    title_uk="Вимкнути діалог про помилку" \
+    title="Disable crash dialog"
+
+load_nocrashdialog()
+{
+    echo "Disabling graphical crash dialog"
+    cat > "$W_TMP"/crashdialog.reg <<_EOF_
+REGEDIT4
+
+[HKEY_CURRENT_USER\\Software\\Wine\\WineDbg]
+"ShowCrashDialog"=dword:00000000
+
+_EOF_
+    w_try_cd "$W_TMP"
+    w_try_regedit crashdialog.reg
+}
+
+####
+# settings->misc
+
+w_metadata alldlls=default settings \
+    title_uk="Видалити всі перевизначення DLL" \
+    title="Remove all DLL overrides"
+w_metadata alldlls=builtin settings \
+    title_uk="Перевизначити найбільш поширені DLL на вбудовані" \
+    title="Override most common DLLs to builtin"
+
+load_alldlls()
+{
+    case "$1" in
+        default) w_override_no_dlls ;;
+        builtin) w_override_all_dlls ;;
+    esac
+}
+
+#----------------------------------------------------------------
+
+w_metadata bad settings \
+    title="Fake verb that always returns false"
+
+load_bad()
+{
+    w_die "$W_PACKAGE failed!"
 }
 
 #----------------------------------------------------------------
@@ -18562,40 +19052,12 @@ load_forcemono()
 
 #----------------------------------------------------------------
 
-w_metadata gsm=0 settings \
-    title_uk="Встановити MaxShaderModelGS на 0" \
-    title="Set MaxShaderModelGS to 0"
-w_metadata gsm=1 settings \
-    title_uk="Встановити MaxShaderModelGS на 1" \
-    title="Set MaxShaderModelGS to 1"
-w_metadata gsm=2 settings \
-    title_uk="Встановити MaxShaderModelGS на 2" \
-    title="Set MaxShaderModelGS to 2"
-w_metadata gsm=3 settings \
-    title_uk="Встановити MaxShaderModelGS на 3" \
-    title="Set MaxShaderModelGS to 3"
+w_metadata good settings \
+    title="Fake verb that always returns true"
 
-load_gsm()
+load_good()
 {
-    winetricks_set_wined3d_var MaxShaderModelGS "$1"
-}
-
-#----------------------------------------------------------------
-
-w_metadata heapcheck settings \
-    title_uk="Увімкнути накопичувальну перевірку GlobalFlag" \
-    title="Enable heap checking with GlobalFlag"
-
-load_heapcheck()
-{
-    cat > "$W_TMP"/heapcheck.reg <<_EOF_
-REGEDIT4
-
-[HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager]
-"GlobalFlag"=dword:00200030
-
-_EOF_
-    w_try_regedit "$W_TMP_WIN"\\heapcheck.reg
+    w_info "$W_PACKAGE succeeded!"
 }
 
 #----------------------------------------------------------------
@@ -18681,54 +19143,33 @@ load_native_oleaut32()
 
 #----------------------------------------------------------------
 
-w_metadata nocrashdialog settings \
-    title_uk="Вимкнути діалог про помилку" \
-    title="Disable crash dialog"
+w_metadata remove_mono settings \
+    title_uk="Видалити вбудоване wine-mono" \
+    title="Remove builtin wine-mono"
 
-load_nocrashdialog()
+load_remove_mono()
 {
-    echo "Disabling graphical crash dialog"
-    cat > "$W_TMP"/crashdialog.reg <<_EOF_
-REGEDIT4
+    mono_uuid="$("${WINE_ARCH}" uninstaller --list | grep Mono | cut -f1 -d\|)"
+    if test "$mono_uuid"; then
+         "${WINE_ARCH}" uninstaller --remove "$mono_uuid"
+    else
+        w_warn "Mono does not appear to be installed."
+    fi
 
-[HKEY_CURRENT_USER\\Software\\Wine\\WineDbg]
-"ShowCrashDialog"=dword:00000000
+    # FIXME: verify on pristine Windows XP:
+    if w_workaround_wine_bug 34803; then
+        "${WINE_ARCH}" reg delete 'HKLM\\Software\\Microsoft\\.NETFramework\\v2.0.50727\\SBSDisabled' /f
+    fi
 
-_EOF_
-    w_try_cd "$W_TMP"
-    w_try_regedit crashdialog.reg
+    "${WINE_ARCH}" reg delete "HKLM\\Software\\Microsoft\\NET Framework Setup\\NDP\\v3.5" /f || true
+    "${WINE_ARCH}" reg delete "HKLM\\Software\\Microsoft\\NET Framework Setup\\NDP\\v4" /f || true
+
+    w_try rm -f "$W_WINDIR_UNIX/system32/mscoree.dll"
+    if [ "$W_ARCH" = "win64" ]; then
+        w_try rm -f "$W_WINDIR_UNIX/syswow64/mscoree.dll"
+    fi
 }
 
-#----------------------------------------------------------------
-
-w_metadata nt40 settings \
-    title_uk="Встановити версію Windows NT 4.0" \
-    title="Set windows version to Windows NT 4.0"
-
-load_nt40()
-{
-    w_set_winver nt40
-}
-
-#----------------------------------------------------------------
-
-w_metadata psm=0 settings \
-    title_uk="Встановити MaxShaderModelPS на 0" \
-    title="Set MaxShaderModelPS to 0"
-w_metadata psm=1 settings \
-    title_uk="Встановити MaxShaderModelPS на 1" \
-    title="Set MaxShaderModelPS to 1"
-w_metadata psm=2 settings \
-    title_uk="Встановити MaxShaderModelPS на 2" \
-    title="Set MaxShaderModelPS to 2"
-w_metadata psm=3 settings \
-    title_uk="Встановити MaxShaderModelPS на 3" \
-    title="Set MaxShaderModelPS to 3"
-
-load_psm()
-{
-    winetricks_set_wined3d_var MaxShaderModelPS "$1"
-}
 
 #----------------------------------------------------------------
 
@@ -18764,133 +19205,16 @@ load_sandbox()
     echo disable > "$WINEPREFIX/.update-timestamp"
 }
 
+# settings->winversions
 #----------------------------------------------------------------
 
-w_metadata sound=alsa settings \
-    title_uk="Встановити звуковий драйвер ALSA" \
-    title="Set sound driver to ALSA"
-w_metadata sound=coreaudio settings \
-    title_uk="Встановити звуковий драйвер Mac CoreAudio" \
-    title="Set sound driver to Mac CoreAudio"
-w_metadata sound=disabled settings \
-    title_uk="Вимкнути звуковий драйвер" \
-    title="Set sound driver to disabled"
-w_metadata sound=oss settings \
-    title_uk="Встановити звуковий драйвер OSS" \
-    title="Set sound driver to OSS"
-w_metadata sound=pulse settings \
-    title_uk="Встановити звуковий драйвер PulseAudio" \
-    title="Set sound driver to PulseAudio"
+w_metadata nt40 settings \
+    title_uk="Встановити версію Windows NT 4.0" \
+    title="Set windows version to Windows NT 4.0"
 
-load_sound()
+load_nt40()
 {
-    echo "Setting sound driver to $1"
-    cat > "$W_TMP"/set-sound.reg <<_EOF_
-REGEDIT4
-
-[HKEY_CURRENT_USER\\Software\\Wine\\Drivers]
-"Audio"="$1"
-
-_EOF_
-    w_try_regedit "$W_TMP_WIN"\\set-sound.reg
-}
-
-#----------------------------------------------------------------
-
-w_metadata vd=off settings \
-    title_uk="Вимкнути віртуальний робочий стіл" \
-    title="Disable virtual desktop"
-w_metadata vd=640x480 settings \
-    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 640x480" \
-    title="Enable virtual desktop, set size to 640x480"
-w_metadata vd=800x600 settings \
-    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 800x600" \
-    title="Enable virtual desktop, set size to 800x600"
-w_metadata vd=1024x768 settings \
-    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 1024x768" \
-    title="Enable virtual desktop, set size to 1024x768"
-w_metadata vd=1280x1024 settings \
-    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 1280x1024" \
-    title="Enable virtual desktop, set size to 1280x1024"
-w_metadata vd=1440x900 settings \
-    title_uk="Увімкнути віртуальний робочий стіл та встановити розмір 1440x900" \
-    title="Enable virtual desktop, set size to 1440x900"
-
-load_vd()
-{
-    size="$1"
-    case $size in
-        off|disabled)
-        cat > "$W_TMP"/vd.reg <<_EOF_
-REGEDIT4
-
-[HKEY_CURRENT_USER\\Software\\Wine\\Explorer]
-"Desktop"=-
-[HKEY_CURRENT_USER\\Software\\Wine\\Explorer\\Desktops]
-"Default"=-
-
-_EOF_
-        ;;
-        [1-9]*x[1-9]*)
-        cat > "$W_TMP"/vd.reg <<_EOF_
-REGEDIT4
-
-[HKEY_CURRENT_USER\\Software\\Wine\\Explorer]
-"Desktop"="Default"
-[HKEY_CURRENT_USER\\Software\\Wine\\Explorer\\Desktops]
-"Default"="$size"
-
-_EOF_
-        ;;
-        *)
-        w_die "you want a virtual desktop of $size? I don't understand."
-        ;;
-    esac
-    w_try_regedit "$W_TMP_WIN"/vd.reg
-}
-
-#----------------------------------------------------------------
-
-w_metadata videomemorysize=default settings \
-    title_uk="Дати можливість Wine визначити розмір відеопам'яті" \
-    title="Let Wine detect amount of video card memory"
-w_metadata videomemorysize=512 settings \
-    title_uk="Повідомити Wine про 512МБ відеопам'яті" \
-    title="Tell Wine your video card has 512MB RAM"
-w_metadata videomemorysize=1024 settings \
-    title_uk="Повідомити Wine про 1024МБ відеопам'яті" \
-    title="Tell Wine your video card has 1024MB RAM"
-w_metadata videomemorysize=2048 settings \
-    title_uk="Повідомити Wine про 2048МБ відеопам'яті" \
-    title="Tell Wine your video card has 2048MB RAM"
-
-load_videomemorysize()
-{
-    size="$1"
-    echo "Setting video memory size to $size"
-
-    case $size in
-        default)
-
-    cat > "$W_TMP"/set-video.reg <<_EOF_
-REGEDIT4
-
-[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
-"VideoMemorySize"=-
-
-_EOF_
-    ;;
-        *)
-    cat > "$W_TMP"/set-video.reg <<_EOF_
-REGEDIT4
-
-[HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
-"VideoMemorySize"="$size"
-
-_EOF_
-    ;;
-    esac
-    w_try_regedit "$W_TMP_WIN"\\set-video.reg
+    w_set_winver nt40
 }
 
 #----------------------------------------------------------------
@@ -18902,26 +19226,6 @@ w_metadata vista settings \
 load_vista()
 {
     w_set_winver vista
-}
-
-#----------------------------------------------------------------
-
-w_metadata vsm=0 settings \
-    title_uk="Встановити MaxShaderModelVS на 0" \
-    title="Set MaxShaderModelVS to 0"
-w_metadata vsm=1 settings \
-    title_uk="Встановити MaxShaderModelVS на 1" \
-    title="Set MaxShaderModelVS to 1"
-w_metadata vsm=2 settings \
-    title_uk="Встановити MaxShaderModelVS на 2" \
-    title="Set MaxShaderModelVS to 2"
-w_metadata vsm=3 settings \
-    title_uk="Встановити MaxShaderModelVS на 3" \
-    title="Set MaxShaderModelVS to 3"
-
-load_vsm()
-{
-    winetricks_set_wined3d_var MaxShaderModelVS "$1"
 }
 
 #----------------------------------------------------------------
@@ -19056,32 +19360,6 @@ w_metadata winxp settings \
 load_winxp()
 {
     w_set_winver winxp
-}
-
-#----------------------------------------------------------------
-
-# Not really a setting, just a fake verb, that shouldn't count as 'installed',
-# that always works
-
-w_metadata good settings \
-    title="Fake verb that always returns true"
-
-load_good()
-{
-    w_info "$W_PACKAGE succeeded!"
-}
-
-#----------------------------------------------------------------
-
-# Not really a setting, just a fake verb, that shouldn't count as 'installed',
-# that always fails
-
-w_metadata bad settings \
-    title="Fake verb that always returns false"
-
-load_bad()
-{
-    w_die "$W_PACKAGE failed!"
 }
 
 #---- Main Program ----

@@ -941,6 +941,13 @@
 			<key>WS-Name</key>
 			<string>dotnet35</string>
 		</dict>
+		<key>dotnet35sp1</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS .NET 3.5 SP1</string>
+			<key>WS-Name</key>
+			<string>dotnet35sp1</string>
+		</dict>
 		<key>dotnet40</key>
 		<dict>
 			<key>WS-Description</key>
@@ -968,6 +975,13 @@
 			<string>MS .NET 4.6</string>
 			<key>WS-Name</key>
 			<string>dotnet46</string>
+		</dict>
+		<key>dotnet461</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS .NET 4.6.1</string>
+			<key>WS-Name</key>
+			<string>dotnet461</string>
 		</dict>
 		<key>dotnet462</key>
 		<dict>
@@ -1714,12 +1728,54 @@
 			<key>WS-Name</key>
 			<string>baekmuk</string>
 		</dict>
+		<key>calibri</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Calibri font</string>
+			<key>WS-Name</key>
+			<string>calibri</string>
+		</dict>
+		<key>cambria</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Cambria font</string>
+			<key>WS-Name</key>
+			<string>cambria</string>
+		</dict>
+		<key>candara</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Candara font</string>
+			<key>WS-Name</key>
+			<string>candara</string>
+		</dict>
 		<key>cjkfonts</key>
 		<dict>
 			<key>WS-Description</key>
 			<string>All Chinese, Japanese, Korean fonts and aliases</string>
 			<key>WS-Name</key>
 			<string>cjkfonts</string>
+		</dict>
+		<key>consolas</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Consolas console font</string>
+			<key>WS-Name</key>
+			<string>consolas</string>
+		</dict>
+		<key>constantia</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Constantia font</string>
+			<key>WS-Name</key>
+			<string>constantia</string>
+		</dict>
+		<key>corbel</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Corbel font</string>
+			<key>WS-Name</key>
+			<string>corbel</string>
 		</dict>
 		<key>corefonts</key>
 		<dict>
@@ -1798,12 +1854,26 @@
 			<key>WS-Name</key>
 			<string>lucida</string>
 		</dict>
+		<key>meiryo</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>MS Meiryo font</string>
+			<key>WS-Name</key>
+			<string>meiryo</string>
+		</dict>
 		<key>opensymbol</key>
 		<dict>
 			<key>WS-Description</key>
 			<string>OpenSymbol fonts (replacement for Wingdings)</string>
 			<key>WS-Name</key>
 			<string>opensymbol</string>
+		</dict>
+		<key>pptfonts</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>All MS PowerPoint Viewer fonts</string>
+			<key>WS-Name</key>
+			<string>pptfonts</string>
 		</dict>
 		<key>tahoma</key>
 		<dict>
@@ -1853,7 +1923,7 @@
 		<key>acreedbro</key>
 		<dict>
 			<key>WS-Description</key>
-			<string>Assassin&apos;s Creed Brotherhood</string>
+			<string>Assassin's Creed Brotherhood</string>
 			<key>WS-Name</key>
 			<string>acreedbro</string>
 		</dict>
@@ -2930,41 +3000,6 @@
 			<string>Sandbox the wineprefix - remove links to $HOME</string>
 			<key>WS-Name</key>
 			<string>sandbox</string>
-		</dict>
-		<key>sound=alsa</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to ALSA</string>
-			<key>WS-Name</key>
-			<string>sound=alsa</string>
-		</dict>
-		<key>sound=coreaudio</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to Mac CoreAudio</string>
-			<key>WS-Name</key>
-			<string>sound=coreaudio</string>
-		</dict>
-		<key>sound=disabled</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to disabled</string>
-			<key>WS-Name</key>
-			<string>sound=disabled</string>
-		</dict>
-		<key>sound=oss</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to OSS</string>
-			<key>WS-Name</key>
-			<string>sound=oss</string>
-		</dict>
-		<key>sound=pulse</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to PulseAudio</string>
-			<key>WS-Name</key>
-			<string>sound=pulse</string>
 		</dict>
 		<key>strictdrawordering=disabled</key>
 		<dict>
