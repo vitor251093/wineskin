@@ -122,7 +122,8 @@ NSFileManager *fm;
     [confirmQuitCheckBoxButton setEnabled:state];
     [focusFollowsMouseCheckBoxButton setEnabled:state];
     [WinetricksNoLogsButton setEnabled:state];
-    
+    [disableCPUsCheckBoxButton setEnabled:state];
+
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"] && ![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
     {
@@ -868,6 +869,7 @@ NSFileManager *fm;
         [forceWrapperQuartzWMButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue]];
     }
     
+    [disableCPUsCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue]];
 	[alwaysMakeLogFilesCheckBoxButton setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE] intValue]];
     [setMaxFilesCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_MAX_OF_10240_FILES] intValue]];
     
@@ -1045,6 +1047,11 @@ NSFileManager *fm;
     [modifyMappingsDownloadsTextField  setStringValue:[portManager plistObjectForKey:@"Symlink Downloads"]];
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
+}
+- (IBAction)disableCPUsButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([disableCPUsCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU];
+    [portManager synchronizePlist];
 }
 - (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender
 {
