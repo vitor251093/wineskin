@@ -7,6 +7,7 @@
 //
 
 #import "NSPortDataLoader.h"
+#import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 
 #import "NSPathUtilities.h"
 

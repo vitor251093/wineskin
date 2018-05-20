@@ -6,6 +6,8 @@
 //  Copyright 2014 UFRJ. All rights reserved.
 //
 
+#import <ObjectiveC_Extension/ObjectiveC_Extension.h>
+
 #import "NSExeSelection.h"
 
 #import "NSPortManager.h"

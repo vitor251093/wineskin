@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Winery.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.urgesoftware.wineskin.wineskinwinery</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -33,14 +33,14 @@
 		<key>x86_64</key>
 		<string>10.6</string>
 	</dict>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>

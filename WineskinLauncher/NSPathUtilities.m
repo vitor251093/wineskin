@@ -7,6 +7,7 @@
 //
 
 #import "NSPathUtilities.h"
+#import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 
 @implementation NSPathUtilities
 
