@@ -46,6 +46,13 @@
 			<key>WS-Name</key>
 			<string>autohotkey</string>
 		</dict>
+		<key>busybox</key>
+		<dict>
+			<key>WS-Description</key>
+			<string>BusyBox FRP-2121</string>
+			<key>WS-Name</key>
+			<string>busybox</string>
+		</dict>
 		<key>cmake</key>
 		<dict>
 			<key>WS-Description</key>
@@ -2993,41 +3000,6 @@
 			<string>Sandbox the wineprefix - remove links to $HOME</string>
 			<key>WS-Name</key>
 			<string>sandbox</string>
-		</dict>
-		<key>sound=alsa</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to ALSA</string>
-			<key>WS-Name</key>
-			<string>sound=alsa</string>
-		</dict>
-		<key>sound=coreaudio</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to Mac CoreAudio</string>
-			<key>WS-Name</key>
-			<string>sound=coreaudio</string>
-		</dict>
-		<key>sound=disabled</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to disabled</string>
-			<key>WS-Name</key>
-			<string>sound=disabled</string>
-		</dict>
-		<key>sound=oss</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to OSS</string>
-			<key>WS-Name</key>
-			<string>sound=oss</string>
-		</dict>
-		<key>sound=pulse</key>
-		<dict>
-			<key>WS-Description</key>
-			<string>Set sound driver to PulseAudio</string>
-			<key>WS-Name</key>
-			<string>sound=pulse</string>
 		</dict>
 		<key>strictdrawordering=disabled</key>
 		<dict>

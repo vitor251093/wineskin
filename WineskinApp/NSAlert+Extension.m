@@ -55,6 +55,9 @@
         case NSAlertTypeWarning:
             return NSLocalizedString(@"Warning",nil);
             
+        case NSAlertTypeWinetricks:
+            return NSLocalizedString(@"Winetricks No Logs Mode",nil);
+            
         case NSAlertTypeError:
             return NSLocalizedString(@"Error",nil);
             
@@ -71,6 +74,9 @@
     switch (alertType)
     {
         case NSAlertTypeWarning:
+            [self setAlertStyle:NSCriticalAlertStyle];
+            break;
+        case NSAlertTypeWinetricks:
             [self setAlertStyle:NSCriticalAlertStyle];
             break;
         case NSAlertTypeError:

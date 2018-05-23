@@ -26,6 +26,7 @@
     NSString *appName;                              //name of our app/wrapper
 	NSString *lockfile;                             //lockfile being used to know if the app is already in use
     NSString *tmpFolder;                            //where tmp files can be made and used to be specific to just this wrapper
+    NSString *tmpwineFolder;                        //wine makes its own tmp & wineserver uses it for each wine process
 	NSString *winePrefix;                           //the $WINEPREFIX
 	NSMutableString *theDisplayNumber;              //the Display Number to use
     NSString *wineLogFile;                          //location of wine log file

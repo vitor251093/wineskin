@@ -61,6 +61,7 @@ static NSPortManager* portManager;
     
     appName = appNameWithPath.lastPathComponent.stringByDeletingPathExtension;
     tmpFolder = [NSString stringWithFormat:@"/tmp/%@",[appNameWithPath stringByReplacingOccurrencesOfString:@"/" withString:@"xWSx"]];
+    tmpwineFolder = [NSString stringWithFormat:@"/tmp/.wine-501/"];
     
     globalFilesToOpen = [[NSMutableArray alloc] init];
     fm = [NSFileManager defaultManager];
@@ -183,7 +184,7 @@ static NSPortManager* portManager;
         NSPortManager *cexeManager = nil;
         NSString *resolutionTemp;
         
-        //check to make sure CFBundleName is not WineskinWineskinDefault3345, if it is, change it to current wrapper name
+        //check to make sure CFBundleName is not WineskinNavyWrapper, if it is, change it to current wrapper name
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_NAME] isEqualToString:@"WineskinNavyWrapper"])
         {
             [self.portManager setPlistObject:appName forKey:WINESKIN_WRAPPER_PLIST_KEY_NAME];
@@ -286,6 +287,7 @@ static NSPortManager* portManager;
         //WSS-wineprefixcreatenoregs- same as above, doesn't load default regs
         //WSS-wineboot				- run simple wineboot, no deletions or loading regs. mshtml=disabled
         //WSS-winetricks {command}	- winetricks is being run
+        //WSS-wineserverkill        - tell winesever to kill all wine processes from wrapper
         //debug 					- run in debug mode, keep logs
         //CustomEXE {appname}		- running a custom EXE with appname
         //starts with a"/" 			- will be 1+ path/filename to open
@@ -310,6 +312,15 @@ static NSPortManager* portManager;
             {
                 debugEnabled = YES; //need logs in special commands
                 useGamma = NO;
+                if ([wssCommand isEqualToString:@"WSS-wineserverkill"])
+                [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
+                NSArray* command = @[
+                                     [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
+                                     [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                                     [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                                     @"wineserver -k"];
+                [self systemCommand:[command componentsJoinedByString:@" "]];
+                usleep(3000000);
                 if ([wssCommand isEqualToString:@"WSS-installer"]) //if its in the installer, need to know if normal windows are forced
                 {
                     if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS] intValue] == 1)
@@ -392,6 +403,7 @@ static NSPortManager* portManager;
             system([[NSString stringWithFormat:@"open \"%@/Wineskin.app\"",appNameWithPath] UTF8String]);
             [fm removeItemAtPath:lockfile];
             [fm removeItemAtPath:tmpFolder];
+            [fm removeItemAtPath:tmpwineFolder];
             exit(0);
         }
         //********** Wineskin Customizer start up script
@@ -461,6 +473,7 @@ static NSPortManager* portManager;
                     {
                         [fm removeItemAtPath:lockfile];
                         [fm removeItemAtPath:tmpFolder];
+                        [fm removeItemAtPath:tmpwineFolder];
                         return;
                     }
                 }
@@ -629,6 +642,7 @@ static NSPortManager* portManager;
         //WSS-wineprefixcreatenoregs- same as above, doesn't load default regs
         //WSS-wineboot				- run simple wineboot, no deletions or loading regs. mshtml=disabled
         //WSS-winetricks {command}	- winetricks is being run
+        //WSS-wineserverkill        - tell winesever to kill all wine processes from wrapper
         //debug 					- run in debug mode, keep logs
         //CustomEXE {appname}		- running a custom EXE with appname
         //starts with a"/" 			- will be 1+ path/filename to open
@@ -730,6 +744,7 @@ static NSPortManager* portManager;
     //WSS-wineprefixcreatenoregs- need to error, saying this cannot run while the wrapper is running
     //WSS-wineboot				- need to error, saying this cannot run while the wrapper is running
     //WSS-winetricks {command}	- need to error, saying this cannot run while the wrapper is running
+    //WSS-wineserverkill        - tell winesever to kill all wine processes from wrapper
     //debug 					- need to error, saying this cannot run while the wrapper is running
     //CustomEXE {appname}		- need to send path to cexe to main
     //starts with a"/" 			- need to just pass this one to main
@@ -741,6 +756,7 @@ static NSPortManager* portManager;
     
     NSDictionary* fileToRunForCommand = @{
                                 @"WSS-installer":   otherCommands[0],
+                                @"WSS-wineserverkill":   otherCommands[0],
                                 @"WSS-winecfg":     [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix],
                                 @"WSS-cmd":         [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix],
                                 @"WSS-regedit":     [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix],
@@ -1291,6 +1307,7 @@ static NSPortManager* portManager;
         CFUserNotificationDisplayNotice(0, 0, NULL, NULL, NULL, CFSTR("ERROR"), CFSTR("Error: XQuartz cannot already be running if using Override Fullscreen option!\n\nPlease close XQuartz and try again!"), NULL);
         [fm removeItemAtPath:lockfile];
         [fm removeItemAtPath:tmpFolder];
+        [fm removeItemAtPath:tmpwineFolder];
         [NSApp terminate:nil];
     }
     
@@ -1579,7 +1596,7 @@ static NSPortManager* portManager;
     
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 - (void)fixWine32ExecutableNames
 {
     BOOL fixWine=YES;
@@ -1651,7 +1668,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 - (void)fixWine64ExecutableNames
 {
     BOOL fixWine=YES;
@@ -1744,7 +1761,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 // Wine-Staging engines only work correctly on 10.8+ systems according to wine-staging.com
 // Renaming can only apply to wine-preloader for staging engines
 - (void)fixWineStagingExecutableNames
@@ -1818,7 +1835,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
 
-//Lib redirection with the bash scripts was removed as it broke wrappers using universal libs, the same libs pulled from XQuartz, with it removed now it will accept those same libs
+// WINESKIN_LIB_PATH_FOR_FALLBACK removed from bash scripts, it's only needed so WineskinX11 will launch on El Capitan & above (commit 5ac7fa4) and this gets handled by -startWine so it's not needed within the bash scripts
 // Wine-Staging engines only work correctly on 10.8+ systems according to wine-staging.com
 // Renaming can only apply to wine-preloader/wine64-preloader for staging engines
 - (void)fixWineStaging64ExecutableNames
@@ -1938,7 +1955,6 @@ static NSPortManager* portManager;
         usleep(1000000);
     }
 }
-
 
 - (void)startWine:(WineStart *)wineStartInfo
 {
@@ -2143,9 +2159,26 @@ static NSPortManager* portManager;
             startExeLine = @" start /unix";
         }
         //Wine start section
+        NSString *silentMode;
         if ([wssCommand isEqualToString:@"WSS-winetricks"])
         {
-            NSString *wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
+            if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue] == 1)
+            {
+                wineDebugLine = @"err-all,warn-all,fixme-all,trace-all";
+            }
+            else
+            {
+                wineDebugLine = @"err+all,warn-all,fixme+all,trace-all";
+            }
+            
+            if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue] == 1)
+            {
+                silentMode = @"-q";
+            }
+            else
+            {
+                silentMode = @"";
+            }
             NSArray *winetricksCommands = [wineStartInfo getWinetricksCommands];
             if ((winetricksCommands.count == 2 &&  [winetricksCommands[1] isEqualToString:@"list"]) ||
                 (winetricksCommands.count == 1 && ([winetricksCommands[0] isEqualToString:@"list"]  ||
@@ -2156,7 +2189,7 @@ static NSPortManager* portManager;
             }
             else
             {
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
+                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks %@ --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,silentMode,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
             }
             usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
             return;
@@ -2396,12 +2429,17 @@ static NSPortManager* portManager;
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@.lockfile",x11PListFile]];
     [fm removeItemAtPath:lockfile];
     [fm removeItemAtPath:tmpFolder];
+    [fm removeItemAtPath:tmpwineFolder];
     
     //kill processes
-    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineName]];
-    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wine64Name]];
-    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineStagingName]];
-    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"%@\" > /dev/null 2>&1", wineStaging64Name]];
+    [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
+    NSArray* command = @[
+                         [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
+                         [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                         [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                         @"wineserver -k"];
+    [self systemCommand:[command componentsJoinedByString:@" "]];
+    usleep(3000000);
 
     //get rid of OS X saved state file
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/%@%@.wineskin.prefs.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]]];
