@@ -8,6 +8,8 @@
 
 #import "NSPortManager.h"
 
+#import <ObjectiveC_Extension/ObjectiveC_Extension.h>
+
 #import "NSExeSelection.h"
 #import "NSPathUtilities.h"
 

@@ -8,6 +8,8 @@
 
 #import "WineskinLauncherAppDelegate.h"
 
+#import <ObjectiveC_Extension/ObjectiveC_Extension.h>
+
 #import "NSPathUtilities.h"
 #import "NSPortDataLoader.h"
 
@@ -256,16 +258,16 @@ static NSPortManager* portManager;
             [vdResolution setString:resolution ? [resolution stringByReplacingOccurrencesOfString:@"x" withString:@" "] :
                                                  WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_NO_VIRTUAL_DESKTOP];
             
-            if ([fullScreenResolutionBitDepth isEqualToString:@"unset"])
+            if ([self->fullScreenResolutionBitDepth isEqualToString:@"unset"])
             {
-                [fullScreenResolutionBitDepth setString:[NSString stringWithFormat:@"%d",colors]];
+                [self->fullScreenResolutionBitDepth setString:[NSString stringWithFormat:@"%d",colors]];
             }
             
             //make sure vdReso has a space, not an x
-            currentResolution = [self getScreenResolution];
+            self->currentResolution = [self getScreenResolution];
             if ([vdResolution isEqualToString:WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_CURRENT_RESOLUTION])
             {
-                [vdResolution setString:currentResolution];
+                [vdResolution setString:self->currentResolution];
             }
         }];
         

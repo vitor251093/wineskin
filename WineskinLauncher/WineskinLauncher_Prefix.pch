@@ -25,7 +25,6 @@
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
-    #import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 #endif
 
 #define WINESKIN_APP_NAME @"Wineskin Launcher"
