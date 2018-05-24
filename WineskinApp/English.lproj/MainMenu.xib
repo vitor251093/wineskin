@@ -571,9 +571,6 @@ Gw
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
-                                    <connections>
-                                        <action selector="useD3DBoostIfAvailableCheckBoxClicked:" target="494" id="jFh-eq-Qxp"/>
-                                    </connections>
                                 </button>
                             </subviews>
                         </view>
@@ -623,6 +620,16 @@ Gw
                                 <view key="view" id="gpV-rM-qo9">
                                     <rect key="frame" x="10" y="7" width="640" height="150"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="s0u-Bv-Hz6">
+                                            <rect key="frame" x="12" y="119" width="304" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Retina Mode" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="0QR-lU-bCq">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                        </button>
+                                    </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="X11" identifier="" id="vIY-Re-DEn">
@@ -819,9 +826,6 @@ Gw
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
-                                                        <connections>
-                                                            <action selector="windowManagerCheckBoxClicked:" target="494" id="978"/>
-                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -3054,6 +3058,7 @@ Gw
                 <outlet property="rebuildWrapperButton" destination="739" id="826"/>
                 <outlet property="refreshWrapperButton" destination="741" id="827"/>
                 <outlet property="regeditButton" destination="733" id="851"/>
+                <outlet property="retinaModeCheckBoxButton" destination="s0u-Bv-Hz6" id="pJ3-8Q-EdO"/>
                 <outlet property="screenOptionsWindow" destination="553" id="661"/>
                 <outlet property="setMaxFilesCheckBoxButton" destination="2095" id="2098"/>
                 <outlet property="tab" destination="682" id="928"/>
@@ -3372,7 +3377,7 @@ Gw
         <image name="NSAddTemplate" width="11" height="11"/>
         <image name="NSRefreshTemplate" width="11" height="15"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
-        <image name="NSStopProgressFreestandingTemplate" width="14" height="14"/>
+        <image name="NSStopProgressFreestandingTemplate" width="11" height="11"/>
         <image name="Wineskin" width="256" height="256"/>
         <image name="WineskinBanner" width="53" height="167"/>
     </resources>
