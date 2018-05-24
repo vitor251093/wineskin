@@ -218,7 +218,6 @@
 //Screen Options window methods
 - (void)saveScreenOptionsData;
 - (void)loadScreenOptionsData;
-- (IBAction)doneButtonPressed:(id)sender;
 - (IBAction)automaticClicked:(id)sender;
 - (IBAction)overrideClicked:(id)sender;
 - (IBAction)installerAutomaticClicked:(id)sender;

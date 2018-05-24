@@ -511,14 +511,14 @@ Gw
         </window>
         <window title="Screen Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="553">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="645" y="530" width="692" height="326"/>
+            <rect key="contentRect" x="645" y="530" width="692" height="296"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2880" height="1778"/>
             <view key="contentView" misplaced="YES" id="554">
-                <rect key="frame" x="0.0" y="0.0" width="692" height="326"/>
+                <rect key="frame" x="0.0" y="0.0" width="692" height="296"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box misplaced="YES" title="Window System" id="JbT-kI-Xjn">
-                        <rect key="frame" x="17" y="218" width="124" height="88"/>
+                        <rect key="frame" x="17" y="188" width="124" height="88"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="gzC-2N-adY">
                             <rect key="frame" x="2" y="2" width="120" height="71"/>
@@ -550,7 +550,7 @@ Gw
                         </view>
                     </box>
                     <box misplaced="YES" title="General Options" id="atO-6J-6cp">
-                        <rect key="frame" x="143" y="218" width="289" height="88"/>
+                        <rect key="frame" x="143" y="188" width="289" height="88"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="kex-0y-Pm2">
                             <rect key="frame" x="2" y="2" width="285" height="71"/>
@@ -579,7 +579,7 @@ Gw
                         </view>
                     </box>
                     <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Extra Gamma Correction" id="563">
-                        <rect key="frame" x="434" y="218" width="241" height="88"/>
+                        <rect key="frame" x="434" y="188" width="241" height="88"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="VAv-4X-XRr">
                             <rect key="frame" x="1" y="1" width="239" height="72"/>
@@ -615,7 +615,7 @@ Gw
                         </view>
                     </box>
                     <tabView misplaced="YES" type="noTabsBezelBorder" initialItem="vIY-Re-DEn" id="qU5-eT-wgq">
-                        <rect key="frame" x="16" y="46" width="660" height="170"/>
+                        <rect key="frame" x="16" y="16" width="660" height="170"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
@@ -865,26 +865,12 @@ Gw
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <button verticalHuggingPriority="750" misplaced="YES" id="571">
-                        <rect key="frame" x="499" y="13" width="179" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="572">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                            <string key="keyEquivalent" base64-UTF8="YES">
-Gw
-</string>
-                        </buttonCell>
-                        <connections>
-                            <action selector="doneButtonPressed:" target="494" id="675"/>
-                        </connections>
-                    </button>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="494" id="817"/>
             </connections>
-            <point key="canvasLocation" x="187" y="-136"/>
+            <point key="canvasLocation" x="187" y="-151"/>
         </window>
         <window title="Wineskin Advanced" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="680">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
@@ -2115,14 +2101,14 @@ DQ
                                             <rect key="frame" x="0.0" y="-3" width="754" height="273"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="6iJ-NR-9eg">
-                                                <rect key="frame" x="1" y="1" width="737" height="271"/>
+                                                <rect key="frame" x="1" y="1" width="752" height="271"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <textView focusRingType="none" editable="NO" importsGraphics="NO" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="1695">
                                                         <rect key="frame" x="0.0" y="0.0" width="752" height="271"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <size key="minSize" width="737" height="271"/>
+                                                        <size key="minSize" width="752" height="271"/>
                                                         <size key="maxSize" width="761" height="10000000"/>
                                                         <color key="insertionPointColor" red="0.27450981740000002" green="0.23529411850000001" blue="0.23529411850000001" alpha="1" colorSpace="calibratedRGB"/>
                                                     </textView>

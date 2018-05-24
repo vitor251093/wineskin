@@ -593,15 +593,6 @@ NSFileManager *fm;
         [colorDepth selectItemWithTitle:[NSString stringWithFormat:@"%d bit",colors]];
     }];
 }
-- (IBAction)doneButtonPressed:(id)sender
-{
-	[self saveScreenOptionsData];
-	if (usingAdvancedWindow)
-		[advancedWindow makeKeyAndOrderFront:self];
-	else
-		[window makeKeyAndOrderFront:self];
-	[screenOptionsWindow orderOut:self];
-}
 - (IBAction)automaticClicked:(id)sender
 {
     [defaultSettingsOverrideRadioButton setState:false];
