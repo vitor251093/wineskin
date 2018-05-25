@@ -136,6 +136,7 @@ NSFileManager *fm;
         [forceWrapperQuartzWMButton setEnabled:state];
     }
     
+    // TODO: The code below seems to be causing a crash sometimes. Remove?
     if (state) {
         [toolRunningPI stopAnimation:self];
     }
@@ -467,18 +468,45 @@ NSFileManager *fm;
 }
 - (void)saveScreenOptionsData
 {
-    int colorInt = [[[[colorDepth selectedItem] title] stringByReplacingOccurrencesOfString:@" bit" withString:@""] intValue];
-    NSString* sleep = @"0";
+    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     
-    BOOL vd = ([windowModeVirtualDesktopRadioButton isEnabled] && [windowModeVirtualDesktopRadioButton state]);
-    BOOL fullscreen = [virtualDesktopFullscreenRadioButton isEnabled] && [virtualDesktopFullscreenRadioButton intValue];
-    NSString* resolution = [[virtualDesktopResolution selectedItem] title];
+    [NSWineskinPortDataWriter saveMacDriver:[useMacDriverRadioButton state] atPort:portManager];
     
-    [NSWineskinPortDataWriter setAutomaticScreenOptions:([defaultSettingsAutomaticRadioButton intValue] == 1)
-                                             fullscreen:fullscreen virtualDesktop:vd resolution:resolution colors:colorInt
-                                                  sleep:sleep atPort:portManager];
+    if ([useX11RadioButton state])
+    {
+        int colorInt = [[[[colorDepth selectedItem] title] stringByReplacingOccurrencesOfString:@" bit" withString:@""] intValue];
+        NSString* sleep = @"0";
+        
+        BOOL vd = ([windowModeVirtualDesktopRadioButton isEnabled] && [windowModeVirtualDesktopRadioButton state]);
+        BOOL fullscreen = [virtualDesktopFullscreenRadioButton isEnabled] && [virtualDesktopFullscreenRadioButton intValue];
+        NSString* resolution = [[virtualDesktopResolution selectedItem] title];
+        
+        [NSWineskinPortDataWriter setAutomaticScreenOptions:([defaultSettingsAutomaticRadioButton intValue] == 1)
+                                                 fullscreen:fullscreen virtualDesktop:vd resolution:resolution colors:colorInt
+                                                      sleep:sleep atPort:portManager];
+        
+        if ([defaultSettingsAutomaticRadioButton intValue] == 1)
+        {
+            //set to automatic
+            [portManager setPlistObject:@FALSE forKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS];
+        }
+        else
+        {
+            //set to override
+            [portManager setPlistObject:@([installerSettingsAutomaticRadioButton intValue])
+                                 forKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS];
+        }
+        
+        [NSWineskinPortDataWriter saveDecorateWindow:windowManagerCheckBoxButton.state atPort:portManager];
+    }
+    else
+    {
+        BOOL result = [NSWineskinPortDataWriter saveRetinaMode:[retinaModeCheckBoxButton state] withEngine:engine atPort:portManager];
+        NSLog(@"%@",result?@"TRUE":@"FALSE");
+    }
     
-    //gamma always set the same, set it first
+    
+    // Gamma
 	if ([gammaSlider doubleValue] == 60.0)
     {
         [portManager setPlistObject:@"default" forKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION];
@@ -489,19 +517,12 @@ NSFileManager *fm;
                              forKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION];
     }
     
-    if ([defaultSettingsAutomaticRadioButton intValue] == 1)
-	{
-		//set to automatic
-		[portManager setPlistObject:@FALSE forKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS];
-	}
-	else
-	{
-		//set to override
-		[portManager setPlistObject:@([installerSettingsAutomaticRadioButton intValue])
-                             forKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS];
-	}
     
-	//write GPU info check
+    // Direct3D Boost
+    [NSWineskinPortDataWriter saveDirect3DBoost:useD3DBoostIfAvailableCheckBoxButton.state withEngine:engine atPort:portManager];
+    
+    
+	// Auto-detect GPU
     [portManager setPlistObject:@([autoDetectGPUInfoCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU];
     [portManager synchronizePlist];
 }
@@ -593,15 +614,6 @@ NSFileManager *fm;
         [colorDepth selectItemWithTitle:[NSString stringWithFormat:@"%d bit",colors]];
     }];
 }
-- (IBAction)doneButtonPressed:(id)sender
-{
-	[self saveScreenOptionsData];
-	if (usingAdvancedWindow)
-		[advancedWindow makeKeyAndOrderFront:self];
-	else
-		[window makeKeyAndOrderFront:self];
-	[screenOptionsWindow orderOut:self];
-}
 - (IBAction)automaticClicked:(id)sender
 {
     [defaultSettingsOverrideRadioButton setState:false];
@@ -685,30 +697,15 @@ NSFileManager *fm;
                    withArgs:@[[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-60))/100]]];
 }
 
-- (IBAction)windowManagerCheckBoxClicked:(id)sender
-{
-    [NSWineskinPortDataWriter saveDecorateWindow:windowManagerCheckBoxButton.state atPort:portManager];
-}
-
 - (IBAction)useMacDriverCheckBoxClicked:(id)sender
 {
     [useX11RadioButton setState:false];
-    
-    [NSWineskinPortDataWriter saveMacDriver:YES atPort:portManager];
     [macDriverX11TabView selectTabViewItemAtIndex:0];
 }
 - (IBAction)useX11CheckBoxClicked:(id)sender
 {
     [useMacDriverRadioButton setState:false];
-    
-    [NSWineskinPortDataWriter saveMacDriver:NO atPort:portManager];
     [macDriverX11TabView selectTabViewItemAtIndex:1];
-}
-
-- (IBAction)useD3DBoostIfAvailableCheckBoxClicked:(id)sender
-{
-    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
-    [NSWineskinPortDataWriter saveDirect3DBoost:useD3DBoostIfAvailableCheckBoxButton.state withEngine:engine atPort:portManager];
 }
 
 

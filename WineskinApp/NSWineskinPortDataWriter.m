@@ -27,8 +27,7 @@
 {
     NSString* registry = @"[Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run]";
     [port deleteRegistry:registry fromRegistryFileNamed:USER_REG];
-    [port addRegistry:[NSString stringWithFormat:@"%@\n",registry] fromRegistryFileNamed:USER_REG];
-    return YES;
+    return [port addRegistry:[NSString stringWithFormat:@"%@\n",registry] fromRegistryFileNamed:USER_REG];
 }
 
 //Custom EXE Functions
@@ -118,9 +117,7 @@
 {
     NSString* driversRegistry = @"[Software\\\\Wine\\\\Drivers]";
     NSString* graphicsValue = (macdriver ? @"\"mac\"" : @"\"x11\"");
-    [port setValues:@{@"Graphics":graphicsValue} forEntry:driversRegistry atRegistryFileNamed:USER_REG];
-    
-    return TRUE;
+    return [port setValues:@{@"Graphics":graphicsValue} forEntry:driversRegistry atRegistryFileNamed:USER_REG];
 }
 +(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engine atPort:(NSPortManager*)port
 {
@@ -144,19 +141,28 @@
         value = (direct3DBoost ? @"\"enabled\"" : @"\"disabled\"");
     }
     
-    [port setValues:@{key:value} forEntry:direct3DRegistry atRegistryFileNamed:USER_REG];
-    
-    return TRUE;
+    return [port setValues:@{key:value} forEntry:direct3DRegistry atRegistryFileNamed:USER_REG];
 }
 +(BOOL)saveDecorateWindow:(BOOL)decorate atPort:(NSPortManager*)port
 {
     NSString* decorateValue = (decorate ? @"\"Y\"" : @"\"N\"");
     NSString* x11DriverRegistry = @"[Software\\\\Wine\\\\X11 Driver]";
     
-    [port setValues:@{@"Managed"  :decorateValue,
-                      @"Decorated":decorateValue} forEntry:x11DriverRegistry atRegistryFileNamed:USER_REG];
+    return [port setValues:@{@"Managed"  :decorateValue,
+                             @"Decorated":decorateValue} forEntry:x11DriverRegistry atRegistryFileNamed:USER_REG];
+}
++(BOOL)saveRetinaMode:(BOOL)retinaModeOn withEngine:(NSString*)engine atPort:(NSPortManager*)port
+{
+    BOOL enableRetinaModeOn = retinaModeOn && [NSWineskinEngine isHighQualityModeCompatibleWithEngine:engine];
     
-    return TRUE;
+    BOOL result = true;
+    result = [port setValues:@{@"LogPixels": (enableRetinaModeOn ? @"dword:000000c0" : @"dword:00000060")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    if (!result) return false;
+    
+    result = [port setValues:@{@"RetinaMode": (enableRetinaModeOn ? @"\"Y\"" : @"\"N\"")}
+                    forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    return result;
 }
 
 +(BOOL)setMainExeName:(NSString*)name version:(NSString*)version icon:(NSImage*)icon path:(NSString*)path atPort:(NSPortManager*)port

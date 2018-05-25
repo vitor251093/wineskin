@@ -24,6 +24,7 @@
 +(BOOL)saveMacDriver:(BOOL)macdriver atPort:(NSPortManager*)port;
 +(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engine atPort:(NSPortManager*)port;
 +(BOOL)saveDecorateWindow:(BOOL)decorate atPort:(NSPortManager*)port;
++(BOOL)saveRetinaMode:(BOOL)retinaModeOn withEngine:(NSString*)engine atPort:(NSPortManager*)port;
 
 +(BOOL)setMainExeName:(NSString*)name version:(NSString*)version icon:(NSImage*)icon path:(NSString*)path atPort:(NSPortManager*)port;
 +(BOOL)addCustomExeWithName:(NSString*)name version:(NSString*)version icon:(NSImage*)icon path:(NSString*)path atPortAtPath:(NSString*)portPath;

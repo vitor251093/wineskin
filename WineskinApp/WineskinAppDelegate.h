@@ -41,21 +41,18 @@
     IBOutlet NSTabView *macDriverX11TabView;
     
     IBOutlet NSPopUpButton *colorDepth;
-    
     IBOutlet NSButton *defaultSettingsOverrideRadioButton;
     IBOutlet NSButton *defaultSettingsAutomaticRadioButton;
-    
     IBOutlet NSButton *installerSettingsOverrideRadioButton;
     IBOutlet NSButton *installerSettingsAutomaticRadioButton;
-    
     IBOutlet NSButton *windowModeNormalWindowsRadioButton;
     IBOutlet NSButton *windowModeVirtualDesktopRadioButton;
-	
 	IBOutlet NSButton *virtualDesktopFullscreenRadioButton;
     IBOutlet NSButton *virtualDesktopWindowedRadioButton;
 	IBOutlet NSPopUpButton *virtualDesktopResolution;
-    
 	IBOutlet NSButton *windowManagerCheckBoxButton;
+    
+    IBOutlet NSButton* retinaModeCheckBoxButton;
     
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
@@ -218,7 +215,6 @@
 //Screen Options window methods
 - (void)saveScreenOptionsData;
 - (void)loadScreenOptionsData;
-- (IBAction)doneButtonPressed:(id)sender;
 - (IBAction)automaticClicked:(id)sender;
 - (IBAction)overrideClicked:(id)sender;
 - (IBAction)installerAutomaticClicked:(id)sender;
@@ -228,10 +224,8 @@
 - (IBAction)fullscreenClicked:(id)sender;
 - (IBAction)windowedClicked:(id)sender;
 - (IBAction)gammaChanged:(id)sender;
-- (IBAction)windowManagerCheckBoxClicked:(id)sender;
 - (IBAction)useMacDriverCheckBoxClicked:(id)sender;
 - (IBAction)useX11CheckBoxClicked:(id)sender;
-- (IBAction)useD3DBoostIfAvailableCheckBoxClicked:(id)sender;
 
 //advanced menu
 - (IBAction)testRunButtonPressed:(id)sender;

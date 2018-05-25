@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* WineskinLauncherAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* WineskinLauncherAppDelegate.m */; };
-		4E25741E1F850FB3009013D6 /* ObjectiveC_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E25741B1F850F92009013D6 /* ObjectiveC_Extension.framework */; };
-		4E25741F1F850FB3009013D6 /* ObjectiveC_Extension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4E25741B1F850F92009013D6 /* ObjectiveC_Extension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4E2574261F85125E009013D6 /* NSExeSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2574241F85125D009013D6 /* NSExeSelection.m */; };
 		55987E111F0410600035C5C1 /* NSPathUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 55987E031F0410600035C5C1 /* NSPathUtilities.m */; };
 		55987E121F0410600035C5C1 /* NSPortManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 55987E051F0410600035C5C1 /* NSPortManager.m */; };
@@ -19,26 +17,28 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A8C23E5A18DB810500ACD355 /* WineStart.m in Sources */ = {isa = PBXBuildFile; fileRef = A8C23E5918DB810500ACD355 /* WineStart.m */; };
+		D9EB7D4120B22ED5005D3308 /* ObjectiveC_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */; };
+		D9EB7D4220B22ED5005D3308 /* ObjectiveC_Extension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		4E25741A1F850F92009013D6 /* PBXContainerItemProxy */ = {
+		D9EB7D3920B22EA1005D3308 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 4E2574151F850F92009013D6 /* ObjectiveC_Extension.xcodeproj */;
+			containerPortal = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4E6C51071F7E8EB700A187E9;
 			remoteInfo = ObjectiveC_Extension;
 		};
-		4E25741C1F850F92009013D6 /* PBXContainerItemProxy */ = {
+		D9EB7D3B20B22EA1005D3308 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 4E2574151F850F92009013D6 /* ObjectiveC_Extension.xcodeproj */;
+			containerPortal = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4E6C51101F7E8EB700A187E9;
 			remoteInfo = ObjectiveC_ExtensionTests;
 		};
-		4E2574201F850FB3009013D6 /* PBXContainerItemProxy */ = {
+		D9EB7D4320B22ED5005D3308 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 4E2574151F850F92009013D6 /* ObjectiveC_Extension.xcodeproj */;
+			containerPortal = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 4E6C51061F7E8EB700A187E9;
 			remoteInfo = ObjectiveC_Extension;
@@ -46,13 +46,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4E2574221F850FB4009013D6 /* Embed Frameworks */ = {
+		D9EB7D4520B22ED5005D3308 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				4E25741F1F850FB3009013D6 /* ObjectiveC_Extension.framework in Embed Frameworks */,
+				D9EB7D4220B22ED5005D3308 /* ObjectiveC_Extension.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,7 +70,6 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		4E2574151F850F92009013D6 /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = "../../../../Meus Programas/ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj"; sourceTree = "<group>"; };
 		4E2574241F85125D009013D6 /* NSExeSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSExeSelection.m; sourceTree = "<group>"; };
 		4E2574251F85125E009013D6 /* NSExeSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSExeSelection.h; sourceTree = "<group>"; };
 		55987E021F0410600035C5C1 /* NSPathUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSPathUtilities.h; sourceTree = "<group>"; };
@@ -83,6 +82,7 @@
 		8D1107320486CEB800E47090 /* WineskinLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WineskinLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8C23E5818DB810500ACD355 /* WineStart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WineStart.h; sourceTree = "<group>"; };
 		A8C23E5918DB810500ACD355 /* WineStart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WineStart.m; sourceTree = "<group>"; };
+		D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = ../Carthage/Checkouts/ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,8 +90,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4E25741E1F850FB3009013D6 /* ObjectiveC_Extension.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				D9EB7D4120B22ED5005D3308 /* ObjectiveC_Extension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,7 +137,7 @@
 		29B97314FDCFA39411CA2CEA /* WineskinLauncher */ = {
 			isa = PBXGroup;
 			children = (
-				4E2574151F850F92009013D6 /* ObjectiveC_Extension.xcodeproj */,
+				D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -175,15 +175,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4E2574161F850F92009013D6 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				4E25741B1F850F92009013D6 /* ObjectiveC_Extension.framework */,
-				4E25741D1F850F92009013D6 /* ObjectiveC_ExtensionTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		55987E1C1F0411560035C5C1 /* Functions */ = {
 			isa = PBXGroup;
 			children = (
@@ -217,6 +208,15 @@
 			name = Controller;
 			sourceTree = "<group>";
 		};
+		D9EB7D3520B22EA1005D3308 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */,
+				D9EB7D3C20B22EA1005D3308 /* ObjectiveC_ExtensionTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -227,12 +227,12 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				4E2574221F850FB4009013D6 /* Embed Frameworks */,
+				D9EB7D4520B22ED5005D3308 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				4E2574211F850FB3009013D6 /* PBXTargetDependency */,
+				D9EB7D4420B22ED5005D3308 /* PBXTargetDependency */,
 			);
 			name = WineskinLauncher;
 			productInstallPath = "$(HOME)/Applications";
@@ -246,7 +246,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0930;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "WineskinLauncher" */;
 			compatibilityVersion = "Xcode 3.1";
@@ -262,8 +262,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 4E2574161F850F92009013D6 /* Products */;
-					ProjectRef = 4E2574151F850F92009013D6 /* ObjectiveC_Extension.xcodeproj */;
+					ProductGroup = D9EB7D3520B22EA1005D3308 /* Products */;
+					ProjectRef = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -274,18 +274,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		4E25741B1F850F92009013D6 /* ObjectiveC_Extension.framework */ = {
+		D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = ObjectiveC_Extension.framework;
-			remoteRef = 4E25741A1F850F92009013D6 /* PBXContainerItemProxy */;
+			remoteRef = D9EB7D3920B22EA1005D3308 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		4E25741D1F850F92009013D6 /* ObjectiveC_ExtensionTests.xctest */ = {
+		D9EB7D3C20B22EA1005D3308 /* ObjectiveC_ExtensionTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = ObjectiveC_ExtensionTests.xctest;
-			remoteRef = 4E25741C1F850F92009013D6 /* PBXContainerItemProxy */;
+			remoteRef = D9EB7D3B20B22EA1005D3308 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -320,10 +320,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		4E2574211F850FB3009013D6 /* PBXTargetDependency */ = {
+		D9EB7D4420B22ED5005D3308 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = ObjectiveC_Extension;
-			targetProxy = 4E2574201F850FB3009013D6 /* PBXContainerItemProxy */;
+			targetProxy = D9EB7D4320B22ED5005D3308 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -350,7 +350,6 @@
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -372,7 +371,6 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
@@ -396,11 +394,13 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
@@ -434,11 +434,13 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;

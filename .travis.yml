@@ -1,0 +1,11 @@
+osx_image: xcode9.3
+language: objective-c
+
+before_script:
+  - carthage update
+
+script:
+  - set -o pipefail
+  - xcodebuild -workspace Wineskin.xcworkspace -scheme Wineskin build | xcpretty -c
+  - xcodebuild -workspace Wineskin.xcworkspace -scheme "Wineskin Winery" build | xcpretty -c
+  - xcodebuild -workspace Wineskin.xcworkspace -scheme WineskinLauncher build | xcpretty -c

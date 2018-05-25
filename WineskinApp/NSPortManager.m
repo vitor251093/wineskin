@@ -329,19 +329,19 @@
     
     return [NSString stringWithFormat:@"%@/Contents/Resources/%@.reg",self.path,reg];
 }
--(void)addRegistry:(NSString*)lines fromRegistryFileNamed:(NSString*)reg
+-(BOOL)addRegistry:(NSString*)lines fromRegistryFileNamed:(NSString*)reg
 {
     NSString* regFile = [self getPathForRegistryFile:reg];
     NSString* text = [NSString stringWithContentsOfFile:regFile encoding:NSASCIIStringEncoding];
     
     text = [NSString stringWithFormat:@"%@\n\n\n%@",text,lines];
-    [text writeToFile:regFile atomically:NO encoding:NSASCIIStringEncoding];
+    return [text writeToFile:regFile atomically:NO encoding:NSASCIIStringEncoding];
 }
--(void)deleteRegistry:(NSString*)line fromRegistryFileNamed:(NSString*)reg
+-(BOOL)deleteRegistry:(NSString*)line fromRegistryFileNamed:(NSString*)reg
 {
     NSString* regFile = [self getPathForRegistryFile:reg];
     NSString* text = [NSString stringWithContentsOfFile:regFile encoding:NSASCIIStringEncoding];
-    if (!text) return;
+    if (!text) return false;
     
     NSMutableArray* fragments = [[text componentsSeparatedByString:line] mutableCopy];
     if (fragments.count > 1)
@@ -364,7 +364,7 @@
         while ([text contains:@"\n\n\n"]) text = [text stringByReplacingOccurrencesOfString:@"\n\n\n" withString:@"\n\n"];
     }
     
-    [text writeToFile:regFile atomically:NO encoding:NSASCIIStringEncoding];
+    return [text writeToFile:regFile atomically:NO encoding:NSASCIIStringEncoding];
 }
 -(NSArray*)getRegistriesWithGramar:(NSString*)gramar fromRegistryFileNamed:(NSString*)reg
 {
@@ -456,14 +456,16 @@
         [self setValue:values[key] forKey:key atRegistryEntryString:registry];
     }
 }
--(void)setValues:(NSDictionary*)values forEntry:(NSString*)registryEntry atRegistryFileNamed:(NSString*)regFileName
+-(BOOL)setValues:(NSDictionary*)values forEntry:(NSString*)registryEntry atRegistryFileNamed:(NSString*)regFileName
 {
     NSMutableString* registry2 = [[self getRegistryEntry:registryEntry fromRegistryFileNamed:regFileName] mutableCopy];
     
     [self setValues:values atRegistryEntryString:registry2];
     
-    [self deleteRegistry:registryEntry fromRegistryFileNamed:regFileName];
-    [self addRegistry:[NSString stringWithFormat:@"%@\n%@\n",registryEntry,registry2] fromRegistryFileNamed:regFileName];
+    BOOL deleted = [self deleteRegistry:registryEntry fromRegistryFileNamed:regFileName];
+    if (!deleted) return false;
+    
+    return [self addRegistry:[NSString stringWithFormat:@"%@\n%@\n",registryEntry,registry2] fromRegistryFileNamed:regFileName];
 }
 
 //Get values from registry entries

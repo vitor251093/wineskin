@@ -45,8 +45,8 @@
 -(NSString*)programFilesPathFor64bitsApplication:(BOOL)is64bits;
 
 -(NSString*)getPathForRegistryFile:(NSString*)reg;
--(void)addRegistry:(NSString*)lines fromRegistryFileNamed:(NSString*)reg;
--(void)deleteRegistry:(NSString*)line fromRegistryFileNamed:(NSString*)reg;
+-(BOOL)addRegistry:(NSString*)lines fromRegistryFileNamed:(NSString*)reg;
+-(BOOL)deleteRegistry:(NSString*)line fromRegistryFileNamed:(NSString*)reg;
 -(NSArray*)getRegistriesWithGramar:(NSString*)gramar fromRegistryFileNamed:(NSString*)reg;
 -(NSString*)getRegistryEntry:(NSString*)line fromRegistryFileNamed:(NSString*)reg;
 
@@ -54,7 +54,7 @@
 
 -(void)setValue:(NSString*)value forKey:(NSString*)key atRegistryEntryString:(NSMutableString*)registry;
 -(void)setValues:(NSDictionary*)values atRegistryEntryString:(NSMutableString*)registry;
--(void)setValues:(NSDictionary*)values forEntry:(NSString*)registryEntry atRegistryFileNamed:(NSString*)regFileName;
+-(BOOL)setValues:(NSDictionary*)values forEntry:(NSString*)registryEntry atRegistryFileNamed:(NSString*)regFileName;
 
 +(NSString*)getStringValueForKey:(NSString*)value fromRegistryString:(NSString*)registry;
 +(NSString*)getValueForKey:(NSString*)value fromRegistryString:(NSString*)registry;

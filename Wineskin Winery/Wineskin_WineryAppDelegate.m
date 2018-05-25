@@ -46,7 +46,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 			[alert runModal];
 		}
 	}
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 	[waitWheel startAnimation:self];
 	[busyWindow makeKeyAndOrderFront:self];
 	[self refreshButtonPressed:self];
@@ -503,7 +503,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 	[panel setCanChooseDirectories:YES];
 	[panel setCanChooseFiles:NO];
 	[panel setAllowsMultipleSelection:NO];
-	int error = [panel runModal];
+	NSModalResponse error = [panel runModal];
 	if (error == 0) return;
 	[engineBuildWineSource setStringValue:[[panel filenames] objectAtIndex:0]];
 }
@@ -650,7 +650,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 {
 	NSArray *ignoredEngines = [self getEnginesToIgnore];
 	NSMutableArray *availableEngines = [NSMutableArray arrayWithCapacity:[ignoredEngines count]];
-	int length = [engineWindowEngineList numberOfItems];
+	NSInteger length = [engineWindowEngineList numberOfItems];
 	for (int i=0;i<length;i++)
 		[availableEngines addObject:[engineWindowEngineList itemTitleAtIndex:i]];
 	NSMutableArray *fixedIgnoredEnginesList = [NSMutableArray arrayWithCapacity:[ignoredEngines count]];
