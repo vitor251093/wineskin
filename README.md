@@ -1,6 +1,6 @@
 # Wineskin
 
-[![Build Status](https://travis-ci.org/vitor251093/wineskin.svg?branch=master)](https://travis-ci.org/vitor251093/wineskin)
+[![Build Status](https://travis-ci.org/Gcenx/wineskin.svg?branch=master)](https://travis-ci.org/Gcenx/wineskin)
 
 Wineskin is a tool used to make ports of Windows software to Mac OS X. 
 
@@ -20,7 +20,7 @@ $ brew install carthage
 Clone the repository and build the dependencies:
 
 ```bash
-$ git clone https://github.com/vitor251093/wineskin.git
+$ git clone https://github.com/Gcenx/wineskin.git
 $ cd wineskin/
 $ carthage update
 ```
