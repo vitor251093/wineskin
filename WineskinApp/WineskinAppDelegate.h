@@ -226,6 +226,7 @@
 - (IBAction)gammaChanged:(id)sender;
 - (IBAction)useMacDriverCheckBoxClicked:(id)sender;
 - (IBAction)useX11CheckBoxClicked:(id)sender;
+- (IBAction)retinaModeCheckBoxClicked:(id)sender;
 
 //advanced menu
 - (IBAction)testRunButtonPressed:(id)sender;
