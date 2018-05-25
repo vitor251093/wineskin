@@ -41,19 +41,27 @@ $ xcodebuild -workspace Wineskin.xcworkspace -scheme WineskinLauncher build
 
 
 ## Modifications
-As you may have already noticed, this is not the [original Wineskin repository](https://sourceforge.net/p/wineskin/code/ci/master/tree/). That repository counts with some changes to make Wineskin more stable, and to make its source easier to maintain. Considering this, lots of changes were made in WineskinApp and WineskinLauncher, and now both or them use [ObjectiveC_Extension](https://github.com/vitor251093/ObjectiveC_Extension) and some new classes to perform most of their tasks. 
+As you may have already noticed, this is not the [original Wineskin repository](https://sourceforge.net/p/wineskin/code/ci/master/tree/). That repository counts with some changes to make Wineskin more stable, and to make its source easier to maintain. Considering this, lots of changes were made in WineskinApp and WineskinLauncher, and now both of them use [ObjectiveC_Extension](https://github.com/vitor251093/ObjectiveC_Extension) and some new classes to perform most of their tasks. 
 
-## List of modifications
+## List of modifications in the Wineskin App (WineskinApp)
 - The Resolution property in Info.plist should never get corrupted (*(null)x24sleep0*);
 - The *Auto-detect GPU* feature should never cause malfunction in the port;
 - The *Auto-detect GPU* feature should have a much bigger accuracy and detect the memory size of integrated video cards as well;
 - Enabling *Mac Driver* and *Decorate window* checkboxes should not corrupt the wrapper registry;
+- The *Retina Mode* can be enabled from the Screen Options window;
 - *Kill Wineskin Processes* should kill ALL Wineskin processes.
 - Images (not .icns files) should also be accepted has wrapper icons;
 - LNK files should be able to be selected as a port's run path, so Wineskin can extract the path and flags from it;
-- Winetricks installation should be silent (with no windows) so it's much faster;
+- Winetricks installation can be silent (with no windows) so it's much faster;
 - The first *Advanced* tab (*Configuration*) should be much more simple in the first section:
     - The *Windows EXE* should use Wineskin syntax, including the drive and the flags, (eg. *"C:/Program Files/temp.exe" --run*) instead of using a macOS reference path (eg. */Program Files/temp.exe*) and the flag apart (eg. *--run*).
+
+## List of modifications for the Master Wrapper (WineskinLauncher)
+- Many fixes when dealing with newest engines.
+
+## List of desired modifications for the Master Wrapper (WineskinLauncher)
+- A different Master Wrapper for macOS 10.6 and 10.7;
+- WineskinX11 should be dropped.
 
 ## License
 Keeping the same as the original material, LGPL 2.1 is the license of that project. You can find more details about that in the LICENSE file.
