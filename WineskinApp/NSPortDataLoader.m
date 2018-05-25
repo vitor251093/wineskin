@@ -160,6 +160,21 @@
     
     return false;
 }
++(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine
+{
+    if ([NSWineskinEngine isHighQualityModeCompatibleWithEngine:engine])
+    {
+        NSPortManager* port = [NSPortManager managerWithPath:path];
+        NSString* macDriverVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Mac Driver]" fromRegistryFileNamed:USER_REG];
+        if (macDriverVariable)
+        {
+            macDriverVariable = [NSPortManager getStringValueForKey:@"RetinaMode" fromRegistryString:macDriverVariable];
+            return macDriverVariable && [macDriverVariable isEqualToString:@"Y"];
+        }
+    }
+    
+    return FALSE;
+}
 
 +(void)getValuesFromResolutionString:(NSString*)originalResolutionString
                              inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues

@@ -468,10 +468,6 @@ NSFileManager *fm;
 }
 - (void)saveScreenOptionsData
 {
-    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
-    
-    [NSWineskinPortDataWriter saveMacDriver:[useMacDriverRadioButton state] atPort:portManager];
-    
     if ([useX11RadioButton state])
     {
         int colorInt = [[[[colorDepth selectedItem] title] stringByReplacingOccurrencesOfString:@" bit" withString:@""] intValue];
@@ -501,8 +497,8 @@ NSFileManager *fm;
     }
     else
     {
-        BOOL result = [NSWineskinPortDataWriter saveRetinaMode:[retinaModeCheckBoxButton state] withEngine:engine atPort:portManager];
-        NSLog(@"%@",result?@"TRUE":@"FALSE");
+        NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+        [NSWineskinPortDataWriter saveRetinaMode:[retinaModeCheckBoxButton state] withEngine:engine atPort:portManager];
     }
     
     
@@ -516,19 +512,13 @@ NSFileManager *fm;
 		[portManager setPlistObject:[NSString stringWithFormat:@"%1.2f",(100.0-([gammaSlider doubleValue]-60))/100]
                              forKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION];
     }
-    
-    
-    // Direct3D Boost
-    [NSWineskinPortDataWriter saveDirect3DBoost:useD3DBoostIfAvailableCheckBoxButton.state withEngine:engine atPort:portManager];
-    
-    
-	// Auto-detect GPU
-    [portManager setPlistObject:@([autoDetectGPUInfoCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU];
-    [portManager synchronizePlist];
 }
 - (void)loadScreenOptionsData
 {
     NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+    
+    BOOL retinaMode = [NSPortDataLoader retinaModeIsEnabledAtPort:self.wrapperPath withEngine:engine];
+    [retinaModeCheckBoxButton setState:retinaMode];
     
     BOOL macDriver = [NSPortDataLoader macDriverIsEnabledAtPort:self.wrapperPath withEngine:engine];
     [useMacDriverRadioButton setState: macDriver];
@@ -701,11 +691,31 @@ NSFileManager *fm;
 {
     [useX11RadioButton setState:false];
     [macDriverX11TabView selectTabViewItemAtIndex:0];
+    
+    [NSWineskinPortDataWriter saveMacDriver:true atPort:portManager];
 }
 - (IBAction)useX11CheckBoxClicked:(id)sender
 {
     [useMacDriverRadioButton setState:false];
     [macDriverX11TabView selectTabViewItemAtIndex:1];
+    
+    [NSWineskinPortDataWriter saveMacDriver:false atPort:portManager];
+}
+
+- (IBAction)retinaModeCheckBoxClicked:(id)sender
+{
+    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+    [NSWineskinPortDataWriter saveRetinaMode:[retinaModeCheckBoxButton state] withEngine:engine atPort:portManager];
+}
+- (IBAction)direct3dBoostCheckBoxClicked:(id)sender
+{
+    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+    [NSWineskinPortDataWriter saveDirect3DBoost:useD3DBoostIfAvailableCheckBoxButton.state withEngine:engine atPort:portManager];
+}
+- (IBAction)autoDetectGpuCheckBoxClicked:(id)sender
+{
+    [portManager setPlistObject:@([autoDetectGPUInfoCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU];
+    [portManager synchronizePlist];
 }
 
 

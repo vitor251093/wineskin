@@ -563,6 +563,9 @@ Gw
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="autoDetectGpuCheckBoxClicked:" target="494" id="Mos-rZ-S21"/>
+                                    </connections>
                                 </button>
                                 <button misplaced="YES" id="jzg-hU-Fza">
                                     <rect key="frame" x="18" y="18" width="258" height="16"/>
@@ -571,6 +574,9 @@ Gw
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="direct3dBoostCheckBoxClicked:" target="494" id="6XY-Wz-tu0"/>
+                                    </connections>
                                 </button>
                             </subviews>
                         </view>
@@ -628,6 +634,9 @@ Gw
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="retinaModeCheckBoxClicked:" target="494" id="D3n-xg-VOe"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                 </view>
@@ -3377,7 +3386,7 @@ Gw
         <image name="NSAddTemplate" width="11" height="11"/>
         <image name="NSRefreshTemplate" width="11" height="15"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
-        <image name="NSStopProgressFreestandingTemplate" width="11" height="11"/>
+        <image name="NSStopProgressFreestandingTemplate" width="14" height="14"/>
         <image name="Wineskin" width="256" height="256"/>
         <image name="WineskinBanner" width="53" height="167"/>
     </resources>
