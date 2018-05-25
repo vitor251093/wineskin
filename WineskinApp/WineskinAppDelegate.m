@@ -700,6 +700,9 @@ NSFileManager *fm;
     [macDriverX11TabView selectTabViewItemAtIndex:1];
     
     [NSWineskinPortDataWriter saveMacDriver:false atPort:portManager];
+    
+    [NSWineskinPortDataWriter saveRetinaMode:false withEngine:nil atPort:portManager];
+    [retinaModeCheckBoxButton setState:false];
 }
 
 - (IBAction)retinaModeCheckBoxClicked:(id)sender
