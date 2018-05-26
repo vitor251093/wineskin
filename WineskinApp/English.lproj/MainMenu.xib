@@ -1488,6 +1488,17 @@ Gw
                                                 <action selector="disableCPUsButtonPressed:" target="494" id="ICf-GT-y81"/>
                                             </connections>
                                         </button>
+                                        <button misplaced="YES" id="dfm-mt-PUY">
+                                            <rect key="frame" x="14" y="156" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Disable Winedbg (winedbg will not launch even on appliction crash)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="dED-2q-gGz">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="winedbgDisabledButtonPressed:" target="494" id="0nh-Br-vPj"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -3092,6 +3103,7 @@ Gw
                 <outlet property="windowsExeTextField" destination="705" id="790"/>
                 <outlet property="wineDebugTextField" destination="1493" id="1495"/>
                 <outlet property="winecfgButton" destination="729" id="853"/>
+                <outlet property="winedbgDisabledButton" destination="dfm-mt-PUY" id="dpw-gz-3Mw"/>
                 <outlet property="winetricksActionPopup" destination="1748" id="1894"/>
                 <outlet property="winetricksButton" destination="731" id="829"/>
                 <outlet property="winetricksCancelButton" destination="1661" id="1702"/>
