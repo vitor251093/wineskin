@@ -37,18 +37,6 @@
     return FALSE;
 }
 
-+(BOOL)macDriverIsEnabledAtPort:(NSPortManager*)port
-    {
-        NSString* driversVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Drivers]" fromRegistryFileNamed:USER_REG];
-        if (driversVariable)
-        {
-            driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
-            return driversVariable && [driversVariable isEqualToString:@"mac"];
-        }
-        
-        return FALSE;
-    }
-
 +(void)getValuesFromResolutionString:(NSString*)originalResolutionString
                              inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues
 {

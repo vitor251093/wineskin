@@ -1132,8 +1132,7 @@ NSFileManager *fm;
 }
 - (IBAction)winedbgDisabledButtonPressed:(id)sender
 {
-    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
-    [NSWineskinPortDataWriter saveWinedbg:[winedbgDisabledButton state] withEngine:engine atPort:portManager];
+    [NSWineskinPortDataWriter saveWinedbg:[winedbgDisabledButton state] atPort:portManager];
 }
 //*************************************************************
 //*********************** Winetricks **************************
