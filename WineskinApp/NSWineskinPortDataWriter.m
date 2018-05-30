@@ -113,16 +113,16 @@
     
     return TRUE;
 }
-+(BOOL)saveWinedbg:(BOOL)Debugger withEngine:(NSString*)engine atPort:(NSPortManager*)port
++(BOOL)saveWinedbg:(BOOL)Debugger atPort:(NSPortManager*)port
 {
     NSString* key;
     NSString* value;
-    NSString* direct3DRegistry = @"[Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\AeDebug]";
+    NSString* winedbgRegistry = @"[Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\AeDebug]";
     
     key = @"Debugger";
     value = (Debugger ? @"\"false\"" : @"\"true\"");
     
-    return [port setValues:@{key:value} forEntry:direct3DRegistry atRegistryFileNamed:SYSTEM_REG];
+    return [port setValues:@{key:value} forEntry:winedbgRegistry atRegistryFileNamed:SYSTEM_REG];
 }
 +(BOOL)saveMacDriver:(BOOL)macdriver atPort:(NSPortManager*)port
 {
