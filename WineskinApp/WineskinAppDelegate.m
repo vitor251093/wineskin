@@ -889,8 +889,7 @@ NSFileManager *fm;
 	[focusFollowsMouseCheckBoxButton       setState:[[portManager x11PlistObjectForKey:@"wm_ffm"] intValue]];
     
     // change if better way to do this / state does not update if changed again via winetricks
-    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
-    BOOL winedbg = [NSPortDataLoader winedbgIsDisabledAtPort:self.wrapperPath withEngine:engine];
+    BOOL winedbg = [NSPortDataLoader winedbgIsDisabledAtPort:self.wrapperPath];
     [winedbgDisabledButton setState:winedbg];
     
     
