@@ -16,27 +16,27 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A1DF1C2420BDBA7500E079AE /* ObjectiveC_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF1C2120BDB8AE00E079AE /* ObjectiveC_Extension.framework */; };
+		A1DF1C2520BDBA7500E079AE /* ObjectiveC_Extension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF1C2120BDB8AE00E079AE /* ObjectiveC_Extension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A8C23E5A18DB810500ACD355 /* WineStart.m in Sources */ = {isa = PBXBuildFile; fileRef = A8C23E5918DB810500ACD355 /* WineStart.m */; };
-		D9EB7D4120B22ED5005D3308 /* ObjectiveC_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */; };
-		D9EB7D4220B22ED5005D3308 /* ObjectiveC_Extension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		D9EB7D3920B22EA1005D3308 /* PBXContainerItemProxy */ = {
+		A1DF1C2020BDB8AE00E079AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4E6C51071F7E8EB700A187E9;
 			remoteInfo = ObjectiveC_Extension;
 		};
-		D9EB7D3B20B22EA1005D3308 /* PBXContainerItemProxy */ = {
+		A1DF1C2220BDB8AE00E079AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4E6C51101F7E8EB700A187E9;
 			remoteInfo = ObjectiveC_ExtensionTests;
 		};
-		D9EB7D4320B22ED5005D3308 /* PBXContainerItemProxy */ = {
+		A1DF1C2620BDBA7500E079AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 1;
@@ -52,7 +52,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D9EB7D4220B22ED5005D3308 /* ObjectiveC_Extension.framework in Embed Frameworks */,
+				A1DF1C2520BDBA7500E079AE /* ObjectiveC_Extension.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,7 +82,7 @@
 		8D1107320486CEB800E47090 /* WineskinLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WineskinLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8C23E5818DB810500ACD355 /* WineStart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WineStart.h; sourceTree = "<group>"; };
 		A8C23E5918DB810500ACD355 /* WineStart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WineStart.m; sourceTree = "<group>"; };
-		D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = ../Carthage/Checkouts/ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj; sourceTree = "<group>"; };
+		D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = "../../../Menu Programs/ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,8 +90,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1DF1C2420BDBA7500E079AE /* ObjectiveC_Extension.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
-				D9EB7D4120B22ED5005D3308 /* ObjectiveC_Extension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,11 +208,11 @@
 			name = Controller;
 			sourceTree = "<group>";
 		};
-		D9EB7D3520B22EA1005D3308 /* Products */ = {
+		A1DF1C1C20BDB8AE00E079AE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */,
-				D9EB7D3C20B22EA1005D3308 /* ObjectiveC_ExtensionTests.xctest */,
+				A1DF1C2120BDB8AE00E079AE /* ObjectiveC_Extension.framework */,
+				A1DF1C2320BDB8AE00E079AE /* ObjectiveC_ExtensionTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -232,7 +232,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				D9EB7D4420B22ED5005D3308 /* PBXTargetDependency */,
+				A1DF1C2720BDBA7500E079AE /* PBXTargetDependency */,
 			);
 			name = WineskinLauncher;
 			productInstallPath = "$(HOME)/Applications";
@@ -262,7 +262,7 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = D9EB7D3520B22EA1005D3308 /* Products */;
+					ProductGroup = A1DF1C1C20BDB8AE00E079AE /* Products */;
 					ProjectRef = D9EB7D3420B22EA1005D3308 /* ObjectiveC_Extension.xcodeproj */;
 				},
 			);
@@ -274,18 +274,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		D9EB7D3A20B22EA1005D3308 /* ObjectiveC_Extension.framework */ = {
+		A1DF1C2120BDB8AE00E079AE /* ObjectiveC_Extension.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = ObjectiveC_Extension.framework;
-			remoteRef = D9EB7D3920B22EA1005D3308 /* PBXContainerItemProxy */;
+			remoteRef = A1DF1C2020BDB8AE00E079AE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		D9EB7D3C20B22EA1005D3308 /* ObjectiveC_ExtensionTests.xctest */ = {
+		A1DF1C2320BDB8AE00E079AE /* ObjectiveC_ExtensionTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = ObjectiveC_ExtensionTests.xctest;
-			remoteRef = D9EB7D3B20B22EA1005D3308 /* PBXContainerItemProxy */;
+			remoteRef = A1DF1C2220BDB8AE00E079AE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -320,10 +320,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		D9EB7D4420B22ED5005D3308 /* PBXTargetDependency */ = {
+		A1DF1C2720BDBA7500E079AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = ObjectiveC_Extension;
-			targetProxy = D9EB7D4320B22ED5005D3308 /* PBXContainerItemProxy */;
+			targetProxy = A1DF1C2620BDBA7500E079AE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -351,7 +351,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = RD56V43GW9;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -364,6 +367,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = WineskinLauncher;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -372,7 +376,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = RD56V43GW9;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WineskinLauncher_Prefix.pch;
@@ -382,6 +389,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = WineskinLauncher;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;

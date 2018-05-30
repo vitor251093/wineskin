@@ -51,7 +51,6 @@
     IBOutlet NSButton *virtualDesktopWindowedRadioButton;
 	IBOutlet NSPopUpButton *virtualDesktopResolution;
 	IBOutlet NSButton *windowManagerCheckBoxButton;
-    
     IBOutlet NSButton* retinaModeCheckBoxButton;
     
 	//advanced menu
@@ -102,8 +101,6 @@
 	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
 	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
-	IBOutlet NSButton *forceWrapperQuartzWMButton;
-	IBOutlet NSButton *forceSystemXQuartzButton;
     
     //advanced menu - Advanced Tab
     IBOutlet NSButton *WinetricksNoLogsButton;
@@ -275,8 +272,6 @@
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 - (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
-- (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender;
-- (IBAction)forceSystemXQuartzButtonPressed:(id)sender;
 
 //advanced menu - Advanced Tab
 - (IBAction)WinetricksNoLogsButtonPressed:(id)sender;

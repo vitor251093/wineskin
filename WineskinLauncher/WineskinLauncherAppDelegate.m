@@ -1150,7 +1150,7 @@ static NSPortManager* portManager;
 	if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
 	{
 		NSLog(@"Error XQuartz not found, defaulting back to WineskinX11");
-		useXQuartz = NO;
+		//useXQuartz = NO;
 		return;
 	}
     
@@ -1191,6 +1191,7 @@ static NSPortManager* portManager;
     
     //if started this way we need extra time or Wine may be gotten too too quickly
     usleep(1500000);
+    // Do we need to keep this, as all the notes point to bringToFront only being needed by WineskinX11?
     [self bringToFront:xQuartzBundlePID];
 }
 

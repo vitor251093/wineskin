@@ -124,18 +124,6 @@ NSFileManager *fm;
     [WinetricksNoLogsButton setEnabled:state];
     [disableCPUsCheckBoxButton setEnabled:state];
     [winedbgDisabledButton setEnabled:state];
-
-    //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
-    if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"] && ![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
-    {
-        [forceSystemXQuartzButton setEnabled:NO];
-        [forceWrapperQuartzWMButton setEnabled:NO];
-    }
-    else
-    {
-        [forceSystemXQuartzButton setEnabled:state];
-        [forceWrapperQuartzWMButton setEnabled:state];
-    }
     
     // TODO: The code below seems to be causing a crash sometimes. Remove?
     if (state) {
@@ -516,6 +504,13 @@ NSFileManager *fm;
 }
 - (void)loadScreenOptionsData
 {
+    if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+    {
+        [useX11RadioButton setEnabled:NO];
+        [useX11RadioButton setState:false];
+        [macDriverX11TabView selectTabViewItemAtIndex:0];
+        [NSWineskinPortDataWriter saveMacDriver:true atPort:portManager];
+    }
     NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     
     BOOL retinaMode = [NSPortDataLoader retinaModeIsEnabledAtPort:self.wrapperPath withEngine:engine];
@@ -770,9 +765,8 @@ NSFileManager *fm;
         //sends kill command to winesever, this then cause winesever to kill everything without causing registry corruption
         [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-wineserverkill"];
         
-        //kill WineskinLauncher WineskinX11
+        //kill WineskinLauncher
         NSMutableArray *pidsToKill = [[NSMutableArray alloc] init];
-        [pidsToKill addObjectsFromArray:[[self systemCommand:[NSString stringWithFormat:@"ps ax | grep \"%@\" | grep WineskinX11 | awk \"{print \\$1}\"",self.wrapperPath]] componentsSeparatedByString:@"\n"]];
         [pidsToKill addObjectsFromArray:[[self systemCommand:[NSString stringWithFormat:@"ps ax | grep \"%@\" | grep WineskinLauncher | awk \"{print \\$1}\"",self.wrapperPath]] componentsSeparatedByString:@"\n"]];
         
         for (NSString *pid in pidsToKill)
@@ -860,25 +854,6 @@ NSFileManager *fm;
     [modifyMappingsButton         setEnabled:[mapUserFoldersCheckBoxButton state]];
     [enableWinetricksSilentButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue]];
     [WinetricksNoLogsButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue]];
-
-    //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
-    if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"] && ![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
-    {
-        [forceSystemXQuartzButton setEnabled:NO];
-        [forceSystemXQuartzButton setState:0];
-        [portManager setPlistObject:@([forceSystemXQuartzButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ];
-        [forceWrapperQuartzWMButton setEnabled:NO];
-        [forceWrapperQuartzWMButton setState:0];
-        [portManager setPlistObject:@([forceWrapperQuartzWMButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW];
-        [portManager synchronizePlist];
-    }
-    else
-    {
-        [forceSystemXQuartzButton setEnabled:YES];
-        [forceSystemXQuartzButton         setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ] intValue]];
-        [forceWrapperQuartzWMButton setEnabled:YES];
-        [forceWrapperQuartzWMButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue]];
-    }
     
     [disableCPUsCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue]];
 	[alwaysMakeLogFilesCheckBoxButton setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE] intValue]];
@@ -1064,16 +1039,6 @@ NSFileManager *fm;
     [modifyMappingsDownloadsTextField  setStringValue:[portManager plistObjectForKey:@"Symlink Downloads"]];
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
-}
-- (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender
-{
-    [portManager setPlistObject:@([forceWrapperQuartzWMButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW];
-    [portManager synchronizePlist];
-}
-- (IBAction)forceSystemXQuartzButtonPressed:(id)sender
-{
-    [portManager setPlistObject:@([forceSystemXQuartzButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ];
-    [portManager synchronizePlist];
 }
 //*************************************************************
 //**************** Advanced Menu - Tools Tab ******************

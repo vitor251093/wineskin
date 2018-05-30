@@ -15,6 +15,7 @@
 {
     // Used to run the port normally or in debug mode
     return [path stringByAppendingString:@"/Contents/Frameworks/bin/Wineskin"];
+    //why is this needed?, it just sets dylibfallback then launcher WineskinLauncher
 }
 +(NSString*)wineskinAppBinaryForPortAtPath:(NSString*)path
 {

@@ -103,7 +103,7 @@
 //fixes whatever libraries in Frameworks needs to be set before launching X or Wine
 - (void)fixFrameworksLibraries;
 
-//returns the correct line needed for startX11 to get the right quartz-wm started
+//returns the correct line needed for startXQuartz to get the right quartz-wm started
 - (NSString *)setWindowManager;
 
 //checks if Mac or X11 driver is set in Wine
