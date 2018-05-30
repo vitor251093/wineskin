@@ -123,6 +123,7 @@ NSFileManager *fm;
     [focusFollowsMouseCheckBoxButton setEnabled:state];
     [WinetricksNoLogsButton setEnabled:state];
     [disableCPUsCheckBoxButton setEnabled:state];
+    [winedbgDisabledButton setEnabled:state];
 
     //Use System XQuartz and ForceQuartzWM disabled unless XQuartz is installed
     if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"] && ![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
@@ -887,6 +888,11 @@ NSFileManager *fm;
 	[emulateThreeButtonMouseCheckBoxButton setState:[[portManager x11PlistObjectForKey:WINESKIN_WRAPPER_X11_PLIST_KEY_EMULATE_THREE_BUTTONS] intValue]];
 	[focusFollowsMouseCheckBoxButton       setState:[[portManager x11PlistObjectForKey:@"wm_ffm"] intValue]];
     
+    // change if better way to do this / state does not update if changed again via winetricks
+    BOOL winedbg = [NSPortDataLoader winedbgIsDisabledAtPort:self.wrapperPath];
+    [winedbgDisabledButton setState:winedbg];
+    
+    
     [confirmQuitCheckBoxButton setState:[NSPortDataLoader isCloseNicelyEnabledAtPort:portManager]];
 }
 - (IBAction)windowsExeBrowseButtonPressed:(id)sender
@@ -1058,11 +1064,6 @@ NSFileManager *fm;
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
-- (IBAction)disableCPUsButtonPressed:(id)sender
-{
-    [portManager setPlistObject:@([disableCPUsCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU];
-    [portManager synchronizePlist];
-}
 - (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender
 {
     [portManager setPlistObject:@([forceWrapperQuartzWMButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW];
@@ -1071,16 +1072,6 @@ NSFileManager *fm;
 - (IBAction)forceSystemXQuartzButtonPressed:(id)sender
 {
     [portManager setPlistObject:@([forceSystemXQuartzButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ];
-    [portManager synchronizePlist];
-}
-- (IBAction)enableWinetricksSilentButtonPressed:(id)sender
-{
-    [portManager setPlistObject:@([enableWinetricksSilentButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT];
-    [portManager synchronizePlist];
-}
-- (IBAction)WinetricksNoLogsButtonPressed:(id)sender
-{
-    [portManager setPlistObject:@([WinetricksNoLogsButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS];
     [portManager synchronizePlist];
 }
 //*************************************************************
@@ -1160,6 +1151,26 @@ NSFileManager *fm;
 	[advancedWindow makeKeyAndOrderFront:self];
 	[busyWindow orderOut:self];
 }
+//****************************************************************
+//**************** Advanced Menu - Advanced Tab ******************
+//****************************************************************
+- (IBAction)WinetricksNoLogsButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([WinetricksNoLogsButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS];
+    [portManager synchronizePlist];
+}
+- (IBAction)disableCPUsButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([disableCPUsCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU];
+    [portManager synchronizePlist];
+}
+- (IBAction)winedbgDisabledButtonPressed:(id)sender
+{
+    [NSWineskinPortDataWriter saveWinedbg:[winedbgDisabledButton state] atPort:portManager];
+}
+//*************************************************************
+//*********************** Winetricks **************************
+//*************************************************************
 - (IBAction)winetricksButtonPressed:(id)sender
 {
     //Warning User if Winetricks No Logs Mode is enabled, Custom Title instead of Warning?
@@ -1172,6 +1183,11 @@ NSFileManager *fm;
         [self winetricksRefreshButtonPressed:self];
     }
     [self winetricksRefreshButtonPressed:self];
+}
+- (IBAction)enableWinetricksSilentButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([enableWinetricksSilentButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT];
+    [portManager synchronizePlist];
 }
 - (IBAction)winetricksDoneButtonPressed:(id)sender
 {
