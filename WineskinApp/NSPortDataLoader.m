@@ -120,7 +120,7 @@
     
     return FALSE;
 }
-+(BOOL)winedbgIsDisabledAtPort:(NSString*)path withEngine:(NSString*)engine
++(BOOL)winedbgIsDisabledAtPort:(NSString*)path
 {
     NSPortManager* port = [NSPortManager managerWithPath:path];
     NSString* winedbgVariable = [port getRegistryEntry:@"[Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\AeDebug]" fromRegistryFileNamed:SYSTEM_REG];
