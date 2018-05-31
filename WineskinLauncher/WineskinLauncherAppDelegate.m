@@ -157,6 +157,7 @@ static NSPortManager* portManager;
         wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
         x11LogFile      = [NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
         useMacDriver    = [self checkToUseMacDriver];
+        useXQuartz      = [self checkToUseXQuartz];
         
         //exit if the lock file exists, another user is running this wrapper currently
         BOOL lockFileAlreadyExisted = NO;
@@ -217,8 +218,8 @@ static NSPortManager* portManager;
         }
         
         debugEnabled = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE] intValue];
-        forceWrapperQuartzWM = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue];
-        useXQuartz = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ] intValue];
+        //forceWrapperQuartzWM = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue];
+        //useXQuartz = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ] intValue];
         
         //set correct dyldFallBackLibraryPath
         if (useXQuartz)
@@ -431,11 +432,11 @@ static NSPortManager* portManager;
             [self handleWineskinLauncherDirectSecondaryRun:wineStartInfo];
             BOOL killWineskin = YES;
             
-            // check if WineskinX11 is even running
-            if (!useMacDriver && [self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
+            // check if XQuartz is even running
+            if (!useMacDriver && [self systemCommand:@"killall -s X11.bin 2>&1"].length > 0)
             {
-                //ignore if no WineskinX11 is running, must have been in error
-                NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
+                //ignore if no XQuartz is running, must have been in error
+                NSLog(@"Lockfile ignored because no running XQaurtz processes found");
                 lockFileAlreadyExisted = NO;
                 killWineskin = NO;
             }
@@ -1145,11 +1146,16 @@ static NSPortManager* portManager;
     return [NSPortDataLoader macDriverIsEnabledAtPort:self.portManager];
 }
 
+- (BOOL)checkToUseXQuartz
+{
+    return [NSPortDataLoader useXQuartzIsEnabledAtPort:self.portManager];
+}
+
 - (void)startXQuartz
 {
 	if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
 	{
-		NSLog(@"Error XQuartz not found, defaulting back to WineskinX11");
+		NSLog(@"Error XQuartz not found, please install XQuartz");
 		//useXQuartz = NO;
 		return;
 	}
@@ -1191,15 +1197,14 @@ static NSPortManager* portManager;
     
     //if started this way we need extra time or Wine may be gotten too too quickly
     usleep(1500000);
-    // Do we need to keep this, as all the notes point to bringToFront only being needed by WineskinX11?
     [self bringToFront:xQuartzBundlePID];
 }
 
 - (void)bringToFront:(NSString *)thePid
 {
-	/*this has been very problematic.  Need to detect front most app, and try to make WineskinX11 go frontmost
+	/*this has been very problematic.  Need to detect front most app, and try to make XQuartz go frontmost
 	 *recheck and retry different ways until it is the frontmost, or just fail with a NSLog.
-	 *only attempt if WineskinX11 is still actually running
+	 *only attempt if XQuartz is still actually running
 	 */
     if ([self isPID:thePid named:appNameWithPath] == false) return;
 	
@@ -1215,7 +1220,7 @@ static NSPortManager* portManager;
         UInt32 highLong = [frontMostAppInfo[@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
         ProcessSerialNumber currentAppPSN = {highLong,lowLong};
         
-        //Get Apple Process for WineskinX11 PID
+        //Get Apple Process PID
         ProcessSerialNumber PSN = {kNoProcess, kNoProcess};
         GetProcessForPID((pid_t)[thePid intValue], &PSN);
         

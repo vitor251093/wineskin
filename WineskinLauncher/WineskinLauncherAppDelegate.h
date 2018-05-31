@@ -41,7 +41,6 @@
 	NSMutableString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
 	NSString *currentResolution;                    //the resolution that was running when the wrapper was started
 	NSString *wrapperBundlePID;                     //PID of running wrapper bundle
-	NSMutableString *wineskinX11PID;                //PID of running WineskinX11 exectuable (not used except for shutdown, only use wrapper bundle for checks)
 	NSMutableString *xQuartzX11BinPID;              //PID of running XQuartz X11.bin (only needed for Override->Fullscreen)
 	NSString *xQuartzBundlePID;                     //PID of running XQuartz bundle (only needed for Override->Fullscreen)
 	BOOL debugEnabled;                              //set if debug mode is being run, to make logs
