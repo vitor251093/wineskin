@@ -314,6 +314,7 @@ static NSPortManager* portManager;
                 debugEnabled = YES; //need logs in special commands
                 useGamma = NO;
                 if ([wssCommand isEqualToString:@"WSS-wineserverkill"])
+                {
                 [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
                 NSArray* command = @[
                                      [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
@@ -322,6 +323,7 @@ static NSPortManager* portManager;
                                      @"wineserver -k"];
                 [self systemCommand:[command componentsJoinedByString:@" "]];
                 usleep(3000000);
+                }
                 if ([wssCommand isEqualToString:@"WSS-installer"]) //if its in the installer, need to know if normal windows are forced
                 {
                     if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS] intValue] == 1)
