@@ -410,7 +410,7 @@ static NSPortManager* portManager;
             exit(0);
         }
         //********** Wineskin Customizer start up script
-        system([[NSString stringWithFormat:@"\"%@/WineskinStartupScript\"",winePrefix] UTF8String]);
+        system([[NSString stringWithFormat:@"\"%@/Scripts/WineskinStartupScript\"",winePrefix] UTF8String]);
             
         //****** if CPUs Disabled, disable all but 1 CPU
         NSString *cpuCountInput;
@@ -539,7 +539,7 @@ static NSPortManager* portManager;
         }
             
         //********** Wineskin Customizer shut down script
-        system([[NSString stringWithFormat:@"\"%@/WineskinShutdownScript\"",winePrefix] UTF8String]);
+        system([[NSString stringWithFormat:@"\"%@/Scripts/WineskinShutdownScript\"",winePrefix] UTF8String]);
         
         //********** app finished, time to clean up and shut down
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] intValue] == 1)

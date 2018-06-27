@@ -325,7 +325,7 @@
 
 +(BOOL)isCloseNicelyEnabledAtPort:(NSPortManager*)port
 {
-    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",
+    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/Scripts/WineskinQuitScript",
                                         port.path];
     if ([[NSFileManager defaultManager] fileExistsAtPath:wineskinQuitScriptPath])
     {

@@ -1967,7 +1967,7 @@ NSFileManager *fm;
 	}
     
 	//confirm wrapper change
-    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:@"Are you sure you want to do this update? It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery. The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Frameworks\nContents/Resources/English.lproj/MainMenu.nib\nContents/Resources/English.lproj/main.nib" withDefault:NO] == false)
+    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:@"Are you sure you want to do this update? It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery. The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Frameworks\nContents/Resources/English.lproj" withDefault:NO] == false)
     {
         return;
     }
@@ -2026,10 +2026,25 @@ NSFileManager *fm;
 	//delete old WineskinLauncher.nib
     NSString* oldNibPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinLauncher.nib",self.wrapperPath];
     if ([fm fileExistsAtPath:oldNibPath]) [fm removeItemAtPath:oldNibPath];
+
+    //delete old WineskinMenuScripts folder
+    NSString* oldWineskinMenuScriptsPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts",self.wrapperPath];
+    if ([fm fileExistsAtPath:oldWineskinMenuScriptsPath]) [fm removeItemAtPath:oldWineskinMenuScriptsPath];
     
-    //copy new MainMenu.nib
-    [self replaceFile:@"/Contents/Resources/English.lproj/MainMenu.nib" withVersionFromMasterWrapper:masterWrapperName];
-	
+    //delete old WineskinShutdownScript
+    NSString* WineskinShutdownScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinShutdownScript",self.wrapperPath];
+    if ([fm fileExistsAtPath:WineskinShutdownScriptPath]) [fm removeItemAtPath:WineskinShutdownScriptPath];
+    
+    //delete old WineskinStartupScript
+    NSString* WineskinStartupScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinStartupScript",self.wrapperPath];
+    if ([fm fileExistsAtPath:WineskinStartupScriptPath]) [fm removeItemAtPath:WineskinStartupScriptPath];
+    
+    //delete old English.lproj, and copy in new
+    [self replaceFile:@"/Contents/Resources/English.lproj" withVersionFromMasterWrapper:masterWrapperName];
+    
+    //copy new Scripts folder
+    [self replaceFile:@"/Contents/Resources/Scripts" withVersionFromMasterWrapper:masterWrapperName];
+
     //edit Info.plist to new wrapper version, replace - with spaces, and dump .app
 	[portManager setPlistObject:[[masterWrapperName stringByReplacingOccurrencesOfString:@".app" withString:@""] stringByReplacingOccurrencesOfString:@"-" withString:@" "] forKey:WINESKIN_WRAPPER_PLIST_KEY_WINESKIN_VERSION];
 	
@@ -2053,9 +2068,6 @@ NSFileManager *fm;
     
 	//move wswine.bundle back into Frameworks
 	[fm moveItemAtPath:wswineBundleTempPath toPath:wswineBundleOriginalPath];
-    
-	//change out main.nib
-    [self replaceFile:@"/Contents/Resources/English.lproj/main.nib" withVersionFromMasterWrapper:masterWrapperName];
     
 	//open new Wineskin.app
 	[self systemCommand:@"/usr/bin/open" withArgs:@[[NSString stringWithFormat:@"%@/Wineskin.app",self.wrapperPath]]];

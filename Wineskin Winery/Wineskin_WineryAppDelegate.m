@@ -970,7 +970,7 @@ static NSInteger localizedComparator(id a, id b, void* context)
 		// 777 the bundle
 		system([[NSString stringWithFormat:@"chmod 777 \"/tmp/%@.app/Contents/Frameworks/wswine.bundle\"",[createWrapperName stringValue]] UTF8String]);
 		//refresh wrapper
-		system([[NSString stringWithFormat:@"\"/tmp/%@.app/Contents/Frameworks/bin/Wineskin\" WSS-wineprefixcreate",[createWrapperName stringValue]] UTF8String]);
+		system([[NSString stringWithFormat:@"\"/tmp/%@.app/Contents/MacOS/WineskinLauncher\" WSS-wineprefixcreate",[createWrapperName stringValue]] UTF8String]);
 		//move wrapper to ~/Applications/Wineskin
 		[fm moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] toPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]] error:nil];
 		//put ending message
