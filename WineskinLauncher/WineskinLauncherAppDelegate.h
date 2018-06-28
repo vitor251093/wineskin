@@ -35,7 +35,6 @@
     NSString *x11PListFile;                         //location of x11 plist
 	BOOL fullScreenOption;                          //wether running fullscreen or rootless (RandR is rootless)
 	BOOL useGamma;                                  //wether or not gamma correction will be checked for
-	BOOL forceWrapperQuartzWM;                      //YES if forced to use wrapper quartz-wm and not newest version on the system
 	BOOL useXQuartz;                                //YES if using System XQuartz instead of WineskinX11
 	NSMutableString *gammaCorrection;               //added in gamma correction
 	NSMutableString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
@@ -99,9 +98,6 @@
 //remove GPU info from Registry
 - (void)removeGPUInfo;
 
-//fixes whatever libraries in Frameworks needs to be set before launching X or Wine
-- (void)fixFrameworksLibraries;
-
 //returns the correct line needed for startXQuartz to get the right quartz-wm started
 - (NSString *)setWindowManager;
 
@@ -143,6 +139,9 @@
 
 //fix standard wine and wineserver names
 - (void)fixWine64ExecutableNames;
+
+//fix staging names
+- (void)fixWineStagingExecutableNames;
 
 //fix staging64 names
 - (void)fixWineStaging64ExecutableNames;

@@ -1076,26 +1076,6 @@ static NSPortManager* portManager;
     [self setGpuInfoVendorID:nil deviceID:nil memorySize:nil];
 }
 
-- (void)fixFrameworksLibraries
-{
-    //fix to have the right libXplugin for the OS version
-    SInt32 majorVersion,minorVersion;
-    Gestalt(gestaltSystemVersionMajor, &majorVersion);
-    Gestalt(gestaltSystemVersionMinor, &minorVersion);
-    
-    NSString *symlinkName = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
-    NSMutableString *mainFile = [[NSMutableString alloc] init];
-    [mainFile setString:[NSString stringWithFormat:@"libXplugin.1.%d.%d.dylib",(int)majorVersion,(int)minorVersion]];
-    
-    if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",frameworksFold,mainFile]])
-    {
-        [mainFile setString:@"libXplugin.1.10.8.dylib"];//default to 10.8 for 10.9+
-    }
-    
-    [fm removeItemAtPath:symlinkName];
-    [fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
-    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
-}
 - (NSString *)setWindowManager
 {
     //do not run quartz-wm in override->fullscreen
@@ -1105,12 +1085,7 @@ static NSPortManager* portManager;
     }
     
 	NSMutableString *quartzwmLine = [[NSMutableString alloc] init];
-    [quartzwmLine setString:[NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold]];
-	if (forceWrapperQuartzWM)
-    {
-        return [NSString stringWithString:quartzwmLine];
-    }
-	
+
     //look for quartz-wm in all locations, if not found default to backup
 	//should be in /usr/bin/quartz-wm or /opt/X11/bin/quartz-wm or /opt/local/bin/quartz-wm
 	//find the newest version
