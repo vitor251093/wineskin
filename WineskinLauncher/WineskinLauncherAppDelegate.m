@@ -127,8 +127,6 @@ static NSPortManager* portManager;
         NSMutableString *vdResolution = [[NSMutableString alloc] init];
         fullScreenResolutionBitDepth = [[NSMutableString alloc] init];
         [fullScreenResolutionBitDepth setString:@"unset"];
-        wineskinX11PID = [[NSMutableString alloc] init];
-        [wineskinX11PID setString:@"unset"];
         xQuartzX11BinPID = [[NSMutableString alloc] init];
         gammaCorrection = [[NSMutableString alloc] init];
         BOOL runWithStartExe = NO;
@@ -159,6 +157,7 @@ static NSPortManager* portManager;
         wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
         x11LogFile      = [NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
         useMacDriver    = [self checkToUseMacDriver];
+        useXQuartz      = [self checkToUseXQuartz];
         
         //exit if the lock file exists, another user is running this wrapper currently
         BOOL lockFileAlreadyExisted = NO;
@@ -219,8 +218,8 @@ static NSPortManager* portManager;
         }
         
         debugEnabled = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE] intValue];
-        forceWrapperQuartzWM = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue];
-        useXQuartz = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ] intValue];
+        //forceWrapperQuartzWM = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DECORATE_WINDOW] intValue];
+        //useXQuartz = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_USE_XQUARTZ] intValue];
         
         //set correct dyldFallBackLibraryPath
         if (useXQuartz)
@@ -315,6 +314,7 @@ static NSPortManager* portManager;
                 debugEnabled = YES; //need logs in special commands
                 useGamma = NO;
                 if ([wssCommand isEqualToString:@"WSS-wineserverkill"])
+                {
                 [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
                 NSArray* command = @[
                                      [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
@@ -323,6 +323,7 @@ static NSPortManager* portManager;
                                      @"wineserver -k"];
                 [self systemCommand:[command componentsJoinedByString:@" "]];
                 usleep(3000000);
+                }
                 if ([wssCommand isEqualToString:@"WSS-installer"]) //if its in the installer, need to know if normal windows are forced
                 {
                     if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS] intValue] == 1)
@@ -409,7 +410,7 @@ static NSPortManager* portManager;
             exit(0);
         }
         //********** Wineskin Customizer start up script
-        system([[NSString stringWithFormat:@"\"%@/WineskinStartupScript\"",winePrefix] UTF8String]);
+        system([[NSString stringWithFormat:@"\"%@/Scripts/WineskinStartupScript\"",winePrefix] UTF8String]);
             
         //****** if CPUs Disabled, disable all but 1 CPU
         NSString *cpuCountInput;
@@ -433,11 +434,11 @@ static NSPortManager* portManager;
             [self handleWineskinLauncherDirectSecondaryRun:wineStartInfo];
             BOOL killWineskin = YES;
             
-            // check if WineskinX11 is even running
-            if (!useMacDriver && [self systemCommand:@"killall -0 WineskinX11 2>&1"].length > 0)
+            // check if XQuartz is even running
+            if (!useMacDriver && [self systemCommand:@"killall -s X11.bin 2>&1"].length > 0)
             {
-                //ignore if no WineskinX11 is running, must have been in error
-                NSLog(@"Lockfile ignored because no running WineskinX11 processes found");
+                //ignore if no XQuartz is running, must have been in error
+                NSLog(@"Lockfile ignored because no running XQaurtz processes found");
                 lockFileAlreadyExisted = NO;
                 killWineskin = NO;
             }
@@ -465,19 +466,6 @@ static NSPortManager* portManager;
                 {
                     NSLog(@"Wineskin: Starting XQuartz");
                     [self startXQuartz];
-                }
-                if (!useXQuartz)
-                {
-                    NSLog(@"Wineskin: Starting WineskinX11");
-                    [self startX11];
-                    NSLog(@"Wineskin: WineskinX11 Started, PID = %@", wineskinX11PID);
-                    if ([wrapperBundlePID isEqualToString:@"ERROR"])
-                    {
-                        [fm removeItemAtPath:lockfile];
-                        [fm removeItemAtPath:tmpFolder];
-                        [fm removeItemAtPath:tmpwineFolder];
-                        return;
-                    }
                 }
                 else
                 {
@@ -521,19 +509,6 @@ static NSPortManager* portManager;
         }
 	
         //for xorg1.11.0+, log files are put in ~/Library/Logs.  Need to move to correct place if in Debug
-        if (debugEnabled && !useXQuartz)
-        {
-            NSString *theBundleID = [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER] stringByReplacingOccurrencesOfString:@".wineskin.prefs" withString:@""];
-            NSString *logName = [NSString stringWithFormat:@"%@/Library/Logs/X11/%@.Wineskin.p.log",NSHomeDirectory(),theBundleID];
-            if ([fm fileExistsAtPath:logName])
-            {
-                [fm removeItemAtPath:x11LogFile];
-                [fm copyItemAtPath:logName toPath:x11LogFile];
-                [fm removeItemAtPath:logName];
-            }
-        }
-        
-        //********** Write system info to end X11 log file
         if (debugEnabled)
         {
             if (useXQuartz)
@@ -564,7 +539,7 @@ static NSPortManager* portManager;
         }
             
         //********** Wineskin Customizer shut down script
-        system([[NSString stringWithFormat:@"\"%@/WineskinShutdownScript\"",winePrefix] UTF8String]);
+        system([[NSString stringWithFormat:@"\"%@/Scripts/WineskinShutdownScript\"",winePrefix] UTF8String]);
         
         //********** app finished, time to clean up and shut down
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] intValue] == 1)
@@ -1101,26 +1076,6 @@ static NSPortManager* portManager;
     [self setGpuInfoVendorID:nil deviceID:nil memorySize:nil];
 }
 
-- (void)fixFrameworksLibraries
-{
-    //fix to have the right libXplugin for the OS version
-    SInt32 majorVersion,minorVersion;
-    Gestalt(gestaltSystemVersionMajor, &majorVersion);
-    Gestalt(gestaltSystemVersionMinor, &minorVersion);
-    
-    NSString *symlinkName = [NSString stringWithFormat:@"%@/libXplugin.1.dylib",frameworksFold];
-    NSMutableString *mainFile = [[NSMutableString alloc] init];
-    [mainFile setString:[NSString stringWithFormat:@"libXplugin.1.%d.%d.dylib",(int)majorVersion,(int)minorVersion]];
-    
-    if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",frameworksFold,mainFile]])
-    {
-        [mainFile setString:@"libXplugin.1.10.8.dylib"];//default to 10.8 for 10.9+
-    }
-    
-    [fm removeItemAtPath:symlinkName];
-    [fm createSymbolicLinkAtPath:symlinkName withDestinationPath:mainFile error:nil];
-    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",symlinkName]];
-}
 - (NSString *)setWindowManager
 {
     //do not run quartz-wm in override->fullscreen
@@ -1130,12 +1085,7 @@ static NSPortManager* portManager;
     }
     
 	NSMutableString *quartzwmLine = [[NSMutableString alloc] init];
-    [quartzwmLine setString:[NSString stringWithFormat:@" +extension \"'%@/bin/quartz-wm'\"",frameworksFold]];
-	if (forceWrapperQuartzWM)
-    {
-        return [NSString stringWithString:quartzwmLine];
-    }
-	
+
     //look for quartz-wm in all locations, if not found default to backup
 	//should be in /usr/bin/quartz-wm or /opt/X11/bin/quartz-wm or /opt/local/bin/quartz-wm
 	//find the newest version
@@ -1173,123 +1123,17 @@ static NSPortManager* portManager;
     return [NSPortDataLoader macDriverIsEnabledAtPort:self.portManager];
 }
 
-- (void)startX11
+- (BOOL)checkToUseXQuartz
 {
-	//copying X11plist file over to /tmp to use... was needed in C++ for copy problems from /Volumes, may not be needed now... trying directly
-	//fix the Frameworks Libraires
-	[self fixFrameworksLibraries];
-    
-	//set up quartz-wm launch correctly
-	NSString *quartzwmLine = [self setWindowManager];
-    
-	//copy the plist over
-	[fm removeItemAtPath:x11PListFile];
-	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/WSX11Prefs.plist",frameworksFold] toPath:x11PListFile];
-    
-	//make proper files and symlinks in /tmp/Wineskin
-	[fm removeItemAtPath:@"/tmp/Wineskin"]; // try to remove old folder if you can
-	[fm createDirectoryAtPath:@"/tmp/Wineskin" withIntermediateDirectories:YES];
-	[self systemCommand:@"chmod 0777 /tmp/Wineskin"];
-    
-	//stuff for /tmp/Wineskin/bin
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/bin" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
-	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/bin"];
-    
-	//stuff for /tmp/Wineskin/lib
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/lib" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
-	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/lib"];
-    
-	//stuff for /tmp/Wineskin/share
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/share" withDestinationPath:[NSString stringWithFormat:@"%@/bin",frameworksFold] error:nil];
-	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/share"];
-    
-	//stuff for Xmodmap
-	[fm createSymbolicLinkAtPath:@"/tmp/Wineskin/.Xmodmap" withDestinationPath:[NSString stringWithFormat:@"%@/.Xmodmap",frameworksFold] error:nil];
-	[self systemCommand:@"chmod -h 777 /tmp/Wineskin/.Xmodmap"];
-    
-	//change Info.plist to use main.nib (xquartz's nib) instead of MainMenu.nib (Wineskin's nib)
-    [self.portManager setPlistObject:@"X11Application" forKey:@"NSPrincipalClass"];
-	[self.portManager setPlistObject:@"main.nib" forKey:@"NSMainNibFile"];
-    [self.portManager setPlistObject:@NO forKey:@"LSUIElement"];
-    
-	BOOL fileWriteWorked = [self.portManager synchronizePlist];
-	if (!fileWriteWorked)
-	{
-		//error!  read only volume or other permissions problem, cannot run.
-		NSLog(@"Error, cannot write to Info.plist, there are permission problems, or you are on a read-only volume. This cannot run from within a read-only dmg file.");
-		CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)@"ERROR! cannot write to Info.plist, there are permission problems, or you are on a read-only volume.\n\nThis cannot run from within a read-only dmg file.", NULL);
-        if ([wineskinX11PID isEqualToString:@"unset"])
-        {
-            [wineskinX11PID setString:@"ERROR"];
-        }
-		return;
-	}
-    
-    @try
-    {
-        //set up fontpath variable for server depending where X11 fonts are on the system
-        NSMutableString *wineskinX11FontPathPrefix = [[NSMutableString alloc] init];
-        [wineskinX11FontPathPrefix setString:@"/opt/X11/share/fonts"];
-        if (![fm fileExistsAtPath:wineskinX11FontPathPrefix])
-        {
-            NSArray *locsToCheck = @[@"/usr/X11/share/fonts",@"/opt/local/share/fonts",@"/usr/X11/lib/X11/fonts",
-                                     @"/usr/X11R6/lib/X11/fonts",[NSString stringWithFormat:@"%@/bin/fonts",frameworksFold]];
-            for (NSString *item in locsToCheck)
-            {
-                if ([fm fileExistsAtPath:item])
-                {
-                    [wineskinX11FontPathPrefix setString:item];
-                    break;
-                }
-            }
-        }
-        NSString *wineskinX11FontPath = [NSString stringWithFormat:@"-fp \"%@/75dpi,%@/100dpi,%@/cyrillic,%@/misc,%@/OTF,%@/Speedo,%@/TTF,%@/Type1,%@/util\"",wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix,wineskinX11FontPathPrefix];
-        
-        //make sure the X11 lock files is gone before starting X11
-        [fm removeItemAtPath:@"/tmp/.X11-unix"];
-        
-        //find WineskinX11 executable PID (this is only used for proper shut down, all other PID usage for X11 should be the Bundle PID
-        //make first pid array
-        NSArray *firstPIDlist = [self makePIDArray:@"WineskinX11"];
-        
-        //Start WineskinX11
-        wrapperBundlePID = [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export DISPLAY=%@;DYLD_FALLBACK_LIBRARY_PATH=\"%@\" \"%@/MacOS/WineskinX11\" %@ -depth %@ +xinerama -br %@ -xkbdir \"%@/bin/X11/xkb\"%@ > \"/dev/null\" 2>&1 & echo \"$!\"",dyldFallBackLibraryPath,theDisplayNumber,dyldFallBackLibraryPath,contentsFold,theDisplayNumber,fullScreenResolutionBitDepth,wineskinX11FontPath,frameworksFold,quartzwmLine]];
-        
-        // get PID of WineskinX11 just launched
-        if ([wineskinX11PID isEqualToString:@"unset"])
-        {
-            [wineskinX11PID setString:[self getNewPid:@"WineskinX11" from:firstPIDlist confirm:NO]];
-        }
-        
-        //if no PID found, log problem
-        if ([wineskinX11PID isEqualToString:@"-1"])
-        {
-            NSLog(@"Wineskin: Error! WineskinX11 PID not found, there may be unexpected errors on shut down!\n");
-        }
-    }
-    @finally
-    {
-        //fix Info.plist back
-        usleep(500000);
-        
-        //bring X11 to front before any windows are drawn
-        [self bringToFront:wrapperBundlePID];
-        [self.portManager setPlistObject:@"NSApplication" forKey:@"NSPrincipalClass"];
-        [self.portManager setPlistObject:@"MainMenu.nib" forKey:@"NSMainNibFile"];
-        [self.portManager setPlistObject:@YES forKey:@"LSUIElement"];
-        [self.portManager synchronizePlist];
-    }
-    
-	//get rid of X11 lock folder that shouldnt be needed
-	[fm removeItemAtPath:@"/tmp/.X11-unix"];
-	return;
+    return [NSPortDataLoader useXQuartzIsEnabledAtPort:self.portManager];
 }
+
 - (void)startXQuartz
 {
 	if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
 	{
-		NSLog(@"Error XQuartz not found, defaulting back to WineskinX11");
-		useXQuartz = NO;
+		NSLog(@"Error XQuartz not found, please install XQuartz");
+		//useXQuartz = NO;
 		return;
 	}
     
@@ -1335,9 +1179,9 @@ static NSPortManager* portManager;
 
 - (void)bringToFront:(NSString *)thePid
 {
-	/*this has been very problematic.  Need to detect front most app, and try to make WineskinX11 go frontmost
+	/*this has been very problematic.  Need to detect front most app, and try to make XQuartz go frontmost
 	 *recheck and retry different ways until it is the frontmost, or just fail with a NSLog.
-	 *only attempt if WineskinX11 is still actually running
+	 *only attempt if XQuartz is still actually running
 	 */
     if ([self isPID:thePid named:appNameWithPath] == false) return;
 	
@@ -1353,7 +1197,7 @@ static NSPortManager* portManager;
         UInt32 highLong = [frontMostAppInfo[@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
         ProcessSerialNumber currentAppPSN = {highLong,lowLong};
         
-        //Get Apple Process for WineskinX11 PID
+        //Get Apple Process PID
         ProcessSerialNumber PSN = {kNoProcess, kNoProcess};
         GetProcessForPID((pid_t)[thePid intValue], &PSN);
         
@@ -2252,7 +2096,6 @@ static NSPortManager* portManager;
     NSString *timestampChecker = [NSString stringWithFormat:@"find \"%@\" -type f -newer \"%@\"",logsFolderPath,timeStampFile];
 	BOOL fixGamma = NO;
 	int fixGammaCounter = 0;
-    BOOL usingWineskinX11 = YES;
     if (fullScreenOption)
     {
         [self systemCommand:[NSString stringWithFormat:@"> \"%@\"",timeStampFile]];
@@ -2261,18 +2104,9 @@ static NSPortManager* portManager;
     if (useXQuartz || useMacDriver)
     {
         //use most efficent checking for background loop
-        usingWineskinX11 = NO;
     }
 	while ([self isWineserverRunning])
 	{
-		//if WineskinX11 is no longer running, tell wineserver to close
-		if (usingWineskinX11)
-        {
-			if (![self isPID:wrapperBundlePID named:@"WineskinX11"])
-            {
-				[self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wineserver -k > /dev/null 2>&1",dyldFallBackLibraryPath,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,dyldFallBackLibraryPath]];
-            }
-        }
 		//if running in override fullscreen, need to handle resolution changes
 		if (fullScreenOption)
 		{
@@ -2340,15 +2174,7 @@ static NSPortManager* portManager;
         {
             [self setResolution:currentResolution];
         }
-        if (!useXQuartz)
-        {
-            char *tmp;
-            kill((pid_t)(strtoimax([wineskinX11PID UTF8String], &tmp, 10)), 9);
-            kill((pid_t)(strtoimax([wrapperBundlePID UTF8String], &tmp, 10)), 9);
-            [fm removeItemAtPath:@"/tmp/.X11-unix"];
-            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/.X%@-lock",[theDisplayNumber substringFromIndex:1]]];
-        }
-        else if (fullScreenOption)
+        if (fullScreenOption)
         {
             char *tmp;
             kill((pid_t)(strtoimax([xQuartzBundlePID UTF8String], &tmp, 10)), 9);

@@ -219,7 +219,7 @@
         [self synchronizePlist];
     }
     
-    NSString* appPath = [NSPathUtilities wineskinFrameworkBinForPortAtPath:self.path];
+    NSString* appPath = [NSPathUtilities wineskinLauncherBinForPortAtPath:self.path];
     NSString* wineLog = [NSTask runProgram:appPath withFlags:args];
     
     if (returnLog)

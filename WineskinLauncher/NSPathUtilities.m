@@ -11,11 +11,6 @@
 
 @implementation NSPathUtilities
 
-+(NSString*)wineskinFrameworkBinForPortAtPath:(NSString*)path
-{
-    // Used to run the port normally or in debug mode
-    return [path stringByAppendingString:@"/Contents/Frameworks/bin/Wineskin"];
-}
 +(NSString*)wineskinAppBinaryForPortAtPath:(NSString*)path
 {
     // Used to run the Wineskin App which resides inside Wineskin wrappers

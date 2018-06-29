@@ -35,13 +35,11 @@
     NSString *x11PListFile;                         //location of x11 plist
 	BOOL fullScreenOption;                          //wether running fullscreen or rootless (RandR is rootless)
 	BOOL useGamma;                                  //wether or not gamma correction will be checked for
-	BOOL forceWrapperQuartzWM;                      //YES if forced to use wrapper quartz-wm and not newest version on the system
 	BOOL useXQuartz;                                //YES if using System XQuartz instead of WineskinX11
 	NSMutableString *gammaCorrection;               //added in gamma correction
 	NSMutableString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
 	NSString *currentResolution;                    //the resolution that was running when the wrapper was started
 	NSString *wrapperBundlePID;                     //PID of running wrapper bundle
-	NSMutableString *wineskinX11PID;                //PID of running WineskinX11 exectuable (not used except for shutdown, only use wrapper bundle for checks)
 	NSMutableString *xQuartzX11BinPID;              //PID of running XQuartz X11.bin (only needed for Override->Fullscreen)
 	NSString *xQuartzBundlePID;                     //PID of running XQuartz bundle (only needed for Override->Fullscreen)
 	BOOL debugEnabled;                              //set if debug mode is being run, to make logs
@@ -100,17 +98,11 @@
 //remove GPU info from Registry
 - (void)removeGPUInfo;
 
-//fixes whatever libraries in Frameworks needs to be set before launching X or Wine
-- (void)fixFrameworksLibraries;
-
-//returns the correct line needed for startX11 to get the right quartz-wm started
+//returns the correct line needed for startXQuartz to get the right quartz-wm started
 - (NSString *)setWindowManager;
 
 //checks if Mac or X11 driver is set in Wine
 - (BOOL)checkToUseMacDriver;
-
-//starts up WineskinX11
-- (void)startX11;
 
 //starts up XQuartz
 - (void)startXQuartz;
@@ -147,6 +139,9 @@
 
 //fix standard wine and wineserver names
 - (void)fixWine64ExecutableNames;
+
+//fix staging names
+- (void)fixWineStagingExecutableNames;
 
 //fix staging64 names
 - (void)fixWineStaging64ExecutableNames;

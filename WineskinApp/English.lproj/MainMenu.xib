@@ -617,7 +617,7 @@ Gw
                             </subviews>
                         </view>
                     </box>
-                    <tabView misplaced="YES" type="noTabsBezelBorder" initialItem="vIY-Re-DEn" id="qU5-eT-wgq">
+                    <tabView misplaced="YES" type="noTabsBezelBorder" initialItem="ptO-Vm-aU3" id="qU5-eT-wgq">
                         <rect key="frame" x="16" y="16" width="660" height="170"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1370,28 +1370,6 @@ Gw
                                                 <action selector="focusFollowsMouseCheckBoxButtonPressed:" target="494" id="1575"/>
                                             </connections>
                                         </button>
-                                        <button id="1654">
-                                            <rect key="frame" x="14" y="46" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Force use of wrappers quartz-wm for window decorations and not what is on the system" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1900">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="forceWrapperQuartzWMButtonPressed:" target="494" id="1904"/>
-                                            </connections>
-                                        </button>
-                                        <button id="1910">
-                                            <rect key="frame" x="14" y="24" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Force use of system installed XQuartz instead of using built in WineskinX11" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1911">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="forceSystemXQuartzButtonPressed:" target="494" id="1914"/>
-                                            </connections>
-                                        </button>
                                         <button id="1541">
                                             <rect key="frame" x="14" y="156" width="267" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1486,6 +1464,17 @@ Gw
                                             </buttonCell>
                                             <connections>
                                                 <action selector="disableCPUsButtonPressed:" target="494" id="ICf-GT-y81"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="dfm-mt-PUY">
+                                            <rect key="frame" x="14" y="156" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Disable Winedbg (winedbg will not launch even on appliction crash)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="dED-2q-gGz">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="winedbgDisabledButtonPressed:" target="494" id="0nh-Br-vPj"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -3043,8 +3032,6 @@ Gw
                 <outlet property="extPlusButton" destination="1406" id="2033"/>
                 <outlet property="extPopUpButton" destination="1398" id="1460"/>
                 <outlet property="focusFollowsMouseCheckBoxButton" destination="1572" id="1576"/>
-                <outlet property="forceSystemXQuartzButton" destination="1910" id="1913"/>
-                <outlet property="forceWrapperQuartzWMButton" destination="1654" id="Zjy-eU-QAk"/>
                 <outlet property="gammaSlider" destination="564" id="677"/>
                 <outlet property="helpWindow" destination="1352" id="1360"/>
                 <outlet property="iconBrowseButton" destination="718" id="825"/>
@@ -3092,6 +3079,7 @@ Gw
                 <outlet property="windowsExeTextField" destination="705" id="790"/>
                 <outlet property="wineDebugTextField" destination="1493" id="1495"/>
                 <outlet property="winecfgButton" destination="729" id="853"/>
+                <outlet property="winedbgDisabledButton" destination="dfm-mt-PUY" id="dpw-gz-3Mw"/>
                 <outlet property="winetricksActionPopup" destination="1748" id="1894"/>
                 <outlet property="winetricksButton" destination="731" id="829"/>
                 <outlet property="winetricksCancelButton" destination="1661" id="1702"/>

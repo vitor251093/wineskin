@@ -120,6 +120,17 @@
     
     return FALSE;
 }
++(BOOL)winedbgIsDisabledAtPort:(NSString*)path
+{
+    NSPortManager* port = [NSPortManager managerWithPath:path];
+    NSString* winedbgVariable = [port getRegistryEntry:@"[Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\AeDebug]" fromRegistryFileNamed:SYSTEM_REG];
+    if (winedbgVariable)
+    {
+        winedbgVariable = [NSPortManager getStringValueForKey:@"Debugger" fromRegistryString:winedbgVariable];
+        if (winedbgVariable) return [winedbgVariable isEqualToString:@"false"];
+        }
+    return false;
+}
 +(BOOL)decorateWindowIsEnabledAtPort:(NSString*)path
 {
     NSPortManager* port = [NSPortManager managerWithPath:path];
@@ -314,7 +325,7 @@
 
 +(BOOL)isCloseNicelyEnabledAtPort:(NSPortManager*)port
 {
-    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",
+    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/Scripts/WineskinQuitScript",
                                         port.path];
     if ([[NSFileManager defaultManager] fileExistsAtPath:wineskinQuitScriptPath])
     {
