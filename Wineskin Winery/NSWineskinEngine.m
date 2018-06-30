@@ -127,7 +127,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
 
 +(NSMutableArray*)getListOfAvailableEnginesOffline
 {
-    NSArray* validExtensions = @[@"tar.7z"];
+    NSString* supportedExtension = @".tar.7z";
     NSMutableArray* list = [[NSMutableArray alloc] init];
     
     NSArray* fileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:WINESKIN_LIBRARY_ENGINES_FOLDER];
@@ -143,9 +143,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
                 
                 if (newObject.length > wineRange.length)
                 {
-                    while ([validExtensions containsObject:newObject.pathExtension])
+                    if ([newObject hasSuffix:supportedExtension])
                     {
-                        newObject = newObject.stringByDeletingPathExtension;
+                        newObject = [newObject substringToIndex:newObject.length - supportedExtension.length];
                     }
                     newObject = [newObject substringFromIndex:wineRange.length];
                     
@@ -153,9 +153,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
                     {
                         newObject = file;
                         
-                        while ([validExtensions containsObject:newObject.pathExtension])
+                        if ([newObject hasSuffix:supportedExtension])
                         {
-                            newObject = newObject.stringByDeletingPathExtension;
+                            newObject = [newObject substringToIndex:newObject.length - supportedExtension.length];
                         }
                         
                         if (![list containsObject:newObject]) [list addObject:newObject];
