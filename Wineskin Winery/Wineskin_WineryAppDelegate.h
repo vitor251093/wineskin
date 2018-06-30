@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "NSWineskinEngine.h"
+
 #if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
 @interface Wineskin_WineryAppDelegate : NSObject
 #else
@@ -28,7 +30,7 @@
 	IBOutlet NSTextField *updateAvailableLabel;
 	IBOutlet NSButton *updateButton;
 	IBOutlet NSButton *createWrapperButton;
-	NSMutableArray *installedEnginesList;
+	NSMutableArray<NSWineskinEngine*>* installedEnginesList;
 	
 	//downloading window
 	IBOutlet NSWindow *downloadingWindow;
