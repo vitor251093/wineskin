@@ -49,20 +49,6 @@
         {
             portManager.plist = [NSMutableDictionary mutableDictionaryWithContentsOfFile:plistPath];
         }
-        
-        NSString* x11plistPath = [NSString stringWithFormat:@"%@/Contents/Resources/WSX11Prefs.plist",path];
-        if ([[NSFileManager defaultManager] regularFileExistsAtPath:x11plistPath])
-        {
-            portManager.x11Plist = [NSMutableDictionary mutableDictionaryWithContentsOfFile:x11plistPath];
-        }
-        else
-        {
-            x11plistPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/X11/WSX11Prefs.plist",path];
-            if (![[NSFileManager defaultManager] regularFileExistsAtPath:x11plistPath])
-            {
-                portManager.x11Plist = [NSMutableDictionary mutableDictionaryWithContentsOfFile:x11plistPath];
-            }
-        }
     }
     
     return portManager;
@@ -161,25 +147,6 @@
     return [_plist writeToFile:[NSString stringWithFormat:@"%@%@",self.path,PLIST_PATH_WINESKIN_WRAPPER] atomically:YES];
 }
 
--(id)x11PlistObjectForKey:(NSString*)item
-{
-    return _x11Plist ? _x11Plist[item] : nil;
-}
--(void)setX11PlistObject:(id)object forKey:(NSString*)item
-{
-    if (!_x11Plist) return;
-    
-    if (object)
-        [_x11Plist setObject:object forKey:item];
-    else [_x11Plist removeObjectForKey:item];
-}
--(BOOL)synchronizeX11Plist
-{
-    if (!_x11Plist) return false;
-    
-    return [_x11Plist writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/WSX11Prefs.plist",self.path] atomically:YES];
-}
-
 -(BOOL)mainExeHasInvalidPath
 {
     NSString* mainExePath = [self plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH];
@@ -219,7 +186,7 @@
         [self synchronizePlist];
     }
     
-    NSString* appPath = [NSPathUtilities wineskinFrameworkBinForPortAtPath:self.path];
+    NSString* appPath = [NSPathUtilities wineskinLauncherBinForPortAtPath:self.path];
     NSString* wineLog = [NSTask runProgram:appPath withFlags:args];
     
     if (returnLog)

@@ -84,27 +84,6 @@
     return [self wineskinEngineOfPortAtPath:path];
 }
 
-+(NSString*)getMenubarItemFunctionFromFile:(NSString*)menuFile ofPort:(NSString*)port
-{
-    menuFile = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/%@",port,menuFile];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:menuFile])
-    {
-        NSString* text = [NSString stringWithContentsOfFile:menuFile encoding:NSASCIIStringEncoding error:nil];
-        
-        NSArray* fragments = [text componentsSeparatedByString:@"export WINEPREFIX=\"$CONTENTSFOLD/Resources\"\n"];
-        if ([fragments count]==1) fragments = [text componentsSeparatedByString:@"CONTENTSFOLD=\"$PWD\"\n"];
-        if ([fragments count]>1)
-        {
-            NSString* command = fragments[1];
-            while ([command hasPrefix:@"\n"]) command = [command substringFromIndex:1];
-            while ([command hasSuffix:@"\n"]) command = [command substringToIndex:command.length-1];
-            return command;
-        }
-        return @" ";
-    }
-    return @" ";
-}
-
 +(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine
 {
     if ([NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
@@ -325,7 +304,7 @@
 
 +(BOOL)isCloseNicelyEnabledAtPort:(NSPortManager*)port
 {
-    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",
+    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/Scripts/WineskinQuitScript",
                                         port.path];
     if ([[NSFileManager defaultManager] fileExistsAtPath:wineskinQuitScriptPath])
     {

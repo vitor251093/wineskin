@@ -31,15 +31,12 @@
 	
 	//Screen Options window
 	IBOutlet NSWindow *screenOptionsWindow;
-	
     IBOutlet NSButton *useD3DBoostIfAvailableCheckBoxButton;
     IBOutlet NSButton *autoDetectGPUInfoCheckBoxButton;
     IBOutlet NSSlider *gammaSlider;
-    
     IBOutlet NSButton *useMacDriverRadioButton;
     IBOutlet NSButton *useX11RadioButton;
     IBOutlet NSTabView *macDriverX11TabView;
-    
     IBOutlet NSPopUpButton *colorDepth;
     IBOutlet NSButton *defaultSettingsOverrideRadioButton;
     IBOutlet NSButton *defaultSettingsAutomaticRadioButton;
@@ -51,7 +48,6 @@
     IBOutlet NSButton *virtualDesktopWindowedRadioButton;
 	IBOutlet NSPopUpButton *virtualDesktopResolution;
 	IBOutlet NSButton *windowManagerCheckBoxButton;
-    
     IBOutlet NSButton* retinaModeCheckBoxButton;
     
 	//advanced menu
@@ -96,14 +92,9 @@
 	//advanced menu - Options Tab
 	IBOutlet NSButton *alwaysMakeLogFilesCheckBoxButton;
     IBOutlet NSButton *setMaxFilesCheckBoxButton;
-	IBOutlet NSButton *optSendsAltCheckBoxButton;
-	IBOutlet NSButton *emulateThreeButtonMouseCheckBoxButton;
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
 	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
-	IBOutlet NSButton *focusFollowsMouseCheckBoxButton;
-	IBOutlet NSButton *forceWrapperQuartzWMButton;
-	IBOutlet NSButton *forceSystemXQuartzButton;
     
     //advanced menu - Advanced Tab
     IBOutlet NSButton *WinetricksNoLogsButton;
@@ -269,14 +260,9 @@
 //advanced menu - Options Tab
 - (IBAction)alwaysMakeLogFilesCheckBoxButtonPressed:(id)sender;
 - (IBAction)setMaxFilesCheckBoxButtonPressed:(id)sender;
-- (IBAction)optSendsAltCheckBoxButtonPressed:(id)sender;
-- (IBAction)emulateThreeButtonMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
-- (IBAction)focusFollowsMouseCheckBoxButtonPressed:(id)sender;
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
-- (IBAction)forceWrapperQuartzWMButtonPressed:(id)sender;
-- (IBAction)forceSystemXQuartzButtonPressed:(id)sender;
 
 //advanced menu - Advanced Tab
 - (IBAction)WinetricksNoLogsButtonPressed:(id)sender;

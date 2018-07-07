@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -1348,50 +1348,6 @@ Gw
                                     <rect key="frame" x="10" y="33" width="639" height="225"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="1528">
-                                            <rect key="frame" x="14" y="112" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Option key works as Alt (disabling this will prevent Alt key usage in Windows programs)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1529">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="optSendsAltCheckBoxButtonPressed:" target="494" id="1533"/>
-                                            </connections>
-                                        </button>
-                                        <button id="1572">
-                                            <rect key="frame" x="14" y="90" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Focus follows mouse (windows may be activated by mouse over instead of clicks)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1573">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="focusFollowsMouseCheckBoxButtonPressed:" target="494" id="1575"/>
-                                            </connections>
-                                        </button>
-                                        <button id="1654">
-                                            <rect key="frame" x="14" y="46" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Force use of wrappers quartz-wm for window decorations and not what is on the system" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1900">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="forceWrapperQuartzWMButtonPressed:" target="494" id="1904"/>
-                                            </connections>
-                                        </button>
-                                        <button id="1910">
-                                            <rect key="frame" x="14" y="24" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Force use of system installed XQuartz instead of using built in WineskinX11" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1911">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="forceSystemXQuartzButtonPressed:" target="494" id="1914"/>
-                                            </connections>
-                                        </button>
                                         <button id="1541">
                                             <rect key="frame" x="14" y="156" width="267" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1403,19 +1359,8 @@ Gw
                                                 <action selector="mapUserFoldersCheckBoxButtonPressed:" target="494" id="1545"/>
                                             </connections>
                                         </button>
-                                        <button id="1649">
-                                            <rect key="frame" x="14" y="134" width="610" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Emulate three button Mouse (Alt+Click = Middle click, Cmd+Click = Right click)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1650">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="emulateThreeButtonMouseCheckBoxButtonPressed:" target="494" id="1653"/>
-                                            </connections>
-                                        </button>
-                                        <button id="1546">
-                                            <rect key="frame" x="14" y="68" width="610" height="23"/>
+                                        <button misplaced="YES" id="1546">
+                                            <rect key="frame" x="14" y="136" width="610" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Try to shutdown nicely so Windows program may prompt with warning and save options" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1547">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2125,14 +2070,14 @@ DQ
                                             <rect key="frame" x="0.0" y="-3" width="754" height="273"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="6iJ-NR-9eg">
-                                                <rect key="frame" x="1" y="1" width="752" height="271"/>
+                                                <rect key="frame" x="1" y="1" width="737" height="271"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <textView focusRingType="none" editable="NO" importsGraphics="NO" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="1695">
                                                         <rect key="frame" x="0.0" y="0.0" width="752" height="271"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <size key="minSize" width="752" height="271"/>
+                                                        <size key="minSize" width="737" height="271"/>
                                                         <size key="maxSize" width="761" height="10000000"/>
                                                         <color key="insertionPointColor" red="0.27450981740000002" green="0.23529411850000001" blue="0.23529411850000001" alpha="1" colorSpace="calibratedRGB"/>
                                                     </textView>
@@ -3040,7 +2985,6 @@ Gw
                 <outlet property="defaultSettingsAutomaticRadioButton" destination="d8j-7E-Otb" id="p53-V0-scb"/>
                 <outlet property="defaultSettingsOverrideRadioButton" destination="c2t-uK-gSa" id="gu2-zK-hdk"/>
                 <outlet property="disableCPUsCheckBoxButton" destination="3vK-bJ-KPs" id="3jJ-QM-UVr"/>
-                <outlet property="emulateThreeButtonMouseCheckBoxButton" destination="1649" id="1652"/>
                 <outlet property="enableWinetricksSilentButton" destination="Les-bd-aEF" id="qe5-TL-7QP"/>
                 <outlet property="engineVersionText" destination="1562" id="1570"/>
                 <outlet property="engineWindowOkButton" destination="992" id="1207"/>
@@ -3053,9 +2997,6 @@ Gw
                 <outlet property="extMinusButton" destination="1414" id="1648"/>
                 <outlet property="extPlusButton" destination="1406" id="2033"/>
                 <outlet property="extPopUpButton" destination="1398" id="1460"/>
-                <outlet property="focusFollowsMouseCheckBoxButton" destination="1572" id="1576"/>
-                <outlet property="forceSystemXQuartzButton" destination="1910" id="1913"/>
-                <outlet property="forceWrapperQuartzWMButton" destination="1654" id="Zjy-eU-QAk"/>
                 <outlet property="gammaSlider" destination="564" id="677"/>
                 <outlet property="helpWindow" destination="1352" id="1360"/>
                 <outlet property="iconBrowseButton" destination="718" id="825"/>
@@ -3074,7 +3015,6 @@ Gw
                 <outlet property="modifyMappingsMyPicturesTextField" destination="1606" id="1631"/>
                 <outlet property="modifyMappingsMyVideosTextField" destination="1598" id="1632"/>
                 <outlet property="modifyMappingsWindow" destination="1579" id="1633"/>
-                <outlet property="optSendsAltCheckBoxButton" destination="1528" id="1532"/>
                 <outlet property="rebuildWrapperButton" destination="739" id="826"/>
                 <outlet property="refreshWrapperButton" destination="741" id="827"/>
                 <outlet property="regeditButton" destination="733" id="851"/>
@@ -3400,6 +3340,6 @@ Gw
         <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="NSStopProgressFreestandingTemplate" width="14" height="14"/>
         <image name="Wineskin" width="256" height="256"/>
-        <image name="WineskinBanner" width="53" height="167"/>
+        <image name="WineskinBanner" width="167" height="53"/>
     </resources>
 </document>

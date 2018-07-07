@@ -136,7 +136,7 @@
 
 -(NSString*)runWithArguments:(NSArray*)args
 {
-    NSString* appPath = [NSPathUtilities wineskinFrameworkBinForPortAtPath:self.path];
+    NSString* appPath = [NSPathUtilities wineskinLauncherBinForPortAtPath:self.path];
     return [NSTask runProgram:appPath atRunPath:nil withFlags:args wait:YES];
 }
 -(NSString*)installWinetrick:(NSString*)winetrick
