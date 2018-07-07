@@ -1886,17 +1886,6 @@ static NSPortManager* portManager;
                     [fm createSymbolicLinkAtPath:usersUserFolderPath withDestinationPath:@"Wineskin" error:nil];
                     [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersUserFolderPath]];
                 }
-                
-                // TODO: copy remakedefaults.reg to /tmp edit as needed instead of using a second copy
-                NSString *remakedefaults;
-                if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
-                {
-                    remakedefaults = @"remakedefaults2.reg";
-                }
-                else
-                {
-                    remakedefaults = @"remakedefaults.reg";
-                }
 
                 //load Wineskin default reg entries
                 NSArray* loadRegCommand = @[[NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
@@ -1904,7 +1893,7 @@ static NSPortManager* portManager;
                                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
                                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
                                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                                            [NSString stringWithFormat:@"wine regedit \"%@/../Wineskin.app/Contents/Resources/%@\" > \"/dev/null\" 2>&1", contentsFold,remakedefaults]];
+                                            [NSString stringWithFormat:@"wine regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\" 2>&1", contentsFold]];
                 [self systemCommand:[loadRegCommand componentsJoinedByString:@" "]];
                 usleep(5000000);
             }
