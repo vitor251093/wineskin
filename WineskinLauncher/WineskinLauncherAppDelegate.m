@@ -1887,17 +1887,6 @@ static NSPortManager* portManager;
                     [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersUserFolderPath]];
                 }
                 
-                // TODO: copy remakedefaults.reg to /tmp edit as needed instead of using a second copy
-                NSString *remakedefaults;
-                if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
-                {
-                    remakedefaults = @"remakedefaults2.reg";
-                }
-                else
-                {
-                    remakedefaults = @"remakedefaults.reg";
-                }
-
                 //load Wineskin default reg entries
                 NSArray* loadRegCommand = @[[NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
                                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
