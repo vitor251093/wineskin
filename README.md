@@ -2,12 +2,24 @@
 
 [![Build Status](https://travis-ci.org/Gcenx/wineskin.svg?branch=master)](https://travis-ci.org/Gcenx/wineskin)
 
-Wineskin is a tool used to make ports of Windows software to Mac OS X. 
+**Wineskin** is a user-friendly tool used to make ports of Microsoft Windows software to Apple's macOS/Mac OS X.
 
-## About
-The ports are in the form of normal Mac application bundle wrappers.  It works like a wrapper around the Windows software, and you can share just the wrappers if you choose. Make ports/wrappers to share with others, make ports of your own open source, free, or commercial software, or just make a port for yourself!  Why install and use Windows if you don’t need to?
+## How Does It Work?
 
-Source: http://wineskin.urgesoftware.com/
+As described in the [original Wineskin's website](http://wineskin.urgesoftware.com/):
+
+> The ports are in the form of normal macOS application bundle wrappers.
+> It works like a wrapper around the Windows software, and you can share just the wrappers if you choose.
+> 
+> Make ports/wrappers to share with others, make ports of your own open source, free, or commercial software, or just make a port for yourself!
+> Why install and use Windows if you don’t need to?
+
+Wineskin relies on [WINE](www.winehq.org) ("WINE Is Not an Emulator") under the hood:
+
+> Instead of simulating internal Windows logic like a virtual machine or emulator,
+> Wine translates Windows API calls into POSIX calls on-the-fly,
+> eliminating the performance and memory penalties of other methods
+> and allowing you to cleanly integrate Windows applications into your desktop.
 
 ## Quick Start
 
@@ -39,11 +51,14 @@ $ xcodebuild -workspace Wineskin.xcworkspace -scheme "Wineskin Winery" build
 $ xcodebuild -workspace Wineskin.xcworkspace -scheme WineskinLauncher build
 ```
 
+## Changes from the original project
 
-## Modifications
-As you may have already noticed, this is not the [original Wineskin repository](https://sourceforge.net/p/wineskin/code/ci/master/tree/). That repository counts with some changes to make Wineskin more stable, and to make its source easier to maintain. Considering this, lots of changes were made in WineskinApp and WineskinLauncher, and now both of them use [ObjectiveC_Extension](https://github.com/vitor251093/ObjectiveC_Extension) and some new classes to perform most of their tasks. 
+As you may have already noticed, this is not the [original Wineskin repository](https://sourceforge.net/p/wineskin/code/ci/master/tree/).
+This repository counts with changes to make Wineskin more stable and its source easier to maintain.
+Considering this, lots of changes were made in WineskinApp and WineskinLauncher, and now both of them use [ObjectiveC_Extension](https://github.com/vitor251093/ObjectiveC_Extension) and some new classes to perform most of their tasks. 
 
-## List of modifications in the Wineskin App (WineskinApp)
+### Changes in the Wineskin App (WineskinApp)
+
 - The Resolution property in Info.plist should never get corrupted (*(null)x24sleep0*);
 - The *Auto-detect GPU* feature should never cause malfunction in the port;
 - The *Auto-detect GPU* feature should have a much bigger accuracy and detect the memory size of integrated video cards as well;
@@ -56,15 +71,21 @@ As you may have already noticed, this is not the [original Wineskin repository](
 - The first *Advanced* tab (*Configuration*) should be much more simple in the first section:
     - The *Windows EXE* should use Wineskin syntax, including the drive and the flags, (eg. *"C:/Program Files/temp.exe" --run*) instead of using a macOS reference path (eg. */Program Files/temp.exe*) and the flag apart (eg. *--run*).
 
-## List of modifications for the Master Wrapper (WineskinLauncher)
+### Changes in the Master Wrapper (WineskinLauncher)
+
 - Many fixes when dealing with newest engines.
 
-## List of desired modifications for the Master Wrapper (WineskinLauncher)
+### Roadmap of desired changes in the Master Wrapper (WineskinLauncher)
+
 - A different Master Wrapper for macOS 10.6 and 10.7;
 - WineskinX11 should be dropped.
 
-## License
-Keeping the same as the original material, LGPL 2.1 is the license of that project. You can find more details about that in the LICENSE file.
+## Licensing
+
+The license is kept the same as the original material as LGPL 2.1.
+You can find more details in the [LICENSE](LICENSE) file.
 
 ## Credits
-Special credits for this version go to doh123, for creating the original Wineskin.
+
+Special credits for this version go to doh123, for creating the original Wineskin
+[[website](http://wineskin.urgesoftware.com/)] [[code](https://sourceforge.net/projects/wineskin/)].
