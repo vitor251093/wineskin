@@ -16,6 +16,8 @@
 
 +(BOOL)macDriverIsEnabledAtPort:(NSPortManager*)port;
 
++(BOOL)useXQuartzIsEnabledAtPort:(NSPortManager*)port;
+
 +(void)getValuesFromResolutionString:(NSString*)originalResolutionString
                              inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues;
 

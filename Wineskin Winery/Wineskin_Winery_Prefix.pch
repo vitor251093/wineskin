@@ -4,4 +4,5 @@
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
+    #import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 #endif
