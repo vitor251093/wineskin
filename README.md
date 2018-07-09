@@ -1,6 +1,6 @@
 # Wineskin
 
-[![Build Status](https://travis-ci.org/Gcenx/wineskin.svg?branch=master)](https://travis-ci.org/Gcenx/wineskin)
+[![Build Status](https://travis-ci.org/vitor251093/wineskin.svg?branch=master)](https://travis-ci.org/vitor251093/wineskin)
 
 **Wineskin** is a user-friendly tool used to make ports of Microsoft Windows software to Apple's macOS/Mac OS X.
 
