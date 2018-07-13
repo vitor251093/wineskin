@@ -601,9 +601,31 @@
 }
 - (IBAction)engineWindowViewWineReleaseNotesButtonPressed:(id)sender
 {
+    // TODO: Is there a better way to do this?
 	NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine"];
-	NSString *wineVersion = [tempArray objectAtIndex:1];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.winehq.org/announce/%@",wineVersion]]];
+    NSString *wineVersion = [tempArray objectAtIndex:1];
+    if ([wineVersion hasPrefix:@"64Bit"]) [self Wine64ReleaseNotes];
+    else if ([wineVersion hasPrefix:@"C"]) [self WineCrossoverReleaseNotes];
+    else [self WineReleaseNotes];
+}
+- (void)Wine64ReleaseNotes
+{
+    // Drop's the Wine64 for release notes
+    NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine64Bit"];
+    NSString *wineVersion = [tempArray objectAtIndex:1];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.winehq.org/announce/%@",wineVersion]]];
+}
+- (void)WineReleaseNotes
+{
+    // Original version for Normal Wine versions
+    NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine"];
+    NSString *wineVersion = [tempArray objectAtIndex:1];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.winehq.org/announce/%@",wineVersion]]];
+}
+-(void)WineCrossoverReleaseNotes
+{
+    // loads the Crossover Changelog
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://www.codeweavers.com/products/more-information/changelog"]];
 }
 - (IBAction)engineWindowEngineListChanged:(id)sender
 {
@@ -615,7 +637,7 @@
 	else [engineWindowDontPromptAsNewButton setEnabled:YES];
 	NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine"];
 	NSString *wineVersion = [tempArray objectAtIndex:1];
-	if ([wineVersion hasPrefix:@"C"]) [engineWindowViewWineReleaseNotesButton setEnabled:NO];
+    if ([wineVersion hasPrefix:@"S"]) [engineWindowViewWineReleaseNotesButton setEnabled:NO];
 	else [engineWindowViewWineReleaseNotesButton setEnabled:YES];
 }
 - (IBAction)engineWindowDontPromptAsNewButtonPressed:(id)sender
@@ -956,7 +978,7 @@
 		// 777 the bundle
 		system([[NSString stringWithFormat:@"chmod 777 \"/tmp/%@.app/Contents/Frameworks/wswine.bundle\"",[createWrapperName stringValue]] UTF8String]);
 		//refresh wrapper
-		system([[NSString stringWithFormat:@"\"/tmp/%@.app/Contents/Frameworks/bin/Wineskin\" WSS-wineprefixcreate",[createWrapperName stringValue]] UTF8String]);
+		system([[NSString stringWithFormat:@"\"/tmp/%@.app/Contents/MacOS/WineskinLauncher\" WSS-wineprefixcreate",[createWrapperName stringValue]] UTF8String]);
 		//move wrapper to ~/Applications/Wineskin
 		[fm moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] toPath:[NSString stringWithFormat:@"%@/Applications/Wineskin/%@.app",NSHomeDirectory(),[createWrapperName stringValue]] error:nil];
 		//put ending message

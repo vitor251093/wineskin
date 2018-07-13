@@ -16,6 +16,7 @@
 +(NSString*)engineOfPortAtPath:(NSString*)path;
 
 +(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine;
++(BOOL)winedbgIsDisabledAtPort:(NSString*)path;
 +(BOOL)decorateWindowIsEnabledAtPort:(NSString*)path;
 +(BOOL)direct3DBoostIsEnabledAtPort:(NSString*)path;
 +(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine;

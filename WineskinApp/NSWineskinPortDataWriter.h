@@ -21,6 +21,7 @@
 //Saving Data instructions
 +(BOOL)saveCloseSafely:(NSNumber*)closeSafely atPort:(NSPortManager*)port;
 +(BOOL)saveCopyrightsAtPort:(NSPortManager*)port;
++(BOOL)saveWinedbg:(BOOL)Debugged atPort:(NSPortManager*)port;
 +(BOOL)saveMacDriver:(BOOL)macdriver atPort:(NSPortManager*)port;
 +(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engine atPort:(NSPortManager*)port;
 +(BOOL)saveDecorateWindow:(BOOL)decorate atPort:(NSPortManager*)port;

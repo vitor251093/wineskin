@@ -13,7 +13,6 @@
 
 @interface NSPathUtilities : NSObject
 
-+(NSString*)wineskinFrameworkBinForPortAtPath:(NSString*)path;
 +(NSString*)wineskinAppBinaryForPortAtPath:(NSString*)path;
 +(NSString*)wineskinLauncherBinForPortAtPath:(NSString*)path;
 

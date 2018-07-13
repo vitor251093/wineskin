@@ -48,10 +48,6 @@ typedef enum {
 -(void)setPlistObject:(id)object forKey:(NSString*)item;
 -(BOOL)synchronizePlist;
 
--(id)x11PlistObjectForKey:(NSString*)item;
--(void)setX11PlistObject:(id)object forKey:(NSString*)item;
--(BOOL)synchronizeX11Plist;
-
 -(BOOL)isWinetrickAvailableForInstalling:(NSString*)winetrickName;
 
 -(NSString*)completeWindowsPath:(NSString*)windowsPath;
