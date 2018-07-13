@@ -190,9 +190,25 @@
 	[busyWindow orderOut:self];
 }
 
+-(NSArray<NSWineskinEngine*>*)installedEnginesList {
+    BOOL hideX11Engines = hideXQuartzEnginesCheckBox.state;
+    return hideX11Engines ? installedMacDriverEnginesList : installedEnginesList;
+}
+
+-(BOOL)isXQuartzInstalled {
+    return [[NSFileManager defaultManager] fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"];
+}
+-(IBAction)showOrHideXQuartzEngines:(NSButton*)sender {
+    [installedEngines reloadData];
+    
+    if (!sender.state && !self.isXQuartzInstalled) {
+        [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
+    }
+}
+
 - (IBAction)createNewBlankWrapperButtonPressed:(id)sender
 {
-	NSWineskinEngine* engine = [installedEnginesList objectAtIndex:[installedEngines selectedRow]];
+	NSWineskinEngine* engine = [self.installedEnginesList objectAtIndex:[installedEngines selectedRow]];
 	[createWrapperEngine setStringValue:engine.engineName];
 	[createWrapperWindow makeKeyAndOrderFront:self];
 	[window orderOut:self];
@@ -218,7 +234,7 @@
 	[self setWrapperAvailablePrompt];
 	
     // make sure an engine and master wrapper are both installed first, or have CREATE button disabled!
-    [createWrapperButton setEnabled:([installedEnginesList count] > 0 &&
+    [createWrapperButton setEnabled:([self.installedEnginesList count] > 0 &&
                                     ![[wrapperVersion stringValue] isEqualToString:@"No Wrapper Installed"])];
 	
     //check wrapper version is 2.5+, if not then do not enable button
@@ -289,7 +305,7 @@
 }
 - (IBAction)minusButtonPressed:(id)sender
 {
-	NSWineskinEngine* engine = [installedEnginesList objectAtIndex:[installedEngines selectedRow]];
+	NSWineskinEngine* engine = [self.installedEnginesList objectAtIndex:[installedEngines selectedRow]];
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"Yes"];
 	[alert addButtonWithTitle:@"Cancel"];
@@ -340,6 +356,13 @@
 {
 	[installedEnginesList removeAllObjects];
     [installedEnginesList addObjectsFromArray:[NSWineskinEngine getListOfAvailableEngines]];
+    
+    installedMacDriverEnginesList = [installedEnginesList mutableCopy];
+    [installedMacDriverEnginesList replaceObjectsWithVariation:^id _Nullable(NSWineskinEngine * _Nonnull object, NSUInteger index) {
+        if (object.isCompatibleWithMacDriver) return object;
+        return nil;
+    }];
+    [installedMacDriverEnginesList removeObject:[NSNull null]];
 }
 
 - (NSArray *)getEnginesToIgnore
@@ -960,11 +983,18 @@
 //***************************** OVERRIDES *************************
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return [installedEnginesList count];
+	return [self.installedEnginesList count];
 }
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-	return [installedEnginesList objectAtIndex:rowIndex].engineName;
+    NSString* engineName = [self.installedEnginesList objectAtIndex:rowIndex].engineName;
+    NSMutableAttributedString* text = [[NSMutableAttributedString alloc] initWithString:engineName];
+    
+    if (![self.installedEnginesList objectAtIndex:rowIndex].isCompatibleWithMacDriver) {
+        [text setFontColor:[NSColor redColor]];
+    }
+	
+    return text;
 }
 - (id)init
 {
@@ -972,6 +1002,7 @@
 	if (self)
 	{
 		installedEnginesList = [[NSMutableArray alloc] init];
+        installedMacDriverEnginesList = [[NSMutableArray alloc] init];
 	}
 	return self;
 }

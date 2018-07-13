@@ -10,13 +10,7 @@
 
 #import "NSWineskinEngine.h"
 
-#if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
-@interface Wineskin_WineryAppDelegate : NSObject
-#else
 @interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
-#endif
-
-//@interface Wineskin_WineryAppDelegate : NSObject <NSApplicationDelegate>
 {
 	//main window
     IBOutlet NSWindow *__unsafe_unretained window;
@@ -28,9 +22,11 @@
 	IBOutlet NSTableView *installedEngines;
 	IBOutlet NSTextField *engineAvailableLabel;
 	IBOutlet NSTextField *updateAvailableLabel;
+    IBOutlet NSButton *hideXQuartzEnginesCheckBox;
 	IBOutlet NSButton *updateButton;
 	IBOutlet NSButton *createWrapperButton;
 	NSMutableArray<NSWineskinEngine*>* installedEnginesList;
+    NSMutableArray* installedMacDriverEnginesList;
 	
 	//downloading window
 	IBOutlet NSWindow *downloadingWindow;

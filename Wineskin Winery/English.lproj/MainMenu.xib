@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14269.14" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14269.14"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,7 +12,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <menu title="AMainMenu" systemMenu="main" id="29">
             <items>
                 <menuItem title="Wineskin Winery" id="56">
@@ -187,21 +186,21 @@
         <window title="Wineskin Winery" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="839" y="431" width="287" height="416"/>
+            <rect key="contentRect" x="839" y="431" width="287" height="447"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
-            <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="287" height="416"/>
+            <view key="contentView" misplaced="YES" id="372">
+                <rect key="frame" x="0.0" y="0.0" width="287" height="447"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" id="598">
-                        <rect key="frame" x="17" y="186" width="253" height="182"/>
+                        <rect key="frame" x="17" y="217" width="253" height="182"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="4nc-zI-pUr">
-                            <rect key="frame" x="1" y="1" width="251" height="180"/>
+                            <rect key="frame" x="3" y="3" width="247" height="176"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button focusRingType="none" id="595">
-                                    <rect key="frame" x="25" y="3" width="24" height="24"/>
+                                    <rect key="frame" x="25" y="-1" width="24" height="24"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSRemoveTemplate" imagePosition="only" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="596">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -212,7 +211,7 @@
                                     </connections>
                                 </button>
                                 <button focusRingType="none" id="544">
-                                    <rect key="frame" x="2" y="3" width="24" height="24"/>
+                                    <rect key="frame" x="2" y="-1" width="24" height="24"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSAddTemplate" imagePosition="only" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="545">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -222,8 +221,8 @@
                                         <action selector="plusButtonPressed:" target="494" id="663"/>
                                     </connections>
                                 </button>
-                                <textField hidden="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="679">
-                                    <rect key="frame" x="54" y="6" width="156" height="17"/>
+                                <textField hidden="YES" verticalHuggingPriority="750" id="679">
+                                    <rect key="frame" x="54" y="2" width="156" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="New Engine(s) available!" id="680">
                                         <font key="font" metaFont="system"/>
@@ -232,7 +231,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button id="538">
-                                    <rect key="frame" x="225" y="3" width="24" height="24"/>
+                                    <rect key="frame" x="225" y="-1" width="24" height="24"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSRefreshTemplate" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="539">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -245,8 +244,8 @@
                             </subviews>
                         </view>
                     </box>
-                    <button id="536">
-                        <rect key="frame" x="18" y="16" width="251" height="36"/>
+                    <button misplaced="YES" id="536">
+                        <rect key="frame" x="18" y="17" width="251" height="36"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="bevel" title="Create New Blank Wrapper" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="537">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -259,8 +258,8 @@ DQ
                             <action selector="createNewBlankWrapperButtonPressed:" target="494" id="659"/>
                         </connections>
                     </button>
-                    <button id="540">
-                        <rect key="frame" x="18" y="54" width="251" height="36"/>
+                    <button misplaced="YES" id="540">
+                        <rect key="frame" x="18" y="55" width="251" height="36"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="bevel" title="Download Packages Manually" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="541">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -271,7 +270,7 @@ DQ
                         </connections>
                     </button>
                     <scrollView focusRingType="none" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="586">
-                        <rect key="frame" x="20" y="214" width="247" height="152"/>
+                        <rect key="frame" x="20" y="245" width="247" height="152"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="prc-iG-wPe">
                             <rect key="frame" x="1" y="0.0" width="245" height="151"/>
@@ -304,11 +303,11 @@ DQ
                                 </tableView>
                             </subviews>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="588">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="588">
                             <rect key="frame" x="-100" y="-100" width="205" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="587">
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="587">
                             <rect key="frame" x="230" y="23" width="16" height="128"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -317,15 +316,15 @@ DQ
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
-                    <box autoresizesSubviews="NO" borderType="line" title="Wrapper Version" id="599">
-                        <rect key="frame" x="17" y="92" width="253" height="90"/>
+                    <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Wrapper Version" id="599">
+                        <rect key="frame" x="17" y="93" width="253" height="90"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="BcE-h6-V4b">
-                            <rect key="frame" x="1" y="1" width="251" height="74"/>
+                            <rect key="frame" x="3" y="3" width="247" height="72"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="600">
-                                    <rect key="frame" x="16" y="42" width="217" height="22"/>
+                                <textField verticalHuggingPriority="750" id="600">
+                                    <rect key="frame" x="16" y="40" width="217" height="22"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="601">
                                         <font key="font" metaFont="system"/>
@@ -334,7 +333,7 @@ DQ
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" id="602">
-                                    <rect key="frame" x="10" y="6" width="95" height="32"/>
+                                    <rect key="frame" x="10" y="4" width="95" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Update" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="603">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -344,8 +343,8 @@ DQ
                                         <action selector="updateButtonPressed:" target="494" id="665"/>
                                     </connections>
                                 </button>
-                                <textField hidden="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="683">
-                                    <rect key="frame" x="104" y="16" width="112" height="17"/>
+                                <textField hidden="YES" verticalHuggingPriority="750" id="683">
+                                    <rect key="frame" x="104" y="14" width="112" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Update available!" id="684">
                                         <font key="font" metaFont="system"/>
@@ -356,8 +355,8 @@ DQ
                             </subviews>
                         </view>
                     </box>
-                    <searchField wantsLayer="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" id="908">
-                        <rect key="frame" x="20" y="374" width="247" height="22"/>
+                    <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" id="908">
+                        <rect key="frame" x="20" y="405" width="247" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" borderStyle="bezel" placeholderString="Filter Engine List" bezelStyle="round" id="909">
                             <font key="font" metaFont="system"/>
@@ -368,8 +367,20 @@ DQ
                             <action selector="engineSearchFilter:" target="494" id="910"/>
                         </connections>
                     </searchField>
+                    <button verticalHuggingPriority="750" misplaced="YES" id="iam-gv-IPG">
+                        <rect key="frame" x="18" y="197" width="251" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Hide engines that require XQuartz" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oLS-Em-ZmA">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="showOrHideXQuartzEngines:" target="494" id="GWd-2M-UgJ"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="139.5" y="-117.5"/>
         </window>
         <customObject id="494" customClass="Wineskin_WineryAppDelegate">
             <connections>
@@ -402,6 +413,7 @@ DQ
                 <outlet property="fileName" destination="635" id="656"/>
                 <outlet property="fileNameDestination" destination="690" id="695"/>
                 <outlet property="helpWindow" destination="862" id="870"/>
+                <outlet property="hideXQuartzEnginesCheckBox" destination="iam-gv-IPG" id="tHu-4Y-qlK"/>
                 <outlet property="installedEngines" destination="589" id="667"/>
                 <outlet property="progressBar" destination="614" id="701"/>
                 <outlet property="updateAvailableLabel" destination="683" id="685"/>
@@ -415,7 +427,7 @@ DQ
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
-        <window title="About" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="846">
+        <window title="About" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="846">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="830" y="517" width="260" height="240"/>
@@ -432,14 +444,15 @@ DQ
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="852">
                         <rect key="frame" x="20" y="20" width="220" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <clipView key="contentView" id="TsJ-gf-RoT">
+                        <clipView key="contentView" drawsBackground="NO" id="TsJ-gf-RoT">
                             <rect key="frame" x="1" y="1" width="218" height="94"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
-                                <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" spellingCorrection="YES" smartInsertDelete="YES" id="855">
+                                <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" spellingCorrection="YES" smartInsertDelete="YES" id="855">
                                     <rect key="frame" x="0.0" y="0.0" width="218" height="94"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <size key="minSize" width="218" height="94"/>
                                     <size key="maxSize" width="463" height="10000000"/>
                                     <attributedString key="textStorage">
@@ -451,6 +464,7 @@ by Urge Software LLC
 For more information see
 </string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -496,6 +510,7 @@ For more information see
                                         </fragment>
                                         <fragment content="http://wineskin.urgesoftware.com/">
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
                                                 <url key="NSLink" string="http://wineskin.urgesoftware.com/"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" allowsDefaultTighteningForTruncation="NO">
@@ -544,18 +559,17 @@ For more information see
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
                             </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="854">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="854">
                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="853">
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="853">
                             <rect key="frame" x="-100" y="-100" width="15" height="161"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="875">
+                    <textField verticalHuggingPriority="750" id="875">
                         <rect key="frame" x="17" y="135" width="226" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Wineskin Winery Version:" id="876">
@@ -564,7 +578,7 @@ For more information see
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="877">
+                    <textField verticalHuggingPriority="750" id="877">
                         <rect key="frame" x="17" y="119" width="226" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VERSIONNUMBER" id="878">
@@ -590,7 +604,7 @@ Gw
                 </subviews>
             </view>
         </window>
-        <window title="Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="862">
+        <window title="Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="862">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="830" y="620" width="215" height="157"/>
@@ -607,19 +621,21 @@ Gw
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="864">
                         <rect key="frame" x="-2" y="-2" width="217" height="76"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <clipView key="contentView" id="Udc-Oh-TtX">
+                        <clipView key="contentView" drawsBackground="NO" id="Udc-Oh-TtX">
                             <rect key="frame" x="1" y="1" width="215" height="74"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
-                                <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" spellingCorrection="YES" smartInsertDelete="YES" id="867">
+                                <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" spellingCorrection="YES" smartInsertDelete="YES" id="867">
                                     <rect key="frame" x="0.0" y="0.0" width="215" height="74"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <size key="minSize" width="215" height="74"/>
                                     <size key="maxSize" width="463" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment content="How to get help">
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="15" name="Helvetica-Bold"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -669,6 +685,7 @@ Gw
 Help is available on the main website
 </string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -714,6 +731,7 @@ Help is available on the main website
                                         </fragment>
                                         <fragment content="http://wineskin.urgesoftware.com/">
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
                                                 <url key="NSLink" string="http://wineskin.urgesoftware.com/"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" allowsDefaultTighteningForTruncation="NO">
@@ -762,13 +780,12 @@ Help is available on the main website
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
                             </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="868">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="868">
                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="869">
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="869">
                             <rect key="frame" x="-100" y="-100" width="15" height="161"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -790,7 +807,7 @@ Gw
                 </subviews>
             </view>
         </window>
-        <window title="Busy..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="838">
+        <window title="Busy..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="838">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="791" y="672" width="340" height="84"/>
@@ -799,7 +816,7 @@ Gw
                 <rect key="frame" x="0.0" y="0.0" width="340" height="84"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="840">
+                    <textField verticalHuggingPriority="750" id="840">
                         <rect key="frame" x="17" y="56" width="306" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Wineskin Winery is currently busy, please wait..." id="841">
@@ -815,7 +832,7 @@ Gw
                 </subviews>
             </view>
         </window>
-        <window title="Create a Wrapper" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="807">
+        <window title="Create a Wrapper" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="807">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="818" y="555" width="298" height="197"/>
@@ -828,11 +845,11 @@ Gw
                         <rect key="frame" x="9" y="47" width="280" height="101"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="b1f-et-Ds7">
-                            <rect key="frame" x="1" y="1" width="278" height="99"/>
+                            <rect key="frame" x="3" y="3" width="274" height="95"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         </view>
                     </box>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="809">
+                    <textField verticalHuggingPriority="750" id="809">
                         <rect key="frame" x="17" y="170" width="264" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Creating a wrapper using Engine:" id="810">
@@ -841,7 +858,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="811">
+                    <textField verticalHuggingPriority="750" id="811">
                         <rect key="frame" x="17" y="152" width="264" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="engine name" id="812">
@@ -850,7 +867,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="813">
+                    <textField verticalHuggingPriority="750" id="813">
                         <rect key="frame" x="17" y="120" width="264" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Please choose a name for this wrapper..." id="814">
@@ -859,16 +876,16 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="816">
+                    <textField verticalHuggingPriority="750" id="816">
                         <rect key="frame" x="33" y="90" width="197" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="MyCoolWrapper" drawsBackground="YES" id="817">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="818">
+                    <textField verticalHuggingPriority="750" id="818">
                         <rect key="frame" x="229" y="92" width="38" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=".app" id="819">
@@ -877,7 +894,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="820">
+                    <textField verticalHuggingPriority="750" id="820">
                         <rect key="frame" x="17" y="60" width="264" height="11"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="do NOT use special characters like &amp; # @ ! * % &quot; ' ? etc..." id="821">
@@ -886,7 +903,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="822">
+                    <textField verticalHuggingPriority="750" id="822">
                         <rect key="frame" x="17" y="73" width="264" height="11"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="only use letters, numbers, - and _" id="823">
@@ -926,7 +943,7 @@ Gw
                 </subviews>
             </view>
         </window>
-        <window title="File Downloader" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="608">
+        <window title="File Downloader" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="608">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="839" y="608" width="262" height="126"/>
@@ -969,7 +986,7 @@ DQ
                         <rect key="frame" x="17" y="41" width="226" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <textField hidden="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="616">
+                    <textField hidden="YES" verticalHuggingPriority="750" id="616">
                         <rect key="frame" x="0.0" y="104" width="79" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="error" drawsBackground="YES" id="617">
@@ -978,7 +995,7 @@ DQ
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="618">
+                    <textField verticalHuggingPriority="750" id="618">
                         <rect key="frame" x="42" y="92" width="178" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="File to download and install" id="619">
@@ -987,7 +1004,7 @@ DQ
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField hidden="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="633">
+                    <textField hidden="YES" verticalHuggingPriority="750" id="633">
                         <rect key="frame" x="180" y="104" width="79" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="error" drawsBackground="YES" id="634">
@@ -996,7 +1013,7 @@ DQ
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField hidden="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="690">
+                    <textField hidden="YES" verticalHuggingPriority="750" id="690">
                         <rect key="frame" x="91" y="104" width="79" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="error" drawsBackground="YES" id="691">
@@ -1005,7 +1022,7 @@ DQ
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="635">
+                    <textField verticalHuggingPriority="750" id="635">
                         <rect key="frame" x="20" y="62" width="222" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="error" drawsBackground="YES" id="636">
@@ -1017,7 +1034,7 @@ DQ
                 </subviews>
             </view>
         </window>
-        <window title="Add Engine" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="704">
+        <window title="Add Engine" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="704">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="808" y="466" width="319" height="305"/>
@@ -1030,11 +1047,11 @@ DQ
                         <rect key="frame" x="17" y="71" width="285" height="226"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="ASK-wo-5Bx">
-                            <rect key="frame" x="1" y="1" width="283" height="210"/>
+                            <rect key="frame" x="3" y="3" width="279" height="208"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" id="730">
-                                    <rect key="frame" x="12" y="70" width="259" height="32"/>
+                                    <rect key="frame" x="12" y="68" width="259" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="View Wine Release Notes" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="731">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1045,7 +1062,7 @@ DQ
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" id="732">
-                                    <rect key="frame" x="12" y="38" width="259" height="32"/>
+                                    <rect key="frame" x="12" y="36" width="259" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Don't Prompt This One as New" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="733">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1056,7 +1073,7 @@ DQ
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" id="711">
-                                    <rect key="frame" x="12" y="102" width="259" height="32"/>
+                                    <rect key="frame" x="12" y="100" width="259" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Download and Install" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="716">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1070,11 +1087,11 @@ DQ
                                     </connections>
                                 </button>
                                 <popUpButton verticalHuggingPriority="750" id="724">
-                                    <rect key="frame" x="15" y="146" width="253" height="26"/>
+                                    <rect key="frame" x="15" y="144" width="253" height="26"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="727" id="725">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="menu"/>
                                         <menu key="menu" title="OtherViews" id="726">
                                             <items>
                                                 <menuItem title="Item 1" state="on" id="727"/>
@@ -1088,7 +1105,7 @@ DQ
                                     </connections>
                                 </popUpButton>
                                 <button verticalHuggingPriority="750" id="886">
-                                    <rect key="frame" x="12" y="6" width="259" height="32"/>
+                                    <rect key="frame" x="12" y="4" width="259" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Don't Prompt Any of These as New" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="887">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1098,8 +1115,8 @@ DQ
                                         <action selector="engineWindowDontPromptAllEnginesAsNewButtonPressed:" target="494" id="889"/>
                                     </connections>
                                 </button>
-                                <searchField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" id="911">
-                                    <rect key="frame" x="18" y="178" width="247" height="22"/>
+                                <searchField verticalHuggingPriority="750" textCompletion="NO" id="911">
+                                    <rect key="frame" x="18" y="176" width="247" height="22"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" borderStyle="bezel" placeholderString="Filter Available Engines List" usesSingleLineMode="YES" bezelStyle="round" id="912">
                                         <font key="font" metaFont="system"/>
@@ -1141,7 +1158,7 @@ Gw
                 </subviews>
             </view>
         </window>
-        <window title="Wineskin Engine Builder" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="750">
+        <window title="Wineskin Engine Builder" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="750">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="721" y="339" width="501" height="565"/>
@@ -1150,7 +1167,7 @@ Gw
                 <rect key="frame" x="0.0" y="0.0" width="501" height="565"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="752">
+                    <textField verticalHuggingPriority="750" id="752">
                         <rect key="frame" x="17" y="542" width="467" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="This is very advanced... and may not always work." id="753">
@@ -1159,7 +1176,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="756">
+                    <textField verticalHuggingPriority="750" id="756">
                         <rect key="frame" x="10" y="517" width="467" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="You MUST have Xcode with the selected OS SDK for this to work." id="757">
@@ -1168,7 +1185,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="906">
+                    <textField verticalHuggingPriority="750" id="906">
                         <rect key="frame" x="14" y="492" width="467" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="This will run in Terminal and close Wineskin Winery" id="907">
@@ -1188,7 +1205,7 @@ Gw
                             <action selector="engineBuildChooseButtonPressed:" target="494" id="805"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="762">
+                    <textField verticalHuggingPriority="750" id="762">
                         <rect key="frame" x="18" y="443" width="85" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Wine Source:" id="763">
@@ -1197,12 +1214,12 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="764">
+                    <textField verticalHuggingPriority="750" id="764">
                         <rect key="frame" x="108" y="441" width="290" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="765">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -1210,17 +1227,17 @@ Gw
                         <rect key="frame" x="12" y="481" width="476" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="769">
+                    <textField verticalHuggingPriority="750" id="769">
                         <rect key="frame" x="21" y="195" width="460" height="208"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" selectable="YES" editable="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="770">
                             <font key="font" metaFont="system"/>
                             <string key="title">--disable-option-checking --without-oss --without-cms --disable-tests --without-v4l --without-alsa --without-audioio --without-capi --with-coreaudio --without-esd --without-hal --without-jack --with-xcomposite --with-xcursor --with-xinerama --with-xinput --with-xml --with-xrandr --with-xrender --with-xshape --with-xshm --with-xslt --with-xxf86vm --with-x --without-fontconfig --without-gphoto --without-gstreamer --without-dbus</string>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="773">
+                    <textField verticalHuggingPriority="750" id="773">
                         <rect key="frame" x="18" y="411" width="466" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="All the Wine Configure Arguments" id="774">
@@ -1229,7 +1246,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="775">
+                    <textField verticalHuggingPriority="750" id="775">
                         <rect key="frame" x="18" y="138" width="91" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Engine Name:" id="776">
@@ -1238,12 +1255,12 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="777">
+                    <textField verticalHuggingPriority="750" id="777">
                         <rect key="frame" x="114" y="135" width="260" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="778">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -1268,7 +1285,7 @@ DQ
                         <rect key="frame" x="13" y="115" width="476" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="782">
+                    <textField verticalHuggingPriority="750" id="782">
                         <rect key="frame" x="18" y="89" width="144" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Current Engine Base:" id="783">
@@ -1277,7 +1294,7 @@ DQ
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="784">
+                    <textField verticalHuggingPriority="750" id="784">
                         <rect key="frame" x="156" y="87" width="242" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="EngineBase" drawsBackground="YES" id="785">
@@ -1297,7 +1314,7 @@ DQ
                             <action selector="engineBuildUpdateButtonPressed:" target="494" id="806"/>
                         </connections>
                     </button>
-                    <textField hidden="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="788">
+                    <textField hidden="YES" verticalHuggingPriority="750" id="788">
                         <rect key="frame" x="399" y="74" width="85" height="11"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Update Available!" id="789">
@@ -1324,7 +1341,7 @@ Gw
                             <action selector="engineBuildCancelButtonPressed:" target="494" id="804"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="894">
+                    <textField verticalHuggingPriority="750" id="894">
                         <rect key="frame" x="17" y="170" width="141" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Minimum OS Version:" id="895">
@@ -1338,7 +1355,7 @@ Gw
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="push" title="10.6" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="902" id="900">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="901">
                                 <items>
                                     <menuItem title="10.6" state="on" id="902"/>
