@@ -138,9 +138,22 @@
 	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Applications/Wineskin"] withIntermediateDirectories:YES
                         attributes:nil error:nil];
     
-	if (!([filemgr fileExistsAtPath:[wineskinFolder stringByAppendingString:@"/7za"]]))
-		[filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/7za"]
+    NSString* bin7zipFilePath = [wineskinFolder stringByAppendingString:@"/7za"];
+    BOOL is7zaValid = [filemgr regularFileExistsAtPath:bin7zipFilePath];
+    if (is7zaValid)
+    {
+        NSString* expectedSha256 = @"c0e54f82dcf1ec7fff6cf64874cafd46b56f48f8e09b7a2f3a667e10932525b9";
+        NSString* fileSha256 = [[NSFileManager defaultManager] checksum:NSChecksumTypeSHA256 ofFileAtPath:bin7zipFilePath];
+        
+        is7zaValid = [expectedSha256 isEqualToString:fileSha256];
+        if (!is7zaValid) [filemgr removeItemAtPath:bin7zipFilePath];
+    }
+    
+	if (!is7zaValid)
+    {
+        [filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/7za"]
                          toPath:[wineskinFolder stringByAppendingString:@"/7za"] error:nil];
+    }
 }
 - (void)checkForUpdates
 {
