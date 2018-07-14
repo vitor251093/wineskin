@@ -2021,7 +2021,8 @@ NSFileManager *fm;
     [self replaceFile:@"/Contents/Resources/English.lproj" withVersionFromMasterWrapper:masterWrapperName];
     
     //copy new Scripts folder
-    [self replaceFile:@"/Contents/Resources/Scripts" withVersionFromMasterWrapper:masterWrapperName];
+    NSString* ScriptsPath = [NSString stringWithFormat:@"%@/Contents/Resources/Scripts",self.wrapperPath];
+    if (![fm fileExistsAtPath:ScriptsPath]) [self replaceFile:@"/Contents/Resources/Scripts" withVersionFromMasterWrapper:masterWrapperName];
     
     //edit Info.plist to new wrapper version, replace - with spaces, and dump .app
     [portManager setPlistObject:[[masterWrapperName stringByReplacingOccurrencesOfString:@".app" withString:@""] stringByReplacingOccurrencesOfString:@"-" withString:@" "] forKey:WINESKIN_WRAPPER_PLIST_KEY_WINESKIN_VERSION];
