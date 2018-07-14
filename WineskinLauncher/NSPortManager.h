@@ -25,7 +25,6 @@ typedef enum {
 
 @property (nonatomic) NSPortManagerType type;
 @property (nonatomic, strong) NSMutableDictionary* plist;
-@property (nonatomic, strong) NSMutableDictionary* x11Plist;
 
 +(NSPortManager*)managerForWrapperAtPath:(NSString*)path;
 +(NSPortManager*)managerForCustomExeAtPath:(NSString*)path;

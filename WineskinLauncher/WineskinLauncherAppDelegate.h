@@ -32,7 +32,6 @@
     NSString *wineLogFile;                          //location of wine log file
     NSString *wineTempLogFile;                      //location of wine temp log file
     NSString *x11LogFile;                           //location of x11 log file
-    NSString *x11PListFile;                         //location of x11 plist
 	BOOL fullScreenOption;                          //wether running fullscreen or rootless (RandR is rootless)
 	BOOL useGamma;                                  //wether or not gamma correction will be checked for
 	BOOL useXQuartz;                                //YES if using XQuartz over Mac Driver

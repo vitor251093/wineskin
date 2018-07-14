@@ -230,8 +230,6 @@ static NSPortManager* portManager;
         }
         
         [gammaCorrection setString:[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION]];
-        x11PListFile = [NSString stringWithFormat:@"%@/Library/Preferences/%@.plist",NSHomeDirectory(),
-                        [self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER]];
         NSString *uLimitNumber;
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_MAX_OF_10240_FILES] intValue])
         {
@@ -2251,8 +2249,6 @@ static NSPortManager* portManager;
 	[self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@/drive_c\"",winePrefix]];
     
     //get rid of the preference file
-    [fm removeItemAtPath:x11PListFile];
-    [fm removeItemAtPath:[NSString stringWithFormat:@"%@.lockfile",x11PListFile]];
     [fm removeItemAtPath:lockfile];
     [fm removeItemAtPath:tmpFolder];
     [fm removeItemAtPath:tmpwineFolder];

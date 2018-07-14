@@ -16,7 +16,6 @@
 @property (nonatomic) BOOL isCustomEXE;
 @property (nonatomic, strong) NSString* path;
 @property (nonatomic, strong) NSMutableDictionary* plist;
-@property (nonatomic, strong) NSMutableDictionary* x11Plist;
 
 +(NSPortManager*)managerWithPath:(NSString*)path;
 +(NSPortManager*)managerWithCustomExePath:(NSString*)path;
@@ -31,10 +30,6 @@
 -(id)plistObjectForKey:(NSString*)item;
 -(void)setPlistObject:(id)object forKey:(NSString*)item;
 -(void)synchronizePlist;
-
--(id)x11PlistObjectForKey:(NSString*)item;
--(void)setX11PlistObject:(id)object forKey:(NSString*)item;
--(void)synchronizeX11Plist;
 
 -(void)addToPortCreationLog:(NSString*)newLogs;
 
