@@ -517,6 +517,7 @@ NSFileManager *fm;
     [useMacDriverRadioButton setState: macDriver];
     [useX11RadioButton       setState:!macDriver];
     [macDriverX11TabView selectTabViewItemAtIndex:macDriver ? 0 : 1];
+    [useMacDriverRadioButton setEnabled:[NSWineskinEngine isMacDriverCompatibleWithEngine:engine]];
     
     [useD3DBoostIfAvailableCheckBoxButton setEnabled:[NSWineskinEngine isCsmtCompatibleWithEngine:engine]];
     [useD3DBoostIfAvailableCheckBoxButton setState:[NSPortDataLoader direct3DBoostIsEnabledAtPort:self.wrapperPath]];

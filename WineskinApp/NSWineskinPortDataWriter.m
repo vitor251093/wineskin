@@ -127,7 +127,7 @@
 +(BOOL)saveMacDriver:(BOOL)macdriver atPort:(NSPortManager*)port
 {
     NSString* driversRegistry = @"[Software\\\\Wine\\\\Drivers]";
-    NSString* graphicsValue = (macdriver ? @"\"mac\"" : @"\"x11\"");
+    NSString* graphicsValue = (macdriver ? @"\"mac,x11\"" : @"\"x11,mac\"");
     return [port setValues:@{@"Graphics":graphicsValue} forEntry:driversRegistry atRegistryFileNamed:USER_REG];
 }
 +(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engine atPort:(NSPortManager*)port

@@ -27,7 +27,7 @@ REGEDIT4
 [HKEY_CURRENT_USER\Software\Wine\Direct3D]
 
 [HKEY_CURRENT_USER\Software\Wine\Drivers]
-"Graphics"="x11"
+"Graphics"="mac,x11"
 "Audio"="coreaudio"
 
 [HKEY_CURRENT_USER\Software\Wine\Mac Driver]

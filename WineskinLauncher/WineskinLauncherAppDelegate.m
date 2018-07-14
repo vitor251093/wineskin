@@ -1144,7 +1144,6 @@ static NSPortManager* portManager;
     
 	if (!fullScreenOption)
 	{
-		[self systemCommand:@"open /Applications/Utilities/XQuartz.app"];
         [theDisplayNumber setString:[self systemCommand:@"echo $DISPLAY"]];
         return;
 	}

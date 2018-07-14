@@ -93,7 +93,7 @@
         if (driversVariable)
         {
             driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
-            return driversVariable && [driversVariable isEqualToString:@"mac"];
+            return driversVariable && [driversVariable isEqualToString:@"mac,x11"];
         }
     }
     
