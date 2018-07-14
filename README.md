@@ -65,6 +65,7 @@ Considering this, lots of changes were made in WineskinApp and WineskinLauncher,
 - Enabling *Mac Driver* and *Decorate window* checkboxes should not corrupt the wrapper registry;
 - The *Retina Mode* can be enabled from the Screen Options window;
 - *Kill Wineskin Processes* should kill ALL Wineskin processes.
+- Icons can be extracted directly from exe files;
 - Images (not .icns files) should also be accepted has wrapper icons;
 - LNK files should be able to be selected as a port's run path, so Wineskin can extract the path and flags from it;
 - Winetricks installation can be silent (with no windows) so it's much faster;
@@ -74,11 +75,11 @@ Considering this, lots of changes were made in WineskinApp and WineskinLauncher,
 ### Changes in the Master Wrapper (WineskinLauncher)
 
 - Many fixes when dealing with newest engines.
+- WineskinX11 dropped.
 
 ### Roadmap of desired changes in the Master Wrapper (WineskinLauncher)
 
 - A different Master Wrapper for macOS 10.6 and 10.7;
-- WineskinX11 should be dropped.
 
 ## Licensing
 
