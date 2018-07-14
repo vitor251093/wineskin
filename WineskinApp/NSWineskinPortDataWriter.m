@@ -86,7 +86,7 @@
 //Saving Data instructions
 +(BOOL)saveCloseSafely:(NSNumber*)closeSafely atPort:(NSPortManager*)port
 {
-    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/WineskinQuitScript",
+    NSString* wineskinQuitScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/Scripts/WineskinQuitScript",
                                         port.path];
     NSString* text = [NSString stringWithContentsOfFile:wineskinQuitScriptPath encoding:NSASCIIStringEncoding];
     NSArray* fragments = [text componentsSeparatedByString:@"wineskinAppChoice="];
