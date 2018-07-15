@@ -12,6 +12,7 @@
 
 #import "NSPathUtilities.h"
 #import "NSPortDataLoader.h"
+#import "WineskinLauncher_Prefix.pch"
 
 @implementation WineskinLauncherAppDelegate
 
@@ -2027,11 +2028,11 @@ static NSPortManager* portManager;
                                                    [winetricksCommands[0] hasPrefix:@"list-"])))
             {
                 //just getting a list of packages... X should NOT be running.
-                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@/Logs/WinetricksTemp.log\"",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],winePrefix]];
+                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@/Logs/WinetricksTemp.log\"",wineDebugLine,WINESKIN_LIBRARY_FOLDER,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],winePrefix]];
             }
             else
             {
-                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/../Wineskin.app/Contents/Resources\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks %@ --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",wineDebugLine,contentsFold,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,silentMode,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
+                [self systemCommand:[NSString stringWithFormat:@"export WINEDEBUG=%@;cd \"%@/\";export PATH=\"$PWD:%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks %@ --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",wineDebugLine,WINESKIN_LIBRARY_FOLDER,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,silentMode,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
             }
             usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
             return;
@@ -2201,7 +2202,9 @@ static NSPortManager* portManager;
 	{
 		[fm removeItemAtPath:wineLogFile];
 		[fm removeItemAtPath:x11LogFile];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/Winetricks.log",winePrefix]];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Winetricks.log",winePrefix]];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/Winetricks.log",winePrefix]];
+		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Logs/WinetricksTemp.log",winePrefix]];
 	}
     else if (fullScreenOption)
     {

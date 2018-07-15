@@ -69,3 +69,6 @@
 // Plist files paths
 #define PLIST_PATH_WINESKIN_CUSTOM_EXE @"/Contents/Info.plist.cexe"
 #define PLIST_PATH_WINESKIN_WRAPPER    @"/Contents/Info.plist"
+
+#define WINESKIN_LIBRARY_FOLDER             [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin",NSHomeDirectory()]
+

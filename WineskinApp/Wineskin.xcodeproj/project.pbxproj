@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		162AD88C1434CE2800FC0426 /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 162AD88B1434CE2800FC0426 /* Defaults.plist */; };
-		16987CF3142873C2003AFFFF /* winetricksHelpList.plist in Resources */ = {isa = PBXBuildFile; fileRef = 16987CF2142873C2003AFFFF /* winetricksHelpList.plist */; };
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* WineskinAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */; };
 		4EA283A81EFFFA4100E61883 /* NSDropIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EA283A71EFFFA4100E61883 /* NSDropIconView.m */; };
@@ -40,8 +39,6 @@
 		A82645D5153ADC3D00FA0306 /* WineskinBanner2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A82645D4153ADC3D00FA0306 /* WineskinBanner2.jpg */; };
 		A82E5B8C133E73B8007AA611 /* CustomEXE.app in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2E12820240001EBA25 /* CustomEXE.app */; };
 		A82E5B90133E73EF007AA611 /* remakedefaults.reg in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2C12820230001EBA25 /* remakedefaults.reg */; };
-		A82E5B92133E73FB007AA611 /* cabextract in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2812820226001EBA25 /* cabextract */; };
-		A82E5B93133E7400007AA611 /* winetricks in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2912820226001EBA25 /* winetricks */; };
 		A82E5B94133E7407007AA611 /* WSGamma in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2512820212001EBA25 /* WSGamma */; };
 		A82E5B95133E740C007AA611 /* Wineskin.icns in Resources */ = {isa = PBXBuildFile; fileRef = A88CCE4E127B9CED007FBC32 /* Wineskin.icns */; };
 		A82E5B96133E7411007AA611 /* WineskinBanner.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */; };
@@ -53,7 +50,6 @@
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		162AD88B1434CE2800FC0426 /* Defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Defaults.plist; sourceTree = "<group>"; };
-		16987CF2142873C2003AFFFF /* winetricksHelpList.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = winetricksHelpList.plist; sourceTree = "<group>"; };
 		1DDD58150DA1D0A300B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		256AC3D80F4B6AC300CF3369 /* WineskinAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WineskinAppDelegate.h; sourceTree = "<group>"; };
 		256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WineskinAppDelegate.m; sourceTree = "<group>"; };
@@ -111,8 +107,6 @@
 		A82645D4153ADC3D00FA0306 /* WineskinBanner2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner2.jpg; sourceTree = "<group>"; };
 		A84DB68A153230490071D4F8 /* Command Line Wine Test */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "Command Line Wine Test"; sourceTree = "<group>"; };
 		A868FC2512820212001EBA25 /* WSGamma */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = WSGamma; sourceTree = "<group>"; };
-		A868FC2812820226001EBA25 /* cabextract */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cabextract; sourceTree = "<group>"; };
-		A868FC2912820226001EBA25 /* winetricks */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winetricks; sourceTree = "<group>"; };
 		A868FC2C12820230001EBA25 /* remakedefaults.reg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = remakedefaults.reg; sourceTree = "<group>"; };
 		A868FC2E12820240001EBA25 /* CustomEXE.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = CustomEXE.app; sourceTree = "<group>"; };
 		A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner.jpg; sourceTree = "<group>"; };
@@ -197,7 +191,6 @@
 				A84DB68A153230490071D4F8 /* Command Line Wine Test */,
 				A868FC2E12820240001EBA25 /* CustomEXE.app */,
 				A868FC2C12820230001EBA25 /* remakedefaults.reg */,
-				A868FC2712820226001EBA25 /* Winetricks */,
 				A868FC2512820212001EBA25 /* WSGamma */,
 				A88CCE4E127B9CED007FBC32 /* Wineskin.icns */,
 				A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */,
@@ -309,16 +302,6 @@
 			name = Controller;
 			sourceTree = "<group>";
 		};
-		A868FC2712820226001EBA25 /* Winetricks */ = {
-			isa = PBXGroup;
-			children = (
-				16987CF2142873C2003AFFFF /* winetricksHelpList.plist */,
-				A868FC2812820226001EBA25 /* cabextract */,
-				A868FC2912820226001EBA25 /* winetricks */,
-			);
-			path = Winetricks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -382,11 +365,8 @@
 				A82E5B96133E7411007AA611 /* WineskinBanner.jpg in Resources */,
 				A82E5B95133E740C007AA611 /* Wineskin.icns in Resources */,
 				A82E5B94133E7407007AA611 /* WSGamma in Resources */,
-				A82E5B92133E73FB007AA611 /* cabextract in Resources */,
-				A82E5B93133E7400007AA611 /* winetricks in Resources */,
 				A82E5B90133E73EF007AA611 /* remakedefaults.reg in Resources */,
 				A82E5B8C133E73B8007AA611 /* CustomEXE.app in Resources */,
-				16987CF3142873C2003AFFFF /* winetricksHelpList.plist in Resources */,
 				162AD88C1434CE2800FC0426 /* Defaults.plist in Resources */,
 				A84DB68B153230490071D4F8 /* Command Line Wine Test in Resources */,
 				A82645D5153ADC3D00FA0306 /* WineskinBanner2.jpg in Resources */,

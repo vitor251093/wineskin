@@ -137,6 +137,8 @@
                         attributes:nil error:nil];
 	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Applications/Wineskin"] withIntermediateDirectories:YES
                         attributes:nil error:nil];
+    [filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/cabextract"]
+                     toPath:[wineskinFolder stringByAppendingString:@"/cabextract"] error:nil];
     
     NSString* bin7zipFilePath = [wineskinFolder stringByAppendingString:@"/7za"];
     BOOL is7zaValid = [filemgr regularFileExistsAtPath:bin7zipFilePath];

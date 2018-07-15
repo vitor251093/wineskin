@@ -325,7 +325,7 @@
 }
 -(NSArray*)getAvailableWinetricksList
 {
-    NSString* winetricksPath = [NSString stringWithFormat:@"%@/Wineskin.app/Contents/Resources/winetricks",self.path];
+    NSString* winetricksPath = [NSString stringWithFormat:@"%@/winetricks",WINESKIN_LIBRARY_FOLDER];
     NSString* winetricksRaw = [[NSString alloc] initWithContentsOfFile:winetricksPath encoding:NSASCIIStringEncoding error:nil];
     
     NSMutableArray* newList = [[NSMutableArray alloc] init];
