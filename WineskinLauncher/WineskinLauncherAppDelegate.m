@@ -158,7 +158,6 @@ static NSPortManager* portManager;
         wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
         x11LogFile      = [NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
         useMacDriver    = [self checkToUseMacDriver];
-        useXQuartz      = [self checkToUseXQuartz];
         
         //exit if the lock file exists, another user is running this wrapper currently
         BOOL lockFileAlreadyExisted = NO;
@@ -453,21 +452,10 @@ static NSPortManager* portManager;
                 }
                 [theDisplayNumber setString:[NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]]];
                 //**********start the X server
-                if (useXQuartz)
-                {
-                    NSLog(@"Wineskin: Starting XQuartz");
-                    [self startXQuartz];
+                NSLog(@"Wineskin: Starting XQuartz");
+                useXQuartz = YES;
+                [self startXQuartz];
                 }
-                else
-                {
-                    // Needed for wrapper creation when using Engines that don't support Mac Driver
-                    if ([fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
-                    {
-                    [self startXQuartz];
-                    }
-                    NSLog(@"Wineskin: XQuartz Started, PID = %@", xQuartzX11BinPID);
-                }
-            }
         }
         //**********set user folders
         [self setUserFolders:([[self.portManager plistObjectForKey:@"Symlinks In User Folder"] intValue] == 1)];
@@ -1118,11 +1106,6 @@ static NSPortManager* portManager;
 - (BOOL)checkToUseMacDriver
 {
     return [NSPortDataLoader macDriverIsEnabledAtPort:self.portManager];
-}
-
-- (BOOL)checkToUseXQuartz
-{
-    return [NSPortDataLoader useXQuartzIsEnabledAtPort:self.portManager];
 }
 
 - (void)startXQuartz
@@ -2258,15 +2241,14 @@ static NSPortManager* portManager;
     [fm removeItemAtPath:tmpFolder];
     [fm removeItemAtPath:tmpwineFolder];
     
-    //kill processes
-    [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
-    NSArray* command = @[
-                         [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
-                         [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
-                         [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                         @"wineserver -k"];
-    [self systemCommand:[command componentsJoinedByString:@" "]];
+    //kill wine processes
+    [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wineserver -k > /dev/null 2>&1",dyldFallBackLibraryPath,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,frameworksFold,dyldFallBackLibraryPath]];
     usleep(3000000);
+    
+    //kill XQuartz processes
+    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"XQuartz\" > /dev/null 2>&1"]];
+    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"Xquartz\" > /dev/null 2>&1"]];
+    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"xinit\" > /dev/null 2>&1"]];
 
     //get rid of OS X saved state file
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/%@%@.wineskin.prefs.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]]];
