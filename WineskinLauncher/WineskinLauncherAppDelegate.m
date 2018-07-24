@@ -158,6 +158,7 @@ static NSPortManager* portManager;
         wineTempLogFile = [NSString stringWithFormat:@"%@/LastRunWineTemp.log",tmpFolder];
         x11LogFile      = [NSString stringWithFormat:@"%@/Logs/LastRunX11.log",winePrefix];
         useMacDriver    = [self checkToUseMacDriver];
+        useXQuartz      = [self checkToUseXQuartz];
         
         //exit if the lock file exists, another user is running this wrapper currently
         BOOL lockFileAlreadyExisted = NO;
@@ -452,10 +453,22 @@ static NSPortManager* portManager;
                 }
                 [theDisplayNumber setString:[NSString stringWithFormat:@":%@",[[NSNumber numberWithLong:randomint] stringValue]]];
                 //**********start the X server
-                NSLog(@"Wineskin: Starting XQuartz");
-                useXQuartz = YES;
-                [self startXQuartz];
+                if (useXQuartz)
+                {
+                    NSLog(@"Wineskin: Starting XQuartz");
+                    [self startXQuartz];
                 }
+                else
+                {
+                    // Needed for wrapper creation when using Engines that don't support Mac Driver
+                    if ([fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+                    {
+                        useXQuartz = YES;
+                        [self startXQuartz];
+                    }
+                    NSLog(@"Wineskin: XQuartz Started, PID = %@", xQuartzX11BinPID);
+                }
+            }
         }
         //**********set user folders
         [self setUserFolders:([[self.portManager plistObjectForKey:@"Symlinks In User Folder"] intValue] == 1)];
@@ -1106,6 +1119,11 @@ static NSPortManager* portManager;
 - (BOOL)checkToUseMacDriver
 {
     return [NSPortDataLoader macDriverIsEnabledAtPort:self.portManager];
+}
+
+- (BOOL)checkToUseXQuartz
+{
+    return [NSPortDataLoader useXQuartzIsEnabledAtPort:self.portManager];
 }
 
 - (void)startXQuartz

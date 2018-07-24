@@ -31,7 +31,29 @@
     if (driversVariable)
     {
         driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
+        return driversVariable && [driversVariable isEqualToString:@"mac,x11"];
+    }
+    else if (driversVariable)
+    {
+        driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
         return driversVariable && [driversVariable isEqualToString:@"mac"];
+    }
+    
+    return FALSE;
+}
+
++(BOOL)useXQuartzIsEnabledAtPort:(NSPortManager*)port
+{
+    NSString* driversVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Drivers]" fromRegistryFileNamed:USER_REG];
+    if (driversVariable)
+    {
+        driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
+        return driversVariable && [driversVariable isEqualToString:@"x11,mac"];
+    }
+    else if (driversVariable)
+    {
+        driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
+        return driversVariable && [driversVariable isEqualToString:@"x11"];
     }
     
     return FALSE;
