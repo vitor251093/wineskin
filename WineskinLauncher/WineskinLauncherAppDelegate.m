@@ -31,6 +31,26 @@ static NSPortManager* portManager;
     }
 }
 
+- (void)application:(NSApplication *)application openURLs:(NSArray<NSURL *> *)urls;
+{
+    for (NSURL *url in urls) {
+        NSString *urlString = [url absoluteString];
+
+        NSRange replaceRange = [urlString rangeOfString:@"file://"];
+        if (replaceRange.location == 0)
+        {
+            urlString = [urlString stringByReplacingCharactersInRange:replaceRange withString:@""];
+        }
+
+        [globalFilesToOpen addObject:urlString];
+    }
+    if (wrapperRunning)
+    {
+        [NSThread detachNewThreadSelector:@selector(secondaryRun:) toTarget:self withObject:[globalFilesToOpen copy]];
+        [globalFilesToOpen removeAllObjects];
+    }
+}
+
 - (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
 {
     [globalFilesToOpen addObjectsFromArray:filenames];
@@ -298,7 +318,8 @@ static NSPortManager* portManager;
         }
         if ([filesToOpen count] > 0)
         {
-            if ([wssCommand hasPrefix:@"/"]) //if wssCommand starts with a / its file(s) passed in to open
+            if ([wssCommand hasPrefix:@"/"] || //if wssCommand starts with a / its file(s) passed in to open
+                [wssCommand rangeOfString:@"[A-Za-z][A-Za-z0-9\\.\\+-]+:" options:NSRegularExpressionSearch].location == 0) //url schema
             {
                 for (NSString *item in filesToOpen)
                 {
@@ -631,7 +652,8 @@ static NSPortManager* portManager;
         }
         if ([filesToOpen count] > 0)
         {
-            if ([wssCommand hasPrefix:@"/"]) //if wssCommand starts with a / its file(s) passed in to open
+            if ([wssCommand hasPrefix:@"/"] ||  //if wssCommand starts with a / its file(s) passed in to open
+                [wssCommand rangeOfString:@"[A-Za-z][A-Za-z0-9\\.\\+-]+:" options:NSRegularExpressionSearch].location == 0) //url schema
             {
                 for (NSString *item in filesToOpen)
                 {
@@ -2061,7 +2083,15 @@ static NSPortManager* portManager;
                 {
                     break;
                 }
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &", dyldFallBackLibraryPath,frameworksFold, frameworksFold, [wineStartInfo getULimitNumber], wineDebugLine, theDisplayNumber, winePrefix, [wineStartInfo getCliCustomCommands], frameworksFold, dyldFallBackLibraryPath, item, wineLogFileLocal]];
+
+                if ([item hasPrefix:@"/"])
+                {
+                    [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start /unix \"%@\" > \"%@\" 2>&1 &", dyldFallBackLibraryPath,frameworksFold, frameworksFold, [wineStartInfo getULimitNumber], wineDebugLine, theDisplayNumber, winePrefix, [wineStartInfo getCliCustomCommands], frameworksFold, dyldFallBackLibraryPath, item, wineLogFileLocal]];
+                }
+                else
+                {
+                    [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export PATH=\"%@/wswine.bundle/bin:%@/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" wine start \"%@\" > \"%@\" 2>&1 &", dyldFallBackLibraryPath,frameworksFold, frameworksFold, [wineStartInfo getULimitNumber], wineDebugLine, theDisplayNumber, winePrefix, [wineStartInfo getCliCustomCommands], frameworksFold, dyldFallBackLibraryPath, item, wineLogFileLocal]];
+                }
             }
         }
         else
