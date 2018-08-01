@@ -482,7 +482,7 @@ static NSPortManager* portManager;
                 else
                 {
                     // Needed for wrapper creation when using Engines that don't support Mac Driver
-                    if ([fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+                    if (self.isXQuartzInstalled)
                     {
                         useXQuartz = YES;
                         [self startXQuartz];
@@ -1143,6 +1143,11 @@ static NSPortManager* portManager;
     return [NSPortDataLoader macDriverIsEnabledAtPort:self.portManager];
 }
 
+-(BOOL)isXQuartzInstalled
+{
+    return [[NSFileManager defaultManager] fileExistsAtPath:@"/opt/X11/bin/Xquartz"];
+}
+
 - (BOOL)checkToUseXQuartz
 {
     return [NSPortDataLoader useXQuartzIsEnabledAtPort:self.portManager];
@@ -1150,7 +1155,7 @@ static NSPortManager* portManager;
 
 - (void)startXQuartz
 {
-	if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+	if (!self.isXQuartzInstalled)
 	{
         NSLog(@"Error XQuartz not found, please install XQuartz");
 		//useXQuartz = NO;
@@ -1181,7 +1186,7 @@ static NSPortManager* portManager;
     NSArray *firstPIDlist = [self makePIDArray:@"X11.bin"];
     
     //start XQuartz
-    xQuartzBundlePID = [self systemCommand:[NSString stringWithFormat:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin %@ > /dev/null & echo $!",theDisplayNumber]];
+    xQuartzBundlePID = [self systemCommand:[NSString stringWithFormat:@"/opt/X11/bin/Xquartz %@ > /dev/null & echo $!",theDisplayNumber]];
     
     // get PID of X11.bin just launched
     [xQuartzX11BinPID setString:[self getNewPid:@"X11.bin" from:firstPIDlist confirm:NO]];

@@ -103,6 +103,9 @@
 //checks if Mac is set in Wine
 - (BOOL)checkToUseMacDriver;
 
+//check if XQuartz is installed
+-(BOOL)isXQuartzInstalled;
+
 //starts up XQuartz
 - (void)startXQuartz;
 

@@ -500,9 +500,10 @@ NSFileManager *fm;
                              forKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION];
     }
 }
+
 - (void)loadScreenOptionsData
 {
-    if (![fm fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"])
+    if (!self.isXQuartzInstalled)
     {
         [useX11RadioButton setEnabled:NO];
         [useX11RadioButton setState:false];
@@ -2327,7 +2328,10 @@ NSFileManager *fm;
         [modifyMappingsDownloadsTextField setStringValue:newPath];
     }
 }
-
+-(BOOL)isXQuartzInstalled
+{
+    return [[NSFileManager defaultManager] fileExistsAtPath:@"/opt/X11/bin/Xquartz"];
+}
 - (NSString *)systemCommand:(NSString *)command
 {
 	FILE *fp;

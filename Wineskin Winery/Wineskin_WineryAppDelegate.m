@@ -211,7 +211,7 @@
 }
 
 -(BOOL)isXQuartzInstalled {
-    return [[NSFileManager defaultManager] fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"];
+    return [[NSFileManager defaultManager] fileExistsAtPath:@"/opt/X11/bin/Xquartz"];
 }
 -(IBAction)showOrHideXQuartzEngines:(NSButton*)sender {
     [installedEngines reloadData];
