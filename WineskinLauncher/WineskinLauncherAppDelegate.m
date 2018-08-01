@@ -1864,7 +1864,6 @@ static NSPortManager* portManager;
             //calling wineboot is a simple builtin refresh that needs to NOT prompt for gecko
             NSString *mshtmlLine;
             if ([wssCommand isEqualToString:@"WSS-wineboot"] || [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO] intValue] == 1 )
-            if ([wssCommand isEqualToString:@"WSS-wineboot"])
             {
                 mshtmlLine = @"export WINEDLLOVERRIDES=\"mscoree,mshtml=\";";
             }
