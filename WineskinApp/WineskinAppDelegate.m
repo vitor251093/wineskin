@@ -121,6 +121,7 @@ NSFileManager *fm;
     [WinetricksNoLogsButton setEnabled:state];
     [disableCPUsCheckBoxButton setEnabled:state];
     [winedbgDisabledButton setEnabled:state];
+    [monogeckoCheckBoxButton setEnabled:state];
     
     // TODO: The code below seems to be causing a crash sometimes. Remove?
     if (state) {
@@ -852,6 +853,7 @@ NSFileManager *fm;
     [modifyMappingsButton         setEnabled:[mapUserFoldersCheckBoxButton state]];
     [enableWinetricksSilentButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue]];
     [WinetricksNoLogsButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue]];
+    [monogeckoCheckBoxButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO] intValue]];
     
     [disableCPUsCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue]];
 	[alwaysMakeLogFilesCheckBoxButton setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE] intValue]];
@@ -1116,6 +1118,11 @@ NSFileManager *fm;
 - (IBAction)winedbgDisabledButtonPressed:(id)sender
 {
     [NSWineskinPortDataWriter saveWinedbg:[winedbgDisabledButton state] atPort:portManager];
+}
+- (IBAction)monogeckoButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([monogeckoCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO];
+    [portManager synchronizePlist];
 }
 //*************************************************************
 //*********************** Winetricks **************************

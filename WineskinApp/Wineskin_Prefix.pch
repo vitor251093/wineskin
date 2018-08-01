@@ -57,6 +57,7 @@
 #define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT             @"Winetricks silent"
 #define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS             @"Winetricks disable logging"
 #define WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE               @"IsFnToggleEnabled"
+#define WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO            @"Skip Mono & Gecko"
 
 // Wineskin Plist values
 #define WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_CURRENT_RESOLUTION @"Current Resolution"

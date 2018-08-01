@@ -1444,6 +1444,17 @@ Gw
                                                 <action selector="winedbgDisabledButtonPressed:" target="494" id="0nh-Br-vPj"/>
                                             </connections>
                                         </button>
+                                        <button misplaced="YES" id="sG4-gn-63G">
+                                            <rect key="frame" x="14" y="136" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Disable Mono &amp; Gecko Installation (&quot;Refresh Wrapper&quot; &amp; &quot;Rebuild Wrapper&quot;)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="E6j-gW-Wpp">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="monogeckoButtonPressed:" target="494" id="4kg-6p-f5D"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -3015,6 +3026,7 @@ Gw
                 <outlet property="modifyMappingsMyPicturesTextField" destination="1606" id="1631"/>
                 <outlet property="modifyMappingsMyVideosTextField" destination="1598" id="1632"/>
                 <outlet property="modifyMappingsWindow" destination="1579" id="1633"/>
+                <outlet property="monogeckoCheckBoxButton" destination="sG4-gn-63G" id="cNj-Qf-J6K"/>
                 <outlet property="rebuildWrapperButton" destination="739" id="826"/>
                 <outlet property="refreshWrapperButton" destination="741" id="827"/>
                 <outlet property="regeditButton" destination="733" id="851"/>
