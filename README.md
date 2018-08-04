@@ -32,7 +32,7 @@ $ brew install carthage
 Clone the repository and build the dependencies:
 
 ```bash
-$ git clone https://github.com/Gcenx/wineskin.git
+$ git clone https://github.com/vitor251093/wineskin.git
 $ cd wineskin/
 $ carthage update
 ```
