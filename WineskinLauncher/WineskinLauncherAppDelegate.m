@@ -426,7 +426,14 @@ static NSPortManager* portManager;
         }
         //********** Wineskin Customizer start up script
         system([[NSString stringWithFormat:@"\"%@/Scripts/WineskinStartupScript\"",winePrefix] UTF8String]);
-            
+        
+        //****** if "IsFnToggleEnabled" is enabled
+        if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue] == 1)
+        {
+            [self systemCommand:[NSString stringWithFormat:@"\"%@/../Wineskin.app/Contents/Resources/fntoggle\" on",contentsFold]];
+        }
+        
+        //TODO: CPU Disabled does not work on current macOS versions, still need a replacement
         //****** if CPUs Disabled, disable all but 1 CPU
         NSString *cpuCountInput;
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue] == 1)
@@ -550,6 +557,12 @@ static NSPortManager* portManager;
         
         //**********sleep and monitor in background while app is running
         [self sleepAndMonitor];
+        
+        //****** if "IsFnToggleEnabled" is enabled, revert
+        if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue] == 1)
+        {
+            [self systemCommand:[NSString stringWithFormat:@"\"%@/../Wineskin.app/Contents/Resources/fntoggle\" off",contentsFold]];
+        }
         
         //****** if CPUs Disabled, re-enable them
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue] == 1)

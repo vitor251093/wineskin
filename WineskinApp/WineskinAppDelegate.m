@@ -122,6 +122,7 @@ NSFileManager *fm;
     [disableCPUsCheckBoxButton setEnabled:state];
     [winedbgDisabledButton setEnabled:state];
     [monogeckoCheckBoxButton setEnabled:state];
+    [fntoggleCheckBoxButton setEnabled:state];
     
     // TODO: The code below seems to be causing a crash sometimes. Remove?
     if (state) {
@@ -855,7 +856,8 @@ NSFileManager *fm;
     [enableWinetricksSilentButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue]];
     [WinetricksNoLogsButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue]];
     [monogeckoCheckBoxButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO] intValue]];
-    
+    [fntoggleCheckBoxButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue]];
+
     [disableCPUsCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue]];
 	[alwaysMakeLogFilesCheckBoxButton setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DEBUG_MODE] intValue]];
     [setMaxFilesCheckBoxButton        setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_MAX_OF_10240_FILES] intValue]];
@@ -985,6 +987,89 @@ NSFileManager *fm;
     [[NSFileManager defaultManager] moveItemAtPath:wrapperTemporaryPath toPath:wrapperRealPath];
 }
 //*************************************************************
+//**************** Advanced Menu - Tools Tab ******************
+//*************************************************************
+- (IBAction)winecfgButtonPressed:(id)sender
+{
+    [NSThread detachNewThreadSelector:@selector(runWinecfg) toTarget:self withObject:nil];
+}
+- (void)runWineskinLauncherWithDisabledButtonsWithFlag:(NSString*)flag
+{
+    @autoreleasepool
+    {
+        [self disableButtons];
+        [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[flag]];
+        [self enableButtons];
+    }
+}
+- (void)runWinecfg
+{
+    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-winecfg"];
+}
+- (IBAction)uninstallerButtonPressed:(id)sender
+{
+    [NSThread detachNewThreadSelector:@selector(runUninstaller) toTarget:self withObject:nil];
+}
+- (void)runUninstaller
+{
+    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-uninstaller"];
+}
+- (IBAction)regeditButtonPressed:(id)sender
+{
+    [NSThread detachNewThreadSelector:@selector(runRegedit) toTarget:self withObject:nil];
+}
+- (void)runRegedit
+{
+    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-regedit"];
+}
+- (IBAction)taskmgrButtonPressed:(id)sender
+{
+    [NSThread detachNewThreadSelector:@selector(runTaskmgr) toTarget:self withObject:nil];
+}
+- (void)runTaskmgr
+{
+    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-taskmgr"];
+}
+- (IBAction)rebuildWrapperButtonPressed:(id)sender
+{
+    //issue warning
+    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:@"This will remove all contents, including anything installed in drive_c, and registry files, and rebuild them from scratch! You will lose anything you have installed in the wrapper!\n\nThis data is NOT recoverable!!\n\nAre you sure you want to do this?" withDefault:NO])
+    {
+        //delete files
+        [busyWindow makeKeyAndOrderFront:self];
+        [advancedWindow orderOut:self];
+        
+        for (NSString* fileToRemove in @[@".update-timestamp", @"drive_c", @"dosdevices", @"harddiskvolume0",
+                                         @"system.reg", @"user.reg", @"userdef.reg", @"winetricksInstalled.plist", @"winetricks.log"])
+        {
+            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/%@",self.wrapperPath,fileToRemove];
+            if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
+        }
+        
+        for (NSString* fileToRemove in @[@"winetricksInstalled.plist", @"winetricks.log", @"winetricksTemp.log"])
+        {
+            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/Logs/%@",self.wrapperPath,fileToRemove];
+            if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
+        }
+        
+        //refresh
+        [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreate"]];
+        
+        [advancedWindow makeKeyAndOrderFront:self];
+        [busyWindow orderOut:self];
+    }
+}
+- (IBAction)refreshWrapperButtonPressed:(id)sender
+{
+    [busyWindow makeKeyAndOrderFront:self];
+    [advancedWindow orderOut:self];
+    
+    [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreatenoregs"]];
+    
+    [advancedWindow makeKeyAndOrderFront:self];
+    [busyWindow orderOut:self];
+}
+//*************************************************************
 //*************** Advanced Menu - Options Tab *****************
 //*************************************************************
 - (IBAction)alwaysMakeLogFilesCheckBoxButtonPressed:(id)sender
@@ -1005,10 +1090,6 @@ NSFileManager *fm;
     [portManager setPlistObject:[NSNumber numberWithBool:symlinksInUserFolder] forKey:@"Symlinks In User Folder"];
     [portManager synchronizePlist];
 }
-- (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender
-{
-    [NSWineskinPortDataWriter saveCloseSafely:@(confirmQuitCheckBoxButton.state) atPort:portManager];
-}
 - (IBAction)modifyMappingsButtonPressed:(id)sender
 {
 	[modifyMappingsMyDocumentsTextField setStringValue:[portManager plistObjectForKey:@"Symlink My Documents"]];
@@ -1020,88 +1101,14 @@ NSFileManager *fm;
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
-//*************************************************************
-//**************** Advanced Menu - Tools Tab ******************
-//*************************************************************
-- (IBAction)winecfgButtonPressed:(id)sender
+- (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender
 {
-	[NSThread detachNewThreadSelector:@selector(runWinecfg) toTarget:self withObject:nil];
+    [NSWineskinPortDataWriter saveCloseSafely:@(confirmQuitCheckBoxButton.state) atPort:portManager];
 }
-- (void)runWineskinLauncherWithDisabledButtonsWithFlag:(NSString*)flag
+- (IBAction)fntoggleCheckBoxButton:(id)sender
 {
-    @autoreleasepool
-    {
-        [self disableButtons];
-        [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[flag]];
-        [self enableButtons];
-    }
-}
-- (void)runWinecfg
-{
-    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-winecfg"];
-}
-- (IBAction)uninstallerButtonPressed:(id)sender
-{
-	[NSThread detachNewThreadSelector:@selector(runUninstaller) toTarget:self withObject:nil];
-}
-- (void)runUninstaller
-{
-    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-uninstaller"];
-}
-- (IBAction)regeditButtonPressed:(id)sender
-{
-	[NSThread detachNewThreadSelector:@selector(runRegedit) toTarget:self withObject:nil];
-}
-- (void)runRegedit
-{
-    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-regedit"];
-}
-- (IBAction)taskmgrButtonPressed:(id)sender
-{
-	[NSThread detachNewThreadSelector:@selector(runTaskmgr) toTarget:self withObject:nil];
-}
-- (void)runTaskmgr
-{
-    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-taskmgr"];
-}
-- (IBAction)rebuildWrapperButtonPressed:(id)sender
-{
-	//issue warning
-    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:@"This will remove all contents, including anything installed in drive_c, and registry files, and rebuild them from scratch! You will lose anything you have installed in the wrapper!\n\nThis data is NOT recoverable!!\n\nAre you sure you want to do this?" withDefault:NO])
-    {
-		//delete files
-		[busyWindow makeKeyAndOrderFront:self];
-		[advancedWindow orderOut:self];
-        
-        for (NSString* fileToRemove in @[@".update-timestamp", @"drive_c", @"dosdevices", @"harddiskvolume0",
-                                         @"system.reg", @"user.reg", @"userdef.reg", @"winetricksInstalled.plist", @"winetricks.log"])
-        {
-            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/%@",self.wrapperPath,fileToRemove];
-            if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
-        }
-        
-        for (NSString* fileToRemove in @[@"winetricksInstalled.plist", @"winetricks.log", @"winetricksTemp.log"])
-        {
-            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/Logs/%@",self.wrapperPath,fileToRemove];
-            if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
-        }
-        
-		//refresh
-		[self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreate"]];
-        
-		[advancedWindow makeKeyAndOrderFront:self];
-		[busyWindow orderOut:self];
-	}
-}
-- (IBAction)refreshWrapperButtonPressed:(id)sender
-{
-	[busyWindow makeKeyAndOrderFront:self];
-	[advancedWindow orderOut:self];
-    
-	[self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreatenoregs"]];
-    
-	[advancedWindow makeKeyAndOrderFront:self];
-	[busyWindow orderOut:self];
+    [portManager setPlistObject:@([fntoggleCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE];
+    [portManager synchronizePlist];
 }
 //****************************************************************
 //**************** Advanced Menu - Advanced Tab ******************

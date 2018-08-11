@@ -101,6 +101,7 @@
     IBOutlet NSButton *disableCPUsCheckBoxButton;
     IBOutlet NSButton *winedbgDisabledButton;
     IBOutlet NSButton *monogeckoCheckBoxButton;
+    IBOutlet NSButton *fntoggleCheckBoxButton;
 
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -270,6 +271,7 @@
 - (IBAction)disableCPUsButtonPressed:(id)sender;
 - (IBAction)winedbgDisabledButtonPressed:(id)sender;
 - (IBAction)monogeckoButtonPressed:(id)sender;
+- (IBAction)fntoggleCheckBoxButton:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;

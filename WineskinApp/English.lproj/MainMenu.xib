@@ -1370,6 +1370,17 @@ Gw
                                                 <action selector="confirmQuitCheckBoxButtonPressed:" target="494" id="1550"/>
                                             </connections>
                                         </button>
+                                        <button misplaced="YES" id="0TT-jF-gSk">
+                                            <rect key="frame" x="14" y="116" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use F1, F2, etc. keys as standard function keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="LcT-7n-ckm">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="fntoggleCheckBoxButton:" target="494" id="jfL-n2-yJX"/>
+                                            </connections>
+                                        </button>
                                         <button verticalHuggingPriority="750" id="1577">
                                             <rect key="frame" x="276" y="150" width="139" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3008,6 +3019,7 @@ Gw
                 <outlet property="extMinusButton" destination="1414" id="1648"/>
                 <outlet property="extPlusButton" destination="1406" id="2033"/>
                 <outlet property="extPopUpButton" destination="1398" id="1460"/>
+                <outlet property="fntoggleCheckBoxButton" destination="0TT-jF-gSk" id="Zla-8o-XoX"/>
                 <outlet property="gammaSlider" destination="564" id="677"/>
                 <outlet property="helpWindow" destination="1352" id="1360"/>
                 <outlet property="iconBrowseButton" destination="718" id="825"/>
