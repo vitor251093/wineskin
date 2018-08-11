@@ -49,6 +49,20 @@ NSFileManager *fm;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    //Show warning if wrapper contrains folder WineskinMenuScripts.
+    NSString* MenuScripts = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts/",self.wrapperPath];
+    if ([fm fileExistsAtPath:MenuScripts]);
+    {
+        [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"Looks like you recently upgraded this wrapper from Wineskin-2.6.2 or lower, run Update Wrapper again on this wrapper"];
+    }
+    
+    //Show error if wrapper has XQuartz only engine installed but no XQuartz
+    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+    if (!self.isXQuartzInstalled && ![NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
+    {
+        [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
+    }
+    
     fm = [NSFileManager defaultManager];
     portManager = [NSPortManager managerWithPath:self.wrapperPath];
     if (!portManager)
