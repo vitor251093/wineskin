@@ -409,16 +409,36 @@
 
 - (NSMutableArray *)getAvailableEngines
 {
-	NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
-	if ([fileString hasSuffix:@"\n"])
-	{
-		fileString = [fileString stringByAppendingString:@":!:!:"];
-		fileString = [fileString stringByReplacingOccurrencesOfString:@"\n:!:!:" withString:@""];
-	}
-	NSArray *tempA = [fileString componentsSeparatedByString:@"\n"];
-	NSMutableArray *tempMA = [NSMutableArray arrayWithCapacity:[tempA count]];
-	for(NSString *item in tempA) [tempMA addObject:item];
-	return tempMA;	
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    // If EngineList.txt is in the same directly as winery.app, then use that instead of the online copy
+    if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/../EngineList.txt",[[NSBundle mainBundle] bundlePath]]])
+    {
+        NSString *fileString = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/../EngineList.txt",[[NSBundle mainBundle] bundlePath]] encoding:NSUTF8StringEncoding error:nil];
+        if ([fileString hasSuffix:@"\n"])
+        {
+            fileString = [fileString stringByAppendingString:@":!:!:"];
+            fileString = [fileString stringByReplacingOccurrencesOfString:@"\n:!:!:" withString:@""];
+        }
+        NSArray *tempA = [fileString componentsSeparatedByString:@"\n"];
+        NSMutableArray *tempMA = [NSMutableArray arrayWithCapacity:[tempA count]];
+        for(NSString *item in tempA) [tempMA addObject:item];
+        return tempMA;
+    }
+    else
+    {
+        //read online EngineList.txt
+        NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
+        if ([fileString hasSuffix:@"\n"])
+        {
+            fileString = [fileString stringByAppendingString:@":!:!:"];
+            fileString = [fileString stringByReplacingOccurrencesOfString:@"\n:!:!:" withString:@""];
+        }
+        NSArray *tempA = [fileString componentsSeparatedByString:@"\n"];
+        NSMutableArray *tempMA = [NSMutableArray arrayWithCapacity:[tempA count]];
+        for(NSString *item in tempA) [tempMA addObject:item];
+        return tempMA;
+    }
 }
 
 - (NSString *)getCurrentWrapperVersion
@@ -623,12 +643,111 @@
 //************ Engine Window (+ button) methods *******************
 - (IBAction)engineWindowDownloadAndInstallButtonPressed:(id)sender
 {
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/%@.tar.7z?%@",[[engineWindowEngineList selectedItem] title],[[NSNumber numberWithLong:rand()] stringValue]]];
-	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",[[engineWindowEngineList selectedItem] title]]];
-	[fileName setStringValue:[[engineWindowEngineList selectedItem] title]];
-	[fileNameDestination setStringValue:@"Engines"];
-	[downloadingWindow makeKeyAndOrderFront:self];
-	[addEngineWindow orderOut:self];
+    NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine"];
+    NSString *wineVersion = [tempArray objectAtIndex:1];
+    
+    //Download pre built engines for WineCX & Vulkan
+    if ([wineVersion contains:@"1."] || [wineVersion hasPrefix:@"CX"] || [wineVersion hasPrefix:@"Vulkan"] || [wineVersion hasPrefix:@"Fix"]) //add anything that needs to be prebuild
+    {
+        [urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/%@.tar.7z?%@",[[engineWindowEngineList selectedItem] title],[[NSNumber numberWithLong:rand()] stringValue]]];
+        [urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",[[engineWindowEngineList selectedItem] title]]];
+        [fileName setStringValue:[[engineWindowEngineList selectedItem] title]];
+        [fileNameDestination setStringValue:@"Engines"];
+        [downloadingWindow makeKeyAndOrderFront:self];
+        [addEngineWindow orderOut:self];
+        [fileName setHidden:NO];
+        [fileOutputName setHidden:YES];
+    }
+    
+    //convert Wineskin engine name into winehq portable.tar.gz name for downloading
+    else
+    {
+        NSString *branch;  //Set the Wine branch for link
+        NSString *version; //Set the Wine version for link
+        NSString *arch;    //Set the Wine arch for link
+        
+        if ([wineVersion contains:@".0"])
+        {
+            //Set as Stable
+            if ([wineVersion hasPrefix:@"64Bit"])
+            {
+                NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine64Bit"];
+                NSString *wineVersion = [tempArray objectAtIndex:1];
+                
+                //Set as 64Bit
+                branch = @"stable";
+                arch = @"osx64";
+                version = wineVersion;
+            }
+            else
+            {
+                //Set as 32Bit
+                branch = @"stable";
+                arch = @"osx";
+                version = wineVersion;
+            }
+        }
+        else if ([wineVersion hasPrefix:@"Staging"])
+        {
+            //Set as Staging
+            if ([wineVersion hasPrefix:@"Staging64Bit"])
+            {
+                NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Staging64Bit"];
+                NSString *wineVersion = [tempArray objectAtIndex:1];
+                
+                //Set as 64Bit
+                branch = @"staging";
+                arch = @"osx64";
+                version = wineVersion;
+            }
+            else
+            {
+                NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Staging"];
+                NSString *wineVersion = [tempArray objectAtIndex:1];
+                
+                //Set as 32Bit
+                branch = @"staging";
+                arch = @"osx";
+                version = wineVersion;
+            }
+        }
+        else
+        {
+            //Set as Devel
+            if ([wineVersion hasPrefix:@"64Bit"])
+            {
+                NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine64Bit"];
+                NSString *wineVersion = [tempArray objectAtIndex:1];
+                
+                //Set as 64Bit
+                branch = @"devel";
+                arch = @"osx64";
+                version = wineVersion;
+            }
+            else
+            {
+                //Set as 32Bit
+                branch = @"devel";
+                arch = @"osx";
+                version = wineVersion;
+            }
+        }
+        
+        //Download file name
+        NSString *filename = [NSString stringWithFormat:@"portable-winehq-%@-%@-%@",branch,version,arch];
+        
+        //Download the link & file name
+        [urlInput setStringValue:[NSString stringWithFormat:@"https://dl.winehq.org/wine-builds/macosx/pool/%@.tar.gz",filename]];
+        
+        [urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.gz",filename]];
+        [fileName setHidden:YES];
+        [fileOutputName setHidden:NO];
+        [fileOutputName setStringValue:[[engineWindowEngineList selectedItem] title]];
+        [fileName setStringValue:filename];
+        [fileNameDestination setStringValue:@"EnginesRepack"];
+        [downloadingWindow makeKeyAndOrderFront:self];
+        [addEngineWindow orderOut:self];
+    }
 }
 - (IBAction)engineWindowViewWineReleaseNotesButtonPressed:(id)sender
 {
@@ -770,34 +889,39 @@
 
 - (IBAction) stopDownloading:(NSButton *)sender;
 {
-	if (connection) [connection cancel];
-	[self downloadToggle:NO];
-	if (([[fileNameDestination stringValue] isEqualToString:@"EngineBase"]))
-	{
-		[wineskinEngineBuilderWindow makeKeyAndOrderFront:self];
-		[downloadingWindow orderOut:self];
-	}
-	else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
-	{
-		[addEngineWindow makeKeyAndOrderFront:self];
-		[downloadingWindow orderOut:self];
-	}
-	else if ([[fileName stringValue] isEqualToString:@"Wineskin Winery Update"])
-	{
-		//display warning about not updating.
-		NSAlert *warning = [[NSAlert alloc] init];
-		[warning addButtonWithTitle:@"OK"];
-		[warning setMessageText:@"Warning!"];
-		[warning setInformativeText:@"Some things may not function properly with new Wrappers or Engines until you update!"];
-		[warning runModal];
-		[window makeKeyAndOrderFront:self];
-		[downloadingWindow orderOut:self];
-	}
-	else
-	{
-		[window makeKeyAndOrderFront:self];
-		[downloadingWindow orderOut:self];
-	}
+    if (connection) [connection cancel];
+    [self downloadToggle:NO];
+    if (([[fileNameDestination stringValue] isEqualToString:@"EngineBase"]))
+    {
+        [wineskinEngineBuilderWindow makeKeyAndOrderFront:self];
+        [downloadingWindow orderOut:self];
+    }
+    else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
+    {
+        [addEngineWindow makeKeyAndOrderFront:self];
+        [downloadingWindow orderOut:self];
+    }
+    else if (([[fileNameDestination stringValue] isEqualToString:@"EnginesRepack"]))
+    {
+        [addEngineWindow makeKeyAndOrderFront:self];
+        [downloadingWindow orderOut:self];
+    }
+    else if ([[fileName stringValue] isEqualToString:@"Wineskin Winery Update"])
+    {
+        //display warning about not updating.
+        NSAlert *warning = [[NSAlert alloc] init];
+        [warning addButtonWithTitle:@"OK"];
+        [warning setMessageText:@"Warning!"];
+        [warning setInformativeText:@"Some things may not function properly with new Wrappers or Engines until you update!"];
+        [warning runModal];
+        [window makeKeyAndOrderFront:self];
+        [downloadingWindow orderOut:self];
+    }
+    else
+    {
+        [window makeKeyAndOrderFront:self];
+        [downloadingWindow orderOut:self];
+    }
 }
 
 - (void) downloadToggle:(BOOL)toggle
@@ -830,109 +954,177 @@
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)conn
 {
-	[self downloadToggle:NO];
-	//delete any files that might exist in /tmp first
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar.7z",[fileName stringValue]] error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar",[fileName stringValue]] error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[fileName stringValue]] error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar",[fileName stringValue]] error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@",[fileName stringValue]] error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app.tar.7z" error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app.tar" error:nil];
-	[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app" error:nil];
-	[payload writeToURL:[NSURL URLWithString:[urlOutput stringValue]] atomically:YES];
-	[busyWindow makeKeyAndOrderFront:self];
-	[downloadingWindow orderOut:self];
-	if (([[fileNameDestination stringValue] isEqualToString:@"Wrapper"]))
-	{
-		//uncompress download
-		[self makeFoldersAndFiles];
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/%@.app.tar.7z\" -o/tmp", NSHomeDirectory(),[fileName stringValue]] UTF8String]);
-		system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/%@.app.tar",[fileName stringValue]] UTF8String]);
-		//remove 7z and tar
-		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar.7z",[fileName stringValue]] error:nil];
-		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar",[fileName stringValue]] error:nil];
-		//remove old one
-		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper",NSHomeDirectory()] error:nil];
-		[self makeFoldersAndFiles];
-		//move download into place
-		[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.app",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
-		[window makeKeyAndOrderFront:self];
-		[busyWindow orderOut:self];
-		[self runConverter];
-	}
-	else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
-	{
-		//move download into place
-		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.tar.7z",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
-		[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.tar.7z",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
-		//Add engine to ignored list
-		NSArray *ignoredEngines = [self getEnginesToIgnore];
-		NSString *ignoredEnginesString = @"";
-		BOOL fixTheList=YES;
-		for (NSString *item in ignoredEngines)
-		{
-			if ([item isEqualToString:[fileName stringValue]])
-			{
-				fixTheList=NO;
-				break;
-			}
-			ignoredEnginesString = [ignoredEnginesString stringByAppendingString:[item stringByAppendingString:@"\n"]];	
-		}
-		if (fixTheList)
-		{
-			ignoredEnginesString = [NSString stringWithFormat:@"%@\n%@",ignoredEnginesString,[fileName stringValue]];
-			[ignoredEnginesString writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
-		}		
-		[window makeKeyAndOrderFront:self];
-		[busyWindow orderOut:self];
-	}
-	else if (([[fileNameDestination stringValue] isEqualToString:@"EngineBase"]))
-	{
-		//uncompress download
-		[self makeFoldersAndFiles];
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/%@.tar.7z\" -o/tmp", NSHomeDirectory(),[fileName stringValue]] UTF8String]);
-		system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/%@.tar",[fileName stringValue]] UTF8String]);
-		//remove 7z and tar
-		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] error:nil];
-		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar",[fileName stringValue]] error:nil];
-		//remove old one
-		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/EngineBase",NSHomeDirectory()] error:nil];
-		[self makeFoldersAndFiles];
-		//move download into place
-		[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];		
-		NSString *currentEngineBuild = [self currentEngineBuildVersion];
-		[engineBuildCurrentEngineBase setStringValue:currentEngineBuild];
-		NSString *availableEngineBase = [self availableEngineBuildVersion];
-		//set update button and label
-		if ([availableEngineBase isEqualToString:currentEngineBuild])
-		{
-			[engineBuildUpdateButton setEnabled:NO];
-			[engineBuildUpdateAvailable setHidden:YES];
-		}
-		else
-		{
-			[engineBuildUpdateButton setEnabled:YES];
-			[engineBuildUpdateAvailable setHidden:NO];
-		}
-		[wineskinEngineBuilderWindow makeKeyAndOrderFront:self];
-		[busyWindow orderOut:self];
-	}
-	if ([[fileName stringValue] isEqualToString:@"Wineskin Winery Update"])
-	{
-		//take care of update
-		[self makeFoldersAndFiles];
-		[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWineryUpdater" error:nil];
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/WineskinWinery.app.tar.7z\" -o/tmp", NSHomeDirectory()] UTF8String]);
-		system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/WineskinWinery.app.tar"] UTF8String]);
-		[[NSFileManager defaultManager] copyItemAtPath:@"/tmp/WineskinWinery.app/Contents/Resources/WineskinWineryUpdater" toPath:@"/tmp/WineskinWineryUpdater" error:nil];
-		//run updater program
-		system([[NSString stringWithFormat:@"/tmp/WineskinWineryUpdater \"%@\" &",[[NSBundle mainBundle] bundlePath]] UTF8String]);
-		//kill this app, Updater will restart it after changing out contents.
-		[NSApp terminate:self];
-	}
-	[self refreshButtonPressed:self];
+    [self downloadToggle:NO];
+    //delete any files that might exist in /tmp first
+    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar.7z",[fileName stringValue]] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar",[fileName stringValue]] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[fileName stringValue]] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar",[fileName stringValue]] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@",[fileName stringValue]] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app.tar.7z" error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app.tar" error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWinery.app" error:nil];
+    [payload writeToURL:[NSURL URLWithString:[urlOutput stringValue]] atomically:YES];
+    [busyWindow makeKeyAndOrderFront:self];
+    [downloadingWindow orderOut:self];
+    if (([[fileNameDestination stringValue] isEqualToString:@"Wrapper"]))
+    {
+        //uncompress download
+        [self makeFoldersAndFiles];
+        system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/%@.app.tar.7z\" -o/tmp", NSHomeDirectory(),[fileName stringValue]] UTF8String]);
+        system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/%@.app.tar",[fileName stringValue]] UTF8String]);
+        //remove 7z and tar
+        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar.7z",[fileName stringValue]] error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar",[fileName stringValue]] error:nil];
+        //remove old one
+        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper",NSHomeDirectory()] error:nil];
+        [self makeFoldersAndFiles];
+        //move download into place
+        [[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.app",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
+        [window makeKeyAndOrderFront:self];
+        [busyWindow orderOut:self];
+        [self runConverter];
+    }
+    else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
+    {
+        //move download into place
+        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.tar.7z",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
+        [[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.tar.7z",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
+        //Add engine to ignored list
+        NSArray *ignoredEngines = [self getEnginesToIgnore];
+        NSString *ignoredEnginesString = @"";
+        BOOL fixTheList=YES;
+        for (NSString *item in ignoredEngines)
+        {
+            if ([item isEqualToString:[fileName stringValue]])
+            {
+                fixTheList=NO;
+                break;
+            }
+            ignoredEnginesString = [ignoredEnginesString stringByAppendingString:[item stringByAppendingString:@"\n"]];
+        }
+        if (fixTheList)
+        {
+            ignoredEnginesString = [NSString stringWithFormat:@"%@\n%@",ignoredEnginesString,[fileName stringValue]];
+            [ignoredEnginesString writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        }
+        [window makeKeyAndOrderFront:self];
+        [busyWindow orderOut:self];
+    }
+    
+    //TODO: Engine download & repacking section
+    else if (([[fileNameDestination stringValue] isEqualToString:@"EnginesRepack"]))
+    {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        
+        //make wswine.bundle
+        [fm createDirectoryAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle"] withIntermediateDirectories:YES attributes:nil error:nil];
+        
+        //uncompress download
+        [self makeFoldersAndFiles];
+        system([[NSString stringWithFormat:@"/usr/bin/tar zxf /tmp/%@.tar.gz --strip-components=2 -C /tmp/wswine.bundle",[fileName stringValue]] UTF8String]);
+        
+        //remove tar.gz file
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.gz",[fileName stringValue]] error:nil];
+        
+        //Remove folders from within wswine.bundle
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/include"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/aclocal"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/doc"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/gtk-doc"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/man"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/openal"] error:nil];
+        
+        //make "version" file
+        NSString *configFileContents = [NSString stringWithFormat:@"%@",[fileOutputName stringValue]];
+        [configFileContents writeToFile:[NSString stringWithFormat:@"/tmp/wswine.bundle/version"] atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        
+        //make tar
+        system([[NSString stringWithFormat:@"cd /tmp/;tar -cf %@.tar wswine.bundle",[fileOutputName stringValue]] UTF8String]);
+        
+        //compress using lowest compression level and use upto 30 threads
+        system([[NSString stringWithFormat:@"cd \"tmp\";\"%@/Library/Application Support/Wineskin/7za\" a -mx=1 -mmt=30 %@.tar.7z %@.tar",NSHomeDirectory(),[fileOutputName stringValue],[fileOutputName stringValue]] UTF8String]);
+        
+        //remove wswine.bundle
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle"] error:nil];
+        
+        //remove tar
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar",[fileOutputName stringValue]] error:nil];
+        
+        //Deleted if engine with the same name is in Engines folder
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),[fileOutputName stringValue]] error:nil];
+        
+        //move engine into correct location
+        [fm moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileOutputName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),[fileOutputName stringValue]] error:nil];
+        
+        //Add engine to ignored list
+        NSArray *ignoredEngines = [self getEnginesToIgnore];
+        NSString *ignoredEnginesString = @"";
+        BOOL fixTheList=YES;
+        for (NSString *item in ignoredEngines)
+        {
+            if ([item isEqualToString:[fileOutputName stringValue]])
+            {
+                fixTheList=NO;
+                break;
+            }
+            ignoredEnginesString = [ignoredEnginesString stringByAppendingString:[item stringByAppendingString:@"\n"]];
+        }
+        if (fixTheList)
+        {
+            ignoredEnginesString = [NSString stringWithFormat:@"%@\n%@",ignoredEnginesString,[fileOutputName stringValue]];
+            [ignoredEnginesString writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        }
+        [window makeKeyAndOrderFront:self];
+        [busyWindow orderOut:self];
+    }
+    else if (([[fileNameDestination stringValue] isEqualToString:@"EngineBase"]))
+    {
+        //uncompress download
+        [self makeFoldersAndFiles];
+        system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/%@.tar.7z\" -o/tmp", NSHomeDirectory(),[fileName stringValue]] UTF8String]);
+        system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/%@.tar",[fileName stringValue]] UTF8String]);
+        
+        //remove 7z and tar
+        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar",[fileName stringValue]] error:nil];
+        //remove old one
+        [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/EngineBase",NSHomeDirectory()] error:nil];
+        [self makeFoldersAndFiles];
+        //move download into place
+        [[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
+        NSString *currentEngineBuild = [self currentEngineBuildVersion];
+        [engineBuildCurrentEngineBase setStringValue:currentEngineBuild];
+        NSString *availableEngineBase = [self availableEngineBuildVersion];
+        //set update button and label
+        if ([availableEngineBase isEqualToString:currentEngineBuild])
+        {
+            [engineBuildUpdateButton setEnabled:NO];
+            [engineBuildUpdateAvailable setHidden:YES];
+        }
+        else
+        {
+            [engineBuildUpdateButton setEnabled:YES];
+            [engineBuildUpdateAvailable setHidden:NO];
+        }
+        [wineskinEngineBuilderWindow makeKeyAndOrderFront:self];
+        [busyWindow orderOut:self];
+    }
+    if ([[fileName stringValue] isEqualToString:@"Wineskin Winery Update"])
+    {
+        //take care of update
+        [self makeFoldersAndFiles];
+        [[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWineryUpdater" error:nil];
+        system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/WineskinWinery.app.tar.7z\" -o/tmp", NSHomeDirectory()] UTF8String]);
+        system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/WineskinWinery.app.tar"] UTF8String]);
+        [[NSFileManager defaultManager] copyItemAtPath:@"/tmp/WineskinWinery.app/Contents/Resources/WineskinWineryUpdater" toPath:@"/tmp/WineskinWineryUpdater" error:nil];
+        //run updater program
+        system([[NSString stringWithFormat:@"/tmp/WineskinWineryUpdater \"%@\" &",[[NSBundle mainBundle] bundlePath]] UTF8String]);
+        //kill this app, Updater will restart it after changing out contents.
+        [NSApp terminate:self];
+    }
+    [self refreshButtonPressed:self];
 }
 - (void)connection:(NSURLConnection *)conn didFailWithError:(NSError *)error
 {
