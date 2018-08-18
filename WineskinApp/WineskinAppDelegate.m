@@ -2094,9 +2094,8 @@ NSFileManager *fm;
     //move wswine.bundle back into Frameworks
     [fm moveItemAtPath:wswineBundleTempPath toPath:wswineBundleOriginalPath];
     
-    //TODO: Does not seem to open after an update for some reason
     //open new Wineskin.app
-    [self systemCommand:@"/usr/bin/open" withArgs:@[[NSString stringWithFormat:@"%@/Wineskin.app",self.wrapperPath]]];
+    [self systemCommand:@"/usr/bin/open" withArgs:@[@"-n",[NSString stringWithFormat:@"%@/Wineskin.app",self.wrapperPath]]];
     
     //close program
     [NSApp terminate:sender];
