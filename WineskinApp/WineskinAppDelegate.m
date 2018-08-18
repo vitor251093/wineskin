@@ -49,13 +49,6 @@ NSFileManager *fm;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    //Show error if wrapper has XQuartz only engine installed but no XQuartz
-    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
-    if (!self.isXQuartzInstalled && ![NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
-    {
-        [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
-    }
-    
     fm = [NSFileManager defaultManager];
     portManager = [NSPortManager managerWithPath:self.wrapperPath];
     if (!portManager)
@@ -511,13 +504,6 @@ NSFileManager *fm;
 
 - (void)loadScreenOptionsData
 {
-    if (!self.isXQuartzInstalled)
-    {
-        [useX11RadioButton setEnabled:NO];
-        [useX11RadioButton setState:false];
-        [macDriverX11TabView selectTabViewItemAtIndex:0];
-        [NSWineskinPortDataWriter saveMacDriver:true atPort:portManager];
-    }
     NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     
     BOOL retinaMode = [NSPortDataLoader retinaModeIsEnabledAtPort:self.wrapperPath withEngine:engine];
@@ -537,6 +523,19 @@ NSFileManager *fm;
     BOOL autoDetectGPUEnabled = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] boolValue];
     [autoDetectGPUInfoCheckBoxButton setState:autoDetectGPUEnabled];
 	
+    //If X11 is set without XQuartz being installed force macDriver if the engine supports macDriver
+    if (!self.isXQuartzInstalled && [NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
+    {
+        [useX11RadioButton setEnabled:NO];
+        [useX11RadioButton setState:false];
+        [macDriverX11TabView selectTabViewItemAtIndex:0];
+        [NSWineskinPortDataWriter saveMacDriver:true atPort:portManager];
+    }
+    else if (!self.isXQuartzInstalled && ![NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
+    {
+        [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
+    }
+    
     if ([[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION] isEqualToString:@"default"]) {
         [gammaSlider setDoubleValue:60.0];
     }
