@@ -120,7 +120,7 @@
     NSString* winedbgRegistry = @"[Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\AeDebug]";
     
     key = @"Debugger";
-    value = (Debugger ? @"\"false\"" : @"\"true\"");
+    value = (Debugger ? @"\"false\"" : @"\"winedbg --auto %ld %ld\"");
     
     return [port setValues:@{key:value} forEntry:winedbgRegistry atRegistryFileNamed:SYSTEM_REG];
 }
