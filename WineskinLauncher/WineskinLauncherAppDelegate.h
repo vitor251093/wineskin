@@ -45,6 +45,7 @@
 	BOOL isIce;                                     //YES if ICE engine being used
     BOOL removeX11TraceFromLog;                     //YES if Wineskin added the X11 trace to winedebug to remove them from the output log
 	NSString *dyldFallBackLibraryPath;              //the path for DYLD_FALLBACK_LIBRARY_PATH
+    NSString *fontFix;                              //force freetype into using rendering mode from pre 2.7
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
     NSString *wineServerName;                       //the name of the Wineserver we'll be launching
     NSString *wineName;                             //the name of the Wine process we'll be launching

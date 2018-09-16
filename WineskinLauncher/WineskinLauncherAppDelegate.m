@@ -1542,12 +1542,13 @@ static NSPortManager* portManager;
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
     
     NSString* binBash = @"#!/bin/bash\n";
+    NSString* fontFix = @"FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\"";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                          binBash,dyldFallbackLibraryPath,wineName];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                                binBash,dyldFallbackLibraryPath,wineServerName];
+    NSString *wineBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                          binBash,fontFix,dyldFallbackLibraryPath,wineName];
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,fontFix,dyldFallbackLibraryPath,wineServerName];
     
     [wineBash       writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
@@ -1632,14 +1633,15 @@ static NSPortManager* portManager;
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
     
     NSString* binBash = @"#!/bin/bash\n";
+    NSString* fontFix = @"FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\"";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                          binBash,dyldFallbackLibraryPath,wineName];
-    NSString *wine64Bash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                            binBash,dyldFallbackLibraryPath,wine64Name];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                                binBash,dyldFallbackLibraryPath,wineServerName];
+    NSString *wineBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                          binBash,fontFix,dyldFallbackLibraryPath,wineName];
+    NSString *wine64Bash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                            binBash,fontFix,dyldFallbackLibraryPath,wine64Name];
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,fontFix,dyldFallbackLibraryPath,wineServerName];
     
     [wineBash       writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wine64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
@@ -1709,12 +1711,13 @@ static NSPortManager* portManager;
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
     
     NSString* binBash = @"#!/bin/bash\n";
+    NSString* fontFix = @"FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\"";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineStagingBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                          binBash,dyldFallbackLibraryPath,wineStagingName];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                                binBash,dyldFallbackLibraryPath,wineServerName];
+    NSString *wineStagingBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                          binBash,fontFix,dyldFallbackLibraryPath,wineStagingName];
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,fontFix,dyldFallbackLibraryPath,wineServerName];
 
     //write out bash scripts to launch wine
     [wineStagingBash       writeToFile:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
@@ -1800,14 +1803,15 @@ static NSPortManager* portManager;
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
     
     NSString* binBash = @"#!/bin/bash\n";
+    NSString* fontFix = @"FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\"";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineStagingBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                                 binBash,dyldFallbackLibraryPath,wineStagingName];
-    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                                 binBash,dyldFallbackLibraryPath,wineStaging64Name];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ \"$(dirname \"$0\")/%@\" \"$@\"",
-                                binBash,dyldFallbackLibraryPath,wineServerName];
+    NSString *wineStagingBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                 binBash,fontFix,dyldFallbackLibraryPath,wineStagingName];
+    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                 binBash,fontFix,dyldFallbackLibraryPath,wineStaging64Name];
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,fontFix,dyldFallbackLibraryPath,wineServerName];
     
     
     [wineStagingBash       writeToFile:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
