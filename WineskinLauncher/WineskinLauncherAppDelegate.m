@@ -338,6 +338,11 @@ static NSPortManager* portManager;
                                     [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],@"wineserver -k"];
                 [self systemCommand:[command componentsJoinedByString:@" "]];
                 usleep(3000000);
+                    //****** if "IsFnToggleEnabled" is enabled
+                    if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue] == 1)
+                    {
+                        [self systemCommand:[NSString stringWithFormat:@"\"%@/../Wineskin.app/Contents/Resources/fntoggle\" off",contentsFold]];
+                    }
                 }
                 if ([wssCommand isEqualToString:@"WSS-installer"]) //if its in the installer, need to know if normal windows are forced
                 {
