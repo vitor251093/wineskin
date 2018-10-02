@@ -422,7 +422,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx;
-				VALID_ARCHS = i386;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -460,7 +460,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
 				SDKROOT = macosx;
-				VALID_ARCHS = i386;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};
