@@ -24,12 +24,13 @@ typedef enum {
 @property (nonatomic, strong) NSString* complement;
 @property (nonatomic) NSWineskinEngineType engineType;
 @property (nonatomic) BOOL is64Bit;
+@property (nonatomic) BOOL vulkanEnabled;
 
 +(NSMutableArray<NSWineskinEngine*>*)getListOfAvailableEngines;
 
 +(NSWineskinEngine*)wineskinEngineWithString:(NSString*)engineString;
 
-+(NSWineskinEngine*)wineskinEngineOfType:(NSWineskinEngineType)engineType is64Bit:(BOOL)is64Bit ofVersion:(NSString*)version withComplement:(NSString*)complement;
++(NSWineskinEngine*)wineskinEngineOfType:(NSWineskinEngineType)engineType is64Bit:(BOOL)is64Bit withVulkanEnabled:(BOOL)vulkanEnabled ofVersion:(NSString*)version withComplement:(NSString*)complement;
 
 -(NSString*)engineName;
 -(NSString*)localPath;
@@ -43,6 +44,8 @@ typedef enum {
 -(BOOL)isCompatibleWithOrigin;
 -(BOOL)isCompatibleWithUplay;
 -(BOOL)isCompatibleWithGOGGalaxy;
+
+-(BOOL)requiresManualDownload;
 
 +(NSString*)localPathForEngine:(NSString*)engine;
 
