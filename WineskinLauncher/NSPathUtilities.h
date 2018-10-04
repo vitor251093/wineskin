@@ -16,6 +16,9 @@
 +(NSString*)wineskinAppBinaryForPortAtPath:(NSString*)path;
 +(NSString*)wineskinLauncherBinForPortAtPath:(NSString*)path;
 
++(NSString*)wineBundleBinFolderForPortAtPath:(NSString*)path;
++(NSString*)wineBundleShareFolderForPortAtPath:(NSString*)path;
+
 +(NSString*)getMacPathForWindowsDrive:(char)driveLetter ofWrapper:(NSString*)file;
 +(NSString*)getMacPathForWindowsPath:(NSString*)exePath ofWrapper:(NSString*)file;
 +(NSString*)getWindowsPathForMacPath:(NSString*)exePath ofWrapper:(NSString*)file;

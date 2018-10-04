@@ -22,6 +22,33 @@
     return [path stringByAppendingString:@"/Contents/MacOS/WineskinLauncher"];
 }
 
++(NSString*)wineBundleBinFolderForPortAtPath:(NSString*)path
+{
+    NSString* binFolder = [NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/bin",path];
+    
+    if (![[NSFileManager defaultManager] directoryExistsAtPath:binFolder])
+    {
+        binFolder = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/Wine/bin",path];
+        
+        if (![[NSFileManager defaultManager] directoryExistsAtPath:binFolder]) return nil;
+    }
+    
+    return binFolder;
+}
++(NSString*)wineBundleShareFolderForPortAtPath:(NSString*)path
+{
+    NSString* binFolder = [NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/share",path];
+    
+    if (![[NSFileManager defaultManager] directoryExistsAtPath:binFolder])
+    {
+        binFolder = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinEngine.bundle/Wine/share",path];
+        
+        if (![[NSFileManager defaultManager] directoryExistsAtPath:binFolder]) return nil;
+    }
+    
+    return binFolder;
+}
+
 +(NSString*)getMacPathForWindowsDrive:(char)driveLetter ofWrapper:(NSString*)file
 {
     NSString* path;
