@@ -25,7 +25,7 @@
     IBOutlet NSButton *hideXQuartzEnginesCheckBox;
 	IBOutlet NSButton *updateButton;
 	IBOutlet NSButton *createWrapperButton;
-	NSMutableArray<NSWineskinEngine*>* installedEnginesList;
+	NSMutableArray* installedEnginesList;
     NSMutableArray* installedMacDriverEnginesList;
 	
 	//downloading window

@@ -371,6 +371,11 @@
 {
 	[installedEnginesList removeAllObjects];
     [installedEnginesList addObjectsFromArray:[NSWineskinEngine getListOfAvailableEngines]];
+    [installedEnginesList replaceObjectsWithVariation:^id _Nullable(NSWineskinEngine * _Nonnull object, NSUInteger index) {
+        if (theFilter.length > 0 && ![object.engineName.lowercaseString contains:theFilter.lowercaseString]) return nil;
+        return object;
+    }];
+    [installedEnginesList removeObject:[NSNull null]];
     
     installedMacDriverEnginesList = [installedEnginesList mutableCopy];
     [installedMacDriverEnginesList replaceObjectsWithVariation:^id _Nullable(NSWineskinEngine * _Nonnull object, NSUInteger index) {
