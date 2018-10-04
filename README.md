@@ -32,7 +32,7 @@ $ brew install carthage
 Clone the repository and build the dependencies:
 
 ```bash
-$ git clone https://github.com/Gcenx/wineskin.git
+$ git clone https://github.com/vitor251093/wineskin.git
 $ cd wineskin/
 $ carthage update
 ```
@@ -76,6 +76,8 @@ Considering this, lots of changes were made in WineskinApp and WineskinLauncher,
 
 - Many fixes when dealing with newest engines.
 - WineskinX11 dropped.
+- Closes processes XQuartz on exit
+- Can use XQuartz installed via macports
 
 ### Roadmap of desired changes in the Master Wrapper (WineskinLauncher)
 

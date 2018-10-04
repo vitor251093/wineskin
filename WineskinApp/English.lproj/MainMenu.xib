@@ -1370,6 +1370,17 @@ Gw
                                                 <action selector="confirmQuitCheckBoxButtonPressed:" target="494" id="1550"/>
                                             </connections>
                                         </button>
+                                        <button misplaced="YES" id="0TT-jF-gSk">
+                                            <rect key="frame" x="14" y="116" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use F1, F2, etc. keys as standard function keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="LcT-7n-ckm">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="fntoggleCheckBoxButton:" target="494" id="jfL-n2-yJX"/>
+                                            </connections>
+                                        </button>
                                         <button verticalHuggingPriority="750" id="1577">
                                             <rect key="frame" x="276" y="150" width="139" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1442,6 +1453,17 @@ Gw
                                             </buttonCell>
                                             <connections>
                                                 <action selector="winedbgDisabledButtonPressed:" target="494" id="0nh-Br-vPj"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="sG4-gn-63G">
+                                            <rect key="frame" x="14" y="136" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Disable Mono &amp; Gecko Installation (&quot;Refresh Wrapper&quot; &amp; &quot;Rebuild Wrapper&quot;)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="E6j-gW-Wpp">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="monogeckoButtonPressed:" target="494" id="4kg-6p-f5D"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -2997,6 +3019,7 @@ Gw
                 <outlet property="extMinusButton" destination="1414" id="1648"/>
                 <outlet property="extPlusButton" destination="1406" id="2033"/>
                 <outlet property="extPopUpButton" destination="1398" id="1460"/>
+                <outlet property="fntoggleCheckBoxButton" destination="0TT-jF-gSk" id="Zla-8o-XoX"/>
                 <outlet property="gammaSlider" destination="564" id="677"/>
                 <outlet property="helpWindow" destination="1352" id="1360"/>
                 <outlet property="iconBrowseButton" destination="718" id="825"/>
@@ -3015,6 +3038,7 @@ Gw
                 <outlet property="modifyMappingsMyPicturesTextField" destination="1606" id="1631"/>
                 <outlet property="modifyMappingsMyVideosTextField" destination="1598" id="1632"/>
                 <outlet property="modifyMappingsWindow" destination="1579" id="1633"/>
+                <outlet property="monogeckoCheckBoxButton" destination="sG4-gn-63G" id="cNj-Qf-J6K"/>
                 <outlet property="rebuildWrapperButton" destination="739" id="826"/>
                 <outlet property="refreshWrapperButton" destination="741" id="827"/>
                 <outlet property="regeditButton" destination="733" id="851"/>

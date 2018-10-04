@@ -137,8 +137,6 @@
                         attributes:nil error:nil];
 	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Applications/Wineskin"] withIntermediateDirectories:YES
                         attributes:nil error:nil];
-    [filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/cabextract"]
-                     toPath:[wineskinFolder stringByAppendingString:@"/cabextract"] error:nil];
     
     NSString* bin7zipFilePath = [wineskinFolder stringByAppendingString:@"/7za"];
     BOOL is7zaValid = [filemgr regularFileExistsAtPath:bin7zipFilePath];
@@ -156,6 +154,24 @@
         [filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/7za"]
                          toPath:[wineskinFolder stringByAppendingString:@"/7za"] error:nil];
     }
+    
+    NSString* bincabextractFilePath = [wineskinFolder stringByAppendingString:@"/cabextract"];
+    BOOL iscabextractValid = [filemgr regularFileExistsAtPath:bincabextractFilePath];
+    if (iscabextractValid)
+    {
+        NSString* expectedSha256 = @"c7647f11cf1f2436736735acbb70671ad2fe704150e80e55635db01d4d95c78f";
+        NSString* fileSha256 = [[NSFileManager defaultManager] checksum:NSChecksumTypeSHA256 ofFileAtPath:bincabextractFilePath];
+        
+        iscabextractValid = [expectedSha256 isEqualToString:fileSha256];
+        if (!iscabextractValid) [filemgr removeItemAtPath:bincabextractFilePath];
+    }
+    
+    if (!iscabextractValid)
+    {
+        [filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/cabextract"]
+                         toPath:[wineskinFolder stringByAppendingString:@"/cabextract"] error:nil];
+    }
+    
 }
 - (void)checkForUpdates
 {
@@ -211,7 +227,7 @@
 }
 
 -(BOOL)isXQuartzInstalled {
-    return [[NSFileManager defaultManager] fileExistsAtPath:@"/Applications/Utilities/XQuartz.app/Contents/MacOS/X11.bin"];
+    return [[NSFileManager defaultManager] fileExistsAtPath:@"/opt/X11/bin/Xquartz"];
 }
 -(IBAction)showOrHideXQuartzEngines:(NSButton*)sender {
     [installedEngines reloadData];

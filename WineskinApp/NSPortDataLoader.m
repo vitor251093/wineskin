@@ -95,6 +95,11 @@
             driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
             return driversVariable && [driversVariable isEqualToString:@"mac,x11"];
         }
+        else if (driversVariable)
+        {
+            driversVariable = [NSPortManager getStringValueForKey:@"Graphics" fromRegistryString:driversVariable];
+            return driversVariable && [driversVariable isEqualToString:@"mac"];
+        }
     }
     
     return FALSE;
