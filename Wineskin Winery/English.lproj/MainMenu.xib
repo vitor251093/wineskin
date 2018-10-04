@@ -412,6 +412,7 @@ DQ
                 <outlet property="engineWindowViewWineReleaseNotesButton" destination="730" id="742"/>
                 <outlet property="fileName" destination="635" id="656"/>
                 <outlet property="fileNameDestination" destination="690" id="695"/>
+                <outlet property="fileOutputName" destination="tl7-ju-9jo" id="YLV-ib-OdU"/>
                 <outlet property="helpWindow" destination="862" id="870"/>
                 <outlet property="hideXQuartzEnginesCheckBox" destination="iam-gv-IPG" id="tHu-4Y-qlK"/>
                 <outlet property="installedEngines" destination="589" id="667"/>
@@ -1026,6 +1027,15 @@ DQ
                         <rect key="frame" x="20" y="62" width="222" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="error" drawsBackground="YES" id="636">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField hidden="YES" verticalHuggingPriority="750" misplaced="YES" id="tl7-ju-9jo">
+                        <rect key="frame" x="20" y="62" width="222" height="22"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="error" drawsBackground="YES" id="QA4-Rw-S9m">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
