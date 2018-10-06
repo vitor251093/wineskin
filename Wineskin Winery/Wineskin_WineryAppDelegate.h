@@ -33,6 +33,7 @@
 	IBOutlet NSTextField *urlInput;
 	IBOutlet NSTextField *urlOutput;
 	IBOutlet NSTextField *fileName;
+    IBOutlet NSTextField *fileOutputName;
 	IBOutlet NSTextField *fileNameDestination;
 	IBOutlet NSProgressIndicator *progressBar;
 	IBOutlet NSButton *cancelButton;

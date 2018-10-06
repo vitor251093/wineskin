@@ -647,8 +647,8 @@
         
         [urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.gz",filename]];
         [fileName setHidden:YES];
-//        [fileOutputName setHidden:NO];
-//        [fileOutputName setStringValue:[[engineWindowEngineList selectedItem] title]];
+        [fileOutputName setHidden:NO];
+        [fileOutputName setStringValue:[[engineWindowEngineList selectedItem] title]];
         [fileName setStringValue:filename];
         [fileNameDestination setStringValue:@"EnginesRepack"];
         [downloadingWindow makeKeyAndOrderFront:self];
@@ -807,6 +807,11 @@
 		[addEngineWindow makeKeyAndOrderFront:self];
 		[downloadingWindow orderOut:self];
 	}
+    else if (([[fileNameDestination stringValue] isEqualToString:@"EnginesRepack"]))
+    {
+        [addEngineWindow makeKeyAndOrderFront:self];
+        [downloadingWindow orderOut:self];
+    }
 	else if ([[fileName stringValue] isEqualToString:@"Wineskin Winery Update"])
 	{
 		//display warning about not updating.
@@ -913,6 +918,72 @@
 		[window makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
 	}
+    //TODO: Engine Repacking Section
+    else if (([[fileNameDestination stringValue] isEqualToString:@"EnginesRepack"]))
+    {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        
+        //make wswine.bundle
+        [fm createDirectoryAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle"] withIntermediateDirectories:YES attributes:nil error:nil];
+        
+        //uncompress download
+        [self makeFoldersAndFiles];
+        system([[NSString stringWithFormat:@"/usr/bin/tar zxf /tmp/%@.tar.gz --strip-components=2 -C /tmp/wswine.bundle",[fileName stringValue]] UTF8String]);
+        
+        //remove tar.gz file
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.gz",[fileName stringValue]] error:nil];
+        
+        //Remove folders from within wswine.bundle
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/include"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/aclocal"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/doc"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/gtk-doc"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/man"] error:nil];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/openal"] error:nil];
+        
+        //make "version" file
+        NSString *configFileContents = [NSString stringWithFormat:@"%@",[fileOutputName stringValue]];
+        [configFileContents writeToFile:[NSString stringWithFormat:@"/tmp/wswine.bundle/version"] atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        
+        //make tar
+        system([[NSString stringWithFormat:@"cd /tmp/;tar -cf %@.tar wswine.bundle",[fileOutputName stringValue]] UTF8String]);
+        
+        //compress using lowest compression level and use upto 30 threads
+        system([[NSString stringWithFormat:@"cd \"tmp\";\"%@/Library/Application Support/Wineskin/7za\" a -mx=1 -mmt=30 %@.tar.7z %@.tar",NSHomeDirectory(),[fileOutputName stringValue],[fileOutputName stringValue]] UTF8String]);
+        
+        //remove wswine.bundle
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle"] error:nil];
+        
+        //remove tar
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar",[fileOutputName stringValue]] error:nil];
+        
+        //Deleted if engine with the same name is in Engines folder
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),[fileOutputName stringValue]] error:nil];
+        
+        //move engine into correct location
+        [fm moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileOutputName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z",NSHomeDirectory(),[fileOutputName stringValue]] error:nil];
+        
+        //Add engine to ignored list
+        NSArray *ignoredEngines = [self getEnginesToIgnore];
+        NSString *ignoredEnginesString = @"";
+        BOOL fixTheList=YES;
+        for (NSString *item in ignoredEngines)
+        {
+            if ([item isEqualToString:[fileOutputName stringValue]])
+            {
+                fixTheList=NO;
+                break;
+            }
+            ignoredEnginesString = [ignoredEnginesString stringByAppendingString:[item stringByAppendingString:@"\n"]];
+        }
+        if (fixTheList)
+        {
+            ignoredEnginesString = [NSString stringWithFormat:@"%@\n%@",ignoredEnginesString,[fileOutputName stringValue]];
+            [ignoredEnginesString writeToFile:[NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin/IgnoredEngines.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        }
+        [window makeKeyAndOrderFront:self];
+        [busyWindow orderOut:self];
+    }
 	else if (([[fileNameDestination stringValue] isEqualToString:@"EngineBase"]))
 	{
 		//uncompress download
