@@ -640,28 +640,10 @@
         [addEngineWindow orderOut:self];
     }
     else {
-        //Set the Wine branch for link
-        NSString *branch = (selectedEngine.engineType == NSWineskinEngineWine) ? @"devel" : @"staging";
-        VMMVersion* engineWineVersion = [[VMMVersion alloc] initWithString:selectedEngine.wineVersion];
-        NSMutableArray* versionComponents = [engineWineVersion.components mutableCopy];
-        [versionComponents removeObjectAtIndex:0];
-        engineWineVersion.components = versionComponents;
-        if ([engineWineVersion compareWithVersion:[[VMMVersion alloc] initWithString:@"0"]] == VMMVersionCompareFirstIsNewest &&
-            [engineWineVersion compareWithVersion:[[VMMVersion alloc] initWithString:@"1"]] == VMMVersionCompareSecondIsNewest) {
-            branch = @"stable";
-        }
+        NSString *directLink = selectedEngine.wineOfficialBuildDirectLink;
+        NSString* filename = directLink.lastPathComponent;
         
-        //Set the Wine version for link
-        NSString *version = selectedEngine.is64Bit ? @"osx64" : @"osx";
-        
-        //Set the Wine arch for link
-        NSString *arch = selectedEngine.wineVersion;
-        
-        //Download file name
-        NSString *filename = [NSString stringWithFormat:@"portable-winehq-%@-%@-%@",branch,version,arch];
-        
-        //Download the link & file name
-        [urlInput setStringValue:[NSString stringWithFormat:@"https://dl.winehq.org/wine-builds/macosx/pool/%@.tar.gz",filename]];
+        [urlInput setStringValue:directLink];
         
         [urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.gz",filename]];
         [fileName setHidden:YES];

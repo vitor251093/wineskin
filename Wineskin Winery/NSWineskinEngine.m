@@ -432,6 +432,29 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
 {
     return [NSWineskinEngine localPathForEngine:self.engineName];
 }
+-(NSString*)wineOfficialBuildDirectLink {
+    //Set the Wine branch for link
+    NSString *branch = (self.engineType == NSWineskinEngineWine) ? @"devel" : @"staging";
+    VMMVersion* engineWineVersion = [[VMMVersion alloc] initWithString:self.wineVersion];
+    NSMutableArray* versionComponents = [engineWineVersion.components mutableCopy];
+    [versionComponents removeObjectAtIndex:0];
+    engineWineVersion.components = versionComponents;
+    if ([engineWineVersion compareWithVersion:[[VMMVersion alloc] initWithString:@"1"]] == VMMVersionCompareSecondIsNewest) {
+        branch = @"stable";
+    }
+    
+    //Set the Wine arch for link
+    NSString *arch = self.is64Bit ? @"osx64" : @"osx";
+    
+    //Set the Wine version for link
+    NSString *version = self.wineVersion;
+    
+    //Download file name
+    NSString *filename = [NSString stringWithFormat:@"portable-winehq-%@-%@-%@",branch,version,arch];
+    
+    //Download the link & file name
+    return [NSString stringWithFormat:@"https://dl.winehq.org/wine-builds/macosx/pool/%@.tar.gz",filename];
+}
 
 -(BOOL)isCompatibleWithMacDriver
 {
@@ -825,6 +848,34 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     }
     
     return nil;
+}
+
+-(NSString*)description {
+    NSMutableArray* desc = [[NSMutableArray alloc] init];
+    [desc addObject:[NSString stringWithFormat:@"engineIdentifier: %@",_engineIdentifier]];
+    [desc addObject:[NSString stringWithFormat:@"engineVersion: %d",_engineVersion]];
+    [desc addObject:[NSString stringWithFormat:@"wineVersion: %@",_wineVersion]];
+    [desc addObject:[NSString stringWithFormat:@"complement: %@",_complement]];
+    switch (_engineType) {
+        case NSWineskinEngineWine:
+            [desc addObject:@"engineType: Wine"];
+            break;
+        case NSWineskinEngineWineStaging:
+            [desc addObject:@"engineType: Wine Staging"];
+            break;
+        case NSWineskinEngineCrossOver:
+            [desc addObject:@"engineType: CrossOver"];
+            break;
+        case NSWineskinEngineCrossOverGames:
+            [desc addObject:@"engineType: CrossOver Games"];
+            break;
+        default:
+            [desc addObject:@"engineType: Unknown"];
+            break;
+    }
+    [desc addObject:[NSString stringWithFormat:@"64bit: %@",(_is64Bit ? @"yes" : @"no")]];
+    [desc addObject:[NSString stringWithFormat:@"vulkanEnabled: %@",(_vulkanEnabled ? @"yes" : @"no")]];
+    return [NSString stringWithFormat:@"[%@]",[desc componentsJoinedByString:@", "]];
 }
 
 @end
