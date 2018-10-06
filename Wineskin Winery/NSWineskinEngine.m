@@ -852,30 +852,30 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
 
 -(NSString*)description {
     NSMutableArray* desc = [[NSMutableArray alloc] init];
-    [desc addObject:[NSString stringWithFormat:@"engineIdentifier: %@",_engineIdentifier]];
+    [desc addObject:[NSString stringWithFormat:@"engineIdentifier: \"%@\"",_engineIdentifier]];
     [desc addObject:[NSString stringWithFormat:@"engineVersion: %d",_engineVersion]];
-    [desc addObject:[NSString stringWithFormat:@"wineVersion: %@",_wineVersion]];
-    [desc addObject:[NSString stringWithFormat:@"complement: %@",_complement]];
+    [desc addObject:[NSString stringWithFormat:@"wineVersion: \"%@\"",_wineVersion]];
+    [desc addObject:[NSString stringWithFormat:@"complement: \"%@\"",_complement]];
     switch (_engineType) {
         case NSWineskinEngineWine:
-            [desc addObject:@"engineType: Wine"];
+            [desc addObject:@"engineType: \"Wine\""];
             break;
         case NSWineskinEngineWineStaging:
-            [desc addObject:@"engineType: Wine Staging"];
+            [desc addObject:@"engineType: \"Wine Staging\""];
             break;
         case NSWineskinEngineCrossOver:
-            [desc addObject:@"engineType: CrossOver"];
+            [desc addObject:@"engineType: \"CrossOver\""];
             break;
         case NSWineskinEngineCrossOverGames:
-            [desc addObject:@"engineType: CrossOver Games"];
+            [desc addObject:@"engineType: \"CrossOver Games\""];
             break;
         default:
-            [desc addObject:@"engineType: Unknown"];
+            [desc addObject:@"engineType: \"Unknown\""];
             break;
     }
-    [desc addObject:[NSString stringWithFormat:@"64bit: %@",(_is64Bit ? @"yes" : @"no")]];
-    [desc addObject:[NSString stringWithFormat:@"vulkanEnabled: %@",(_vulkanEnabled ? @"yes" : @"no")]];
-    return [NSString stringWithFormat:@"[%@]",[desc componentsJoinedByString:@", "]];
+    [desc addObject:[NSString stringWithFormat:@"64bit: %@",(_is64Bit ? @"true" : @"false")]];
+    [desc addObject:[NSString stringWithFormat:@"vulkanEnabled: %@",(_vulkanEnabled ? @"true" : @"false")]];
+    return [NSString stringWithFormat:@"{%@}",[desc componentsJoinedByString:@", "]];
 }
 
 @end
