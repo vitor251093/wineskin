@@ -8,12 +8,6 @@
 
 #import "NSWineskinEngine.h"
 
-//#import "NSFileManager+Compression.h"
-
-//#import "NSPathUtilities.h"
-
-//#import "NSWebUtilities.h"
-
 #define MINIMUM_ENGINE_NAME_LENGTH 4
 
 #define IDENTIFIER_PREFIX_LENGTH 2
