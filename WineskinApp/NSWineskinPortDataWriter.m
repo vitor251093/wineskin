@@ -130,9 +130,11 @@
     NSString* graphicsValue = (macdriver ? @"\"mac,x11\"" : @"\"x11,mac\"");
     return [port setValues:@{@"Graphics":graphicsValue} forEntry:driversRegistry atRegistryFileNamed:USER_REG];
 }
-+(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engine atPort:(NSPortManager*)port
++(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engineString atPort:(NSPortManager*)port
 {
-    if (![NSWineskinEngine isCsmtCompatibleWithEngine:engine])
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    
+    if (!engine.isCompatibleWithCsmt)
     {
         return FALSE;
     }
@@ -141,7 +143,7 @@
     NSString* value;
     NSString* direct3DRegistry = @"[Software\\\\Wine\\\\Direct3D]";
     
-    if ([NSWineskinEngine csmtUsesNewRegistryWithEngine:engine])
+    if (engine.csmtUsesNewRegistry)
     {
         key = @"csmt";
         value = (direct3DBoost ? @"dword:00000001" : @"dword:00000000");
@@ -162,9 +164,10 @@
     return [port setValues:@{@"Managed"  :decorateValue,
                              @"Decorated":decorateValue} forEntry:x11DriverRegistry atRegistryFileNamed:USER_REG];
 }
-+(BOOL)saveRetinaMode:(BOOL)retinaModeOn withEngine:(NSString*)engine atPort:(NSPortManager*)port
++(BOOL)saveRetinaMode:(BOOL)retinaModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port
 {
-    BOOL enableRetinaModeOn = retinaModeOn && [NSWineskinEngine isHighQualityModeCompatibleWithEngine:engine];
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    BOOL enableRetinaModeOn = retinaModeOn && engine.isCompatibleWithHighQualityMode;
     
     BOOL result = true;
     result = [port setValues:@{@"LogPixels": (enableRetinaModeOn ? @"dword:000000c0" : @"dword:00000060")}

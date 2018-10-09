@@ -41,27 +41,4 @@ static NSAlert* _alertSources;
     return [[NSMutableDictionary mutableDictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@%@",wrapper,plist]] objectForKey:item];
 }
 
-// NSOrderedSame:       They are the same
-// NSOrderedAscending:  The one in the left is bigger
-// NSOrderedDescending: The one in the right is bigger
-+(NSComparisonResult)compareVersionString:(NSString*)PK1 withVersionString:(NSString*)PK2
-{
-    NSArray* PKArray1 = [PK1 componentsSeparatedByString:@"."];
-    NSArray* PKArray2 = [PK2 componentsSeparatedByString:@"."];
-    
-    for (int x = 0; x < PKArray1.count && x < PKArray2.count; x++)
-    {
-        if ([PKArray1[x] initialIntValue] < [PKArray2[x] initialIntValue]) return NSOrderedDescending;
-        if ([PKArray1[x] initialIntValue] > [PKArray2[x] initialIntValue]) return NSOrderedAscending;
-    }
-    
-    if (PKArray1.count < PKArray2.count) return NSOrderedDescending;
-    if (PKArray1.count > PKArray2.count) return NSOrderedAscending;
-    
-    if (PK1.length > PK2.length) return NSOrderedAscending;
-    if (PK1.length < PK2.length) return NSOrderedDescending;
-    
-    return NSOrderedSame;
-}
-
 @end

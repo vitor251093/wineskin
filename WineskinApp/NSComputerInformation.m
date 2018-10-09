@@ -9,6 +9,7 @@
 #import "NSComputerInformation.h"
 
 #import "NSUtilities.h"
+#import "VMMVersion.h"
 
 #import "NSTask+Extension.h"
 #import "NSArray+Extension.h"
@@ -51,7 +52,7 @@ static NSString* _macOsVersion;
 }
 +(BOOL)isSystemMacOsEqualOrSuperiorTo:(NSString*)version
 {
-    return [NSUtilities compareVersionString:version withVersionString:self.macOsVersion] != NSOrderedAscending;
+    return [VMMVersion compareVersionString:version withVersionString:self.macOsVersion] != VMMVersionCompareFirstIsNewest;
 }
 
 +(BOOL)isUsingFnKeysFunctions

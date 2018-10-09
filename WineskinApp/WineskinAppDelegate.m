@@ -504,7 +504,8 @@ NSFileManager *fm;
 
 - (void)loadScreenOptionsData
 {
-    NSString* engine = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+    NSString* engineString = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
     
     BOOL retinaMode = [NSPortDataLoader retinaModeIsEnabledAtPort:self.wrapperPath withEngine:engine];
     [retinaModeCheckBoxButton setState:retinaMode];
@@ -513,9 +514,9 @@ NSFileManager *fm;
     [useMacDriverRadioButton setState: macDriver];
     [useX11RadioButton       setState:!macDriver];
     [macDriverX11TabView selectTabViewItemAtIndex:macDriver ? 0 : 1];
-    [useMacDriverRadioButton setEnabled:[NSWineskinEngine isMacDriverCompatibleWithEngine:engine]];
+    [useMacDriverRadioButton setEnabled:engine.isCompatibleWithMacDriver];
     
-    [useD3DBoostIfAvailableCheckBoxButton setEnabled:[NSWineskinEngine isCsmtCompatibleWithEngine:engine]];
+    [useD3DBoostIfAvailableCheckBoxButton setEnabled:engine.isCompatibleWithCsmt];
     [useD3DBoostIfAvailableCheckBoxButton setState:[NSPortDataLoader direct3DBoostIsEnabledAtPort:self.wrapperPath]];
     
     [windowManagerCheckBoxButton setState:[NSPortDataLoader decorateWindowIsEnabledAtPort:self.wrapperPath]];
@@ -524,14 +525,14 @@ NSFileManager *fm;
     [autoDetectGPUInfoCheckBoxButton setState:autoDetectGPUEnabled];
 	
     //If X11 is set without XQuartz being installed force macDriver if the engine supports macDriver
-    if (!self.isXQuartzInstalled && [NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
+    if (!self.isXQuartzInstalled && engine.isCompatibleWithMacDriver)
     {
         [useX11RadioButton setEnabled:NO];
         [useX11RadioButton setState:false];
         [macDriverX11TabView selectTabViewItemAtIndex:0];
         [NSWineskinPortDataWriter saveMacDriver:true atPort:portManager];
     }
-    else if (!self.isXQuartzInstalled && ![NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
+    else if (!self.isXQuartzInstalled && !engine.isCompatibleWithMacDriver)
     {
         [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
     }

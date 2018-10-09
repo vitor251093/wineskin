@@ -8,8 +8,6 @@
 
 #import "NSPortDataLoader.h"
 
-#import "NSWineskinEngine.h"
-
 #import "NSUtilities.h"
 #import "NSPathUtilities.h"
 
@@ -22,7 +20,7 @@
 
 @implementation NSPortDataLoader
 
-+(NSString*)getPrimaryWineskinWrapperEngineAtPath:(NSString*)path
++(NSString*)wineskinEngineOfPortAtPath:(NSString*)path
 {
     NSString* wswineVersion = [NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",path];
     
@@ -33,60 +31,14 @@
     
     return nil;
 }
-+(NSString*)getWineskinWrapperEngineFromInfFileAtPath:(NSString*)wineInfPath
-{
-    if ([[NSFileManager defaultManager] regularFileExistsAtPath:wineInfPath])
-    {
-        NSArray* frags = [[NSString stringWithContentsOfFile:wineInfPath encoding:NSASCIIStringEncoding] componentsSeparatedByString:@"\n"];
-        if (frags.count > 1)
-        {
-            NSString* newWrapperEngine = frags[1];
-            if ([newWrapperEngine contains:@"Wine"])
-            {
-                return [NSWineskinEngine mostRecentVersionOfEngine:newWrapperEngine];
-            }
-        }
-    }
-    
-    return nil;
-}
-+(NSString*)wineskinEngineOfPortAtPath:(NSString*)path
-{
-    NSString* primaryEngine = [self getPrimaryWineskinWrapperEngineAtPath:path];
-    BOOL primaryEngineExists = !!primaryEngine;
-    BOOL primaryEngineIsDesirable = [primaryEngine matchesWithRegex:REGEX_WINESKIN_ENGINE];
-    
-    if (primaryEngineExists && primaryEngineIsDesirable)
-    {
-        return primaryEngine;
-    }
-    
-    NSString* wineInfPath = [NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/share/wine/wine.inf",path];
-    NSString* secondaryEngine = [self getWineskinWrapperEngineFromInfFileAtPath:wineInfPath];
-    BOOL secondaryEngineExists = !!secondaryEngine;
-    BOOL secondaryEngineIsDesirable = [secondaryEngine matchesWithRegex:REGEX_WINESKIN_ENGINE];
-    
-    if (secondaryEngineExists && secondaryEngineIsDesirable)
-    {
-        return secondaryEngine;
-    }
-    
-    if ([primaryEngine isEqualToString:secondaryEngine])
-    {
-        return primaryEngine;
-    }
-    
-    if ([primaryEngine hasPrefix:@"WS"]) return primaryEngine;
-    return secondaryEngine;
-}
 +(NSString*)engineOfPortAtPath:(NSString*)path
 {
     return [self wineskinEngineOfPortAtPath:path];
 }
 
-+(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine
++(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
 {
-    if ([NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
+    if (engine.isCompatibleWithMacDriver)
     {
         NSPortManager* port = [NSPortManager managerWithPath:path];
         NSString* driversVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Drivers]" fromRegistryFileNamed:USER_REG];
@@ -134,14 +86,15 @@
     NSString* direct3DVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Direct3D]" fromRegistryFileNamed:USER_REG];
     if (direct3DVariable)
     {
-        NSString* engine = [NSPortDataLoader engineOfPortAtPath:path];
+        NSString* engineString = [NSPortDataLoader engineOfPortAtPath:path];
+        NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
         
-        if (![NSWineskinEngine isCsmtCompatibleWithEngine:engine])
+        if (!engine.isCompatibleWithCsmt)
         {
             return false;
         }
         
-        if ([NSWineskinEngine csmtUsesNewRegistryWithEngine:engine])
+        if (engine.csmtUsesNewRegistry)
         {
             direct3DVariable = [NSPortManager getValueForKey:@"csmt" fromRegistryString:direct3DVariable];
             if (direct3DVariable) return [direct3DVariable isEqualToString:@"dword:00000001"];
@@ -155,9 +108,9 @@
     
     return false;
 }
-+(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine
++(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
 {
-    if ([NSWineskinEngine isHighQualityModeCompatibleWithEngine:engine])
+    if (engine.isCompatibleWithHighQualityMode)
     {
         NSPortManager* port = [NSPortManager managerWithPath:path];
         NSString* macDriverVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Mac Driver]" fromRegistryFileNamed:USER_REG];

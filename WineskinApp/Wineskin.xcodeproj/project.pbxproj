@@ -10,6 +10,8 @@
 		162AD88C1434CE2800FC0426 /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 162AD88B1434CE2800FC0426 /* Defaults.plist */; };
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* WineskinAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */; };
+		4E8ADD3B216C20CC0015D492 /* NSMutableArray+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E8ADD3A216C20CC0015D492 /* NSMutableArray+Extension.m */; };
+		4E8ADD3E216C21A60015D492 /* VMMVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E8ADD3D216C21A60015D492 /* VMMVersion.m */; };
 		4EA283A81EFFFA4100E61883 /* NSDropIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EA283A71EFFFA4100E61883 /* NSDropIconView.m */; };
 		4EA283B51EFFFA7100E61883 /* NSAlert+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EA283AA1EFFFA7100E61883 /* NSAlert+Extension.m */; };
 		4EA283B61EFFFA7100E61883 /* NSData+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EA283AC1EFFFA7100E61883 /* NSData+Extension.m */; };
@@ -57,6 +59,10 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		4E8ADD39216C20CC0015D492 /* NSMutableArray+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+Extension.h"; sourceTree = "<group>"; };
+		4E8ADD3A216C20CC0015D492 /* NSMutableArray+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+Extension.m"; sourceTree = "<group>"; };
+		4E8ADD3C216C21A60015D492 /* VMMVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VMMVersion.h; sourceTree = "<group>"; };
+		4E8ADD3D216C21A60015D492 /* VMMVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VMMVersion.m; sourceTree = "<group>"; };
 		4EA283A61EFFFA4100E61883 /* NSDropIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDropIconView.h; sourceTree = "<group>"; };
 		4EA283A71EFFFA4100E61883 /* NSDropIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSDropIconView.m; sourceTree = "<group>"; };
 		4EA283A91EFFFA7100E61883 /* NSAlert+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAlert+Extension.h"; sourceTree = "<group>"; };
@@ -234,6 +240,8 @@
 				4EA283AE1EFFFA7100E61883 /* NSFileManager+Extension.m */,
 				4EA283AF1EFFFA7100E61883 /* NSImage+Extension.h */,
 				4EA283B01EFFFA7100E61883 /* NSImage+Extension.m */,
+				4E8ADD39216C20CC0015D492 /* NSMutableArray+Extension.h */,
+				4E8ADD3A216C20CC0015D492 /* NSMutableArray+Extension.m */,
 				4EA283C71EFFFB0500E61883 /* NSMutableDictionary+Extension.h */,
 				4EA283C81EFFFB0500E61883 /* NSMutableDictionary+Extension.m */,
 				4EA283F91F0004D900E61883 /* NSSavePanel+Extension.h */,
@@ -255,6 +263,8 @@
 				4EA283D81EFFFFED00E61883 /* Download.m */,
 				4EA283C41EFFFAF400E61883 /* NSUtilities.h */,
 				4EA283C51EFFFAF400E61883 /* NSUtilities.m */,
+				4E8ADD3C216C21A60015D492 /* VMMVersion.h */,
+				4E8ADD3D216C21A60015D492 /* VMMVersion.m */,
 				4EA283DD1F0000BC00E61883 /* NSWebUtilities.h */,
 				4EA283DE1F0000BC00E61883 /* NSWebUtilities.m */,
 				4EA283ED1F0001FD00E61883 /* NSPathUtilities.h */,
@@ -389,6 +399,7 @@
 				4EA283A81EFFFA4100E61883 /* NSDropIconView.m in Sources */,
 				4EA283C91EFFFB0500E61883 /* NSMutableDictionary+Extension.m in Sources */,
 				4EA283CC1EFFFB7300E61883 /* NSArray+Extension.m in Sources */,
+				4E8ADD3B216C20CC0015D492 /* NSMutableArray+Extension.m in Sources */,
 				4EA284031F003ABE00E61883 /* NSExeSelection.m in Sources */,
 				4EA283B51EFFFA7100E61883 /* NSAlert+Extension.m in Sources */,
 				4EA283EF1F0001FD00E61883 /* NSPathUtilities.m in Sources */,
@@ -400,6 +411,7 @@
 				4EA283D61EFFFFD000E61883 /* NSWineskinPortDataWriter.m in Sources */,
 				4EA283BA1EFFFA7100E61883 /* NSTask+Extension.m in Sources */,
 				4EA283DC1F0000A500E61883 /* NSProgressView.m in Sources */,
+				4E8ADD3E216C21A60015D492 /* VMMVersion.m in Sources */,
 				4EA283B81EFFFA7100E61883 /* NSImage+Extension.m in Sources */,
 				4EA283C31EFFFADE00E61883 /* NSComputerInformation.m in Sources */,
 				4EA283B61EFFFA7100E61883 /* NSData+Extension.m in Sources */,

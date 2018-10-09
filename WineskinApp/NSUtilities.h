@@ -13,6 +13,4 @@
 +(id)getPlistItem:(NSString*)item fromWrapper:(NSString*)wrapper;
 +(id)getPlistItem:(NSString*)item fromPlist:(NSString*)plist fromWrapper:(NSString*)wrapper;
 
-+(NSComparisonResult)compareVersionString:(NSString*)PK1 withVersionString:(NSString*)PK2;
-
 @end
