@@ -14,6 +14,7 @@
 #import "NSString+Extension.h"
 #import "NSSavePanel+Extension.h"
 #import "NSFileManager+Extension.h"
+#import "NSMutableArray+Extension.h"
 #import "NSMutableDictionary+Extension.h"
 
 #import "NSPathUtilities.h"
@@ -1876,7 +1877,10 @@ NSFileManager *fm;
 - (void)setEngineList:(NSString *)theFilter
 {
 	//get installed engines
-	NSMutableArray *installedEnginesList = [NSWineskinEngine getListOfLocalEngines];
+	NSMutableArray* installedEnginesList = [NSWineskinEngine getListOfLocalEngines];
+    [installedEnginesList replaceObjectsWithVariation:^NSString* _Nullable(NSWineskinEngine*  _Nonnull object, NSUInteger index) {
+        return object.engineName;
+    }];
 	
     //update engine list in change engine window
 	[changeEngineWindowPopUpButton removeAllItems];

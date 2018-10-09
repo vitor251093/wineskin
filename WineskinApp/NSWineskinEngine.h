@@ -18,6 +18,7 @@ typedef enum {
 
 @interface NSWineskinEngine : NSObject
 
+-(NSString*)engineName;
 @property (nonatomic, strong) NSString* engineIdentifier;
 @property (nonatomic) int engineVersion;
 @property (nonatomic, strong) NSString* wineVersion;
