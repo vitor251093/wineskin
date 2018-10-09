@@ -796,12 +796,12 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             
         case NSWineskinEngineWineStaging:
             if (self.is64Bit) return false;
-            if ([self isWineVersionAtLeast:@"2.22"]) return true;
+            if (![self isWineVersionAtLeast:@"2.4"]) return true;
             break;
             
         case NSWineskinEngineWine:
             if (self.is64Bit) return false;
-            if ([self isWineVersionAtLeast:@"2.23"]) return true;
+            if (![self isWineVersionAtLeast:@"2.0"]) return true;
             break;
             
         default:
