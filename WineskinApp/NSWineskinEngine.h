@@ -11,6 +11,7 @@
 typedef enum {
     NSWineskinEngineWine,
     NSWineskinEngineWineStaging,
+    NSWineskinEngineProton,
     NSWineskinEngineCrossOver,
     NSWineskinEngineCrossOverGames,
     NSWineskinEngineOther
@@ -26,6 +27,7 @@ typedef enum {
 @property (nonatomic) NSWineskinEngineType engineType;
 @property (nonatomic) BOOL is64Bit;
 @property (nonatomic) BOOL vulkanEnabled;
+@property (nonatomic) BOOL gnutlsEnabled;
 
 +(NSMutableArray<NSWineskinEngine*>*)getListOfLocalEngines;
 

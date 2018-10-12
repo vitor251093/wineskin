@@ -13,13 +13,14 @@
 #define IDENTIFIER_PREFIX_LENGTH 2
 
 #define DEFAULT_WINESKIN_ENGINE_IDENTIFIER @"WS"
-#define DEFAULT_WINESKIN_ENGINE_VERSION    9
+#define DEFAULT_WINESKIN_ENGINE_VERSION    10
 
 #define WINESKIN_LIBRARY_ENGINES_FOLDER [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()]
 
-static NSString *const REGEX_VALID_WINESKIN_ENGINE =                 @"[A-Z]{2}[0-9]+Wine(CX|CXG|Staging)?(Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
-static NSString *const REGEX_VALID_WINESKIN_WINE_ENGINE =            @"[A-Z]{2}[0-9]+Wine(Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
-static NSString *const REGEX_VALID_WINESKIN_STAGING_ENGINE =         @"[A-Z]{2}[0-9]+WineStaging(Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
+static NSString *const REGEX_VALID_WINESKIN_ENGINE =                 @"[A-Z]{2}[0-9]+Wine(CX|CXG|Staging|Proton)?(Gnutls|Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
+static NSString *const REGEX_VALID_WINESKIN_WINE_ENGINE =            @"[A-Z]{2}[0-9]+Wine(Gnutls|Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
+static NSString *const REGEX_VALID_WINESKIN_STAGING_ENGINE =         @"[A-Z]{2}[0-9]+WineStaging(Gnutls|Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
+static NSString *const REGEX_VALID_WINESKIN_PROTON_ENGINE =       @"[A-Z]{2}[0-9]+WineProton(64Bit)?[0-9\\.]+[^\\n]*";
 static NSString *const REGEX_VALID_WINESKIN_CROSSOVER_ENGINE =       @"[A-Z]{2}[0-9]+WineCX(64Bit)?[0-9\\.]+[^\\n]*";
 static NSString *const REGEX_VALID_WINESKIN_CROSSOVER_GAMES_ENGINE = @"[A-Z]{2}[0-9]+WineCXG(64Bit)?[0-9\\.]+[^\\n]*";
 static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\.[0-9]+)*([-\\.]{1}rc[0-9]+)?";
@@ -82,6 +83,28 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
         }
         else if (wineskinEngineIsNotCrossOver1) return NSOrderedAscending;
         else if (wineskinEngineIsNotCrossOver2) return NSOrderedDescending;
+
+        
+        // At this point: Proton
+        
+        if (wineskinEngine1.engineType == NSWineskinEngineProton && wineskinEngine2.engineType == NSWineskinEngineProton)
+        {
+            VMMVersionCompare result = [VMMVersion compareVersionString:wineskinEngine1.wineVersion
+                                                      withVersionString:wineskinEngine2.wineVersion];
+            if (result == VMMVersionCompareSame)
+            {
+                if ( wineskinEngine1.vulkanEnabled && !wineskinEngine2.vulkanEnabled) return NSOrderedAscending;
+                if (!wineskinEngine1.vulkanEnabled &&  wineskinEngine2.vulkanEnabled) return NSOrderedDescending;
+                
+                if ( wineskinEngine1.is64Bit && !wineskinEngine2.is64Bit) return NSOrderedAscending;
+                if (!wineskinEngine1.is64Bit &&  wineskinEngine2.is64Bit) return NSOrderedDescending;
+                
+                return [self alphabeticalOrderOfFirstString:wineskinEngine1.complement andSecondString:wineskinEngine2.complement];
+            }
+            return (result == VMMVersionCompareSecondIsNewest) ? NSOrderedDescending : NSOrderedAscending;
+        }
+        else if (wineskinEngine1.engineType == NSWineskinEngineProton) return NSOrderedAscending;
+        else if (wineskinEngine2.engineType == NSWineskinEngineProton) return NSOrderedDescending;
         
         
         // At this point: CrossOver and CrossOver Games
@@ -282,6 +305,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
         wineskinEngine.engineType = NSWineskinEngineOther;
         wineskinEngine.complement = engineString;
         wineskinEngine.vulkanEnabled = false;
+        wineskinEngine.gnutlsEnabled = false;
         wineskinEngine.is64Bit = false;
         return wineskinEngine;
     }
@@ -289,6 +313,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     wineskinEngine.engineType = NSWineskinEngineOther;
     if ([engineString matchesWithRegex:REGEX_VALID_WINESKIN_WINE_ENGINE])            wineskinEngine.engineType = NSWineskinEngineWine;
     if ([engineString matchesWithRegex:REGEX_VALID_WINESKIN_STAGING_ENGINE])         wineskinEngine.engineType = NSWineskinEngineWineStaging;
+    if ([engineString matchesWithRegex:REGEX_VALID_WINESKIN_PROTON_ENGINE])         wineskinEngine.engineType = NSWineskinEngineProton;
     if ([engineString matchesWithRegex:REGEX_VALID_WINESKIN_CROSSOVER_ENGINE])       wineskinEngine.engineType = NSWineskinEngineCrossOver;
     if ([engineString matchesWithRegex:REGEX_VALID_WINESKIN_CROSSOVER_GAMES_ENGINE]) wineskinEngine.engineType = NSWineskinEngineCrossOverGames;
     
@@ -299,6 +324,10 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     {
         case NSWineskinEngineWineStaging:
             tempEngineString = [tempEngineString substringFromIndex:7];
+            break;
+            
+        case NSWineskinEngineProton:
+            tempEngineString = [tempEngineString substringFromIndex:6];
             break;
             
         case NSWineskinEngineCrossOver:
@@ -321,6 +350,10 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     wineskinEngine.is64Bit = [tempEngineString hasPrefix:component64Bit];
     if (wineskinEngine.is64Bit) tempEngineString = [tempEngineString substringFromIndex:component64Bit.length];
     
+    NSString* componentGnutls = @"Gnutls";
+    wineskinEngine.gnutlsEnabled = [tempEngineString hasPrefix:componentGnutls];
+    if (wineskinEngine.gnutlsEnabled) tempEngineString = [tempEngineString substringFromIndex:componentGnutls.length];
+    
     NSString* version = [self wineskinVersionFromWineskinEngineNameFinal:tempEngineString];
     if (version && [tempEngineString hasPrefix:version])
     {
@@ -342,7 +375,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     return wineskinEngine;
 }
 
-+(NSWineskinEngine*)wineskinEngineOfType:(NSWineskinEngineType)engineType is64Bit:(BOOL)is64Bit withVulkanEnabled:(BOOL)vulkanEnabled ofVersion:(NSString*)version withComplement:(NSString*)complement
++(NSWineskinEngine*)wineskinEngineOfType:(NSWineskinEngineType)engineType is64Bit:(BOOL)is64Bit withGnutlsEnabled:(BOOL)gnutlsEnabled withVulkanEnabled:(BOOL)vulkanEnabled ofVersion:(NSString*)version withComplement:(NSString*)complement
 {
     NSWineskinEngine* wineskinEngine = [[NSWineskinEngine alloc] init];
     
@@ -357,6 +390,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     wineskinEngine.engineType = engineType;
     wineskinEngine.complement = complement ? complement : @"";
     wineskinEngine.vulkanEnabled = vulkanEnabled;
+    wineskinEngine.gnutlsEnabled = gnutlsEnabled;
     wineskinEngine.is64Bit = is64Bit;
     
     NSString* halfOfTheEngineName = [wineskinEngine.engineName substringFromIndex:IDENTIFIER_PREFIX_LENGTH + 1];
@@ -393,6 +427,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     if (!self.wineVersion) return self.complement;
     
     NSString* vulkanEnabled = self.vulkanEnabled ? @"Vulkan" : @"";
+    NSString* gnutlsEnabled = self.gnutlsEnabled ? @"Gnutls" : @"";
     NSString* is64Bit = self.is64Bit ? @"64Bit" : @"";
     NSString* engineTypeString = @"";
     int wineskinEngineVersion = self.engineVersion;
@@ -407,6 +442,10 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             engineTypeString = @"CX";
             break;
             
+        case NSWineskinEngineProton:
+            engineTypeString = @"Proton";
+            break;
+            
         case NSWineskinEngineWineStaging:
             engineTypeString = @"Staging";
             break;
@@ -418,8 +457,8 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             break;
     }
     
-    return [NSString stringWithFormat:@"%@%dWine%@%@%@%@%@", self.engineIdentifier, wineskinEngineVersion,
-            engineTypeString, vulkanEnabled, is64Bit, self.wineVersion, self.complement];
+    return [NSString stringWithFormat:@"%@%dWine%@%@%@%@%@%@", self.engineIdentifier, wineskinEngineVersion,
+            engineTypeString, gnutlsEnabled, vulkanEnabled, is64Bit, self.wineVersion, self.complement];
 }
 
 -(NSString*)localPath
@@ -475,6 +514,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             
             return true;
             
+        case NSWineskinEngineProton:
+            return true;
+            
         case NSWineskinEngineWine:
             
             // Technically Mac Driver was created at 1.5.20, but only at 1.5.22 it became usable
@@ -521,6 +563,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             if ([self isWineVersionAtLeast:@"1.9.6"] && ![self isWineVersionAtLeast:@"1.9.10"]) return false;
             return true;
             
+        case NSWineskinEngineProton:
+            return true;
+            
         case NSWineskinEngineWine:
             
             // CSMT was added to Wine in the 2.6 version
@@ -560,6 +605,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             
             return [self isWineVersionAtLeast:@"1.9.10"];
             
+        case NSWineskinEngineProton:
+            return true;
+            
         case NSWineskinEngineWine:
             
             // CSMT was added to Wine in the 2.6 version, and it always used it in that way
@@ -590,6 +638,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             // https://www.codeweavers.com/products/more-information/changelog#15.0.0
             
             return [self isWineVersionAtLeast:@"15.0.0"];
+            
+        case NSWineskinEngineProton:
+            return true;
             
         case NSWineskinEngineWineStaging:
         case NSWineskinEngineWine:
@@ -628,6 +679,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             // The first Wine Staging version is based on Wine 1.7.7, so it never had 16-bit compatibility
             // https://github.com/wine-compholio/wine-staging/releases?after=v1.7.9
             
+            return false;
+            
+        case NSWineskinEngineProton:
             return false;
             
         case NSWineskinEngineWine:
@@ -784,6 +838,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
 -(BOOL)requiresManualDownload
 {
     if (self.vulkanEnabled) return true;
+    if (self.gnutlsEnabled) return true;
     if (self.complement != nil && [self.complement isEqualToString:@"Fix"]) return true;
     
     switch (self.engineType)
@@ -792,6 +847,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             return true;
             
         case NSWineskinEngineCrossOver:
+            return true;
+            
+        case NSWineskinEngineProton:
             return true;
             
         case NSWineskinEngineWineStaging:
@@ -857,6 +915,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
         case NSWineskinEngineWineStaging:
             [desc addObject:@"engineType: \"Wine Staging\""];
             break;
+        case NSWineskinEngineProton:
+            [desc addObject:@"engineType: \"Wine Proton\""];
+            break;
         case NSWineskinEngineCrossOver:
             [desc addObject:@"engineType: \"CrossOver\""];
             break;
@@ -869,6 +930,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     }
     [desc addObject:[NSString stringWithFormat:@"64bit: %@",(_is64Bit ? @"true" : @"false")]];
     [desc addObject:[NSString stringWithFormat:@"vulkanEnabled: %@",(_vulkanEnabled ? @"true" : @"false")]];
+    [desc addObject:[NSString stringWithFormat:@"gnutlsEnabled: %@",(_gnutlsEnabled ? @"true" : @"false")]];
     return [NSString stringWithFormat:@"{%@}",[desc componentsJoinedByString:@", "]];
 }
 
