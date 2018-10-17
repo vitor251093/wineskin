@@ -753,44 +753,50 @@ static NSPortManager* portManager;
 {
     //if lockfile already existed, then this instance was launched when another is the main one.
     //We need to pass the parameters given to WineskinLauncher over to the correct run of this program
-    //WSS-installer {path/file}	-need to send file path to main
-    //WSS-winecfg 				- need to send path to winecfg.exe to main
-    //WSS-cmd					- need to send path to cmd.exe to main
-    //WSS-regedit 				- need to send path to regedit.exe to main
-    //WSS-taskmgr 				- need to send path to taskmgr.exe to main
-    //WSS-uninstaller			- need to send path to uninstaller.exe to main
-    //WSS-wineprefixcreate		- need to error, saying this cannot run while the wrapper is running
+    //WSS-installer {path/file}    -need to send file path to main
+    //WSS-winecfg                 - need to send path to winecfg.exe to main
+    //WSS-cmd                    - need to send path to cmd.exe to main
+    //WSS-regedit                 - need to send path to regedit.exe to main
+    //WSS-taskmgr                 - need to send path to taskmgr.exe to main
+    //WSS-uninstaller            - need to send path to uninstaller.exe to main
+    //WSS-wineprefixcreate        - need to error, saying this cannot run while the wrapper is running
     //WSS-wineprefixcreatenoregs- need to error, saying this cannot run while the wrapper is running
-    //WSS-wineboot				- need to error, saying this cannot run while the wrapper is running
-    //WSS-winetricks {command}	- need to error, saying this cannot run while the wrapper is running
+    //WSS-wineboot                - need to error, saying this cannot run while the wrapper is running
+    //WSS-winetricks {command}    - need to error, saying this cannot run while the wrapper is running
     //WSS-wineserverkill        - tell winesever to kill all wine processes from wrapper
-    //debug 					- need to error, saying this cannot run while the wrapper is running
-    //CustomEXE {appname}		- need to send path to cexe to main
-    //starts with a"/" 			- need to just pass this one to main
-    //no command line args		- else condition... nothing to do, don't do anything.
+    //debug                     - need to error, saying this cannot run while the wrapper is running
+    //CustomEXE {appname}        - need to send path to cexe to main
+    //starts with a"/"             - need to just pass this one to main
+    //no command line args        - else condition... nothing to do, don't do anything.
     
     NSString *wssCommand = [wineStart getWssCommand];
     NSArray *otherCommands = [wineStart getWinetricksCommands];
     NSString *theFileToRun;
-    
-    NSDictionary* fileToRunForCommand = @{
-                                @"WSS-installer":   otherCommands[0],
-                                @"WSS-wineserverkill":   otherCommands[0],
-                                @"WSS-winecfg":     [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix],
-                                @"WSS-cmd":         [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix],
-                                @"WSS-regedit":     [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix],
-                                @"WSS-taskmgr":     [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix],
-                                @"WSS-uninstaller": [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix]};
-    
-    NSString* path = fileToRunForCommand[wssCommand];
-    
-    if (path != nil)
+    if ([wssCommand isEqualToString:@"WSS-installer"])
     {
-        theFileToRun = path;
+        theFileToRun = [otherCommands objectAtIndex:0];
     }
-    else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] ||
-             [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] ||
-             [wssCommand isEqualToString:@"debug"])
+    else if ([wssCommand isEqualToString:@"WSS-winecfg"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-cmd"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-regedit"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-taskmgr"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-uninstaller"])
+    {
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix];
+    }
+    else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] || [wssCommand isEqualToString:@"debug"])
     {
         NSString *errorMsg = [NSString stringWithFormat:@"ERROR, tried to run command %@ when the wrapper was already running.  Please make sure the wrapper is not running in order to do this.", wssCommand];
         CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)errorMsg, NULL);
@@ -799,15 +805,17 @@ static NSPortManager* portManager;
     }
     else if ([wssCommand isEqualToString:@"CustomEXE"])
     {
-        NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,otherCommands[0]]];
-        NSString* programNameAndPath = [NSString stringWithFormat:@"C:%@",cexePlistDictionary[WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH]];
-        theFileToRun = [NSPathUtilities getMacPathForWindowsPath:programNameAndPath ofWrapper:self.portManager.path];
+        NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[otherCommands objectAtIndex:0]]];
+        theFileToRun = [NSString stringWithFormat:@"%@/drive_c%@",winePrefix,[cexePlistDictionary valueForKey:@"Program Name and Path"]];
     }
     else if ([wssCommand hasPrefix:@"/"])
     {
-        NSMutableArray *temp = [[NSMutableArray alloc] initWithObjects:wssCommand, nil];
-        [temp addObjectsFromArray:otherCommands];
-        theFileToRun = [temp componentsJoinedByString:@"\" \""];
+        NSMutableString *temp = [[NSMutableString alloc] initWithString:wssCommand];
+        for (NSString *item in otherCommands)
+        {
+            [temp appendString:[NSString stringWithFormat:@"\" \"%@",item]];
+        }
+        theFileToRun = temp;
     }
     else
     {
@@ -817,7 +825,6 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"open \"%@\" -a \"%@\"",theFileToRun,appNameWithPath]];
     return;
 }
-
 - (void)setGamma:(NSString *)inputValue
 {
 	if ([inputValue isEqualToString:@"default"])
