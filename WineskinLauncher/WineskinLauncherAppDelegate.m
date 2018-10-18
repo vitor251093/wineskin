@@ -776,6 +776,10 @@ static NSPortManager* portManager;
     {
         theFileToRun = [otherCommands objectAtIndex:0];
     }
+    else if ([wssCommand isEqualToString:@"WSS-wineskinserverkill"])
+    {
+        theFileToRun = [otherCommands objectAtIndex:0];
+    }
     else if ([wssCommand isEqualToString:@"WSS-winecfg"])
     {
         theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix];
@@ -796,7 +800,9 @@ static NSPortManager* portManager;
     {
         theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix];
     }
-    else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] || [wssCommand isEqualToString:@"debug"])
+    else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] ||
+             [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] ||
+             [wssCommand isEqualToString:@"debug"])
     {
         NSString *errorMsg = [NSString stringWithFormat:@"ERROR, tried to run command %@ when the wrapper was already running.  Please make sure the wrapper is not running in order to do this.", wssCommand];
         CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)errorMsg, NULL);
@@ -806,16 +812,14 @@ static NSPortManager* portManager;
     else if ([wssCommand isEqualToString:@"CustomEXE"])
     {
         NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[otherCommands objectAtIndex:0]]];
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c%@",winePrefix,[cexePlistDictionary valueForKey:@"Program Name and Path"]];
+        theFileToRun =[NSString stringWithFormat:@"C:%@",cexePlistDictionary[WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH]];
+        theFileToRun = [NSPathUtilities getMacPathForWindowsPath:theFileToRun ofWrapper:self.portManager.path];
     }
     else if ([wssCommand hasPrefix:@"/"])
     {
-        NSMutableString *temp = [[NSMutableString alloc] initWithString:wssCommand];
-        for (NSString *item in otherCommands)
-        {
-            [temp appendString:[NSString stringWithFormat:@"\" \"%@",item]];
-        }
-        theFileToRun = temp;
+        NSMutableArray *temp = [[NSMutableArray alloc] initWithObjects:wssCommand, nil];
+        [temp addObjectsFromArray:otherCommands];
+        theFileToRun = [temp componentsJoinedByString:@"\" \""];
     }
     else
     {
@@ -825,6 +829,7 @@ static NSPortManager* portManager;
     [self systemCommand:[NSString stringWithFormat:@"open \"%@\" -a \"%@\"",theFileToRun,appNameWithPath]];
     return;
 }
+
 - (void)setGamma:(NSString *)inputValue
 {
 	if ([inputValue isEqualToString:@"default"])
