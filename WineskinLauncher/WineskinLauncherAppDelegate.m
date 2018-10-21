@@ -772,6 +772,8 @@ static NSPortManager* portManager;
     NSString *wssCommand = [wineStart getWssCommand];
     NSArray *otherCommands = [wineStart getWinetricksCommands];
     NSString *theFileToRun;
+    NSString *flags;
+    
     if ([wssCommand isEqualToString:@"WSS-installer"])
     {
         theFileToRun = [otherCommands objectAtIndex:0];
@@ -782,27 +784,67 @@ static NSPortManager* portManager;
     }
     else if ([wssCommand isEqualToString:@"WSS-winecfg"])
     {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix];
+        
+        NSArray* Command = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
+                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"wine winecfg"]];
+        [self systemCommand:[Command componentsJoinedByString:@" "]];
+        
+        //theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/winecfg.exe",winePrefix];
     }
     else if ([wssCommand isEqualToString:@"WSS-cmd"])
     {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix];
+        NSArray* Command = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
+                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                             //[NSString stringWithFormat:@"cd %@/drive_c/windows/system32",winePrefix],
+                             [NSString stringWithFormat:@"wine start C:/windows/system32/cmd.exe"]];
+        [self systemCommand:[Command componentsJoinedByString:@" "]];
+        
+        //theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/cmd.exe",winePrefix];
     }
     else if ([wssCommand isEqualToString:@"WSS-regedit"])
     {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix];
+        NSArray* Command = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
+                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"wine regedit"]];
+        [self systemCommand:[Command componentsJoinedByString:@" "]];
+        
+        //theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/regedit.exe",winePrefix];
     }
     else if ([wssCommand isEqualToString:@"WSS-taskmgr"])
     {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix];
+        NSArray* Command = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
+                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"wine taskmgr"]];
+        [self systemCommand:[Command componentsJoinedByString:@" "]];
+        
+        //theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/taskmgr.exe",winePrefix];
     }
     else if ([wssCommand isEqualToString:@"WSS-uninstaller"])
     {
-        theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix];
+        NSArray* Command = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
+                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"wine C:/windows/system32/uninstaller.exe"]];
+        [self systemCommand:[Command componentsJoinedByString:@" "]];
+        
+        //theFileToRun = [NSString stringWithFormat:@"%@/drive_c/windows/system32/uninstaller.exe",winePrefix];
     }
-    else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] ||
-             [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] ||
-             [wssCommand isEqualToString:@"debug"])
+    else if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"] || [wssCommand isEqualToString:@"WSS-wineprefixcreatenoregs"] || [wssCommand isEqualToString:@"WSS-wineboot"] || [wssCommand isEqualToString:@"WSS-winetricks"] || [wssCommand isEqualToString:@"debug"])
     {
         NSString *errorMsg = [NSString stringWithFormat:@"ERROR, tried to run command %@ when the wrapper was already running.  Please make sure the wrapper is not running in order to do this.", wssCommand];
         CFUserNotificationDisplayNotice(10.0, 0, NULL, NULL, NULL, CFSTR("ERROR!"), (CFStringRef)errorMsg, NULL);
@@ -813,7 +855,17 @@ static NSPortManager* portManager;
     {
         NSDictionary *cexePlistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Contents/Info.plist.cexe",appNameWithPath,[otherCommands objectAtIndex:0]]];
         theFileToRun =[NSString stringWithFormat:@"C:%@",cexePlistDictionary[WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH]];
-        theFileToRun = [NSPathUtilities getMacPathForWindowsPath:theFileToRun ofWrapper:self.portManager.path];
+        flags =[NSString stringWithFormat:@"%@", cexePlistDictionary[WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS]];
+        
+        NSArray* Command = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
+                             [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
+                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
+                             [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
+                             [NSString stringWithFormat:@"wine start \"%@\"",theFileToRun],
+                             [NSString stringWithFormat:@"%@",flags]];
+        [self systemCommand:[Command componentsJoinedByString:@" "]];
+        
     }
     else if ([wssCommand hasPrefix:@"/"])
     {
@@ -826,7 +878,7 @@ static NSPortManager* portManager;
         NSLog(@"ERROR, wrapper was re-run with no recognized command line options while already running.  This is a useless operation and ignored.");
         return;
     }
-    [self systemCommand:[NSString stringWithFormat:@"open \"%@\" -a \"%@\"",theFileToRun,appNameWithPath]];
+    //[self systemCommand:[NSString stringWithFormat:@"open \"%@\" -a \"%@\"",theFileToRun,appNameWithPath]];
     return;
 }
 
