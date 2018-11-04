@@ -1082,9 +1082,17 @@ static NSPortManager* portManager;
 }
 - (void)tryToUseGPUInfo
 {
-	NSMutableString *deviceID = [[VMMComputerInformation mainVideoCard].deviceID mutableCopy];
-    NSMutableString *vendorID = [[VMMComputerInformation mainVideoCard].vendorID mutableCopy];
-    NSString *VRAM = [NSString stringWithFormat:@"%d",[VMMComputerInformation mainVideoCard].memorySizeInMegabytes.intValue];
+    BOOL preferEGpu = [[NSUserDefaults standardUserDefaults] preferExternalGPU];
+    
+    VMMVideoCard* vc = [VMMVideoCardManager bestInternalVideoCard];
+    if (preferEGpu) {
+        VMMVideoCard* egpu = [VMMVideoCardManager bestExternalVideoCard];
+        if (egpu != nil) vc = egpu;
+    }
+    
+	NSMutableString *deviceID = [vc.deviceID mutableCopy];
+    NSMutableString *vendorID = [vc.vendorID mutableCopy];
+    NSString *VRAM = [NSString stringWithFormat:@"%d",vc.memorySizeInMegabytes.intValue];
     
     //need to strip 0x off the front of deviceID and vendorID, and pad with 0's in front until its a total of 8 digits long.
     if (vendorID)
