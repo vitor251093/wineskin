@@ -68,9 +68,6 @@
 //Any time its re-ran after its already running, for like opening extra files or Custom EXEs
 - (void)secondaryRun:(NSArray*)filesToOpen;
 
-//a second instance of program is launched, needs to pass into back to main so it can run.
-- (void)handleWineskinLauncherDirectSecondaryRun:(WineStart *)wineStart;
-
 //used to change the gamma setting since Xquartz cannot yet
 - (void)setGamma:(NSString *)inputValue;
 
