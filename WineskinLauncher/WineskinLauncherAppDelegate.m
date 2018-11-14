@@ -941,26 +941,26 @@ static NSPortManager* portManager;
     NSString* symlinkMyPictures  = [self createWrapperHomeSymlinkFolder:@"My Pictures"  forMacFolder:@"Pictures"];
     
     //set the symlinks
-	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix]])
-	{
+    if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin",winePrefix]])
+    {
         if (!doSymlinks || symlinkMyDocuments.length == 0) symlinkMyDocuments = nil;
-        [self createWrapperHomeFolder:@"My Documents" withSymlinkTo:symlinkMyDocuments];
+        if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Documents",winePrefix]]) {[self createWrapperHomeFolder:@"My Documents" withSymlinkTo:symlinkMyDocuments];}
         
         if (!doSymlinks || symlinkDesktop.length == 0) symlinkDesktop = nil;
-        [self createWrapperHomeFolder:@"Desktop" withSymlinkTo:symlinkDesktop];
-
+        if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Desktop",winePrefix]]) {[self createWrapperHomeFolder:@"Desktop" withSymlinkTo:symlinkDesktop];}
+        
         if (!doSymlinks || symlinkDownloads.length == 0) symlinkDownloads = nil;
-        [self createWrapperHomeFolder:@"Downloads" withSymlinkTo:symlinkDownloads];
-
+        if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/Downloads",winePrefix]]) {[self createWrapperHomeFolder:@"Downloads" withSymlinkTo:symlinkDownloads];}
+        
         if (!doSymlinks || symlinkMyVideos.length == 0) symlinkMyVideos = nil;
-        [self createWrapperHomeFolder:@"My Videos" withSymlinkTo:symlinkMyVideos];
+        if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Videos",winePrefix]]) {[self createWrapperHomeFolder:@"My Videos" withSymlinkTo:symlinkMyVideos];}
         
         if (!doSymlinks || symlinkMyMusic.length == 0) symlinkMyMusic = nil;
-        [self createWrapperHomeFolder:@"My Music" withSymlinkTo:symlinkMyMusic];
+        if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Music",winePrefix]]) {[self createWrapperHomeFolder:@"My Music" withSymlinkTo:symlinkMyMusic];}
         
         if (!doSymlinks || symlinkMyPictures.length == 0) symlinkMyPictures = nil;
-        [self createWrapperHomeFolder:@"My Pictures" withSymlinkTo:symlinkMyPictures];
-	}
+        if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/drive_c/users/Wineskin/My Pictures",winePrefix]]) {[self createWrapperHomeFolder:@"My Pictures" withSymlinkTo:symlinkMyPictures];}
+    }
     
     NSString* usersFolder     = [NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()];
     NSString* crossoverFolder = [NSString stringWithFormat:@"%@/drive_c/users/crossover",winePrefix];
