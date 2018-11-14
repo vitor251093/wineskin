@@ -212,13 +212,6 @@
     return img;
 }
 
-+(NSString*)pathForBatFileAtCDrivePath:(NSString*)batPath atPort:(NSString*)portPath
-{
-    NSString* bat = [[NSString stringWithFormat:@"C:/%@",batPath] stringByReplacingOccurrencesOfString:@"//" withString:@"/"];
-    NSString* way = [NSPathUtilities getMacPathForWindowsPath:bat ofWrapper:portPath];
-    NSString* batContents = [NSString stringWithContentsOfFile:way encoding:NSASCIIStringEncoding];
-    return [batContents stringByReplacingOccurrencesOfString:@"\n" withString:@" & "];
-}
 +(NSString*)pathForMainExeAtPort:(NSString*)port
 {
     NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
@@ -227,11 +220,6 @@
     NSString* customFile = [NSUtilities getPlistItem:path fromWrapper:port];
     NSString* flags = [NSUtilities getPlistItem:flag fromWrapper:port];
     if (!flags) flags = @"";
-    
-    if ([customFile hasSuffix:@".bat"])
-    {
-        return [self pathForBatFileAtCDrivePath:customFile atPort:port];
-    }
     
     return [[[NSString stringWithFormat:@"\"C:/%@\" %@",customFile,flags] stringByReplacingOccurrencesOfString:@"//" withString:@"/"]
                                                                           stringByReplacingOccurrencesOfString:@"/"  withString:@"\\"];
@@ -242,11 +230,6 @@
     NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
     
     NSString* progPath = [NSUtilities getPlistItem:path fromPlist:plist fromWrapper:wrap];
-    if ([progPath hasSuffix:@".bat"])
-    {
-        progPath = [self pathForBatFileAtCDrivePath:progPath atPort:port];
-    }
-    else
     {
         NSString* fullPath = [NSString stringWithFormat:@"C:/%@",progPath];
         fullPath = [fullPath stringByReplacingOccurrencesOfString:@"//" withString:@"/"];
