@@ -977,12 +977,6 @@ static NSPortManager* portManager;
 	// changing owner just fails, need this to work for normal users without admin password on the fly.
 	// Needed folders are set to 777, so just make a new resources folder and move items, should always work.
 	// NSFileManager changing posix permissions still failing to work right, using chmod as a system command
-	//if owner and current user match, exit
-	NSDictionary *checkThis = [fm attributesOfItemAtPath:winePrefix error:nil];
-	if ([NSUserName() isEqualToString:[checkThis valueForKey:@"NSFileOwnerAccountName"]])
-	{
-		return;
-	}
     
 	//make ResoTemp
 	[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/ResoTemp",contentsFold] withIntermediateDirectories:NO];
@@ -1003,7 +997,7 @@ static NSPortManager* portManager;
                 toPath:[NSString stringWithFormat:@"%@/Resources",contentsFold]];
 	
     //fix Resources to 777
-	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
+    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",winePrefix]];
 }
 
 - (void)setGpuInfoVendorID:(NSString*)nvendorID deviceID:(NSString*)ndeviceID memorySize:(NSString*)nVRAM
@@ -2298,6 +2292,8 @@ static NSPortManager* portManager;
             [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
         }
     }
+    //fix wineprefix on exit fixes the permissions for for items created during run also solves the issue that arises if using a CrossOver engine.
+    [self fixWinePrefixForCurrentUser];
     [NSApp terminate:nil];
 }
 @end
