@@ -473,7 +473,17 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     [versionComponents removeObjectAtIndex:0];
     engineWineVersion.components = versionComponents;
     if ([engineWineVersion compareWithVersion:[[VMMVersion alloc] initWithString:@"1"]] == VMMVersionCompareSecondIsNewest) {
-        branch = @"stable";
+        //Release Candidates can have a Staging Version so lets be sure we get that
+        if (self.engineType == NSWineskinEngineWineStaging) {
+            branch = @"staging";
+        }
+        //Release Candidates are listed as devel
+        else if ([self.wineVersion containsString:@"-rc"]) {
+            branch = @"devel";
+        }
+        else {
+            branch = @"stable";
+        }
     }
     
     //Set the Wine arch for link
