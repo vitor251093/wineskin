@@ -478,7 +478,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             branch = @"staging";
         }
         //Release Candidates are listed as devel
-        else if ([self.wineVersion containsString:@"-rc"]) {
+        else if ([self.wineVersion.lowercaseString contains:@"-rc"]) {
             branch = @"devel";
         }
         else {
@@ -496,7 +496,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     NSString *filename = [NSString stringWithFormat:@"portable-winehq-%@-%@-%@",branch,version,arch];
     
     //Download the link & file name
-    return [NSString stringWithFormat:@"https://dl.winehq.org/wine-builds/macosx/pool/%@.tar.gz",filename];
+    return [NSString stringWithFormat:@"http://dl.winehq.org/wine-builds/macosx/pool/%@.tar.gz",filename];
 }
 
 -(BOOL)isCompatibleWithMacDriver
