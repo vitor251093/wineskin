@@ -14,7 +14,7 @@ As described in the [original Wineskin's website](http://wineskin.urgesoftware.c
 > Make ports/wrappers to share with others, make ports of your own open source, free, or commercial software, or just make a port for yourself!
 > Why install and use Windows if you don’t need to?
 
-Wineskin relies on [WINE](www.winehq.org) ("WINE Is Not an Emulator") under the hood:
+Wineskin relies on [WINE](http://www.winehq.org/) ("WINE Is Not an Emulator") under the hood:
 
 > Instead of simulating internal Windows logic like a virtual machine or emulator,
 > Wine translates Windows API calls into POSIX calls on-the-fly,
