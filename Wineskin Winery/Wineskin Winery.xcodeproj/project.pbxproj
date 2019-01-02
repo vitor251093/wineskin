@@ -51,7 +51,7 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		4E45371E20E7DA16005D794E /* NSWineskinEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSWineskinEngine.h; sourceTree = "<group>"; };
 		4E45371F20E7DA16005D794E /* NSWineskinEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSWineskinEngine.m; sourceTree = "<group>"; };
-		4E45373320E7DC52005D794E /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = "../../../../Meus Programas/ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj"; sourceTree = "<group>"; };
+		4E45373320E7DC52005D794E /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = ../Carthage/Checkouts/ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Wineskin_Winery-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Wineskin_Winery-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Wineskin Winery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wineskin Winery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A169784C20FAF1CB00B2EE72 /* cabextract */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cabextract; sourceTree = "<group>"; };
