@@ -35,6 +35,8 @@ typedef enum {
 
 -(BOOL)isCompatibleWithMacDriver;
 -(BOOL)isCompatibleWithCsmt;
+-(BOOL)isCompatibleWithCommandCtrl;
+-(BOOL)isCompatibleWithOptionAlt;
 -(BOOL)csmtUsesNewRegistry;
 -(BOOL)isCompatibleWithHighQualityMode;
 -(BOOL)isCompatibleWith16Bit;

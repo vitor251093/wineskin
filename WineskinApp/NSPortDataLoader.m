@@ -123,7 +123,48 @@
     
     return FALSE;
 }
-
++(BOOL)CommandModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
+{
+    if (engine.isCompatibleWithCommandCtrl)
+    {
+        NSPortManager* port = [NSPortManager managerWithPath:path];
+        NSString* commandVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Mac Driver]" fromRegistryFileNamed:USER_REG];
+    if (commandVariable)
+    {
+        commandVariable = [NSPortManager getStringValueForKey:@"LeftCommandIsCtrl" fromRegistryString:commandVariable];
+        return commandVariable && [commandVariable isEqualToString:@"Y"];
+        }
+    }
+    
+    return FALSE;
+}
++(BOOL)OptionModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
+{
+    if (engine.isCompatibleWithOptionAlt)
+    {
+        NSPortManager* port = [NSPortManager managerWithPath:path];
+        NSString* optionVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Mac Driver]" fromRegistryFileNamed:USER_REG];
+        if (optionVariable)
+        {
+            optionVariable = [NSPortManager getStringValueForKey:@"RightOptionIsAlt" fromRegistryString:optionVariable];
+            return optionVariable && [optionVariable isEqualToString:@"Y"];
+        }
+    }
+    
+    return FALSE;
+}
++(BOOL)FontSmoothingIsEnabledAtPort:(NSString*)path
+{
+    NSPortManager* port = [NSPortManager managerWithPath:path];
+    NSString* optionVariable = [port getRegistryEntry:@"[Control Panel\\\\Desktop]" fromRegistryFileNamed:USER_REG];
+    if (optionVariable)
+    {
+        optionVariable = [NSPortManager getStringValueForKey:@"FontSmoothing" fromRegistryString:optionVariable];
+        return optionVariable && [optionVariable isEqualToString:@"2"];
+    }
+    
+    return FALSE;
+}
 +(void)getValuesFromResolutionString:(NSString*)originalResolutionString
                              inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues
 {
@@ -214,15 +255,23 @@
 
 +(NSString*)pathForMainExeAtPort:(NSString*)port
 {
-    NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
     NSString* path = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH;
+    NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
     
-    NSString* customFile = [NSUtilities getPlistItem:path fromWrapper:port];
-    NSString* flags = [NSUtilities getPlistItem:flag fromWrapper:port];
-    if (!flags) flags = @"";
+    NSString* progPath = [NSUtilities getPlistItem:path fromWrapper:port];
     
-    return [[[NSString stringWithFormat:@"\"C:/%@\" %@",customFile,flags] stringByReplacingOccurrencesOfString:@"//" withString:@"/"]
-                                                                          stringByReplacingOccurrencesOfString:@"/"  withString:@"\\"];
+    {
+        NSString* fullPath = [NSString stringWithFormat:@"C:/%@",progPath];
+        fullPath = [[fullPath stringByReplacingOccurrencesOfString:@"//" withString:@"/"]
+                    stringByReplacingOccurrencesOfString:@"/"  withString:@"\\"];
+        
+        NSString* flags = [NSUtilities getPlistItem:flag fromWrapper:port];
+        if (!flags) flags = @"";
+        
+        progPath = [NSString stringWithFormat:@"\"%@\" %@",fullPath,flags];
+    }
+    
+    return progPath;
 }
 +(NSString*)pathForCustomEXEFileAtPath:(NSString*)wrap withPlist:(NSString*)plist atPort:(NSString*)port
 {
@@ -230,6 +279,7 @@
     NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
     
     NSString* progPath = [NSUtilities getPlistItem:path fromPlist:plist fromWrapper:wrap];
+
     {
         NSString* fullPath = [NSString stringWithFormat:@"C:/%@",progPath];
         fullPath = [fullPath stringByReplacingOccurrencesOfString:@"//" withString:@"/"];

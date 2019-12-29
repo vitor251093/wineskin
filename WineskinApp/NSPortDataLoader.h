@@ -21,6 +21,9 @@
 +(BOOL)decorateWindowIsEnabledAtPort:(NSString*)path;
 +(BOOL)direct3DBoostIsEnabledAtPort:(NSString*)path;
 +(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
++(BOOL)CommandModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
++(BOOL)OptionModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
++(BOOL)FontSmoothingIsEnabledAtPort:(NSString*)path;
 
 +(void)getValuesFromResolutionString:(NSString*)originalResolutionString
                              inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues;

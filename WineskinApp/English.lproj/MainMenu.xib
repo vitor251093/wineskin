@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -1274,7 +1274,7 @@ Gw
                                         <button id="778">
                                             <rect key="frame" x="223" y="84" width="194" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="View Last Run Log Files" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="779">
+                                            <buttonCell key="cell" type="bevel" title="View Last Run Log File" bezelStyle="regularSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="779">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1394,7 +1394,7 @@ Gw
                                         <button id="1923">
                                             <rect key="frame" x="14" y="196" width="610" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Always make Log files, not only when doing a Test Run" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1924">
+                                            <buttonCell key="cell" type="check" title="Always make Log file, not only when doing a Test Run" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1924">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1412,6 +1412,36 @@ Gw
                                             <connections>
                                                 <action selector="setMaxFilesCheckBoxButtonPressed:" target="494" id="2099"/>
                                             </connections>
+                                        </button>
+                                        <button id="eoy-4D-L9O">
+                                            <rect key="frame" x="14" y="76" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Map Command as Ctrl" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="L0h-9l-Qdu">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="commandCheckBoxButton:" target="494" id="NEQ-9a-NFm"/>
+                                            </connections>
+                                        </button>
+                                        <button id="eqr-Lh-Hmd">
+                                            <rect key="frame" x="14" y="96" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Map Option as Alt" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="zUx-a1-kVp">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="optionCheckBoxButton:" target="494" id="GXJ-5h-FUo"/>
+                                            </connections>
+                                        </button>
+                                        <button hidden="YES" id="VzK-M2-W3f">
+                                            <rect key="frame" x="14" y="56" width="610" height="23"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Enable Font Smoothing" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" state="on" inset="2" id="RxY-OP-rKv">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
                                         </button>
                                     </subviews>
                                 </view>
@@ -1435,7 +1465,7 @@ Gw
                                         <button id="3vK-bJ-KPs">
                                             <rect key="frame" x="14" y="176" width="610" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Limit to 1 CPU core (set at an OS level for all applications)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="vKo-4x-GhA">
+                                            <buttonCell key="cell" type="check" title="Limit to 1 CPU core (set at an OS level for all applications)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="vKo-4x-GhA">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1457,7 +1487,7 @@ Gw
                                         <button id="sG4-gn-63G">
                                             <rect key="frame" x="14" y="136" width="610" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Disable Mono &amp; Gecko Installation (&quot;Refresh Wrapper&quot; &amp; &quot;Rebuild Wrapper&quot;)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="E6j-gW-Wpp">
+                                            <buttonCell key="cell" type="check" title="Disable Gecko Installation (&quot;Refresh Wrapper&quot; &amp; &quot;Rebuild Wrapper&quot;)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="E6j-gW-Wpp">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1761,14 +1791,14 @@ DQ
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box autoresizesSubviews="NO" borderType="line" title="Please select an engine to change to..." id="996">
-                        <rect key="frame" x="17" y="49" width="292" height="142"/>
+                        <rect key="frame" x="17" y="42" width="292" height="149"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="tnJ-v8-GeB">
-                            <rect key="frame" x="3" y="3" width="286" height="124"/>
+                            <rect key="frame" x="3" y="3" width="286" height="131"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <popUpButton verticalHuggingPriority="750" id="986">
-                                    <rect key="frame" x="15" y="60" width="260" height="26"/>
+                                    <rect key="frame" x="15" y="67" width="260" height="26"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="987">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1777,17 +1807,18 @@ DQ
                                     </popUpButtonCell>
                                 </popUpButton>
                                 <textField verticalHuggingPriority="750" id="984">
-                                    <rect key="frame" x="15" y="12" width="260" height="44"/>
+                                    <rect key="frame" x="15" y="7" width="260" height="56"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" id="985">
                                         <font key="font" metaFont="miniSystem"/>
-                                        <string key="title">These are what is available installed on your machine.  To get more engines, install them with Wineskin Winery, or manually download them from the official Wineskin website (http://wineskin.doh123.com/)</string>
+                                        <string key="title">These are what is available installed on your machine.  To get more engines, install them with Unofficial Wineskin Winery, or manually download them from the Unofficial Wineskin website 
+(https://github.com/Gcenx/WineskinServer/)</string>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <searchField verticalHuggingPriority="750" id="2022">
-                                    <rect key="frame" x="18" y="92" width="254" height="22"/>
+                                    <rect key="frame" x="18" y="99" width="254" height="22"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" borderStyle="bezel" placeholderString="Filter Engine List" bezelStyle="round" id="2023">
                                         <font key="font" metaFont="system"/>
@@ -1888,7 +1919,7 @@ Gw
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="xLg-9F-6LO">
                                                 <rect key="frame" x="1" y="0.0" width="758" height="302"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" headerView="1677" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="1683" id="1675">
                                                         <rect key="frame" x="0.0" y="0.0" width="758" height="285"/>
@@ -2092,7 +2123,7 @@ DQ
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="6iJ-NR-9eg">
                                                 <rect key="frame" x="1" y="1" width="737" height="271"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <textView focusRingType="none" editable="NO" importsGraphics="NO" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="1695">
                                                         <rect key="frame" x="0.0" y="0.0" width="752" height="271"/>
@@ -2714,11 +2745,11 @@ Help is available on the main website
                                                 </paragraphStyle>
                                             </attributes>
                                         </fragment>
-                                        <fragment content="wineskin.urgesoftware.com">
+                                        <fragment content="https://github.com/Gcenx/WineskinServer">
                                             <attributes>
                                                 <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
-                                                <url key="NSLink" string="http://wineskin.urgesoftware.com/"/>
+                                                <url key="NSLink" string="https://github.com/Gcenx/WineskinServer"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural">
                                                     <tabStops>
                                                         <textTab alignment="left" location="36">
@@ -2873,11 +2904,11 @@ For more information see
                                                 </paragraphStyle>
                                             </attributes>
                                         </fragment>
-                                        <fragment content="wineskin.urgesoftware.com">
+                                        <fragment content="https://github.com/Gcenx/WineskinServer">
                                             <attributes>
                                                 <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
-                                                <url key="NSLink" string="http://wineskin.urgesoftware.com/"/>
+                                                <url key="NSLink" string="https://github.com/Gcenx/WineskinServer"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural">
                                                     <tabStops>
                                                         <textTab alignment="left" location="36">
@@ -3003,6 +3034,7 @@ Gw
                 <outlet property="changeEngineWindowPopUpButton" destination="986" id="998"/>
                 <outlet property="chooseExeWindow" destination="866" id="880"/>
                 <outlet property="colorDepth" destination="643" id="819"/>
+                <outlet property="commandCheckBoxButton" destination="eoy-4D-L9O" id="AU9-IR-lkx"/>
                 <outlet property="commandLineWineTestButton" destination="1918" id="1921"/>
                 <outlet property="confirmQuitCheckBoxButton" destination="1546" id="1549"/>
                 <outlet property="currentVersionTextField" destination="1507" id="1509"/>
@@ -3043,6 +3075,7 @@ Gw
                 <outlet property="modifyMappingsMyVideosTextField" destination="1598" id="1632"/>
                 <outlet property="modifyMappingsWindow" destination="1579" id="1633"/>
                 <outlet property="monogeckoCheckBoxButton" destination="sG4-gn-63G" id="cNj-Qf-J6K"/>
+                <outlet property="optionCheckBoxButton" destination="eqr-Lh-Hmd" id="zVO-G0-E3l"/>
                 <outlet property="rebuildWrapperButton" destination="739" id="826"/>
                 <outlet property="refreshWrapperButton" destination="741" id="827"/>
                 <outlet property="regeditButton" destination="733" id="851"/>

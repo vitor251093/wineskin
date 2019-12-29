@@ -49,6 +49,7 @@
     if ([[[winPath getFragmentAfter:nil andBefore:@":"] lowercaseString] isEqualToString:@"c"])
     {
         [port setPlistObject:[winPath componentsSeparatedByString:@":"][1]   forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH];
+        //TODO: some 32bit exe files need to use this when launched via wine64
         [port setPlistObject:@(![winPath.lowercaseString hasSuffix:@".exe"]) forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
         [port setPlistObject:flags                                           forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS];
     }
@@ -178,7 +179,54 @@
                     forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
     return result;
 }
-
++(BOOL)saveCommandMode:(BOOL)commandModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port
+    {
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    BOOL enableCommandModeOn = commandModeOn && engine.isCompatibleWithCommandCtrl;
+        
+    BOOL result = true;
+    result = [port setValues:@{@"RightCommandIsCtrl": (enableCommandModeOn ? @"\"Y\"" : @"\"N\"")}
+                        forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    if (!result) return false;
+        
+    result = [port setValues:@{@"LeftCommandIsCtrl": (enableCommandModeOn ? @"\"Y\"" : @"\"N\"")}
+                    forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    return result;
+}
++(BOOL)saveOptionMode:(BOOL)optionModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port
+{
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    BOOL enableOptionModeOn = optionModeOn && engine.isCompatibleWithOptionAlt;
+    
+    BOOL result = true;
+    result = [port setValues:@{@"RightOptionIsAlt": (enableOptionModeOn ? @"\"Y\"" : @"\"N\"")}
+                    forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    if (!result) return false;
+    
+    result = [port setValues:@{@"LeftOptionIsAlt": (enableOptionModeOn ? @"\"Y\"" : @"\"N\"")}
+                    forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    return result;
+}
++(BOOL)saveFontSmoothingMode:(BOOL)fontsmoothingModeOn atPort:(NSPortManager*)port
+{
+    BOOL enableFontsmoothingModeOn = fontsmoothingModeOn;
+    
+    BOOL result = true;
+    result = [port setValues:@{@"FontSmoothing": (enableFontsmoothingModeOn ? @"\"2\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    if (!result) return false;
+    
+    result = [port setValues:@{@"FontSmoothingGamma": (enableFontsmoothingModeOn ? @"\"dword:00000578\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    
+    result = [port setValues:@{@"FontSmoothingOrientation": (enableFontsmoothingModeOn ? @"\"dword:00000001\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    
+    result = [port setValues:@{@"FontSmoothingType": (enableFontsmoothingModeOn ? @"\"dword:00000002\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    
+    return result;
+}
 +(BOOL)setMainExeName:(NSString*)name version:(NSString*)version icon:(NSImage*)icon path:(NSString*)path atPort:(NSPortManager*)port
 {
     [port setPlistObject:version forKey:WINESKIN_WRAPPER_PLIST_KEY_VERSION];
@@ -193,7 +241,7 @@
     if (name)
     {
         [port setPlistObject:name forKey:WINESKIN_WRAPPER_PLIST_KEY_NAME];
-        [port setPlistObject:[NSString stringWithFormat:@"%@.Wineskin.prefs",name] forKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER];
+        [port setPlistObject:[NSString stringWithFormat:@"com.%@.Wineskin",name] forKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER];
     }
     
     [port synchronizePlist];

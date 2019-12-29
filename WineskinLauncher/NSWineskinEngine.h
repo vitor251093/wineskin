@@ -41,5 +41,6 @@ typedef enum {
 -(NSString*)engineName;
 -(BOOL)isCompatibleWithMacDriver;
 -(BOOL)isMacDriverDefaultGraphics;
+-(BOOL)isCompatibleWithLatestFreeType;
 
 @end

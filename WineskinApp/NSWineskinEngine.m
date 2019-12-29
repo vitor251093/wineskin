@@ -32,7 +32,7 @@ static NSString *const REGEX_VALID_WINESKIN_STAGING_ENGINE =         @"[A-Z]{2}[
 static NSString *const REGEX_VALID_WINESKIN_PROTON_ENGINE =          @"[A-Z]{2}[0-9]+WineProton(64Bit)?[0-9\\.]+[^\\n]*";
 static NSString *const REGEX_VALID_WINESKIN_CROSSOVER_ENGINE =       @"[A-Z]{2}[0-9]+WineCX(64Bit)?[0-9\\.]+[^\\n]*";
 static NSString *const REGEX_VALID_WINESKIN_CROSSOVER_GAMES_ENGINE = @"[A-Z]{2}[0-9]+WineCXG(64Bit)?[0-9\\.]+[^\\n]*";
-static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\.[0-9]+)*([\\-\\.]{1}rc[0-9]+)?(\\-[0-9]+)?";
+static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\.[0-9]+)*([-\\.]{1}rc[0-9]+)?";
 
 @implementation NSWineskinEngine
 
@@ -513,6 +513,78 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             // https://www.winehq.org/announce/1.5.22
             
             return [self isWineVersionAtLeast:@"1.5.22"];
+            
+        default:
+            break;
+    }
+    
+    return true;
+}
+-(BOOL)isCompatibleWithCommandCtrl
+{
+    switch (self.engineType)
+    {
+        case NSWineskinEngineCrossOverGames:
+            return false;
+            
+        case NSWineskinEngineCrossOver:
+            
+            // CrossOver18.5.0 is based on Wine 4.0
+            // https://github.com/wine-mirror/wine/commit/f621baa00f649a41d64908980661b1bdaf65ad9e
+            
+            return [self isWineVersionAtLeast:@"18.5.0"];
+            
+        case NSWineskinEngineWineStaging:
+            
+            // Command mapping was first added in Wine 3.17
+            // https://github.com/wine-mirror/wine/commit/f621baa00f649a41d64908980661b1bdaf65ad9e
+            
+            return [self isWineVersionAtLeast:@"3.17"];
+
+        case NSWineskinEngineWine:
+            
+            // Command mapping was first added in Wine 3.17
+            // https://github.com/wine-mirror/wine/commit/f621baa00f649a41d64908980661b1bdaf65ad9e
+            
+            return [self isWineVersionAtLeast:@"3.17"];
+            
+        default:
+        break;
+    }
+        
+    return true;
+}
+-(BOOL)isCompatibleWithOptionAlt
+{
+    switch (self.engineType)
+    {
+            case NSWineskinEngineCrossOverGames:
+            
+                // The last CrossOver Games version was released before Mac Driver existed so it could never have the option
+                // https://www.codeweavers.com/products/more-information/changelog#10.3.0
+            
+                return false;
+            
+            case NSWineskinEngineCrossOver:
+            
+                // CrossOver 15 is based on Wine 1.8
+                // https://www.codeweavers.com/products/more-information/changelog#15.0.0
+            
+                return [self isWineVersionAtLeast:@"15.0.0"];
+
+            case NSWineskinEngineWineStaging:
+            
+                // The first Wine Staging version is based on Wine 1.7.7, so it always had this feature
+                // https://github.com/wine-compholio/wine-staging/releases?after=v1.7.9
+            
+                return true;
+            
+            case NSWineskinEngineWine:
+            
+                // The option was added in wine 1.7.4 so anything from winehq would support it, but best be sure its at leasy 1.7.4 incase an older engine is used.
+                // https://github.com/wine-mirror/wine/commit/79d45585bcd7b884fb195ce59bc8b5dada9ad4f0
+            
+                return [self isWineVersionAtLeast:@"1.7.4"];
             
         default:
             break;

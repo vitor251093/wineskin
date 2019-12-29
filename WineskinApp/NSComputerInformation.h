@@ -17,6 +17,7 @@
 #define IS_SYSTEM_MAC_OS_10_12_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.12"]  // Sierra
 #define IS_SYSTEM_MAC_OS_10_13_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.13"]  // High Sierra
 #define IS_SYSTEM_MAC_OS_10_14_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.14"]  // Mojave
+#define IS_SYSTEM_MAC_OS_10_15_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.15"]  // Catalina
 
 #import <Foundation/Foundation.h>
 

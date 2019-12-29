@@ -45,13 +45,15 @@
 	BOOL isIce;                                     //YES if ICE engine being used
     BOOL removeX11TraceFromLog;                     //YES if Wineskin added the X11 trace to winedebug to remove them from the output log
 	NSString *dyldFallBackLibraryPath;              //the path for DYLD_FALLBACK_LIBRARY_PATH
+    NSString *wineExecutable;                       //the wine executable that will be used for all launches
     NSString *fontFix;                              //force freetype into using rendering mode from pre 2.7
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
     NSString *wineServerName;                       //the name of the Wineserver we'll be launching
     NSString *wineName;                             //the name of the Wine process we'll be launching
-    NSString *wine64Name;                             //the name of the Wine64 process we'll be launching
-    NSString *wineStagingName;                        //the name of the Wine-preloader process we'll be launching
-    NSString *wineStaging64Name;                      //the name of the Wine64-preloader process we'll be launching
+    NSString *wine64Name;                           //the name of the Wine64 process we'll be launching
+    NSString *wineStagingName;                      //the name of the Wine-preloader process we'll be launching
+    NSString *wine32on64Name;                       //the name of the Wine32on64-preloader process we'll be launching
+    NSString *wineStaging64Name;                    //the name of the Wine64-preloader process we'll be launching
 	int bundleRandomInt1;
     int bundleRandomInt2;
     
@@ -145,6 +147,12 @@
 
 //fix wine-preloader, wine64-preloader and wineserver names
 - (void)fixWineStaging64ExecutableNames;
+
+//fix wine-preloader, wine32on64-preloader and wineserver names
+- (void)fixWine32on64ExecutableNames;
+
+//fix wine-preloader, wine32on64-preloader, wine64-preloader and wineserver names
+- (void)fixWine32on64_64BitExecutableNames;
 
 //start wine
 - (void)startWine:(WineStart *)wineStart;

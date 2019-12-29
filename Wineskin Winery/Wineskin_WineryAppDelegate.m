@@ -72,7 +72,7 @@
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle",enginesFolderPath] error:nil];
         
 		//decompress engine
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"%@/%@.tar.7z\" \"-o/%@\"", NSHomeDirectory(),enginesFolderPath,item,enginesFolderPath] UTF8String]);
+		system([[NSString stringWithFormat:@"\"%@\" x \"%@/%@.tar.7z\" \"-o/%@\"", BINARY_7ZA,enginesFolderPath,item,enginesFolderPath] UTF8String]);
 		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@\" -xf \"%@/%@.tar\"",enginesFolderPath,enginesFolderPath,item] UTF8String]);
 		
         //remove tar
@@ -100,7 +100,7 @@
 		
         //compress wswine.bundle to engine.tar.7z
 		system([[NSString stringWithFormat:@"cd \"%@\";tar -cf WS8%@.tar wswine.bundle",enginesFolderPath,[item substringFromIndex:3]] UTF8String]);
-		system([[NSString stringWithFormat:@"cd \"%@\";\"%@/Library/Application Support/Wineskin/7za\" a -mx9 WS8%@.tar.7z WS8%@.tar", enginesFolderPath,NSHomeDirectory(),[item substringFromIndex:3],[item substringFromIndex:3]] UTF8String]);
+		system([[NSString stringWithFormat:@"cd \"%@\";\"%@\" a -mx9 WS8%@.tar.7z WS8%@.tar", enginesFolderPath,BINARY_7ZA,[item substringFromIndex:3],[item substringFromIndex:3]] UTF8String]);
 		
         //clean up engine junk now that its in a .tar.7z
 		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WS8%@.tar",enginesFolderPath,[item substringFromIndex:3]] error:nil];
@@ -125,7 +125,6 @@
 }
 - (void)makeFoldersAndFiles
 {
-	NSString *applicationPath = [[NSBundle mainBundle] bundlePath];
 	NSFileManager *filemgr = [NSFileManager defaultManager];
     NSString* wineskinFolder = [NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Wineskin"];
 	
@@ -137,41 +136,6 @@
                         attributes:nil error:nil];
 	[filemgr createDirectoryAtPath:[NSHomeDirectory() stringByAppendingString:@"/Applications/Wineskin"] withIntermediateDirectories:YES
                         attributes:nil error:nil];
-    
-    NSString* bin7zipFilePath = [wineskinFolder stringByAppendingString:@"/7za"];
-    BOOL is7zaValid = [filemgr regularFileExistsAtPath:bin7zipFilePath];
-    if (is7zaValid)
-    {
-        NSString* expectedSha256 = @"c0e54f82dcf1ec7fff6cf64874cafd46b56f48f8e09b7a2f3a667e10932525b9";
-        NSString* fileSha256 = [[NSFileManager defaultManager] checksum:NSChecksumTypeSHA256 ofFileAtPath:bin7zipFilePath];
-        
-        is7zaValid = [expectedSha256 isEqualToString:fileSha256];
-        if (!is7zaValid) [filemgr removeItemAtPath:bin7zipFilePath];
-    }
-    
-	if (!is7zaValid)
-    {
-        [filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/7za"]
-                         toPath:[wineskinFolder stringByAppendingString:@"/7za"] error:nil];
-    }
-    
-    NSString* bincabextractFilePath = [wineskinFolder stringByAppendingString:@"/cabextract"];
-    BOOL iscabextractValid = [filemgr regularFileExistsAtPath:bincabextractFilePath];
-    if (iscabextractValid)
-    {
-        NSString* expectedSha256 = @"c7647f11cf1f2436736735acbb70671ad2fe704150e80e55635db01d4d95c78f";
-        NSString* fileSha256 = [[NSFileManager defaultManager] checksum:NSChecksumTypeSHA256 ofFileAtPath:bincabextractFilePath];
-        
-        iscabextractValid = [expectedSha256 isEqualToString:fileSha256];
-        if (!iscabextractValid) [filemgr removeItemAtPath:bincabextractFilePath];
-    }
-    
-    if (!iscabextractValid)
-    {
-        [filemgr copyItemAtPath:[applicationPath stringByAppendingString:@"/Contents/Resources/cabextract"]
-                         toPath:[wineskinFolder stringByAppendingString:@"/cabextract"] error:nil];
-    }
-    
 }
 - (void)checkForUpdates
 {
@@ -179,7 +143,7 @@
 	NSString *currentVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 	
     //get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Winery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/Winery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (!([newVersion hasPrefix:@"Wineskin"]) || ([currentVersion isEqualToString:newVersion]))
@@ -213,7 +177,7 @@
 	[fm removeItemAtPath:@"/tmp/WineskinWinery.app.tar" error:nil];
 	[fm removeItemAtPath:@"/tmp/WineskinWinery.app" error:nil];
 	//update selected, download update
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Winery/WineskinWinery.app.tar.7z?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/Winery/WineskinWinery.app.tar.7z?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:@"file:///tmp/WineskinWinery.app.tar.7z"];
 	[fileName setStringValue:@"Wineskin Winery Update"];
 	[downloadingWindow makeKeyAndOrderFront:self];
@@ -233,7 +197,7 @@
     [installedEngines reloadData];
     
     if (!sender.state && !self.isXQuartzInstalled) {
-        [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
     }
 }
 
@@ -276,7 +240,7 @@
 
 - (IBAction)downloadPackagesManuallyButtonPressed:(id)sender;
 {
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/tiki-index.php?page=Downloads&%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://mega.nz/#F!7ZxFQYDB!7CJRmNuPReBcbsp0-rfjqg&%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	[[NSWorkspace sharedWorkspace] openURL:url];
 }
 
@@ -356,7 +320,7 @@
 - (IBAction)updateButtonPressed:(id)sender
 {
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![[newVersion substringToIndex:8] isEqualToString:@"Wineskin"])
@@ -370,7 +334,7 @@
 		return;
 	}
 	//download new wrapper to /tmp
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Wrapper/%@.app.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/Wrapper/%@.app.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.app.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"Wrapper"];
@@ -380,7 +344,7 @@
 
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/?%@",[[NSNumber numberWithLong:rand()] stringValue]]]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://github.com/Gcenx/WineskinServer?%@",[[NSNumber numberWithLong:rand()] stringValue]]]];
 }
 
 - (void)getInstalledEngines:(NSString *)theFilter
@@ -414,16 +378,36 @@
 
 - (NSMutableArray *)getAvailableEngines
 {
-	NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
-	if ([fileString hasSuffix:@"\n"])
-	{
-		fileString = [fileString stringByAppendingString:@":!:!:"];
-		fileString = [fileString stringByReplacingOccurrencesOfString:@"\n:!:!:" withString:@""];
-	}
-	NSArray *tempA = [fileString componentsSeparatedByString:@"\n"];
-	NSMutableArray *tempMA = [NSMutableArray arrayWithCapacity:[tempA count]];
-	for(NSString *item in tempA) [tempMA addObject:item];
-	return tempMA;	
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    // If EngineList.txt is present in the same directly use that instead of the online copy
+    if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/../EngineList.txt",[[NSBundle mainBundle] bundlePath]]])
+    {
+        NSString *fileString = [NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/../EngineList.txt",[[NSBundle mainBundle] bundlePath]] encoding:NSUTF8StringEncoding error:nil];
+        if ([fileString hasSuffix:@"\n"])
+        {
+            fileString = [fileString stringByAppendingString:@":!:!:"];
+            fileString = [fileString stringByReplacingOccurrencesOfString:@"\n:!:!:" withString:@""];
+        }
+        NSArray *tempA = [fileString componentsSeparatedByString:@"\n"];
+        NSMutableArray *tempMA = [NSMutableArray arrayWithCapacity:[tempA count]];
+        for(NSString *item in tempA) [tempMA addObject:item];
+        return tempMA;
+    }
+    else
+    {
+        //read online EngineList.txt
+        NSString *fileString = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/Engines/EngineList.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]] encoding:NSUTF8StringEncoding error:nil];
+        if ([fileString hasSuffix:@"\n"])
+        {
+            fileString = [fileString stringByAppendingString:@":!:!:"];
+            fileString = [fileString stringByReplacingOccurrencesOfString:@"\n:!:!:" withString:@""];
+        }
+        NSArray *tempA = [fileString componentsSeparatedByString:@"\n"];
+        NSMutableArray *tempMA = [NSMutableArray arrayWithCapacity:[tempA count]];
+        for(NSString *item in tempA) [tempMA addObject:item];
+        return tempMA;
+    }
 }
 
 - (NSString *)getCurrentWrapperVersion
@@ -480,7 +464,7 @@
 - (void)setWrapperAvailablePrompt
 {
 	//get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/Wrapper/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![[newVersion substringToIndex:8] isEqualToString:@"Wineskin"]) return;
@@ -563,7 +547,7 @@
 	}
 	
 	//write out the config file
-	NSString *configFileContents = [NSString stringWithFormat:@"%@\n%@\n%@\n%@\n%@\n%@\n",[engineBuildWineSource stringValue],[engineBuildEngineName stringValue],[engineBuildConfigurationOptions stringValue],[engineBuildCurrentEngineBase stringValue],[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/7za", NSHomeDirectory()],[[engineBuildOSVersionToBuildEngineFor selectedItem] title]];
+	NSString *configFileContents = [NSString stringWithFormat:@"%@\n%@\n%@\n%@\n%@\n%@\n",[engineBuildWineSource stringValue],[engineBuildEngineName stringValue],[engineBuildConfigurationOptions stringValue],[engineBuildCurrentEngineBase stringValue],[NSString stringWithFormat:@"%@", BINARY_7ZA],[[engineBuildOSVersionToBuildEngineFor selectedItem] title]];
 	[configFileContents writeToFile:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/EngineBase/%@/config.txt",NSHomeDirectory(),[engineBuildCurrentEngineBase stringValue]] atomically:NO encoding:NSUTF8StringEncoding error:nil];
 	//launch terminal with the script
 	system([[NSString stringWithFormat:@"open -a Terminal.app \"%@/Library/Application Support/Wineskin/EngineBase/%@/WineskinEngineBuild\"", NSHomeDirectory(),[engineBuildCurrentEngineBase stringValue]] UTF8String]);
@@ -582,7 +566,7 @@
 	//get latest available version number
 	NSString *newVersion = [self availableEngineBuildVersion];
 	//download new wrapper to /tmp
-	[urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/EngineBase/%@.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
+	[urlInput setStringValue:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/EngineBase/%@.tar.7z?%@",newVersion,[[NSNumber numberWithLong:rand()] stringValue]]];
 	[urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",newVersion]];
 	[fileName setStringValue:newVersion];
 	[fileNameDestination setStringValue:@"EngineBase"];
@@ -618,7 +602,7 @@
 }
 - (NSString *)availableEngineBuildVersion
 {
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/EngineBase/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/EngineBase/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (newVersion == nil || ![newVersion hasSuffix:@"EngineBase"]) return @"ERROR";
@@ -632,7 +616,7 @@
     NSWineskinEngine* selectedEngine = [NSWineskinEngine wineskinEngineWithString:selectedEngineName];
     
     if (selectedEngine.requiresManualDownload) {
-        [urlInput setStringValue:[NSString stringWithFormat:@"http://wineskin.urgesoftware.com/Engines/%@.tar.7z?%@",selectedEngineName,[[NSNumber numberWithLong:rand()] stringValue]]];
+        [urlInput setStringValue:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/Engines/%@.tar.7z?%@",selectedEngineName,[[NSNumber numberWithLong:rand()] stringValue]]];
         [urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",[[engineWindowEngineList selectedItem] title]]];
         [fileName setStringValue:[[engineWindowEngineList selectedItem] title]];
         [fileNameDestination setStringValue:@"Engines"];
@@ -658,8 +642,12 @@
 - (IBAction)engineWindowViewWineReleaseNotesButtonPressed:(id)sender
 {
     // TODO: Is there a better way to do this?
-	NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine"];
-    NSString *wineVersion = [tempArray objectAtIndex:1];
+	//NSArray *tempArray = [[[engineWindowEngineList selectedItem] title] componentsSeparatedByString:@"Wine"];
+    //NSString *wineVersion = [tempArray objectAtIndex:1];
+    NSString* selectedEngineName = [[engineWindowEngineList selectedItem] title];
+    NSWineskinEngine* selectedEngine = [NSWineskinEngine wineskinEngineWithString:selectedEngineName];
+    NSString *wineVersion = selectedEngine.wineVersion;
+
     if ([wineVersion hasPrefix:@"64Bit"]) [self Wine64ReleaseNotes];
     else if ([wineVersion hasPrefix:@"C"]) [self WineCrossoverReleaseNotes];
     else [self WineReleaseNotes];
@@ -878,7 +866,7 @@
 	{
 		//uncompress download
 		[self makeFoldersAndFiles];
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/%@.app.tar.7z\" -o/tmp", NSHomeDirectory(),[fileName stringValue]] UTF8String]);
+		system([[NSString stringWithFormat:@"\"%@\" x \"/tmp/%@.app.tar.7z\" -o/tmp", BINARY_7ZA,[fileName stringValue]] UTF8String]);
 		system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/%@.app.tar",[fileName stringValue]] UTF8String]);
 		//remove 7z and tar
 		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app.tar.7z",[fileName stringValue]] error:nil];
@@ -934,6 +922,7 @@
         [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.gz",[fileName stringValue]] error:nil];
         
         //Remove folders from within wswine.bundle
+        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/SDL2.framework"] error:nil];
         [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/include"] error:nil];
         [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/aclocal"] error:nil];
         [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/doc"] error:nil];
@@ -949,7 +938,8 @@
         system([[NSString stringWithFormat:@"cd /tmp/;tar -cf %@.tar wswine.bundle",[fileOutputName stringValue]] UTF8String]);
         
         //compress using lowest compression level and use upto 30 threads
-        system([[NSString stringWithFormat:@"cd \"tmp\";\"%@/Library/Application Support/Wineskin/7za\" a -mx=1 -mmt=30 %@.tar.7z %@.tar",NSHomeDirectory(),[fileOutputName stringValue],[fileOutputName stringValue]] UTF8String]);
+        //TODO: Allow selection of crompression level
+        system([[NSString stringWithFormat:@"cd \"tmp\";\"%@\" a -mx=1 -mmt=30 %@.tar.7z %@.tar",BINARY_7ZA,[fileOutputName stringValue],[fileOutputName stringValue]] UTF8String]);
         
         //remove wswine.bundle
         [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle"] error:nil];
@@ -988,7 +978,7 @@
 	{
 		//uncompress download
 		[self makeFoldersAndFiles];
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/%@.tar.7z\" -o/tmp", NSHomeDirectory(),[fileName stringValue]] UTF8String]);
+		system([[NSString stringWithFormat:@"\"%@\" x \"/tmp/%@.tar.7z\" -o/tmp", BINARY_7ZA,[fileName stringValue]] UTF8String]);
 		system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/%@.tar",[fileName stringValue]] UTF8String]);
 		//remove 7z and tar
 		[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.7z",[fileName stringValue]] error:nil];
@@ -1020,7 +1010,7 @@
 		//take care of update
 		[self makeFoldersAndFiles];
 		[[NSFileManager defaultManager] removeItemAtPath:@"/tmp/WineskinWineryUpdater" error:nil];
-		system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"/tmp/WineskinWinery.app.tar.7z\" -o/tmp", NSHomeDirectory()] UTF8String]);
+		system([[NSString stringWithFormat:@"\"%@\" x \"/tmp/WineskinWinery.app.tar.7z\" -o/tmp", BINARY_7ZA] UTF8String]);
 		system([[NSString stringWithFormat:@"/usr/bin/tar -C /tmp -xf /tmp/WineskinWinery.app.tar"] UTF8String]);
 		[[NSFileManager defaultManager] copyItemAtPath:@"/tmp/WineskinWinery.app/Contents/Resources/WineskinWineryUpdater" toPath:@"/tmp/WineskinWineryUpdater" error:nil];
 		//run updater program
@@ -1074,7 +1064,7 @@
 	//copy master wrapper to /tmp with correct name
 	[fm copyItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper/%@.app",NSHomeDirectory(),[wrapperVersion stringValue]] toPath:[NSString stringWithFormat:@"/tmp/%@.app",[createWrapperName stringValue]] error:nil];
 	//decompress engine
-	system([[NSString stringWithFormat:@"\"%@/Library/Application Support/Wineskin/7za\" x \"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z\" \"-o/%@/Library/Application Support/Wineskin/Engines\"", NSHomeDirectory(),NSHomeDirectory(),[createWrapperEngine stringValue],NSHomeDirectory()] UTF8String]);
+	system([[NSString stringWithFormat:@"\"%@\" x \"%@/Library/Application Support/Wineskin/Engines/%@.tar.7z\" \"-o/%@/Library/Application Support/Wineskin/Engines\"", BINARY_7ZA,NSHomeDirectory(),[createWrapperEngine stringValue],NSHomeDirectory()] UTF8String]);
 	system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@/Library/Application Support/Wineskin/Engines\" -xf \"%@/Library/Application Support/Wineskin/Engines/%@.tar\"",NSHomeDirectory(),NSHomeDirectory(),[createWrapperEngine stringValue]] UTF8String]);
 	//remove tar
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/%@.tar",NSHomeDirectory(),[createWrapperEngine stringValue]] error:nil];

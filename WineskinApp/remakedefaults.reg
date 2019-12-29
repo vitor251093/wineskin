@@ -22,7 +22,11 @@ REGEDIT4
 "WindowFrame"="0 0 0"
 
 [HKEY_CURRENT_USER\Control Panel\Desktop]
-"FontSmoothing"="1"
+# Winetricks fontsmooth=rgb, improves look of fonts and helps fix UI problems
+"FontSmoothing"="2"
+"FontSmoothingGamma"=dword:00000578
+"FontSmoothingOrientation"=dword:00000001
+"FontSmoothingType"=dword:00000002
 
 [HKEY_CURRENT_USER\Software\Wine\Direct3D]
 
@@ -30,8 +34,18 @@ REGEDIT4
 "Graphics"="mac,x11"
 "Audio"="coreaudio"
 
+[HKEY_CURRENT_USER\Software\Wine\DllOverrides]
+# Disable the Steam overlay by default
+"gameoverlayrenderer"=""
+
 [HKEY_CURRENT_USER\Software\Wine\Mac Driver]
-"CaptureDisplaysForFullscreen"="y"
+# "CaptureDisplaysForFullscreen"="n"
+# Wine 3.17 allows mapping of Command as Control
+"LeftCommandIsCtrl"="Y"
+"RightCommandIsCtrl"="Y"
+# Wine 1.7.4 allows mapping of Option as Alt
+"LeftOptionIsAlt"="Y"
+"RightOptionIsAlt"="Y"
 
 [HKEY_CLASSES_ROOT\htmlfile\shell\open\command]
 @="C:\\windows\\system32\\winebrowser.exe -nohome %1"
@@ -106,6 +120,10 @@ REGEDIT4
 "CommonMusic"="C:\\users\\Public\\Music"
 "CommonPictures"="C:\\users\\Public\\Pictures"
 "CommonVideo"="C:\\users\\Public\\Videos"
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\AeDebug]
+"Auto"="1"
+"Debugger"="false"
 
 [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders]
 "Common Administrative Tools"=str(2):"%ALLUSERSPROFILE%\\Start Menu\\Programs\\Administrative Tools"

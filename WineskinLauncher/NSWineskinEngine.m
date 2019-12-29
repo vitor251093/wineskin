@@ -479,5 +479,43 @@
     
     return true;
 }
+-(BOOL)isCompatibleWithLatestFreeType
+{
+    // Current Freetype version is 2.10, anything below Wine 2.18 will break
+    switch (self.engineType)
+    {
+        case NSWineskinEngineCrossOverGames:
+            
+            return false;
+            
+        case NSWineskinEngineCrossOver:
+            
+            // CrossOver 18 is based on Wine 3.14
+            // https://www.codeweavers.com/products/more-information/changelog#18.0.0
+            
+            return [self isEngineVersionAtLeast:@"18.0.0"];
+            
+        case NSWineskinEngineWineStaging:
+            
+            // FreeType 2.8.1 compatibility fixes
+            // https://bugs.winehq.org/show_bug.cgi?id=43715
+            // https://bugs.winehq.org/show_bug.cgi?id=43716
+            
+            return [self isEngineVersionAtLeast:@"2.18"];
+            
+        case NSWineskinEngineWine:
+            
+            // FreeType 2.8.1 compatibility fixes
+            // https://bugs.winehq.org/show_bug.cgi?id=43715
+            // https://bugs.winehq.org/show_bug.cgi?id=43716
+            
+            return [self isEngineVersionAtLeast:@"2.18"];
+            
+        default:
+            break;
+    }
+    
+    return true;
+}
 
 @end

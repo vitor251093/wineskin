@@ -95,13 +95,15 @@
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
 	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
+    IBOutlet NSButton *fntoggleCheckBoxButton;
+    IBOutlet NSButton *commandCheckBoxButton;
+    IBOutlet NSButton *optionCheckBoxButton;
     
     //advanced menu - Advanced Tab
     IBOutlet NSButton *WinetricksNoLogsButton;
     IBOutlet NSButton *disableCPUsCheckBoxButton;
     IBOutlet NSButton *winedbgDisabledButton;
     IBOutlet NSButton *monogeckoCheckBoxButton;
-    IBOutlet NSButton *fntoggleCheckBoxButton;
 
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -265,13 +267,15 @@
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
+- (IBAction)fntoggleCheckBoxButton:(id)sender;
+- (IBAction)commandCheckBoxButton:(id)sender;
+- (IBAction)optionCheckBoxButton:(id)sender;
 
 //advanced menu - Advanced Tab
 - (IBAction)WinetricksNoLogsButtonPressed:(id)sender;
 - (IBAction)disableCPUsButtonPressed:(id)sender;
 - (IBAction)winedbgDisabledButtonPressed:(id)sender;
 - (IBAction)monogeckoButtonPressed:(id)sender;
-- (IBAction)fntoggleCheckBoxButton:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;

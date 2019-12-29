@@ -10,8 +10,6 @@
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* WineskinLauncherAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* WineskinLauncherAppDelegate.m */; };
 		4E2574261F85125E009013D6 /* NSExeSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2574241F85125D009013D6 /* NSExeSelection.m */; };
-		4E2D01AF20FC36D500A93A9C /* ObjectiveC_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E2D01AC20FC36C900A93A9C /* ObjectiveC_Extension.framework */; };
-		4E2D01B020FC36D500A93A9C /* ObjectiveC_Extension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4E2D01AC20FC36C900A93A9C /* ObjectiveC_Extension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4EE262DF20FC360000831BFC /* NSWineskinEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EE262DE20FC360000831BFC /* NSWineskinEngine.m */; };
 		55987E111F0410600035C5C1 /* NSPathUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 55987E031F0410600035C5C1 /* NSPathUtilities.m */; };
 		55987E121F0410600035C5C1 /* NSPortManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 55987E051F0410600035C5C1 /* NSPortManager.m */; };
@@ -19,25 +17,28 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A1A1154F21F3E71400D5A97F /* NSFileManager+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = A1A1154E21F3E71400D5A97F /* NSFileManager+Extension.m */; };
+		A1A6E5A821E29DC200C70E80 /* ObjectiveC_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A17FC0372168E09800577991 /* ObjectiveC_Extension.framework */; };
+		A1A6E5A921E29DC200C70E80 /* ObjectiveC_Extension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A17FC0372168E09800577991 /* ObjectiveC_Extension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A8C23E5A18DB810500ACD355 /* WineStart.m in Sources */ = {isa = PBXBuildFile; fileRef = A8C23E5918DB810500ACD355 /* WineStart.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		4E2D01AB20FC36C900A93A9C /* PBXContainerItemProxy */ = {
+		A17FC0362168E09800577991 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4E2D01A620FC36C800A93A9C /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4E6C51071F7E8EB700A187E9;
 			remoteInfo = ObjectiveC_Extension;
 		};
-		4E2D01AD20FC36C900A93A9C /* PBXContainerItemProxy */ = {
+		A17FC0382168E09800577991 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4E2D01A620FC36C800A93A9C /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4E6C51101F7E8EB700A187E9;
 			remoteInfo = ObjectiveC_ExtensionTests;
 		};
-		4E2D01B120FC36D500A93A9C /* PBXContainerItemProxy */ = {
+		A1A6E5AA21E29DC200C70E80 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4E2D01A620FC36C800A93A9C /* ObjectiveC_Extension.xcodeproj */;
 			proxyType = 1;
@@ -47,13 +48,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D9EB7D4520B22ED5005D3308 /* Embed Frameworks */ = {
+		A1A6E5AC21E29DC200C70E80 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				4E2D01B020FC36D500A93A9C /* ObjectiveC_Extension.framework in Embed Frameworks */,
+				A1A6E5A921E29DC200C70E80 /* ObjectiveC_Extension.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -73,7 +74,7 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		4E2574241F85125D009013D6 /* NSExeSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSExeSelection.m; sourceTree = "<group>"; };
 		4E2574251F85125E009013D6 /* NSExeSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSExeSelection.h; sourceTree = "<group>"; };
-		4E2D01A620FC36C800A93A9C /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = "../../../../Meus Programas/ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj"; sourceTree = "<group>"; };
+		4E2D01A620FC36C800A93A9C /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = ../../ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj; sourceTree = "<group>"; };
 		4EE262DD20FC360000831BFC /* NSWineskinEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSWineskinEngine.h; sourceTree = "<group>"; };
 		4EE262DE20FC360000831BFC /* NSWineskinEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSWineskinEngine.m; sourceTree = "<group>"; };
 		55987E021F0410600035C5C1 /* NSPathUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSPathUtilities.h; sourceTree = "<group>"; };
@@ -84,6 +85,9 @@
 		55987E211F0412F40035C5C1 /* NSPortDataLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSPortDataLoader.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* WineskinLauncher-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "WineskinLauncher-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* WineskinLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WineskinLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A17158FA23B3FD40001150B3 /* WineskinLauncher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WineskinLauncher.entitlements; sourceTree = "<group>"; };
+		A1A1154C21F3E71400D5A97F /* NSFileManager+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Extension.h"; sourceTree = "<group>"; };
+		A1A1154E21F3E71400D5A97F /* NSFileManager+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Extension.m"; sourceTree = "<group>"; };
 		A8C23E5818DB810500ACD355 /* WineStart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WineStart.h; sourceTree = "<group>"; };
 		A8C23E5918DB810500ACD355 /* WineStart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WineStart.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -93,7 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4E2D01AF20FC36D500A93A9C /* ObjectiveC_Extension.framework in Frameworks */,
+				A1A6E5A821E29DC200C70E80 /* ObjectiveC_Extension.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -140,6 +144,7 @@
 		29B97314FDCFA39411CA2CEA /* WineskinLauncher */ = {
 			isa = PBXGroup;
 			children = (
+				A17158FA23B3FD40001150B3 /* WineskinLauncher.entitlements */,
 				4E2D01A620FC36C800A93A9C /* ObjectiveC_Extension.xcodeproj */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -178,18 +183,10 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4E2D01A720FC36C800A93A9C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				4E2D01AC20FC36C900A93A9C /* ObjectiveC_Extension.framework */,
-				4E2D01AE20FC36C900A93A9C /* ObjectiveC_ExtensionTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		55987E1C1F0411560035C5C1 /* Functions */ = {
 			isa = PBXGroup;
 			children = (
+				A1A1155221F4E16100D5A97F /* Extensions */,
 				4E2574251F85125E009013D6 /* NSExeSelection.h */,
 				4E2574241F85125D009013D6 /* NSExeSelection.m */,
 				55987E021F0410600035C5C1 /* NSPathUtilities.h */,
@@ -222,6 +219,24 @@
 			name = Controller;
 			sourceTree = "<group>";
 		};
+		A17FC0302168E09800577991 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A17FC0372168E09800577991 /* ObjectiveC_Extension.framework */,
+				A17FC0392168E09800577991 /* ObjectiveC_ExtensionTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1A1155221F4E16100D5A97F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A1A1154C21F3E71400D5A97F /* NSFileManager+Extension.h */,
+				A1A1154E21F3E71400D5A97F /* NSFileManager+Extension.m */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -232,12 +247,12 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				D9EB7D4520B22ED5005D3308 /* Embed Frameworks */,
+				A1A6E5AC21E29DC200C70E80 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				4E2D01B220FC36D500A93A9C /* PBXTargetDependency */,
+				A1A6E5AB21E29DC200C70E80 /* PBXTargetDependency */,
 			);
 			name = WineskinLauncher;
 			productInstallPath = "$(HOME)/Applications";
@@ -267,7 +282,7 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 4E2D01A720FC36C800A93A9C /* Products */;
+					ProductGroup = A17FC0302168E09800577991 /* Products */;
 					ProjectRef = 4E2D01A620FC36C800A93A9C /* ObjectiveC_Extension.xcodeproj */;
 				},
 			);
@@ -279,18 +294,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		4E2D01AC20FC36C900A93A9C /* ObjectiveC_Extension.framework */ = {
+		A17FC0372168E09800577991 /* ObjectiveC_Extension.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = ObjectiveC_Extension.framework;
-			remoteRef = 4E2D01AB20FC36C900A93A9C /* PBXContainerItemProxy */;
+			remoteRef = A17FC0362168E09800577991 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		4E2D01AE20FC36C900A93A9C /* ObjectiveC_ExtensionTests.xctest */ = {
+		A17FC0392168E09800577991 /* ObjectiveC_ExtensionTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = ObjectiveC_ExtensionTests.xctest;
-			remoteRef = 4E2D01AD20FC36C900A93A9C /* PBXContainerItemProxy */;
+			remoteRef = A17FC0382168E09800577991 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -319,6 +334,7 @@
 				4EE262DF20FC360000831BFC /* NSWineskinEngine.m in Sources */,
 				256AC3DA0F4B6AC300CF3369 /* WineskinLauncherAppDelegate.m in Sources */,
 				A8C23E5A18DB810500ACD355 /* WineStart.m in Sources */,
+				A1A1154F21F3E71400D5A97F /* NSFileManager+Extension.m in Sources */,
 				55987E121F0410600035C5C1 /* NSPortManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -326,10 +342,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		4E2D01B220FC36D500A93A9C /* PBXTargetDependency */ = {
+		A1A6E5AB21E29DC200C70E80 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = ObjectiveC_Extension;
-			targetProxy = 4E2D01B120FC36D500A93A9C /* PBXContainerItemProxy */;
+			targetProxy = A1A6E5AA21E29DC200C70E80 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -357,7 +373,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = WineskinLauncher.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = RD56V43GW9;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -368,8 +388,9 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskinlauncher;
 				PRODUCT_NAME = WineskinLauncher;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -378,7 +399,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = WineskinLauncher.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = RD56V43GW9;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WineskinLauncher_Prefix.pch;
@@ -386,8 +411,9 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskinlauncher;
 				PRODUCT_NAME = WineskinLauncher;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;

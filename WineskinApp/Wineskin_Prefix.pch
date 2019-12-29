@@ -31,7 +31,7 @@
 #define TRUE_STRING  @"true"
 #define FALSE_STRING @"false"
 
-#define BINARY_7ZA      [NSString stringWithFormat:@"%@/7za",WINESKIN_LIBRARY_FOLDER]
+#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/7za",[[NSBundle mainBundle] bundlePath]]
 #define BINARY_QLMANAGE @"/System/Library/Frameworks/QuickLook.framework/Versions/A/Resources/quicklookd.app/Contents/MacOS/qlmanage"
 
 // Wineskin Plist entries
@@ -65,8 +65,8 @@
 #define WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_NO_VIRTUAL_DESKTOP @"novd"
 
 // These are Wineskin website URLs, which are used to download the Master Wrapper and the Engines
-#define WINESKIN_DOMAIN                         "wineskin.urgesoftware.com"
-#define WINESKIN_WEBSITE                    @"http://wineskin.urgesoftware.com/"
+#define WINESKIN_DOMAIN                         "github.com/Gcenx/WineskinServer"
+#define WINESKIN_WEBSITE                    @"https://github.com/Gcenx/WineskinServer/"
 #define WINESKIN_WEBSITE_WRAPPER_FOLDER     [NSString stringWithFormat:@"%@Wrapper/",WINESKIN_WEBSITE]
 #define WINESKIN_WEBSITE_ENGINES_FOLDER     [NSString stringWithFormat:@"%@Engines/",WINESKIN_WEBSITE]
 #define WINESKIN_WEBSITE_ENGINE_BASE_FOLDER [NSString stringWithFormat:@"%@EngineBase/",WINESKIN_WEBSITE]
