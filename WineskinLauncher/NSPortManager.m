@@ -556,11 +556,10 @@
     NSMutableArray* registries = [[registry componentsSeparatedByString:@"\n"] mutableCopy];
     [registries removeObject:@""];
     
-    [registries replaceObjectsWithVariation:^id(id object, NSUInteger index)
-     {
-         if ([object hasPrefix:@"@="]) return @"@";
-         return [object getFragmentAfter:@"\"" andBefore:@"\"="];
-     }];
+    [registries map:^id _Nullable(id  _Nonnull object) {
+        if ([object hasPrefix:@"@="]) return @"@";
+        return [object getFragmentAfter:@"\"" andBefore:@"\"="];
+    }];
     
     return registries;
 }

@@ -61,9 +61,6 @@
 // if Fn or Alt held on run
 - (void) doSpecialStartup;
 
-//run system command with output returned
-- (NSString *)systemCommand:(NSString *)command;
-
 //the main running of the program...
 - (void)mainRun:(NSArray*)filesToOpen;
 

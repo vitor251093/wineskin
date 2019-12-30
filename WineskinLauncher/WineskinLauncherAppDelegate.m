@@ -10,7 +10,6 @@
 
 #import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 
-#import "NSFileManager+Extension.h"
 #import "NSPathUtilities.h"
 #import "NSPortDataLoader.h"
 #import "WineskinLauncher_Prefix.pch"
@@ -114,29 +113,29 @@ static NSPortManager* portManager;
 - (void)doSpecialStartup
 {
 	//when holding modifier key
-	NSString* theSystemCommand = [NSString stringWithFormat: @"open \"%@/Wineskin.app\"", [[NSBundle mainBundle] bundlePath]];
-	system([theSystemCommand UTF8String]);
+	NSString* wineskinAppPath = [NSString stringWithFormat: @"%@/Wineskin.app", [[NSBundle mainBundle] bundlePath]];
+    [[NSWorkspace sharedWorkspace] launchApplication:wineskinAppPath];
     [NSApp terminate:nil];
 }
 
-- (NSString *)systemCommand:(NSString *)command
+- (NSString *)system:(NSString *)command
 {
-	FILE *fp;
-	char buff[512];
-	NSMutableString *returnString = [[NSMutableString alloc] init];
-	fp = popen([command cStringUsingEncoding:NSUTF8StringEncoding], "r");
-	while (fgets( buff, sizeof buff, fp))
+    FILE *fp;
+    char buff[512];
+    NSMutableString *returnString = [[NSMutableString alloc] init];
+    fp = popen([command cStringUsingEncoding:NSUTF8StringEncoding], "r");
+    while (fgets( buff, sizeof buff, fp))
     {
         [returnString appendString:[NSString stringWithCString:buff encoding:NSUTF8StringEncoding]];
     }
-	pclose(fp);
-    
+    pclose(fp);
+
     //cut out trailing new line
-	if ([returnString hasSuffix:@"\n"])
+    if ([returnString hasSuffix:@"\n"])
     {
         [returnString deleteCharactersInRange:NSMakeRange([returnString length]-1,1)];
     }
-	return [NSString stringWithString:returnString];
+    return [NSString stringWithString:returnString];
 }
 
 - (void)mainRun:(NSArray*)filesToOpen
@@ -188,7 +187,7 @@ static NSPortManager* portManager;
         if ([wssCommand isEqualToString:@"CustomEXE"]) cexeRun = YES;
         
         [fm createDirectoryAtPath:tmpFolder withIntermediateDirectories:YES];
-        [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
+        [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",tmpFolder]];
         
         lockfile        = [NSString stringWithFormat:@"%@/lockfile",tmpFolder];
         wineLogFile     = [NSString stringWithFormat:@"%@/Logs/LastRunWine.log",winePrefix];
@@ -213,7 +212,7 @@ static NSPortManager* portManager;
         {
             //create lockfile that we are already in use
             [self writeStringArray:@[NSUserName()] toFile:lockfile];
-            [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",tmpFolder]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",tmpFolder]];
         }
         
         //fix Wine names which also is setting for bundle ID
@@ -398,16 +397,14 @@ static NSPortManager* portManager;
                     
                     if ([wssCommand isEqualToString:@"WSS-wineserverkill"])
                     {
-                        NSArray* command = @[
-                                             [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
-                                             [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],@"wineserver -k"];
-                        [self systemCommand:[command componentsJoinedByString:@" "]];
-                        usleep(3000000);
-                
+                        NSString* pathEnv = [NSString stringWithFormat:@"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold];
+                        [NSTask runProgram:@"wineserver" withFlags:@[@"-k"] withEnvironment:@{@"PATH":pathEnv, @"WINEPREFIX":winePrefix}];
+                        
                         //****** if "IsFnToggleEnabled" is enabled
                         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue] == 1)
                         {
-                            [self systemCommand:[NSString stringWithFormat:@"\"%@/../Wineskin.app/Contents/Resources/fntoggle\" off",contentsFold]];
+                            [NSTask runProgram:[NSString stringWithFormat:@"%@/../Wineskin.app/Contents/Resources/fntoggle",contentsFold]
+                                     withFlags:@[@"off"]];
                         }
                     }
                     
@@ -472,19 +469,21 @@ static NSPortManager* portManager;
         {
             //error, file doesn't exist, and its not a special command
             NSLog(@"Error! Set executable not found.  Wineskin.app running instead.");
-            system([[NSString stringWithFormat:@"open \"%@/Wineskin.app\"",appNameWithPath] UTF8String]);
+            NSString* wineskinAppPath = [NSString stringWithFormat: @"%@/Wineskin.app", appNameWithPath];
+            [[NSWorkspace sharedWorkspace] launchApplication:wineskinAppPath];
             [fm removeItemAtPath:lockfile];
             [fm removeItemAtPath:tmpFolder];
             [fm removeItemAtPath:tmpwineFolder];
             exit(0);
         }
         //********** Wineskin Customizer start up script
-        system([[NSString stringWithFormat:@"\"%@/Scripts/WineskinStartupScript\"",winePrefix] UTF8String]);
+        [NSTask runProgram:[NSString stringWithFormat:@"%@/Scripts/WineskinStartupScript",winePrefix]];
         
         //****** if "IsFnToggleEnabled" is enabled
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue] == 1)
         {
-            [self systemCommand:[NSString stringWithFormat:@"\"%@/../Wineskin.app/Contents/Resources/fntoggle\" on",contentsFold]];
+            [NSTask runProgram:[NSString stringWithFormat:@"%@/../Wineskin.app/Contents/Resources/fntoggle",contentsFold]
+                     withFlags:@[@"on"]];
         }
         
         //TODO: CPU Disabled does not work on current macOS versions, still need a replacement
@@ -492,11 +491,11 @@ static NSPortManager* portManager;
         NSString *cpuCountInput;
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SINGLE_CPU] intValue] == 1)
         {
-            cpuCountInput = [self systemCommand:@"hwprefs cpu_count 2>/dev/null"];
+            cpuCountInput = [self system:@"hwprefs cpu_count 2>/dev/null"];
             int i, cpuCount = [cpuCountInput intValue];
             for (i = 2; i <= cpuCount; ++i)
             {
-                [self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_disable %d",i]];
+                [self system:[NSString stringWithFormat:@"hwprefs cpu_disable %d",i]];
             }
         }
         
@@ -511,7 +510,7 @@ static NSPortManager* portManager;
             BOOL killWineskin = YES;
             
             // check if X11 is even running
-            if (!useMacDriver && [self systemCommand:@"killall -0 X11.bin 2>&1"].length > 0)
+            if (!useMacDriver && [self system:@"killall -0 X11.bin 2>&1"].length > 0)
             {
                 //ignore if no XQuartz is running, must have been in error
                 NSLog(@"Lockfile ignored because no running XQaurtz processes found");
@@ -597,16 +596,16 @@ static NSPortManager* portManager;
         {
             if (useXQuartz)
             {
-                [self systemCommand:[NSString stringWithFormat:@"echo \"No X11 Log info when using XQuartz!\n\" > \"%@\"",x11LogFile]];
+                [self system:[NSString stringWithFormat:@"echo \"No X11 Log info when using XQuartz!\n\" > \"%@\"",x11LogFile]];
             }
             NSString *versionFile = [NSString stringWithFormat:@"%@/wswine.bundle/version",frameworksFold];
             if ([fm fileExistsAtPath:versionFile])
             {
                 NSArray *tempArray = [self readFileToStringArray:versionFile];
-                [self systemCommand:[NSString stringWithFormat:@"echo \"Engine Used: %@\" >> \"%@\"",[tempArray objectAtIndex:0],x11LogFile]];
+                [self system:[NSString stringWithFormat:@"echo \"Engine Used: %@\" >> \"%@\"",[tempArray objectAtIndex:0],x11LogFile]];
             }
             //use mini detail level so no personal information can be displayed
-            [self systemCommand:[NSString stringWithFormat:@"system_profiler -detailLevel mini SPHardwareDataType SPDisplaysDataType >> \"%@\"",x11LogFile]];
+            [self system:[NSString stringWithFormat:@"system_profiler -detailLevel mini SPHardwareDataType SPDisplaysDataType >> \"%@\"",x11LogFile]];
         }
         
         //**********sleep and monitor in background while app is running
@@ -615,7 +614,8 @@ static NSPortManager* portManager;
         //****** if "IsFnToggleEnabled" is enabled, revert
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue] == 1)
         {
-            [self systemCommand:[NSString stringWithFormat:@"\"%@/../Wineskin.app/Contents/Resources/fntoggle\" off",contentsFold]];
+            [NSTask runProgram:[NSString stringWithFormat:@"%@/../Wineskin.app/Contents/Resources/fntoggle",contentsFold]
+                     withFlags:@[@"off"]];
         }
         
         //****** if CPUs Disabled, re-enable them
@@ -624,12 +624,12 @@ static NSPortManager* portManager;
             int i, cpuCount = [cpuCountInput intValue];
             for ( i = 2; i <= cpuCount; ++i)
             {
-                [self systemCommand:[NSString stringWithFormat:@"hwprefs cpu_enable %d",i]];
+                [self system:[NSString stringWithFormat:@"hwprefs cpu_enable %d",i]];
             }
         }
             
         //********** Wineskin Customizer shut down script
-        system([[NSString stringWithFormat:@"\"%@/Scripts/WineskinShutdownScript\"",winePrefix] UTF8String]);
+        [NSTask runProgram:[NSString stringWithFormat:@"%@/Scripts/WineskinShutdownScript",winePrefix]];
         
         //********** app finished, time to clean up and shut down
         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_AUTOMATICALLY_DETECT_GPU] intValue] == 1)
@@ -857,7 +857,7 @@ static NSPortManager* portManager;
 
 - (NSArray *)makePIDArray:(NSString *)processToLookFor
 {
-	NSString *resultString = [NSString stringWithFormat:@"00000\n%@",[self systemCommand:[NSString stringWithFormat:@"ps axc|awk \"{if (\\$5==\\\"%@\\\") print \\$1}\"",processToLookFor]]];
+	NSString *resultString = [NSString stringWithFormat:@"00000\n%@",[self system:[NSString stringWithFormat:@"ps axc|awk \"{if (\\$5==\\\"%@\\\") print \\$1}\"",processToLookFor]]];
 	return [resultString componentsSeparatedByString:@"\n"];
 }
 
@@ -964,7 +964,7 @@ static NSPortManager* portManager;
     {
         [fm removeItemAtPath:folderPath];
         [fm createSymbolicLinkAtPath:folderPath withDestinationPath:symlink error:nil];
-        [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",folderPath]];
+        [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",folderPath]];
     }
     else
     {
@@ -1008,7 +1008,7 @@ static NSPortManager* portManager;
     for (NSString* folder in @[usersFolder, crossoverFolder])
     {
         [fm createSymbolicLinkAtPath:folder withDestinationPath:@"Wineskin" error:nil];
-        [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",folder]];
+        [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",folder]];
     }
 }
 
@@ -1037,7 +1037,7 @@ static NSPortManager* portManager;
                 toPath:[NSString stringWithFormat:@"%@/Resources",contentsFold]];
 	
     //fix Resources to 777
-	[self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",winePrefix]];
+	[NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",winePrefix]];
 }
 
 - (void)setGpuInfoVendorID:(NSString*)nvendorID deviceID:(NSString*)ndeviceID memorySize:(NSString*)nVRAM
@@ -1058,7 +1058,7 @@ static NSPortManager* portManager;
     [self.portManager deleteRegistry:direct3dHeader fromRegistryFileNamed:USER_REG];
     [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n%@\n",direct3dHeader,direct3dReg] fromRegistryFileNamed:USER_REG];
     
-    [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"666",[NSString stringWithFormat:@"%@/user.reg",winePrefix]]];
 }
 - (void)tryToUseGPUInfo
 {
@@ -1120,8 +1120,8 @@ static NSPortManager* portManager;
 	
 	while (pathsToCheck.count > 1) //go through list, remove all but newest version
 	{
-		NSString *indexZero = [self systemCommand:[NSString stringWithFormat:@"%@ --version",pathsToCheck[0]]];
-		NSString *indexOne  = [self systemCommand:[NSString stringWithFormat:@"%@ --version",pathsToCheck[1]]];
+		NSString *indexZero = [self system:[NSString stringWithFormat:@"%@ --version",pathsToCheck[0]]];
+		NSString *indexOne  = [self system:[NSString stringWithFormat:@"%@ --version",pathsToCheck[1]]];
         
         VMMVersionCompare result = [VMMVersion compareVersionString:indexZero withVersionString:indexOne];
         if (result == VMMVersionCompareSecondIsNewest) //indexZeroArray is smaller, get rid of it
@@ -1168,13 +1168,13 @@ static NSPortManager* portManager;
     
 	if (!fullScreenOption)
 	{
-        [theDisplayNumber setString:[self systemCommand:@"echo $DISPLAY"]];
+        [theDisplayNumber setString:[self system:@"echo $DISPLAY"]];
         return;
 	}
 	
     //make sure XQuartz is not already running
     //this is because it needs to be started with no Quartz-wm for override->fullscreen to function correctly.
-    if ([[self systemCommand:@"killall -s X11.bin"] hasPrefix:@"kill"])
+    if ([[self system:@"killall -s X11.bin"] hasPrefix:@"kill"])
     {
         //already running, error and exit
         NSLog(@"Error: XQuartz cannot already be running if using Override Fullscreen option!  Please close XQuartz and try again!");
@@ -1189,7 +1189,7 @@ static NSPortManager* portManager;
     NSArray *firstPIDlist = [self makePIDArray:@"X11.bin"];
     
     //start XQuartz
-    xQuartzBundlePID = [self systemCommand:[NSString stringWithFormat:@"/opt/X11/bin/Xquartz %@ > /dev/null & echo $!",theDisplayNumber]];
+    xQuartzBundlePID = [self system:[NSString stringWithFormat:@"/opt/X11/bin/Xquartz %@ > /dev/null & echo $!",theDisplayNumber]];
     
     // get PID of X11.bin just launched
     [xQuartzX11BinPID setString:[self getNewPid:@"X11.bin" from:firstPIDlist confirm:NO]];
@@ -1245,7 +1245,7 @@ static NSPortManager* portManager;
         }
         else if (i==2)
         {
-            [self systemCommand:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
+            [self system:[NSString stringWithFormat:@"open \"%@\"",appNameWithPath]];
         }
         else if (i==3)
         {
@@ -1255,7 +1255,7 @@ static NSPortManager* portManager;
         }
         else if (i==4)
         {
-            [self systemCommand:[NSString stringWithFormat:@"arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
+            [self system:[NSString stringWithFormat:@"arch -i386 /usr/bin/osascript -e \"tell application \\\"%@\\\" to activate\"",appNameWithPath]];
         }
         else
         {
@@ -1313,7 +1313,7 @@ static NSPortManager* portManager;
     
 	//get md5
     NSString* wineTar7zFilePath = [NSString stringWithFormat:@"%@/%@.tar.7z",wswineBundlePath,wineFile];
-	NSString *wineFileMd5 = [[self systemCommand:[NSString stringWithFormat:@"md5 -r \"%@\"",wineTar7zFilePath]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@",wineTar7zFilePath] withString:@""];
+	NSString *wineFileMd5 = [[self system:[NSString stringWithFormat:@"md5 -r \"%@\"",wineTar7zFilePath]] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@" %@",wineTar7zFilePath] withString:@""];
 	NSString *wineFileInstalledName = [NSString stringWithFormat:@"%@%@.bundle",[wineFile stringByReplacingOccurrencesOfString:@"bundle" withString:@""],wineFileMd5];
     
 	//make ICE folder if it doesn't exist
@@ -1358,7 +1358,7 @@ static NSPortManager* portManager;
         [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",wswineBundlePath,folder]];
         [fm createSymbolicLinkAtPath:[NSString stringWithFormat:@"%@/%@",wswineBundlePath,folder]
                  withDestinationPath:[NSString stringWithFormat:@"%@/%@/%@",iceFolder,wineFileInstalledName,folder] error:nil];
-        [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/%@\"",wswineBundlePath,folder]];
+        [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",[NSString stringWithFormat:@"%@/%@",wswineBundlePath,folder]]];
     }
     
     [window orderOut:self];
@@ -1393,7 +1393,7 @@ static NSPortManager* portManager;
     [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n%@\n",explorerRegHeader,explorerReg] fromRegistryFileNamed:USER_REG];
     [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n%@\n",desktopsRegHeader,desktopsReg] fromRegistryFileNamed:USER_REG];
     
-	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"666",[NSString stringWithFormat:@"%@/user.reg",winePrefix]]];
 }
 
 - (void)setToNoVirtualDesktop
@@ -1413,7 +1413,7 @@ static NSPortManager* portManager;
     [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n",explorerRegHeader] fromRegistryFileNamed:USER_REG];
     [self.portManager addRegistry:[NSString stringWithFormat:@"%@\n",desktopsRegHeader] fromRegistryFileNamed:USER_REG];
     
-	[self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/user.reg\"",winePrefix]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"666",[NSString stringWithFormat:@"%@/user.reg",winePrefix]]];
 }
 
 - (NSArray *)readFileToStringArray:(NSString *)theFile
@@ -1425,7 +1425,7 @@ static NSPortManager* portManager;
 {
 	[fm removeItemAtPath:theFile];
 	[[theArray componentsJoinedByString:@"\n"] writeToFile:theFile atomically:YES encoding:NSUTF8StringEncoding];
-	[self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",theFile]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"777",theFile]];
 }
 
 - (BOOL)isPID:(NSString *)pid named:(NSString *)name
@@ -1434,7 +1434,7 @@ static NSPortManager* portManager;
     {
         NSLog(@"INVALID PID SENT TO isPID!!!");
     }
-	if ([[self systemCommand:[NSString stringWithFormat:@"ps -p \"%@\" | grep \"%@\"",pid,name]] length] < 1)
+	if ([[self system:[NSString stringWithFormat:@"ps -p \"%@\" | grep \"%@\"",pid,name]] length] < 1)
     {
         return NO;
     }
@@ -1443,7 +1443,7 @@ static NSPortManager* portManager;
 
 - (BOOL)isWineserverRunning
 {
-    return ([[self systemCommand:[NSString stringWithFormat:@"killall -0 \"%@\" 2>&1",wineServerName]] length] < 1);
+    return ([[self system:[NSString stringWithFormat:@"killall -0 \"%@\" 2>&1",wineServerName]] length] < 1);
 }
 
 // Checks to see what wine engine is being used
@@ -1561,7 +1561,7 @@ static NSPortManager* portManager;
     [wineBash       writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
-    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",pathToWineBinFolder]];
 }
 
 - (void)fixWine64ExecutableNames
@@ -1654,7 +1654,7 @@ static NSPortManager* portManager;
     [wine64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
-    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",pathToWineBinFolder]];
 }
 
 // Wine-Staging engines only work correctly on 10.8+ systems according to wine-staging.com
@@ -1729,7 +1729,7 @@ static NSPortManager* portManager;
     [wineStagingBash       writeToFile:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
-    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",pathToWineBinFolder]];
 }
 
 // Wine-Staging engines only work correctly on 10.8+ systems according to wine-staging.com
@@ -1823,7 +1823,7 @@ static NSPortManager* portManager;
     [wineStaging64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
-    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",pathToWineBinFolder]];
 }
 
 // Renaming can only apply to wine-preloader/wine64-preloader
@@ -1917,7 +1917,7 @@ static NSPortManager* portManager;
     [wine32on64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
-    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",pathToWineBinFolder]];
 }
 
 // Renaming can only apply to wine-preloader/wine64-preloader
@@ -2029,7 +2029,7 @@ static NSPortManager* portManager;
     [wineStaging64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
     [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
     
-    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",pathToWineBinFolder]];
 }
 
 
@@ -2042,7 +2042,7 @@ static NSPortManager* portManager;
     int hit = 0;
     for (i=0; i < loopCount; ++i)
     {
-        NSArray *resultArray = [[self systemCommand:@"ps -eo pcpu,pid,args | grep \"wineboot.exe --init\""] componentsSeparatedByString:@" "];
+        NSArray *resultArray = [[self system:@"ps -eo pcpu,pid,args | grep \"wineboot.exe --init\""] componentsSeparatedByString:@" "];
         if ([[resultArray objectAtIndex:1] floatValue] > 90.0)
         {
             if (hit > 5)
@@ -2079,7 +2079,7 @@ static NSPortManager* portManager;
                 [fm removeItemAtPath:pathToWineLockFolder];
             }
             [fm createDirectoryAtPath:pathToWineLockFolder withIntermediateDirectories:YES];
-            [self systemCommand:[NSString stringWithFormat:@"chmod -R 700 \"/tmp/.wine-%@\"",uid]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"700",[NSString stringWithFormat:@"/tmp/.wine-%@",uid]]];
         }
         
         if ([wineStartInfo isNonStandardRun])
@@ -2091,29 +2091,29 @@ static NSPortManager* portManager;
             [fm removeItemAtPath:[NSString stringWithFormat:@"%@/.update-timestamp",winePrefix]];
             
             //calling wineboot is a simple builtin refresh that needs to NOT prompt for gecko
-            NSString *mshtmlLine;
+            NSString *mshtmlValue;
             if ([wssCommand isEqualToString:@"WSS-wineboot"] || [[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO] intValue] == 1 )
             {
-                mshtmlLine = @"export WINEDLLOVERRIDES=\"mscoree,mshtml=\";";
+                mshtmlValue = @"mscoree,mshtml=";
             }
             else
             {
                 //disable mono since its useless anyway
-                mshtmlLine = @"export WINEDLLOVERRIDES=\"mscoree=\";";
+                mshtmlValue = @"mscoree=";
             }
             
             //launch monitor thread for killing stuck wineboots (work-a-round Macdriver bug for 1.5.28)
             [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
-            NSArray* command = @[mshtmlLine,
-                                 [NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
-                                 [NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
-                                 [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
-                                 [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
-                                 [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
-                                 [NSString stringWithFormat:@"export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";"],
-                                 [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                                 [NSString stringWithFormat:@"%@ wineboot",wineExecutable]];
-            [self systemCommand:[command componentsJoinedByString:@" "]];
+            [NSTask runAsynchronousProgram:wineExecutable withFlags:@[@"wineboot"]
+                           withEnvironment:@{@"WINEDLLOVERRIDES":mshtmlValue,
+                                             @"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
+                                             @"WINEDEBUG":wineDebugLine,
+                                             @"PATH":[NSString stringWithFormat:@"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold,frameworksFold],
+                                             @"DISPLAY":theDisplayNumber,
+                                             @"WINEPREFIX":winePrefix,
+                                             @"FREETYPE_PROPERTIES":@"truetype:interpreter-version=35",
+                                             @"DYLD_FALLBACK_LIBRARY_PATH":dyldFallBackLibraryPath
+                                             }];
             usleep(3000000);
             
             if ([wssCommand isEqualToString:@"WSS-wineprefixcreate"]) //only runs on build new wrapper, and rebuild
@@ -2122,7 +2122,7 @@ static NSPortManager* portManager;
                 NSString* profilesFolderPath = [NSString stringWithFormat:@"%@/drive_c/windows/profiles",winePrefix];
                 [fm removeItemAtPath:profilesFolderPath];
                 [fm createSymbolicLinkAtPath:profilesFolderPath withDestinationPath:@"../users" error:nil];
-                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",profilesFolderPath]];
+                [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",profilesFolderPath]];
                 
                 //rename new user folder to Wineskin and make symlinks
                 NSString* usersUserFolderPath = [NSString stringWithFormat:@"%@/drive_c/users/%@",winePrefix,NSUserName()];
@@ -2133,30 +2133,35 @@ static NSPortManager* portManager;
                 {
                     [fm moveItemAtPath:usersUserFolderPath toPath:usersWineskinFolderPath];
                     [fm createSymbolicLinkAtPath:usersUserFolderPath withDestinationPath:@"Wineskin" error:nil];
-                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersUserFolderPath]];
+                    [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",usersUserFolderPath]];
                 }
                 else if ([fm fileExistsAtPath:usersCrossOverFolderPath])
                 {
                     [fm moveItemAtPath:usersCrossOverFolderPath toPath:usersWineskinFolderPath];
                     [fm createSymbolicLinkAtPath:usersCrossOverFolderPath withDestinationPath:@"Wineskin" error:nil];
-                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersCrossOverFolderPath]];
+                    [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",usersCrossOverFolderPath]];
                 }
                 else //this shouldn't ever happen.. but what the heck
                 {
                     [fm createDirectoryAtPath:usersWineskinFolderPath withIntermediateDirectories:YES];
                     [fm createSymbolicLinkAtPath:usersUserFolderPath withDestinationPath:@"Wineskin" error:nil];
-                    [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@\"",usersUserFolderPath]];
+                    [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",usersUserFolderPath]];
                 }
 
                 //load Wineskin default reg entries
-                NSArray* loadRegCommand = @[[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
-                                            [NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
-                                            [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
-                                            [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
-                                            [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
-                                            [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                                            [NSString stringWithFormat:@"%@ regedit \"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg\" > \"/dev/null\" 2>&1",wineExecutable, contentsFold]];
-                [self systemCommand:[loadRegCommand componentsJoinedByString:@" "]];
+                NSString* pathEnv = [@[[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold],
+                                       [NSString stringWithFormat:@"%@/wstools.bundle/bin",frameworksFold],
+                                       @"$PATH",@"/opt/local/bin",@"/opt/local/sbin"] componentsJoinedByString:@":"];
+                NSString* remakedefaultsReg = [NSString stringWithFormat:@"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg",contentsFold];
+                [NSTask runAsynchronousProgram:wineExecutable
+                                     withFlags:@[@"regedit",remakedefaultsReg]
+                               withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
+                                                 @"WINEDEBUG":wineDebugLine,
+                                                 @"PATH":pathEnv,
+                                                 @"DISPLAY":theDisplayNumber,
+                                                 @"WINEPREFIX":winePrefix,
+                                                 @"DYLD_FALLBACK_LIBRARY_PATH":dyldFallBackLibraryPath
+                                                 }];
                 usleep(5000000);
             }
             
@@ -2174,7 +2179,7 @@ static NSPortManager* portManager;
                                                                       withString:wineskinUserFolderWindowsPath]];
             }
             [self writeStringArray:newUserReg toFile:userRegPath];
-            [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@\"",userRegPath]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"666",userRegPath]];
             
             
             NSString* userDefRegPath = [NSString stringWithFormat:@"%@/userdef.reg",winePrefix];
@@ -2197,21 +2202,21 @@ static NSPortManager* portManager;
             // cannot 755 the whole wrapper and then change to 777s or this can break the wrapper for non-Admin users.
             //[self systemCommand:[NSString stringWithFormat:@"chmod 755 \"%@\"",appNameWithPath]];
             // need to chmod 777 on Contents, Resources, and Resources/* for multiuser fix on same machine
-            [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",contentsFold]];
-            [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",winePrefix]];
-            [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@\"",frameworksFold]];
-            [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/wswine.bundle\"",frameworksFold]];//for ICE symlinks
-            [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@/drive_c\"",winePrefix]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"777",contentsFold]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"777",winePrefix]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"777",frameworksFold]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"777",[NSString stringWithFormat:@"%@/wswine.bundle",frameworksFold]]];
+            [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",[NSString stringWithFormat:@"%@/drive_c",winePrefix]]];
             NSArray *tmpy2 = [fm contentsOfDirectoryAtPath:winePrefix];
             for (NSString *item in tmpy2)
             {
-                [self systemCommand:[NSString stringWithFormat:@"chmod 777 \"%@/%@\"",winePrefix,item]];
+                [NSTask runProgram:@"chmod" withFlags:@[@"777",[NSString stringWithFormat:@"%@/%@",winePrefix,item]]];
             }
             NSString* dosdevicesPath = [NSString stringWithFormat:@"%@/dosdevices",winePrefix];
             NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:dosdevicesPath];
             for (NSString *item in tmpy3)
             {
-                [self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/%@\"",dosdevicesPath,item]];
+                [NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",[NSString stringWithFormat:@"%@/%@",dosdevicesPath,item]]];
             }
             return;
         }
@@ -2292,11 +2297,13 @@ static NSPortManager* portManager;
                                                    [winetricksCommands[0] hasPrefix:@"list-"])))
             {
                 //just getting a list of packages... X should NOT be running.
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/\";export PATH=\"$PWD:%@/wswine.bundle/bin:$PATH:%@/wstools.bundle/bin:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@/Logs/WinetricksTemp.log\"",dyldFallBackLibraryPath,wineDebugLine,winePrefix,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],winePrefix]];
+                //TODO: change to using NSTask check runProgram in ObjectiveC_Extension.framework
+                [self system:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/\";export PATH=\"$PWD:%@/wswine.bundle/bin:$PATH:%@/wstools.bundle/bin:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks --no-isolate %@ > \"%@/Logs/WinetricksTemp.log\"",dyldFallBackLibraryPath,wineDebugLine,winePrefix,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,dyldFallBackLibraryPath,[winetricksCommands componentsJoinedByString:@" "],winePrefix]];
             }
             else
             {
-                [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/\";export PATH=\"$PWD:%@/wswine.bundle/bin:$PATH:%@/wstools.bundle/bin:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks %@ --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,winePrefix,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,silentMode,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
+                //TODO: change to using NSTask check runProgram in ObjectiveC_Extension.framework
+                [self system:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export WINEDEBUG=%@;cd \"%@/\";export PATH=\"$PWD:%@/wswine.bundle/bin:$PATH:%@/wstools.bundle/bin:/opt/local/bin:/opt/local/sbin\";export DISPLAY=%@;export WINEPREFIX=\"%@\";export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";%@DYLD_FALLBACK_LIBRARY_PATH=\"%@\" winetricks %@ --no-isolate \"%@\" > \"%@/Logs/Winetricks.log\" 2>&1",dyldFallBackLibraryPath,wineDebugLine,winePrefix,frameworksFold,frameworksFold,theDisplayNumber,winePrefix,[wineStartInfo getCliCustomCommands],dyldFallBackLibraryPath,silentMode,[winetricksCommands componentsJoinedByString:@"\" \""],winePrefix]];
             }
             usleep(5000000); // sometimes it dumps out slightly too fast... just hold for a few seconds
             return;
@@ -2325,39 +2332,54 @@ static NSPortManager* portManager;
 
                 if ([item hasPrefix:@"/"])
                 {
-                    [self systemCommand:[NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";export PATH=\"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";%@export WINEDEBUG=%@;export DISPLAY=%@;export WINEPREFIX=\"%@\";%@cd \"%@/wswine.bundle/bin\";export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";DYLD_FALLBACK_LIBRARY_PATH=\"%@\" %@ start /unix \"%@\" > \"%@\" 2>&1 &", dyldFallBackLibraryPath,frameworksFold,frameworksFold, [wineStartInfo getULimitNumber], wineDebugLine, theDisplayNumber, winePrefix, [wineStartInfo getCliCustomCommands],frameworksFold, dyldFallBackLibraryPath, wineExecutable, item, wineLogFileLocal]];
+                    // TODO: [wineStartInfo getULimitNumber]
+                    // TODO: [wineStartInfo getCliCustomCommands] being ignored
+                    // TODO: wineLogFileLocal being ignored
+                    [NSTask runAsynchronousProgram:wineExecutable withFlags:@[@"start",@"/unix",item]
+                                         atRunPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold]
+                                   withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
+                                                     @"WINEDEBUG":wineDebugLine,
+                                                     @"PATH":[NSString stringWithFormat:@"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold,frameworksFold],
+                                                     @"DISPLAY":theDisplayNumber,
+                                                     @"WINEPREFIX":winePrefix,
+                                                     @"FREETYPE_PROPERTIES":@"truetype:interpreter-version=35",
+                                                     @"DYLD_FALLBACK_LIBRARY_PATH":dyldFallBackLibraryPath
+                                                     }];
                 }
                 else
                 {
-                     NSArray* launchWineCommand = @[
-                         [NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
-                         [NSString stringWithFormat:@"%@export WINEDEBUG=%@;",[wineStartInfo getULimitNumber],wineDebugLine],
-                         [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
-                         [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
-                         [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
-                         [NSString stringWithFormat:@"export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";"],
-                         [NSString stringWithFormat:@"%@cd \"%@\";",[wineStartInfo getCliCustomCommands],[wineStartInfo getWineRunLocation]],
-                         [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                         [NSString stringWithFormat:@"%@ start \"%@\" > \"%@\" 2>&1 &",wineExecutable, item, wineLogFileLocal]];
-                    [self systemCommand:[launchWineCommand componentsJoinedByString:@" "]];
+                    // TODO: [wineStartInfo getULimitNumber]
+                    // TODO: [wineStartInfo getCliCustomCommands] being ignored
+                    // TODO: wineLogFileLocal being ignored
+                    [NSTask runAsynchronousProgram:wineExecutable withFlags:@[@"start",item] atRunPath:[wineStartInfo getWineRunLocation]
+                                   withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
+                                                     @"WINEDEBUG":wineDebugLine,
+                                                     @"PATH":[NSString stringWithFormat:@"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold,frameworksFold],
+                                                     @"DISPLAY":theDisplayNumber,
+                                                     @"WINEPREFIX":winePrefix,
+                                                     @"FREETYPE_PROPERTIES":@"truetype:interpreter-version=35",
+                                                     @"DYLD_FALLBACK_LIBRARY_PATH":dyldFallBackLibraryPath
+                                                     }];
                 }
             }
         }
         else
         {
             //launch Wine normally
-            //TODO: change to using NSTask check runProgram in ObjectiveC_Extension.framework
-            NSArray* launchWineCommand = @[
-                                           [NSString stringWithFormat:@"export WINESKIN_LIB_PATH_FOR_FALLBACK=\"%@\";",dyldFallBackLibraryPath],
-                                           [NSString stringWithFormat:@"export WINEDEBUG=%@;",wineDebugLine],
-                                           [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold,frameworksFold],
-                                           [NSString stringWithFormat:@"export DISPLAY=%@;",theDisplayNumber],
-                                           [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
-                                           [NSString stringWithFormat:@"export FREETYPE_PROPERTIES=\"truetype:interpreter-version=35\";"],
-                                           [NSString stringWithFormat:@"%@cd \"%@\";",[wineStartInfo getCliCustomCommands],[wineStartInfo getWineRunLocation]],
-                                           [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                                           [NSString stringWithFormat:@"%@ %@ \"%@\"%@ > \"%@\" 2>&1 &",wineExecutable, startExeLine,[wineStartInfo getWineRunFile],[wineStartInfo getProgramFlags],wineLogFileLocal]];
-            [self systemCommand:[launchWineCommand componentsJoinedByString:@" "]];
+            // TODO: [wineStartInfo getCliCustomCommands] being ignored
+            // TODO: wineLogFileLocal being ignored
+            NSMutableArray* flags = [[startExeLine.trim componentsSeparatedByString:@" "] mutableCopy];
+            [flags addObject:[wineStartInfo getWineRunFile]];
+            [flags addObjectsFromArray:[NSTask componentsFromFlagsString:[wineStartInfo getProgramFlags]]];
+            [NSTask runAsynchronousProgram:wineExecutable withFlags:flags atRunPath:[wineStartInfo getWineRunLocation]
+                           withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
+                                             @"WINEDEBUG":wineDebugLine,
+                                             @"PATH":[NSString stringWithFormat:@"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold,frameworksFold],
+                                             @"DISPLAY":theDisplayNumber,
+                                             @"WINEPREFIX":winePrefix,
+                                             @"FREETYPE_PROPERTIES":@"truetype:interpreter-version=35",
+                                             @"DYLD_FALLBACK_LIBRARY_PATH":dyldFallBackLibraryPath
+                                             }];
         }
         
         NSMutableString *vdResolution = [[wineStartInfo getVdResolution] mutableCopy];
@@ -2388,8 +2410,8 @@ static NSPortManager* portManager;
 	int fixGammaCounter = 0;
     if (fullScreenOption)
     {
-        [self systemCommand:[NSString stringWithFormat:@"> \"%@\"",timeStampFile]];
-        [self systemCommand:[NSString stringWithFormat:@"> \"%@\"",wineTempLogFile]];
+        [self system:[NSString stringWithFormat:@"> \"%@\"",timeStampFile]];
+        [self system:[NSString stringWithFormat:@"> \"%@\"",wineTempLogFile]];
     }
     if (useXQuartz || useMacDriver)
     {
@@ -2401,11 +2423,11 @@ static NSPortManager* portManager;
 		if (fullScreenOption)
 		{
 			//compare to timestamp, if log is newer, we need to check it out.
-            if ([self systemCommand:timestampChecker])
+            if ([self system:timestampChecker])
             {
 				NSArray *tempArray = [self readFileToStringArray:wineLogFile];
-				[self systemCommand:[NSString stringWithFormat:@"> \"%@\"",wineLogFile]];
-                [self systemCommand:[NSString stringWithFormat:@"> \"%@\"",timeStampFile]];
+				[self system:[NSString stringWithFormat:@"> \"%@\"",wineLogFile]];
+                [self system:[NSString stringWithFormat:@"> \"%@\"",timeStampFile]];
 				if (debugEnabled)
                 {
                     NSArray *oldDataArray = [self readFileToStringArray:wineTempLogFile];
@@ -2533,16 +2555,16 @@ static NSPortManager* portManager;
 	NSArray *tmpy3 = [fm contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/dosdevices",winePrefix]];
 	for (NSString *item in tmpy3)
     {
-		[self systemCommand:[NSString stringWithFormat:@"chmod -h 777 \"%@/dosdevices/%@\"",winePrefix,item]];
+		[NSTask runProgram:@"chmod" withFlags:@[@"-h",@"777",[NSString stringWithFormat:@"%@/dosdevices/%@",winePrefix,item]]];
     }
     
     for (NSString* regFile in @[USERDEF_REG, SYSTEM_REG, USER_REG])
     {
-        [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/%@.reg\"",winePrefix,regFile]];
+        [NSTask runProgram:@"chmod" withFlags:@[@"666",[NSString stringWithFormat:@"%@/%@.reg",winePrefix,regFile]]];
     }
 	
-    [self systemCommand:[NSString stringWithFormat:@"chmod 666 \"%@/Info.plist\"",contentsFold]];
-	[self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@/drive_c\"",winePrefix]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"666",[NSString stringWithFormat:@"%@/Info.plist",contentsFold]]];
+    [NSTask runProgram:@"chmod" withFlags:@[@"-R",@"777",[NSString stringWithFormat:@"%@/drive_c",winePrefix]]];
     
     //get rid of the preference file
     [fm removeItemAtPath:lockfile];
@@ -2552,20 +2574,20 @@ static NSPortManager* portManager;
     NSArray* command = @[
                          [NSString stringWithFormat:@"export PATH=\"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin\";",frameworksFold],
                          [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],@"wineserver -k"];
-    [self systemCommand:[command componentsJoinedByString:@" "]];
+    [self system:[command componentsJoinedByString:@" "]];
     usleep(3000000);
     
     //kill XQuartz processes
-    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"XQuartz\" > /dev/null 2>&1"]];
-    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"Xquartz\" > /dev/null 2>&1"]];
-    [self systemCommand:[NSString stringWithFormat:@"killall -9 \"xinit\" > /dev/null 2>&1"]];
+    [self system:[NSString stringWithFormat:@"killall -9 \"XQuartz\" > /dev/null 2>&1"]];
+    [self system:[NSString stringWithFormat:@"killall -9 \"Xquartz\" > /dev/null 2>&1"]];
+    [self system:[NSString stringWithFormat:@"killall -9 \"xinit\" > /dev/null 2>&1"]];
 
     //get rid of OS X saved state file
     [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Library/Saved Application State/com.%@%@.wineskin.savedState",NSHomeDirectory(),[[NSNumber numberWithLong:bundleRandomInt1] stringValue],[[NSNumber numberWithLong:bundleRandomInt2] stringValue]]];
     
     //attempt to clear out any stuck processes in launchd for the wrapper
     //this may prevent -10810 errors on next launch with 10.9, and *shouldn't* hurt anything.
-    NSArray *results = [[self systemCommand:[NSString stringWithFormat:@"launchctl list | grep \"%@\"",appName]] componentsSeparatedByString:@"\n"];
+    NSArray *results = [[self system:[NSString stringWithFormat:@"launchctl list | grep \"%@\"",appName]] componentsSeparatedByString:@"\n"];
     for (NSString *result in results)
     {
         NSString *entryToRemove = [result getFragmentAfter:@"-" andBefore:nil];
@@ -2578,7 +2600,7 @@ static NSPortManager* portManager;
                 entryToRemove = [entryToRemove substringFromIndex:theBracket.location];
             }
             NSLog(@"launchctl remove \"%@\"",entryToRemove);
-            [self systemCommand:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
+            [self system:[NSString stringWithFormat:@"launchctl remove \"%@\"",entryToRemove]];
         }
     }
     //fix permissions before closing
