@@ -2104,7 +2104,8 @@ static NSPortManager* portManager;
             
             //launch monitor thread for killing stuck wineboots (work-a-round Macdriver bug for 1.5.28)
             [NSThread detachNewThreadSelector:@selector(wineBootStuckProcess) toTarget:self withObject:nil];
-            [NSTask runAsynchronousProgram:wineExecutable withFlags:@[@"wineboot"]
+            [NSTask runAsynchronousProgram:[NSString stringWithFormat:@"%@/wswine.bundle/bin/%@",frameworksFold,wineExecutable]
+                                 withFlags:@[@"wineboot"]
                            withEnvironment:@{@"WINEDLLOVERRIDES":mshtmlValue,
                                              @"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
                                              @"WINEDEBUG":wineDebugLine,
@@ -2153,7 +2154,7 @@ static NSPortManager* portManager;
                                        [NSString stringWithFormat:@"%@/wstools.bundle/bin",frameworksFold],
                                        @"$PATH",@"/opt/local/bin",@"/opt/local/sbin"] componentsJoinedByString:@":"];
                 NSString* remakedefaultsReg = [NSString stringWithFormat:@"%@/../Wineskin.app/Contents/Resources/remakedefaults.reg",contentsFold];
-                [NSTask runAsynchronousProgram:wineExecutable
+                [NSTask runAsynchronousProgram:[NSString stringWithFormat:@"%@/wswine.bundle/bin/%@",frameworksFold,wineExecutable]
                                      withFlags:@[@"regedit",remakedefaultsReg]
                                withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
                                                  @"WINEDEBUG":wineDebugLine,
@@ -2335,7 +2336,8 @@ static NSPortManager* portManager;
                     // TODO: [wineStartInfo getULimitNumber]
                     // TODO: [wineStartInfo getCliCustomCommands] being ignored
                     // TODO: wineLogFileLocal being ignored
-                    [NSTask runAsynchronousProgram:wineExecutable withFlags:@[@"start",@"/unix",item]
+                    [NSTask runAsynchronousProgram:[NSString stringWithFormat:@"%@/wswine.bundle/bin/%@",frameworksFold,wineExecutable]
+                                         withFlags:@[@"start",@"/unix",item]
                                          atRunPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",frameworksFold]
                                    withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
                                                      @"WINEDEBUG":wineDebugLine,
@@ -2351,7 +2353,8 @@ static NSPortManager* portManager;
                     // TODO: [wineStartInfo getULimitNumber]
                     // TODO: [wineStartInfo getCliCustomCommands] being ignored
                     // TODO: wineLogFileLocal being ignored
-                    [NSTask runAsynchronousProgram:wineExecutable withFlags:@[@"start",item] atRunPath:[wineStartInfo getWineRunLocation]
+                    [NSTask runAsynchronousProgram:[NSString stringWithFormat:@"%@/wswine.bundle/bin/%@",frameworksFold,wineExecutable]
+                                         withFlags:@[@"start",item] atRunPath:[wineStartInfo getWineRunLocation]
                                    withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
                                                      @"WINEDEBUG":wineDebugLine,
                                                      @"PATH":[NSString stringWithFormat:@"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold,frameworksFold],
@@ -2371,7 +2374,8 @@ static NSPortManager* portManager;
             NSMutableArray* flags = [[startExeLine.trim componentsSeparatedByString:@" "] mutableCopy];
             [flags addObject:[wineStartInfo getWineRunFile]];
             [flags addObjectsFromArray:[NSTask componentsFromFlagsString:[wineStartInfo getProgramFlags]]];
-            [NSTask runAsynchronousProgram:wineExecutable withFlags:flags atRunPath:[wineStartInfo getWineRunLocation]
+            [NSTask runAsynchronousProgram:[NSString stringWithFormat:@"%@/wswine.bundle/bin/%@",frameworksFold,wineExecutable]
+                                 withFlags:flags atRunPath:[wineStartInfo getWineRunLocation]
                            withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
                                              @"WINEDEBUG":wineDebugLine,
                                              @"PATH":[NSString stringWithFormat:@"%@/wswine.bundle/bin:%@/wstools.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold,frameworksFold],
