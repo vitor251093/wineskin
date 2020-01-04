@@ -280,10 +280,9 @@ static NSPortManager* portManager;
         
         //set the wine executable to be used.
         //can't trust the Engine is named correctly so check the actual binary files
-        if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]])
+        if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]] && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64",pathToWineBinFolder]] && IS_SYSTEM_MAC_OS_10_15_OR_SUPERIOR)
         {
             wineExecutable = @"wine64";
-            runWithStartExe = YES; // workaround for some 32bit exe launch issues
         }
         else if      ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64",pathToWineBinFolder]] && IS_SYSTEM_MAC_OS_10_15_OR_SUPERIOR)
         {
