@@ -2372,7 +2372,7 @@ static NSPortManager* portManager;
             // TODO: wineLogFileLocal being ignored
             NSMutableArray* flags = [[startExeLine.trim componentsSeparatedByString:@" "] mutableCopy];
             [flags addObject:[wineStartInfo getWineRunFile]];
-            [flags addObjectsFromArray:[NSTask componentsFromFlagsString:[wineStartInfo getProgramFlags]]];
+            [flags addObject:[wineStartInfo getProgramFlags]];
             [NSTask runAsynchronousProgram:[NSString stringWithFormat:@"%@/wswine.bundle/bin/%@",frameworksFold,wineExecutable]
                                  withFlags:flags atRunPath:[wineStartInfo getWineRunLocation]
                            withEnvironment:@{@"WINESKIN_LIB_PATH_FOR_FALLBACK":dyldFallBackLibraryPath,
