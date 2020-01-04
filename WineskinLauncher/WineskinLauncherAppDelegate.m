@@ -398,7 +398,7 @@ static NSPortManager* portManager;
                     if ([wssCommand isEqualToString:@"WSS-wineserverkill"])
                     {
                         NSString* pathEnv = [NSString stringWithFormat:@"%@/wswine.bundle/bin:$PATH:/opt/local/bin:/opt/local/sbin",frameworksFold];
-                        [NSTask runProgram:@"wineserver" withFlags:@[@"-k"] withEnvironment:@{@"PATH":pathEnv, @"WINEPREFIX":winePrefix}];
+                        [NSTask runProgram:[NSString stringWithFormat:@"%@/wswine.bundle/bin/wineserver",frameworksFold] withFlags:@[@"-k"] withEnvironment:@{@"PATH":pathEnv, @"WINEPREFIX":winePrefix}];
                         
                         //****** if "IsFnToggleEnabled" is enabled
                         if ([[self.portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue] == 1)
