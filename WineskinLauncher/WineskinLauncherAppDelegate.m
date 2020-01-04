@@ -1553,9 +1553,9 @@ static NSPortManager* portManager;
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                           binBash,dyldFallbackLibraryPath,wineName];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
     
     [wineBash       writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
@@ -1643,11 +1643,11 @@ static NSPortManager* portManager;
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                           binBash,dyldFallbackLibraryPath,wineName];
-    NSString *wine64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wine64Bash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                             binBash,dyldFallbackLibraryPath,wine64Name];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
     
     [wineBash       writeToFile:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
@@ -1720,9 +1720,9 @@ static NSPortManager* portManager;
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                           binBash,dyldFallbackLibraryPath,wineStagingName];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
 
     //write out bash scripts to launch wine
@@ -1811,11 +1811,11 @@ static NSPortManager* portManager;
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                  binBash,dyldFallbackLibraryPath,wineStagingName];
-    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                  binBash,dyldFallbackLibraryPath,wineStaging64Name];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
     
     
@@ -1904,12 +1904,12 @@ static NSPortManager* portManager;
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                  binBash,dyldFallbackLibraryPath,wineStagingName];
-    NSString *wine32on64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wine32on64Bash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                  binBash,dyldFallbackLibraryPath,wine32on64Name];
     
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
     
     
@@ -2014,13 +2014,13 @@ static NSPortManager* portManager;
     NSString* binBash = @"#!/bin/bash\n";
     NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
     
-    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineStagingBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                  binBash,dyldFallbackLibraryPath,wineStagingName];
-    NSString *wine32on64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wine32on64Bash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                  binBash,dyldFallbackLibraryPath,wine32on64Name];
-    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                  binBash,dyldFallbackLibraryPath,wineStaging64Name];
-    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"%@\" \"$@\"",
                                 binBash,dyldFallbackLibraryPath,wineServerName];
     
     
