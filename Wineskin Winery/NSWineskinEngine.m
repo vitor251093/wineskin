@@ -202,7 +202,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
         wineskinEngines = [self getListOfAvailableEnginesOffline];
         wineskinEngines = [[wineskinEngines arrayByRemovingRepetitions] mutableCopy];
         
-        [wineskinEngines replaceObjectsWithVariation:^NSWineskinEngine*(NSString* object, NSUInteger index)
+        [wineskinEngines map:^NSWineskinEngine*(NSString* object)
         {
             return [NSWineskinEngine wineskinEngineWithString:object];
         }];
@@ -225,7 +225,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             return NSOrderedSame;
         }];
         
-        [wineskinEngines replaceObjectsWithVariation:^NSWineskinEngine*(NSWineskinEngine* object, NSUInteger index)
+        [wineskinEngines map:^NSWineskinEngine*(NSWineskinEngine* object)
         {
             if ([object isKindOfClass:[NSWineskinEngine class]] == false)
             {
