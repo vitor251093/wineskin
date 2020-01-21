@@ -42,7 +42,7 @@
 	if (numToCheckMajor < 3 && numToCheckMinor < 5) return;
 	//check if any engines are WS5 - WS7, if not then exit
 	NSMutableArray *enginesToConvert = [NSMutableArray arrayWithCapacity:1];
-    for (NSWineskinEngine *item in installedEnginesList) {
+    for (NSWineskinEngine *item in _installedEnginesList) {
 		if (item.engineVersion >= 5 && item.engineVersion <= 7 && ![item.engineName isEqualToString:@"WS7Wine1.2.2ICE"])
             [enginesToConvert addObject:item];
     }
@@ -187,7 +187,7 @@
 
 -(NSArray<NSWineskinEngine*>*)installedEnginesList {
     BOOL hideX11Engines = hideXQuartzEnginesCheckBox.state;
-    return hideX11Engines ? installedMacDriverEnginesList : installedEnginesList;
+    return hideX11Engines ? _installedMacDriverEnginesList : _installedEnginesList;
 }
 
 -(BOOL)isXQuartzInstalled {
@@ -260,7 +260,7 @@
 	for (NSString *itemAE in availableEngines)
 	{
 		BOOL matchFound=NO;
-		for (NSWineskinEngine *itemIE in installedEnginesList)
+		for (NSWineskinEngine *itemIE in _installedEnginesList)
 		{
 			if ([itemAE isEqualToString:itemIE.engineName])
 			{
@@ -349,20 +349,16 @@
 
 - (void)getInstalledEngines:(NSString *)theFilter
 {
-	[installedEnginesList removeAllObjects];
-    [installedEnginesList addObjectsFromArray:[NSWineskinEngine getListOfAvailableEngines]];
-    [installedEnginesList replaceObjectsWithVariation:^id _Nullable(NSWineskinEngine * _Nonnull object, NSUInteger index) {
-        if (theFilter.length > 0 && ![object.engineName.lowercaseString contains:theFilter.lowercaseString]) return nil;
-        return object;
+	[_installedEnginesList removeAllObjects];
+    [_installedEnginesList addObjectsFromArray:[NSWineskinEngine getListOfAvailableEngines]];
+    [_installedEnginesList filter:^BOOL(NSWineskinEngine * _Nonnull engine) {
+        return (theFilter.length == 0 || [engine.engineName.lowercaseString contains:theFilter.lowercaseString]);
     }];
-    [installedEnginesList removeObject:[NSNull null]];
     
-    installedMacDriverEnginesList = [installedEnginesList mutableCopy];
-    [installedMacDriverEnginesList replaceObjectsWithVariation:^id _Nullable(NSWineskinEngine * _Nonnull object, NSUInteger index) {
-        if (object.isCompatibleWithMacDriver) return object;
-        return nil;
+    _installedMacDriverEnginesList = [_installedEnginesList mutableCopy];
+    [_installedMacDriverEnginesList filter:^BOOL(NSWineskinEngine *  _Nonnull engine) {
+        return engine.isCompatibleWithMacDriver;
     }];
-    [installedMacDriverEnginesList removeObject:[NSNull null]];
 }
 
 - (NSArray *)getEnginesToIgnore
@@ -436,7 +432,7 @@
 	for (NSString *itemAE in availableEngines)
 	{
 		BOOL matchFound=NO;
-		for (NSWineskinEngine *itemIE in installedEnginesList)
+		for (NSWineskinEngine *itemIE in _installedEnginesList)
 		{
 			if ([itemAE isEqualToString:itemIE.engineName])
 			{
@@ -1140,8 +1136,8 @@
 	self = [super init];
 	if (self)
 	{
-		installedEnginesList = [[NSMutableArray alloc] init];
-        installedMacDriverEnginesList = [[NSMutableArray alloc] init];
+		_installedEnginesList = [[NSMutableArray alloc] init];
+        _installedMacDriverEnginesList = [[NSMutableArray alloc] init];
 	}
 	return self;
 }

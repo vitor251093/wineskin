@@ -195,7 +195,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
 }
 +(NSMutableArray<NSWineskinEngine*>*)getListOfAvailableEngines
 {
-    NSMutableArray* wineskinEngines;
+    NSMutableArray<NSWineskinEngine*>* wineskinEngines;
     
     @autoreleasepool
     {
@@ -225,17 +225,10 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             return NSOrderedSame;
         }];
         
-        [wineskinEngines map:^NSWineskinEngine*(NSWineskinEngine* object)
+        [wineskinEngines filter:^BOOL(NSWineskinEngine* object)
         {
-            if ([object isKindOfClass:[NSWineskinEngine class]] == false)
-            {
-                return nil;
-            }
-             
-            return object;
+            return [object isKindOfClass:[NSWineskinEngine class]];
         }];
-        
-        [wineskinEngines removeObject:[NSNull null]];
     }
     
     return wineskinEngines;
