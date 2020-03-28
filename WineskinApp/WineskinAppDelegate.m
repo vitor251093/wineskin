@@ -1109,13 +1109,13 @@ NSFileManager *fm;
         //TODO: reset string back to nothing.exe
         [windowsExeTextField setStringValue:@"C:\nnothing.exe"];
         [self saveAllData];
-        [self loadAllData];
         
         //refresh
         [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreate"]];
         
         [advancedWindow makeKeyAndOrderFront:self];
         [busyWindow orderOut:self];
+        [self loadAllData];
     }
 }
 - (IBAction)refreshWrapperButtonPressed:(id)sender
@@ -1586,6 +1586,13 @@ NSFileManager *fm;
 			}
 			[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath] atomically:YES];
 		}
+        
+        
+        //Fix the permissions just to be safe here
+        NSString* winetricksHelpList = [NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath];
+        [self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",winetricksHelpList,nil]];
+        
+        
 		[self setWinetricksList:list];
 		[self setWinetricksFilteredList:list];
 		

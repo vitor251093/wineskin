@@ -14,19 +14,11 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	SInt32 OSXversionMajor, OSXversionMinor;
-	if(Gestalt(gestaltSystemVersionMajor, &OSXversionMajor) == noErr && Gestalt(gestaltSystemVersionMinor, &OSXversionMinor) == noErr)
-	{
-		if(OSXversionMajor == 10 && OSXversionMinor <= 5) // display warning about 10.5 no longer being supported.
-		{
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert addButtonWithTitle:@"Ok, I got it!"];
-			[alert setMessageText:@"Mac OS X 10.5 Warning"];
-			[alert setInformativeText:@"Wineskin no longer supports Mac OS X 10.5!\n\nYou may want to upgrade your OS!\n\nIf you want to use Wineskin Winery on 10.5 you can, but the built in downloads will get 10.6+ compatible files.\n\nTo use this on 10.5, you must get Manual Download files and only use Wineskin 2.5.3 - 2.5.4 and WS8 based engines.\n\nWineskin 2.5.5+ and WS9 engines are Mac OS X 10.6+ only!"];
-			[alert setAlertStyle:NSInformationalAlertStyle];
-			[alert runModal];
-		}
-	}
+    //if (IS_SYSTEM_MAC_OS_10_15_OR_SUPERIOR && [VMMComputerInformation isSipEnabled]) {
+
+            //[VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:@"SIP needs to be disabled to run Wineskin ports in macOS 10.15+. To disable it: reboot your Mac into Recovery Mode by restarting your computer and holding down Command + R until the Apple logo appears on your screen.\n\nClick Utilities > Terminal.\n\nIn the Terminal window, type in \"csrutil disable\" and press Enter. Then restart your Mac. You should be able to use ports properly after that."];
+
+    //}
 	srand((unsigned int)time(NULL));
 	[waitWheel startAnimation:self];
 	[busyWindow makeKeyAndOrderFront:self];
@@ -34,85 +26,7 @@
 	[self checkForUpdates];
 	[self runConverter];
 }
-- (void)runConverter
-{
-	//check wrapper version is 2.5+, if not then exit
-	int numToCheckMajor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(9,1)] intValue];
-	int numToCheckMinor = [[[self getCurrentWrapperVersion] substringWithRange:NSMakeRange(11,1)] intValue];
-	if (numToCheckMajor < 3 && numToCheckMinor < 5) return;
-	//check if any engines are WS5 - WS7, if not then exit
-	NSMutableArray *enginesToConvert = [NSMutableArray arrayWithCapacity:1];
-    for (NSWineskinEngine *item in installedEnginesList) {
-		if (item.engineVersion >= 5 && item.engineVersion <= 7 && ![item.engineName isEqualToString:@"WS7Wine1.2.2ICE"])
-            [enginesToConvert addObject:item];
-    }
-	if ([enginesToConvert count] < 1) return;
-	//offer to convert all engines to WS8
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert addButtonWithTitle:@"Convert!"];
-	[alert addButtonWithTitle:@"Not Now"];
-	[alert setMessageText:@"Convert Older Engines?"];
-	[alert setInformativeText:@"Wineskin 2.5+ will only use WS8+ engines.\nYou have some WS5/WS6/WS7 engines installed.\n\nWould you like to convert these into WS8 Engines?\n(this could take a while if you have many)"];
-	[alert setAlertStyle:NSInformationalAlertStyle];
-	if ([alert runModal] != NSAlertFirstButtonReturn)
-	{
-		return;
-	}
-	//if convert, do convert	
-	[busyWindow makeKeyAndOrderFront:self];
-	[window orderOut:self];
-	NSFileManager *fm = [NSFileManager defaultManager];
-    NSString* enginesFolderPath = [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()];
-    for (NSString *item in enginesToConvert)
-	{
-        //remove extra left over junk that might mess things up
-        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar",enginesFolderPath,item] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WS8%@.tar",enginesFolderPath,[item substringFromIndex:3]] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle",enginesFolderPath] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle",enginesFolderPath] error:nil];
-        
-		//decompress engine
-		system([[NSString stringWithFormat:@"\"%@\" x \"%@/%@.tar.7z\" \"-o/%@\"", BINARY_7ZA,enginesFolderPath,item,enginesFolderPath] UTF8String]);
-		system([[NSString stringWithFormat:@"/usr/bin/tar -C \"%@\" -xf \"%@/%@.tar\"",enginesFolderPath,enginesFolderPath,item] UTF8String]);
-		
-        //remove tar
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar",enginesFolderPath,item] error:nil];
-		
-        //trash X11 folder
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/X11",enginesFolderPath] error:nil];
-		
-        //make wswine.bundle
-		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/wswine.bundle",enginesFolderPath] withIntermediateDirectories:YES attributes:nil error:nil];
-		
-        //move contents of Wine to wswine.bundle
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine/bin",enginesFolderPath]
-                    toPath:[NSString stringWithFormat:@"%@/wswine.bundle/bin",enginesFolderPath] error:nil];
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine/lib",enginesFolderPath]
-                    toPath:[NSString stringWithFormat:@"%@/wswine.bundle/lib",enginesFolderPath] error:nil];
-		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle/Wine/share",enginesFolderPath]
-                    toPath:[NSString stringWithFormat:@"%@/wswine.bundle/share",enginesFolderPath] error:nil];
-		
-        //put engine version in wswine.bundle
-		system([[NSString stringWithFormat:@"echo \"WS8%@\" > \"%@/wswine.bundle/version\"",[item substringFromIndex:3],enginesFolderPath] UTF8String]);
-		
-        //trash WineskinEngine.bundle
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WineskinEngine.bundle",enginesFolderPath] error:nil];
-		
-        //compress wswine.bundle to engine.tar.7z
-		system([[NSString stringWithFormat:@"cd \"%@\";tar -cf WS8%@.tar wswine.bundle",enginesFolderPath,[item substringFromIndex:3]] UTF8String]);
-		system([[NSString stringWithFormat:@"cd \"%@\";\"%@\" a -mx9 WS8%@.tar.7z WS8%@.tar", enginesFolderPath,BINARY_7ZA,[item substringFromIndex:3],[item substringFromIndex:3]] UTF8String]);
-		
-        //clean up engine junk now that its in a .tar.7z
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/WS8%@.tar",enginesFolderPath,[item substringFromIndex:3]] error:nil];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/wswine.bundle",enginesFolderPath] error:nil];
-		
-        //trash the old engine
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@.tar.7z",enginesFolderPath,item] error:nil];
-	}
-	[window makeKeyAndOrderFront:self];
-	[busyWindow orderOut:self];
-	[self refreshButtonPressed:self];
-}
+
 - (IBAction)aboutWindow:(id)sender
 {
 	NSDictionary* plistDictionary = [[NSDictionary alloc] initWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Info.plist",[[NSBundle mainBundle] bundlePath]]];
@@ -187,7 +101,7 @@
 
 -(NSArray<NSWineskinEngine*>*)installedEnginesList {
     BOOL hideX11Engines = hideXQuartzEnginesCheckBox.state;
-    return hideX11Engines ? installedMacDriverEnginesList : installedEnginesList;
+    return hideX11Engines ? _installedMacDriverEnginesList : _installedEnginesList;
 }
 
 -(BOOL)isXQuartzInstalled {
@@ -198,6 +112,17 @@
     
     if (!sender.state && !self.isXQuartzInstalled) {
         [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:@"You need to install XQuartz to use XQuartz-only compatible engines. You can find it here:\n\nhttps://www.xquartz.org"];
+    }
+}
+
+-(IBAction)compressEngines:(NSButton*)sender {
+    
+    if (!sender.state) {
+        //TODO: Set compression to 0
+    }
+    else
+    {
+        //TODO: Set compression to 1 the default setting
     }
 }
 
@@ -260,7 +185,7 @@
 	for (NSString *itemAE in availableEngines)
 	{
 		BOOL matchFound=NO;
-		for (NSWineskinEngine *itemIE in installedEnginesList)
+		for (NSWineskinEngine *itemIE in _installedEnginesList)
 		{
 			if ([itemAE isEqualToString:itemIE.engineName])
 			{
@@ -349,20 +274,16 @@
 
 - (void)getInstalledEngines:(NSString *)theFilter
 {
-	[installedEnginesList removeAllObjects];
-    [installedEnginesList addObjectsFromArray:[NSWineskinEngine getListOfAvailableEngines]];
-    [installedEnginesList replaceObjectsWithVariation:^id _Nullable(NSWineskinEngine * _Nonnull object, NSUInteger index) {
-        if (theFilter.length > 0 && ![object.engineName.lowercaseString contains:theFilter.lowercaseString]) return nil;
-        return object;
+	[_installedEnginesList removeAllObjects];
+    [_installedEnginesList addObjectsFromArray:[NSWineskinEngine getListOfAvailableEngines]];
+    [_installedEnginesList filter:^BOOL(NSWineskinEngine * _Nonnull engine) {
+        return (theFilter.length == 0 || [engine.engineName.lowercaseString contains:theFilter.lowercaseString]);
     }];
-    [installedEnginesList removeObject:[NSNull null]];
     
-    installedMacDriverEnginesList = [installedEnginesList mutableCopy];
-    [installedMacDriverEnginesList replaceObjectsWithVariation:^id _Nullable(NSWineskinEngine * _Nonnull object, NSUInteger index) {
-        if (object.isCompatibleWithMacDriver) return object;
-        return nil;
+    _installedMacDriverEnginesList = [_installedEnginesList mutableCopy];
+    [_installedMacDriverEnginesList filter:^BOOL(NSWineskinEngine *  _Nonnull engine) {
+        return engine.isCompatibleWithMacDriver;
     }];
-    [installedMacDriverEnginesList removeObject:[NSNull null]];
 }
 
 - (NSArray *)getEnginesToIgnore
@@ -436,7 +357,7 @@
 	for (NSString *itemAE in availableEngines)
 	{
 		BOOL matchFound=NO;
-		for (NSWineskinEngine *itemIE in installedEnginesList)
+		for (NSWineskinEngine *itemIE in _installedEnginesList)
 		{
 			if ([itemAE isEqualToString:itemIE.engineName])
 			{
@@ -616,7 +537,7 @@
     NSWineskinEngine* selectedEngine = [NSWineskinEngine wineskinEngineWithString:selectedEngineName];
     
     if (selectedEngine.requiresManualDownload) {
-        [urlInput setStringValue:[NSString stringWithFormat:@"https://github.com/Gcenx/WineskinServer/raw/master/Engines/%@.tar.7z?%@",selectedEngineName,[[NSNumber numberWithLong:rand()] stringValue]]];
+        [urlInput setStringValue:[NSString stringWithFormat:@"https://github.com/Gcenx/WineskinServer/releases/download/V1.8.4/%@.tar.7z?%@",selectedEngineName,[[NSNumber numberWithLong:rand()] stringValue]]];
         [urlOutput setStringValue:[NSString stringWithFormat:@"file:///tmp/%@.tar.7z",[[engineWindowEngineList selectedItem] title]]];
         [fileName setStringValue:[[engineWindowEngineList selectedItem] title]];
         [fileNameDestination setStringValue:@"Engines"];
@@ -1140,8 +1061,8 @@
 	self = [super init];
 	if (self)
 	{
-		installedEnginesList = [[NSMutableArray alloc] init];
-        installedMacDriverEnginesList = [[NSMutableArray alloc] init];
+		_installedEnginesList = [[NSMutableArray alloc] init];
+        _installedMacDriverEnginesList = [[NSMutableArray alloc] init];
 	}
 	return self;
 }

@@ -238,11 +238,12 @@
     
     [self setMainExePath:path atPort:port];
     
-    if (name)
-    {
-        [port setPlistObject:name forKey:WINESKIN_WRAPPER_PLIST_KEY_NAME];
-        [port setPlistObject:[NSString stringWithFormat:@"com.%@.Wineskin",name] forKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER];
-    }
+    //TODO: FIX BundleID Generation here
+    //if (name)
+    //{
+        //[port setPlistObject:name forKey:WINESKIN_WRAPPER_PLIST_KEY_NAME];
+        //[port setPlistObject:[NSString stringWithFormat:@"com.%@.Wineskin",name] forKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER];
+    //}
     
     [port synchronizePlist];
     

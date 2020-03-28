@@ -28,6 +28,7 @@
     NSString *tmpFolder;                            //where tmp files can be made and used to be specific to just this wrapper
     NSString *tmpwineFolder;                        //wine makes its own tmp & wineserver uses it for each wine process
 	NSString *winePrefix;                           //the $WINEPREFIX
+    NSString *pathToWineBinFolder;
 	NSMutableString *theDisplayNumber;              //the Display Number to use
     NSString *wineLogFile;                          //location of wine log file
     NSString *wineTempLogFile;                      //location of wine temp log file

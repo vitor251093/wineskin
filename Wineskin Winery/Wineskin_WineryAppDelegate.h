@@ -23,10 +23,9 @@
 	IBOutlet NSTextField *engineAvailableLabel;
 	IBOutlet NSTextField *updateAvailableLabel;
     IBOutlet NSButton *hideXQuartzEnginesCheckBox;
+    IBOutlet NSButton *compressEngineCheckBox;
 	IBOutlet NSButton *updateButton;
 	IBOutlet NSButton *createWrapperButton;
-	NSMutableArray* installedEnginesList;
-    NSMutableArray* installedMacDriverEnginesList;
 	
 	//downloading window
 	IBOutlet NSWindow *downloadingWindow;
@@ -72,6 +71,8 @@
 	
 }
 @property (unsafe_unretained) IBOutlet NSWindow *window;
+@property (nonatomic) NSMutableArray<NSWineskinEngine*>* installedEnginesList;
+@property (nonatomic) NSMutableArray<NSWineskinEngine*>* installedMacDriverEnginesList;
 
 //main stuff
 - (void)runConverter;

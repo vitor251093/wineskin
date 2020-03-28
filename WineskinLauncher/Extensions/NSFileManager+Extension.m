@@ -17,7 +17,7 @@
     BOOL created = [self createSymbolicLinkAtPath:path withDestinationPath:destPath error:&error];
     
     if (error)
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while creating symbolic link: %@",nil), error.localizedDescription]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while creating symbolic link: %@",nil), error.localizedDescription]];
     
     return created;
 }
@@ -27,7 +27,7 @@
     BOOL created = [self createDirectoryAtPath:path withIntermediateDirectories:interDirs attributes:nil error:nil];
     
     if (error)
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while creating folder: %@",nil), error.localizedDescription]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while creating folder: %@",nil), error.localizedDescription]];
     
     return created;
 }
@@ -37,7 +37,7 @@
     BOOL created = [self moveItemAtPath:path toPath:destination error:&error];
     
     if (error)
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while moving file: %@",nil),
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while moving file: %@",nil),
                                                                error.localizedDescription]];
     
     return created;
@@ -48,7 +48,7 @@
     BOOL created = [self copyItemAtPath:path toPath:destination error:&error];
     
     if (error)
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while copying file: %@",nil), error.localizedDescription]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while copying file: %@",nil), error.localizedDescription]];
     
     return created;
 }
@@ -60,7 +60,7 @@
     BOOL created = [self removeItemAtPath:path error:&error];
     
     if (error)
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while removing file: %@",nil), error.localizedDescription]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while removing file: %@",nil), error.localizedDescription]];
     
     return created;
 }
@@ -78,13 +78,13 @@
 {
     if (![self fileExistsAtPath:path])
     {
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while listing folder contents: %@ doesn't exist.",nil), path.lastPathComponent]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while listing folder contents: %@ doesn't exist.",nil), path.lastPathComponent]];
         return @[];
     }
     
     if (![self directoryExistsAtPath:path])
     {
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while listing folder contents: %@ is not a folder.",nil), path.lastPathComponent]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while listing folder contents: %@ is not a folder.",nil), path.lastPathComponent]];
         return @[];
     }
     
@@ -93,7 +93,7 @@
     
     if (error)
     {
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while listing folder contents: %@",nil), error.localizedDescription]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while listing folder contents: %@",nil), error.localizedDescription]];
         return @[];
     }
     
@@ -109,7 +109,7 @@
     
     if (error)
     {
-        [VMMAlert showAlertOfType:VMMAlertTypeError withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while retrieving symbolic link destination: %@",nil),error.localizedDescription]];
+        [VMMAlert showAlertOfType:VMMAlertTypeWarning withMessage:[NSString stringWithFormat:NSLocalizedString(@"Error while retrieving symbolic link destination: %@",nil),error.localizedDescription]];
     }
     
     return destination;
