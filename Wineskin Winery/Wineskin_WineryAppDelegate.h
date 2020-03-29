@@ -75,7 +75,6 @@
 @property (nonatomic) NSMutableArray<NSWineskinEngine*>* installedMacDriverEnginesList;
 
 //main stuff
-- (void)runConverter;
 - (IBAction)aboutWindow:(id)sender;
 - (IBAction)helpWindow:(id)sender;
 - (void)makeFoldersAndFiles;

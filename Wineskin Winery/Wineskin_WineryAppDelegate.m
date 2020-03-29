@@ -24,7 +24,6 @@
 	[busyWindow makeKeyAndOrderFront:self];
 	[self refreshButtonPressed:self];
 	[self checkForUpdates];
-	[self runConverter];
 }
 
 - (IBAction)aboutWindow:(id)sender
@@ -799,7 +798,6 @@
 		[[NSFileManager defaultManager] moveItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app",[fileName stringValue]] toPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/%@/%@.app",NSHomeDirectory(),[fileNameDestination stringValue],[fileName stringValue]] error:nil];
 		[window makeKeyAndOrderFront:self];
 		[busyWindow orderOut:self];
-		[self runConverter];
 	}
 	else if (([[fileNameDestination stringValue] isEqualToString:@"Engines"]))
 	{
@@ -993,7 +991,6 @@
 	BOOL engineError=NO;
 	if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()]]) engineError=YES;
 	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/bin/wineserver",NSHomeDirectory()]]) engineError=YES;
-	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/bin/wine",NSHomeDirectory()]]) engineError=YES;
 	//if its ICE the above two errors are wrong... if 7za is in the bundle then its ICE and assume its OK and go along.
 	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/7za",NSHomeDirectory()]]) engineError=NO;
 	if (engineError)

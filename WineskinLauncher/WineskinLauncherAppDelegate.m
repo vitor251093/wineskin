@@ -1456,39 +1456,75 @@ static NSPortManager* portManager;
 // Checks to see what wine engine is being used
 - (void)fixWineExecutableNames
 {
-    //wine32on64 without wine64
-    if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] &&
+    
+    //wine64
+    if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]] && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]]  && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]] && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]])
+    {
+        [self fixWine64_No_Wine32_ExecutableNames];
+    }
+    
+    
+    //wine32on64-preloader, wine-preloader without wine64-preloader
+    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] && [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]] &&
             ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]])
     {
         [self fixWine32on64ExecutableNames];
     }
     
-    //wine32on64 with wine64
-    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] &&
+    
+    
+    
+    
+    //wine64-preloader without wine32on64-preloader & wine-preloader
+    else if     (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]] &&
+                 [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]])
+    {
+    [ self fixWinestaging64_No_Wine32_ExecutableNames];
+    }
+    
+    
+    
+    //wine32on64-preloader, without wine-preloader & wine64-preloader
+    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]] &&
+            ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]])
+    {
+        [self fixWine32on64_No_Wine32_ExecutableNames];
+    }
+    
+    
+    //wine32on64-preloader, & wine64-preloader without wine-preloader
+    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] && [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]] && ![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]])
+    {
+        [self fixWine32on64_64Bit_No_Wine32_ExecutableNames];
+    }
+    
+    
+    //wine32on64-preloader, wine-preloader with wine64-preloader
+    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]] && [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]] &&
                [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]])
     {
         [self fixWine32on64_64BitExecutableNames];
     }
     
-    
-    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]])
+    //wine64-preloader and wine-preloader
+    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]] && [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]])
     {
         [self fixWineStaging64ExecutableNames];
     }
     
-    
-    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]])
+    //wine64 and wine
+    else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]] && [fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine",pathToWineBinFolder]])
     {
         [self fixWine64ExecutableNames];
     }
     
-    
+    //wine-preloader only
     else if     ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/wine-preloader",pathToWineBinFolder]])
     {
         [self fixWineStagingExecutableNames];
     }
     
-    
+    //wine
     else
     {
         [self fixWine32ExecutableNames];
@@ -2029,6 +2065,331 @@ static NSPortManager* portManager;
     
     [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
 }
+
+
+
+//TODO: add more definitions
+
+- (void)fixWine64_No_Wine32_ExecutableNames
+{
+    BOOL fixWine=YES;
+    NSString *oldWine64Name = nil;
+    NSString *oldWineServerName = nil;
+    NSArray *engineBinContents = [fm contentsOfDirectoryAtPath:pathToWineBinFolder];
+    for (NSString *item in engineBinContents)
+    {
+        if ([item hasSuffix:@"Wine64"])
+        {
+            oldWine64Name = [NSString stringWithFormat:@"%@",item];
+            
+        }
+        else if ([item hasSuffix:@"Wineserver"])
+        {
+            oldWineServerName = [NSString stringWithFormat:@"%@",item];
+        }
+    }
+    if (oldWine64Name == nil)
+    {
+        oldWine64Name=@"wine64";
+    }
+    if (oldWineServerName == nil)
+    {
+        oldWineServerName=@"wineserver";
+    }
+    if ([oldWine64Name hasPrefix:appName] && [oldWineServerName hasPrefix:appName])
+    {
+        fixWine=NO;
+        wine64Name = [NSString stringWithFormat:@"%@",oldWine64Name];
+        wineServerName = [NSString stringWithFormat:@"%@",oldWineServerName];
+    }
+    
+    if (fixWine == false) return;
+    
+    // set CFBundleID too
+    srand((unsigned)time(0));
+    bundleRandomInt1 = (int)(rand()%999999999);
+    if (bundleRandomInt1 < 0)
+    {
+        bundleRandomInt1 = bundleRandomInt1*(-1);
+    }
+    
+    //set names for wine, wine64 and wineserver
+    wineServerName = [NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
+    wine64Name = [NSString stringWithFormat:@"%@%dWine64",appName,bundleRandomInt1];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wine64Name]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWine64Name]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wine64Name]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineServerName]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]];
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
+    
+    NSString* binBash = @"#!/bin/bash\n";
+    NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
+    
+    NSString *wine64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                            binBash,dyldFallbackLibraryPath,wine64Name];
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,dyldFallbackLibraryPath,wineServerName];
+    
+    [wine64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine64",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
+    [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
+    
+    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+}
+
+
+
+
+//fix wine32on64-prelodare without wine & wine64
+// Renaming can only apply to wine-preloader/wine64-preloader
+- (void)fixWinestaging64_No_Wine32_ExecutableNames
+{
+    BOOL fixWine=YES;
+    NSString *oldWineStaging64Name = nil;
+    NSString *oldWineServerName = nil;
+    NSArray *engineBinContents = [fm contentsOfDirectoryAtPath:pathToWineBinFolder];
+    for (NSString *item in engineBinContents)
+    {
+        if ([item hasSuffix:@"Wine64-preloader"])
+        {
+            oldWineStaging64Name = [NSString stringWithFormat:@"%@",item];
+        }
+        else if ([item hasSuffix:@"Wineserver"])
+        {
+            oldWineServerName = [NSString stringWithFormat:@"%@",item];
+        }
+    }
+    if (oldWineStaging64Name == nil)
+    {
+        oldWineStaging64Name=@"wine64-preloader";
+    }
+    if (oldWineServerName == nil)
+    {
+        oldWineServerName=@"wineserver";
+    }
+    if ([oldWineStaging64Name hasPrefix:appName] && [oldWineServerName hasPrefix:appName])
+    {
+        fixWine=NO;
+        wineStaging64Name = [NSString stringWithFormat:@"%@",oldWineStaging64Name];
+        wineServerName = [NSString stringWithFormat:@"%@",oldWineServerName];
+    }
+    
+    if (fixWine == false) return;
+    
+    // set CFBundleID too
+    srand((unsigned)time(0));
+    bundleRandomInt1 = (int)(rand()%999999999);
+    if (bundleRandomInt1 < 0)
+    {
+        bundleRandomInt1 = bundleRandomInt1*(-1);
+    }
+    
+    //set names for wine-preloader, wine64-preloader and wineserver
+    wineServerName = [NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
+    wineStaging64Name = [NSString stringWithFormat:@"%@%dWine64-preloader",appName,bundleRandomInt1];
+
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineStaging64Name]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineStaging64Name]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineStaging64Name]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineServerName]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]];
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
+    
+    NSString* binBash = @"#!/bin/bash\n";
+    NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
+    
+    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                   binBash,dyldFallbackLibraryPath,wineStaging64Name];
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,dyldFallbackLibraryPath,wineServerName];
+    
+    [wineStaging64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
+    [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
+    
+    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+}
+
+
+
+
+
+//fix wine32on64-prelodare without wine & wine64
+// Renaming can only apply to wine-preloader/wine64-preloader
+- (void)fixWine32on64_No_Wine32_ExecutableNames
+{
+    BOOL fixWine=YES;
+    NSString *oldWine32on64Name = nil;
+    NSString *oldWineServerName = nil;
+    NSArray *engineBinContents = [fm contentsOfDirectoryAtPath:pathToWineBinFolder];
+    for (NSString *item in engineBinContents)
+    {
+        if ([item hasSuffix:@"Wine32on64-preloader"])
+        {
+            oldWine32on64Name = [NSString stringWithFormat:@"%@",item];
+        }
+        else if ([item hasSuffix:@"Wineserver"])
+        {
+            oldWineServerName = [NSString stringWithFormat:@"%@",item];
+        }
+    }
+    if (oldWine32on64Name == nil)
+    {
+        oldWine32on64Name=@"wine32on64-preloader";
+    }
+    if (oldWineServerName == nil)
+    {
+        oldWineServerName=@"wineserver";
+    }
+    if ([oldWine32on64Name hasPrefix:appName] && [oldWineServerName hasPrefix:appName])
+    {
+        fixWine=NO;
+        wine32on64Name = [NSString stringWithFormat:@"%@",oldWine32on64Name];
+        wineServerName = [NSString stringWithFormat:@"%@",oldWineServerName];
+    }
+    
+    if (fixWine == false) return;
+    
+    // set CFBundleID too
+    srand((unsigned)time(0));
+    bundleRandomInt1 = (int)(rand()%999999999);
+    if (bundleRandomInt1 < 0)
+    {
+        bundleRandomInt1 = bundleRandomInt1*(-1);
+    }
+    
+    //set names for wine-preloader, wine64-preloader and wineserver
+    wineServerName = [NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
+    wine32on64Name = [NSString stringWithFormat:@"%@%dWine32on64-preloader",appName,bundleRandomInt1];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wine32on64Name]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWine32on64Name]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wine32on64Name]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineServerName]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]];
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
+    
+    NSString* binBash = @"#!/bin/bash\n";
+    NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
+    
+    NSString *wine32on64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,dyldFallbackLibraryPath,wine32on64Name];
+    
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,dyldFallbackLibraryPath,wineServerName];
+    
+    
+    [wine32on64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
+    [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
+    
+    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+}
+
+
+
+//fix wine32on64-prelodare & wine64 without wine
+- (void)fixWine32on64_64Bit_No_Wine32_ExecutableNames
+{
+    BOOL fixWine=YES;
+    NSString *oldWine32on64Name = nil;
+    NSString *oldWineStaging64Name = nil;
+    NSString *oldWineServerName = nil;
+    NSArray *engineBinContents = [fm contentsOfDirectoryAtPath:pathToWineBinFolder];
+    for (NSString *item in engineBinContents)
+    {
+        if ([item hasSuffix:@"Wine32on64-preloader"])
+        {
+            oldWine32on64Name = [NSString stringWithFormat:@"%@",item];
+        }
+        if ([item hasSuffix:@"Wine64-preloader"])
+        {
+            oldWineStaging64Name = [NSString stringWithFormat:@"%@",item];
+        }
+        else if ([item hasSuffix:@"Wineserver"])
+        {
+            oldWineServerName = [NSString stringWithFormat:@"%@",item];
+        }
+    }
+    if (oldWine32on64Name == nil)
+    {
+        oldWine32on64Name=@"wine32on64-preloader";
+    }
+    if (oldWineStaging64Name == nil)
+    {
+        oldWineStaging64Name=@"wine64-preloader";
+    }
+    if (oldWineServerName == nil)
+    {
+        oldWineServerName=@"wineserver";
+    }
+    if ([oldWine32on64Name hasPrefix:appName] && [oldWineStaging64Name hasPrefix:appName] && [oldWineServerName hasPrefix:appName])
+    {
+        fixWine=NO;
+        wine32on64Name = [NSString stringWithFormat:@"%@",oldWine32on64Name];
+        wineStaging64Name = [NSString stringWithFormat:@"%@",oldWineStaging64Name];
+        wineServerName = [NSString stringWithFormat:@"%@",oldWineServerName];
+    }
+    
+    if (fixWine == false) return;
+    
+    // set CFBundleID too
+    srand((unsigned)time(0));
+    bundleRandomInt1 = (int)(rand()%999999999);
+    if (bundleRandomInt1 < 0)
+    {
+        bundleRandomInt1 = bundleRandomInt1*(-1);
+    }
+    
+    //set names for wine-preloader, wine64-preloader and wineserver
+    wineServerName = [NSString stringWithFormat:@"%@%dWineserver",appName,bundleRandomInt1];
+    wine32on64Name = [NSString stringWithFormat:@"%@%dWine32on64-preloader",appName,bundleRandomInt1];
+    wineStaging64Name = [NSString stringWithFormat:@"%@%dWine64-preloader",appName,bundleRandomInt1];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wine32on64Name]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWine32on64Name]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wine32on64Name]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineStaging64Name]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineStaging64Name]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineStaging64Name]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,oldWineServerName]
+                toPath:[NSString stringWithFormat:@"%@/%@",pathToWineBinFolder,wineServerName]];
+    
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]];
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]];
+    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder]];
+    
+    NSString* binBash = @"#!/bin/bash\n";
+    NSString* dyldFallbackLibraryPath = @"DYLD_FALLBACK_LIBRARY_PATH=\"${WINESKIN_LIB_PATH_FOR_FALLBACK}\"";
+    
+    NSString *wine32on64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,dyldFallbackLibraryPath,wine32on64Name];
+    NSString *wineStaging64Bash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                   binBash,dyldFallbackLibraryPath,wineStaging64Name];
+    NSString *wineServerBash = [NSString stringWithFormat:@"%@ %@ \"$(dirname \"$0\")/%@\" \"$@\"",
+                                binBash,dyldFallbackLibraryPath,wineServerName];
+    
+    [wine32on64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine32on64-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
+    [wineStaging64Bash       writeToFile:[NSString stringWithFormat:@"%@/wine64-preloader",pathToWineBinFolder]       atomically:YES encoding:NSUTF8StringEncoding];
+    [wineServerBash writeToFile:[NSString stringWithFormat:@"%@/wineserver",pathToWineBinFolder] atomically:YES encoding:NSUTF8StringEncoding];
+    
+    [self systemCommand:[NSString stringWithFormat:@"chmod -R 777 \"%@\"",pathToWineBinFolder]];
+}
+
 
 
 - (void)wineBootStuckProcess

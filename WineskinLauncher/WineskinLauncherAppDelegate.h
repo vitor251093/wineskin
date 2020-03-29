@@ -155,6 +155,18 @@
 //fix wine-preloader, wine32on64-preloader, wine64-preloader and wineserver names
 - (void)fixWine32on64_64BitExecutableNames;
 
+//fix wine64 and wineserver names
+- (void)fixWine64_No_Wine32_ExecutableNames;
+
+//fix wine64-prealoder
+-(void)fixWinestaging64_No_Wine32_ExecutableNames;
+
+//fix wine32on64-preloader & wine64 without wine
+-(void)fixWine32on64_64Bit_No_Wine32_ExecutableNames;
+
+//fix wine32on64-preloader without wine & wine64
+-(void)fixWine32on64_No_Wine32_ExecutableNames;
+
 //start wine
 - (void)startWine:(WineStart *)wineStart;
 
