@@ -113,9 +113,6 @@
 //bring the app to the front most
 - (void)bringToFront:(NSString *)thePid;
 
-//installs ICE files
-- (void)installEngine;
-
 //Changes VD Desktop user.reg entries to a given virtual desktop
 - (void)setToVirtualDesktop:(NSString *)resolution;
 

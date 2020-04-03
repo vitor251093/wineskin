@@ -56,7 +56,7 @@
 	NSString *currentVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 	
     //get latest available version number
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://github.com/Gcenx/WineskinServer/raw/master/Winery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://github.com/Gcenx/WineskinServer/raw/master/inery/NewestVersion.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
 	NSString *newVersion = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
 	newVersion = [newVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
 	if (!([newVersion hasPrefix:@"Wineskin"]) || ([currentVersion isEqualToString:newVersion]))
@@ -839,15 +839,18 @@
         
         //remove tar.gz file
         [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.tar.gz",[fileName stringValue]] error:nil];
-        
-        //Remove folders from within wswine.bundle
-        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/SDL2.framework"] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/include"] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/aclocal"] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/doc"] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/gtk-doc"] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/man"] error:nil];
-        [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/openal"] error:nil];
+
+        //TODO: Find a cleaner way to remove *.a & *.la files instead of listing them
+        //Remove these items
+        for (NSString* remove in @[@"lzcat", @"lzcmp", @"lzdiff", @"lzegrep", @"lzfgrep", @"lzgrep", @"lzless", @"lzma", @"lzmore", @"unlzma", @"unxz", @"xzcat", @"xzcmp", @"xzegrep", @"xzfgrep", @"altonegen", @"bsincgen", @"cjpeg", @"djpeg", @"fax2ps", @"fax2tiff", @"jpegtran", @"jpgicc", @"linkicc", @"lzmadec", @"lzmainfo", @"makehrtf", @"openal-info", @"pal2rgb", @"ppm2tiff", @"psicc", @"raw2tiff", @"rdjpgcom", @"s2tc_compress", @"s2tc_decompress", @"s2tc_from_s3tc", @"sdl2-config", @"tiff2bw", @"tiff2pdf", @"tiff2ps", @"tiff2rgba", @"tiffcmp", @"tiffcp", @"tiffcrop", @"tiffdither", @"tiffdump", @"tiffinfo", @"tiffmedian", @"tiffset", @"tiffsplit", @"tificc", @"tjbench", @"transicc", @"wrjpgcom", @"xml2-config", @"xmlcatalog", @"xmllint", @"xslt-config", @"xsltproc", @"xz", @"xzdec", @"xzdiff", @"xzgrep", @"xzless", @"xzmore", @"SDL2.framework", @"include", @"cmake", @"pkgconfig", @"libxslt-plugins", @"aclocal", @"doc", @"gtk-doc", @"man", @"openal", @"libxslt.a", @"libexslt.dylib", @"libFAudio.dylib", @"libopenal.dylib", @"libFAudio.0.dylib", @"liblcms2.dylib", @"liblzma.dylib", @"libopenal.1.dylib", @"libSDL2.dylib", @"libtiff.dylib", @"libtiffxx.dylib", @"libxml2.dylib", @"libxslt.dylib", @"libexslt.0.dylib", @"libexslt.a", @"libexslt.la", @"libFAudio.0.19.03.dylib", @"libjpeg.a", @"libjpeg.la", @"liblcms2.2.dylib", @"liblcms2.a", @"liblcms2.la", @"liblzma.5.dylib", @"liblzma.a", @"liblzma.la", @"libopenal.1.17.2.dylib", @"libSDL2-2.0.dylib", @"libSDL2.a", @"libSDL2main.a", @"libtiff.5.dylib", @"libtiff.a", @"libtiff.la", @"libtiffxx.5.dylib", @"libtiffxx.a", @"libtiffxx.la", @"libturbojpeg.a", @"libturbojpeg.la", @"libtxc_dxtn.a", @"libtxc_dxtn.la", @"libxml2.2.dylib", @"libxml2.a", @"libxml2.la", @"libxslt.1.dylib", @"libxslt.la", @"xml2Conf.sh", @"xsltConf.sh"])
+        {
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/%@",remove]];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/bin/%@",remove]];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib/%@",remove]];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib64/%@",remove]];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib32on64/%@",remove]];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/%@",remove]];
+        }
         
         //make "version" file
         NSString *configFileContents = [NSString stringWithFormat:@"%@",[fileOutputName stringValue]];
@@ -991,8 +994,6 @@
 	BOOL engineError=NO;
 	if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()]]) engineError=YES;
 	else if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/bin/wineserver",NSHomeDirectory()]]) engineError=YES;
-	//if its ICE the above two errors are wrong... if 7za is in the bundle then its ICE and assume its OK and go along.
-	if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle/7za",NSHomeDirectory()]]) engineError=NO;
 	if (engineError)
 	{
 		NSAlert *alert = [[NSAlert alloc] init];
@@ -1010,6 +1011,21 @@
 	{
 		//put engine in wrapper
 		[fm moveItemAtPath:[NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines/wswine.bundle",NSHomeDirectory()] toPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle",[createWrapperName stringValue]] error:nil];
+        
+        //Remove these items on older packaged Engines
+        //TODO: Find a cleaner way to remove *.a & *.la files instead of listing them
+        //Remove these items
+        for (NSString* remove in @[@"lzcat", @"lzcmp", @"lzdiff", @"lzegrep", @"lzfgrep", @"lzgrep", @"lzless", @"lzma", @"lzmore", @"unlzma", @"unxz", @"xzcat", @"xzcmp", @"xzegrep", @"xzfgrep", @"altonegen", @"bsincgen", @"cjpeg", @"djpeg", @"fax2ps", @"fax2tiff", @"jpegtran", @"jpgicc", @"linkicc", @"lzmadec", @"lzmainfo", @"makehrtf", @"openal-info", @"pal2rgb", @"ppm2tiff", @"psicc", @"raw2tiff", @"rdjpgcom", @"s2tc_compress", @"s2tc_decompress", @"s2tc_from_s3tc", @"sdl2-config", @"tiff2bw", @"tiff2pdf", @"tiff2ps", @"tiff2rgba", @"tiffcmp", @"tiffcp", @"tiffcrop", @"tiffdither", @"tiffdump", @"tiffinfo", @"tiffmedian", @"tiffset", @"tiffsplit", @"tificc", @"tjbench", @"transicc", @"wrjpgcom", @"xml2-config", @"xmlcatalog", @"xmllint", @"xslt-config", @"xsltproc", @"xz", @"xzdec", @"xzdiff", @"xzgrep", @"xzless", @"xzmore", @"SDL2.framework", @"include", @"cmake", @"pkgconfig", @"libxslt-plugins", @"aclocal", @"doc", @"gtk-doc", @"man", @"openal", @"libxslt.a", @"libexslt.dylib", @"libFAudio.dylib", @"libopenal.dylib", @"libFAudio.0.dylib", @"liblcms2.dylib", @"liblzma.dylib", @"libopenal.1.dylib", @"libSDL2.dylib", @"libtiff.dylib", @"libtiffxx.dylib", @"libxml2.dylib", @"libxslt.dylib", @"libexslt.0.dylib", @"libexslt.a", @"libexslt.la", @"libFAudio.0.19.03.dylib", @"libjpeg.a", @"libjpeg.la", @"liblcms2.2.dylib", @"liblcms2.a", @"liblcms2.la", @"liblzma.5.dylib", @"liblzma.a", @"liblzma.la", @"libopenal.1.17.2.dylib", @"libSDL2-2.0.dylib", @"libSDL2.a", @"libSDL2main.a", @"libtiff.5.dylib", @"libtiff.a", @"libtiff.la", @"libtiffxx.5.dylib", @"libtiffxx.a", @"libtiffxx.la", @"libturbojpeg.a", @"libturbojpeg.la", @"libtxc_dxtn.a", @"libtxc_dxtn.la", @"libxml2.2.dylib", @"libxml2.a", @"libxml2.la", @"libxslt.1.dylib", @"libxslt.la", @"xml2Conf.sh", @"xsltConf.sh"])
+        {
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle/%@",[createWrapperName stringValue], remove] error:nil];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle/bin/%@",[createWrapperName stringValue], remove] error:nil];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle/lib/%@",[createWrapperName stringValue], remove] error:nil];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle/lib64/%@",[createWrapperName stringValue], remove] error:nil];
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle/lib32on64/%@",[createWrapperName stringValue], remove] error:nil];
+
+            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/%@.app/Contents/Frameworks/wswine.bundle/share/%@",[createWrapperName stringValue], remove] error:nil];
+        }
+        
 		// 777 the bundle
 		system([[NSString stringWithFormat:@"chmod 777 \"/tmp/%@.app/Contents/Frameworks/wswine.bundle\"",[createWrapperName stringValue]] UTF8String]);
 		//refresh wrapper

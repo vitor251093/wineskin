@@ -7,4 +7,4 @@
     #import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 #endif
 
-#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/7za",[[NSBundle mainBundle] bundlePath]]
+#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/WS7za",[[NSBundle mainBundle] bundlePath]]

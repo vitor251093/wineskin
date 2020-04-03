@@ -1,0 +1,50 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+export PATH="$PWD:$PATH"
+cd "../../../Contents/Resources"
+export PATH="$PWD:$PATH"
+
+# Check for wintricks and download if missing, only if running Mavericks or higer due to GitHubs SSL/TSL requirements
+if [[ ${OSTYPE:6} -ge 13 && ! -f "winetricks" ]]; then
+    curl -O https://raw.githubusercontent.com/Gcenx/winetricks/master/src/winetricks
+    chmod +x winetricks
+fi
+
+cd "../Frameworks/wstools.bundle/bin"
+export PATH="$PWD:$PATH"
+cd "../lib"
+export PATH="$PWD:$PATH"
+cd "../../wswine.bundle/bin"
+export PATH="$PWD:$PATH"
+cd "../lib"
+export WINESKIN_LIB_PATH_FOR_FALLBACK="$PWD:/opt/X11/lib:/opt/local/lib"
+cd "../../"
+export WINESKIN_LIB_PATH_FOR_FALLBACK="$WINESKIN_LIB_PATH_FOR_FALLBACK:$PWD:$HOME/Wineskin/lib:/usr/lib:/usr/libexec:/usr/lib/system:/usr/X11/lib:/usr/X11R6/lib"
+export WINEDEBUG="err+all,warn-all,fixme+all,trace-all,fixme-esync"
+export PS1="\h:\W \u\$ "
+cd "$HOME"
+if [ -x "$(command -v wine64)" ]; then
+    export NAME=wine64
+elif [[ ${OSTYPE:6} -ge 19 && -x "$(command -v wine32on64)" ]]; then
+    export NAME=wine32on64
+else
+    export NAME=wine
+fi
+clear
+echo "################################################################################"
+echo "#                           Wine Is Not an Emulator                            #"
+echo "################################################################################"
+echo ""
+echo " Welcome to $($NAME --version)."
+echo   ""
+echo   " In order to start a program:"
+printf "   .exe:\e[1;31m $NAME\e[0m\e[1;90m program.exe\e[0m\n"
+printf "   .msi:\e[1;31m $NAME msiexec /i\e[0m\e[1;90m program.msi\e[0m\n"
+echo   ""
+echo   " If you want to configure wine:"
+printf "  \e[1;31m $NAME winecfg\e[0m\n"
+echo   ""
+echo   " To get information about app compatibility:"
+printf "  \e[1;31m appdb\e[0m\e[1;90m Program Name\e[0m\n"
+echo   ""
+/bin/bash

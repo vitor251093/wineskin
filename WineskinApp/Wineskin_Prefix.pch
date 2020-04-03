@@ -31,7 +31,7 @@
 #define TRUE_STRING  @"true"
 #define FALSE_STRING @"false"
 
-#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/7za",[[NSBundle mainBundle] bundlePath]]
+#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/WS7za",[[NSBundle mainBundle] bundlePath]]
 #define BINARY_QLMANAGE @"/System/Library/Frameworks/QuickLook.framework/Versions/A/Resources/quicklookd.app/Contents/MacOS/qlmanage"
 
 // Wineskin Plist entries

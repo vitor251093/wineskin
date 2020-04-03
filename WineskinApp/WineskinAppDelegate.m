@@ -161,6 +161,7 @@ NSFileManager *fm;
 }
 - (void)enableButtons
 {
+    [self loadAllData];
 	disableButtonCounter--;
     if (disableButtonCounter >= 1) return;
     [self setButtonsState:YES];
@@ -789,7 +790,7 @@ NSFileManager *fm;
 {
 	@autoreleasepool
     {
-		system([[NSString stringWithFormat: @"export PATH=\"%@/bin:$PATH\";open -a Terminal.app \"%@/Contents/Resources/Command Line Wine Test\"",self.wswineBundlePath,[[NSBundle mainBundle] bundlePath]] UTF8String]);
+		system([[NSString stringWithFormat: @"export PATH=\"%@/bin:$PATH\";open -a Terminal.app \"%@/Contents/Resources/winehelp\"",self.wswineBundlePath,[[NSBundle mainBundle] bundlePath]] UTF8String]);
 	}
 }
 
@@ -1109,6 +1110,7 @@ NSFileManager *fm;
         //TODO: reset string back to nothing.exe
         [windowsExeTextField setStringValue:@"C:\nnothing.exe"];
         [self saveAllData];
+        [self loadAllData];
         
         //refresh
         [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreate"]];
@@ -1587,11 +1589,9 @@ NSFileManager *fm;
 			[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath] atomically:YES];
 		}
         
-        
         //Fix the permissions just to be safe here
         NSString* winetricksHelpList = [NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath];
         [self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",winetricksHelpList,nil]];
-        
         
 		[self setWinetricksList:list];
 		[self setWinetricksFilteredList:list];
