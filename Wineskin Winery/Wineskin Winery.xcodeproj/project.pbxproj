@@ -10,6 +10,8 @@
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* Wineskin_WineryAppDelegate.m */; };
 		4E45372020E7DA16005D794E /* NSWineskinEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E45371F20E7DA16005D794E /* NSWineskinEngine.m */; };
+		4EB08DF2249C62650040A3CF /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EB08DF1249C62650040A3CF /* Sparkle.framework */; };
+		4EB08DF5249C64910040A3CF /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4EB08DF1249C62650040A3CF /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -46,6 +48,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		4EB08DF4249C64660040A3CF /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4EB08DF5249C64910040A3CF /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A1CA022C21CDEEB200257CD5 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -73,6 +85,7 @@
 		4E45371E20E7DA16005D794E /* NSWineskinEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSWineskinEngine.h; sourceTree = "<group>"; };
 		4E45371F20E7DA16005D794E /* NSWineskinEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSWineskinEngine.m; sourceTree = "<group>"; };
 		4E45373320E7DC52005D794E /* ObjectiveC_Extension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveC_Extension.xcodeproj; path = ../../ObjectiveC_Extension/ObjectiveC_Extension.xcodeproj; sourceTree = "<group>"; };
+		4EB08DF1249C62650040A3CF /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Wineskin_Winery-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Wineskin_Winery-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Wineskin Winery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wineskin Winery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A89936DD127B283A006A7581 /* WineskinWineryUpdater */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = WineskinWineryUpdater; sourceTree = SOURCE_ROOT; };
@@ -87,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EB08DF2249C62650040A3CF /* Sparkle.framework in Frameworks */,
 				A1A6E5A221E2918C00C70E80 /* ObjectiveC_Extension.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 			);
@@ -172,6 +186,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4EB08DF1249C62650040A3CF /* Sparkle.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -198,6 +213,7 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				A1CA022C21CDEEB200257CD5 /* Embed Frameworks */,
+				4EB08DF4249C64660040A3CF /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -333,6 +349,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = RD56V43GW9;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -340,7 +360,7 @@
 				GCC_PREFIX_HEADER = Wineskin_Winery_Prefix.pch;
 				INFOPLIST_FILE = "Wineskin_Winery-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskin.wineskinwinery;
 				PRODUCT_NAME = "Wineskin Winery";
@@ -360,12 +380,16 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = RD56V43GW9;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Wineskin_Winery_Prefix.pch;
 				INFOPLIST_FILE = "Wineskin_Winery-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskin.wineskinwinery;
 				PRODUCT_NAME = "Wineskin Winery";
