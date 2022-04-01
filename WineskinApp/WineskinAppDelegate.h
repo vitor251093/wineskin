@@ -103,7 +103,8 @@
     IBOutlet NSButton *WinetricksNoLogsButton;
     IBOutlet NSButton *disableCPUsCheckBoxButton;
     IBOutlet NSButton *winedbgDisabledButton;
-    IBOutlet NSButton *monogeckoCheckBoxButton;
+    IBOutlet NSButton *geckoCheckBoxButton;
+    IBOutlet NSButtonCell *monoCheckBoxButton;
 
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -181,6 +182,7 @@
 	IBOutlet NSTextField *modifyMappingsMyMusicTextField;
 	IBOutlet NSTextField *modifyMappingsMyPicturesTextField;
     IBOutlet NSTextField *modifyMappingsDownloadsTextField;
+    IBOutlet NSTextField *modifyMappingsTemplatesTextField;
 }
 
 @property (unsafe_unretained) IBOutlet NSWindow *window;
@@ -275,7 +277,8 @@
 - (IBAction)WinetricksNoLogsButtonPressed:(id)sender;
 - (IBAction)disableCPUsButtonPressed:(id)sender;
 - (IBAction)winedbgDisabledButtonPressed:(id)sender;
-- (IBAction)monogeckoButtonPressed:(id)sender;
+- (IBAction)geckoButtonPressed:(id)sender;
+- (IBAction)monoButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;
@@ -321,6 +324,7 @@
 - (IBAction)modifyMappingsMyMusicBrowseButtonPressed:(id)sender;
 - (IBAction)modifyMappingsMyPicturesBrowseButtonPressed:(id)sender;
 - (IBAction)modifyMappingsDownloadsBrowseButtonPressed:(id)sender;
+- (IBAction)modifyMappingsTemplatesBrowseButtonPressed:(id)sender;
 //ICE
 - (void)installEngine;
 

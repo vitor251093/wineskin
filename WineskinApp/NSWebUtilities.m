@@ -8,7 +8,6 @@
 
 #import "NSWebUtilities.h"
 #import <SystemConfiguration/SystemConfiguration.h>
-
 #import "NSString+Extension.h"
 
 #define SECONDS_IN_MINUTE 60

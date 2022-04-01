@@ -7,10 +7,8 @@
 //
 
 #import "NSComputerInformation.h"
-
 #import "NSUtilities.h"
 #import "VMMVersion.h"
-
 #import "NSTask+Extension.h"
 #import "NSArray+Extension.h"
 #import "NSString+Extension.h"

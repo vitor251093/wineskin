@@ -31,7 +31,7 @@
 #define TRUE_STRING  @"true"
 #define FALSE_STRING @"false"
 
-#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/WS7za",[[NSBundle mainBundle] bundlePath]]
+#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/7za",[[NSBundle mainBundle] bundlePath]]
 #define BINARY_QLMANAGE @"/System/Library/Frameworks/QuickLook.framework/Versions/A/Resources/quicklookd.app/Contents/MacOS/qlmanage"
 
 // Wineskin Plist entries
@@ -55,17 +55,20 @@
 #define WINESKIN_WRAPPER_PLIST_KEY_GAMMA_CORRECTION              @"Gamma Correction"
 #define WINESKIN_WRAPPER_PLIST_KEY_INSTALLER_WITH_NORMAL_WINDOWS @"force Installer to normal windows"
 #define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT             @"Winetricks silent"
+#define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_FORCE              @"Winetricks force"
 #define WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS             @"Winetricks disable logging"
 #define WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE               @"IsFnToggleEnabled"
-#define WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO            @"Skip Mono & Gecko"
-#define WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE               @"IsFnToggleEnabled"
+#define WINESKIN_WRAPPER_PLIST_KEY_DISABLE_GECKO                 @"Skip Gecko"
+#define WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO                  @"Skip Mono"
+#define WINESKIN_WRAPPER_PLIST_KEY_SYMLINK_USERS                 @"Symlinks In User Folder"
+#define WINESKIN_WRAPPER_PLIST_KEY_WINEDEBUG                     @"WINEDEBUG"
 
 // Wineskin Plist values
 #define WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_CURRENT_RESOLUTION @"Current Resolution"
 #define WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_NO_VIRTUAL_DESKTOP @"novd"
 
 // These are Wineskin website URLs, which are used to download the Master Wrapper and the Engines
-#define WINESKIN_DOMAIN                         "github.com/Gcenx/WineskinServer"
+#define WINESKIN_DOMAIN                     "github.com/Gcenx/WineskinServer"
 #define WINESKIN_WEBSITE                    @"https://github.com/Gcenx/WineskinServer/"
 #define WINESKIN_WEBSITE_WRAPPER_FOLDER     [NSString stringWithFormat:@"%@Wrapper/",WINESKIN_WEBSITE]
 #define WINESKIN_WEBSITE_ENGINES_FOLDER     [NSString stringWithFormat:@"%@Engines/",WINESKIN_WEBSITE]
@@ -87,7 +90,7 @@
 #define REGEX_WINESKIN_CROSSOVER_ENGINE            @"WS[0-9]+WineCX(64Bit)?[0-9\\.]+[^\\n]*"
 #define REGEX_WINESKIN_CROSSOVER_GAMES_ENGINE      @"WS[0-9]+WineCXG(64Bit)?[0-9\\.]+[^\\n]*"
 #define REGEX_WINESKIN_CONVERTABLE_OLD_WINE_ENGINE @"WS(5|6|7)Wine[0-9\\.]+[^\\n]*"
-#define REGEX_WINE_VERSION                         @"[0-9]+(\\.[0-9]+)*([-\\.]{1}rc[0-9]+)?"
+#define REGEX_WINE_VERSION                         @"[0-9]+(\\.[0-9]+)*([\\-\\.]{1}rc[0-9]+)?(\\-[0-9]+)?"
 
 #define EXTENSIONS_COMPATIBLE_WITH_WINESKIN_WRAPPER @[@"exe",@"EXE",@"bat",@"BAT",@"msi",@"MSI"]
 #define EXTENSIONS_COMPATIBLE_WITH_RUN_PATH @[@"exe",@"EXE",@"bat",@"BAT",@"msi",@"MSI",@"lnk",@"LNK", @"inf",@"INF",@"desktop",@"appref-ms",@"url"]

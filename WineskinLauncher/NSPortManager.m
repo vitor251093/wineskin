@@ -7,19 +7,14 @@
 //
 
 #import "NSPortManager.h"
-
 #import <ObjectiveC_Extension/ObjectiveC_Extension.h>
-
 #import "NSExeSelection.h"
 #import "NSPathUtilities.h"
-
 #import "NSPortDataLoader.h"
 
 #define SMALLER_ICONSET_NEEDED_SIZE 16
 #define BIGGEST_ICONSET_NEEDED_SIZE 1024
-
 #define TIFF2ICNS_ICON_SIZE 512
-
 #define DESKTOP_FOLDER   [NSString stringWithFormat:@"%@/Desktop/",NSHomeDirectory()]
 #define NOTHING_EXE_PATH @"C:/nothing.exe"
 

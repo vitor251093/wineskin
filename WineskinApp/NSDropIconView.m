@@ -7,7 +7,6 @@
 //
 
 #import "NSDropIconView.h"
-
 #import "NSData+Extension.h"
 #import "NSTask+Extension.h"
 #import "NSImage+Extension.h"

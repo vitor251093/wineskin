@@ -11,7 +11,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.Wineskin.Wineskin</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>1.0</string>
+	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>Wineskin</string>
 	<key>CFBundlePackageType</key>

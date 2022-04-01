@@ -37,7 +37,10 @@ typedef enum {
 -(NSString*)engineName;
 -(NSString*)localPath;
 -(NSString*)wineOfficialBuildDirectLink;
+-(BOOL)isCompatibleWith32on64Bit;
 -(BOOL)isCompatibleWithMacDriver;
+-(BOOL)isCompatibleWithLatestFreeType;
+-(BOOL)requiresXquartz;
 -(BOOL)isCompatibleWithCsmt;
 -(BOOL)csmtUsesNewRegistry;
 -(BOOL)isCompatibleWithHighQualityMode;

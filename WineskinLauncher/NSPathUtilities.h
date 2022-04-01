@@ -8,7 +8,6 @@
 
 #ifndef NSPathUtilities_Class
 #define NSPathUtilities_Class
-
 #import <Foundation/Foundation.h>
 
 @interface NSPathUtilities : NSObject

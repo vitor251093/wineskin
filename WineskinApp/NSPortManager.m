@@ -209,7 +209,7 @@
 }
 -(NSArray*)getAvailableWinetricksList
 {
-    NSString* winetricksPath = [NSString stringWithFormat:@"%@/Wineskin.app/Contents/Resources/winetricks",self.path];
+    NSString* winetricksPath = [NSString stringWithFormat:@"%@/Wineskin.app/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]];
     NSString* winetricksRaw = [[NSString alloc] initWithContentsOfFile:winetricksPath encoding:NSASCIIStringEncoding error:nil];
     
     NSMutableArray* newList = [[NSMutableArray alloc] init];
@@ -300,7 +300,7 @@
         return cxPath;
     }
     
-    return [NSString stringWithFormat:@"%@/Contents/Resources/%@.reg",self.path,reg];
+    return [NSString stringWithFormat:@"%@/Contents/SharedSupport/prefix/%@.reg",self.path,reg];
 }
 -(BOOL)addRegistry:(NSString*)lines fromRegistryFileNamed:(NSString*)reg
 {

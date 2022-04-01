@@ -7,14 +7,11 @@
 //
 
 #import "NSWineskinEngine.h"
-
 #import "NSPortManager.h"
 #import "NSPathUtilities.h"
 
 #define MINIMUM_ENGINE_NAME_LENGTH 4
-
 #define IDENTIFIER_PREFIX_LENGTH 2
-
 #define DEFAULT_WINESKIN_ENGINE_IDENTIFIER @"WS"
 #define DEFAULT_WINESKIN_ENGINE_VERSION    9
 
@@ -314,7 +311,7 @@
                                             ofVersion:newWrapperEngine withComplement:nil].engineName;
     }
 }
-    
+
 +(NSWineskinEngine*)wineskinEngineOfPortAtPath:(NSString*)path
 {
     NSString* firstEngine = [self getWineskinWrapperEngineFromVersionFileOfPortAtPath:path];

@@ -317,7 +317,7 @@
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I7D-v8-nnF">
                         <rect key="frame" x="18" y="189" width="240" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Compress Engine (Slows repacking)" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="jkh-MG-QV6">
+                        <buttonCell key="cell" type="check" title="Compress Engine (Slows repacking)" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="jkh-MG-QV6">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -1247,11 +1247,11 @@ Gw
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="769">
-                        <rect key="frame" x="21" y="195" width="463" height="229"/>
+                        <rect key="frame" x="21" y="195" width="466" height="229"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" selectable="YES" editable="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="770">
                             <font key="font" metaFont="system"/>
-                            <mutableString key="title">--disable-option-checking --disable-tests --without-alsa --without-capi --with-cms --with-coreaudio --with-cups --with-curses --without-dbus --with-faudio --without-fontconfig --with-freetype --without-gcrypt --without-gettext --without-gettextpo --without-gphoto --with-glu --with-gnutls --without-gsm --without-gssapi --with-gstreamer --without-gtk3 --without-hal --without-inotify --with-jpeg --without-krb5 --without-ldap --with-mingw --with-mpg123 --without-netapi --with-openal --with-opencl --with-opengl --without-osmesa --without-oss --with-pcap --with-png --with-pthread --without-pulse --without-sane --with-sdl --with-tiff --without-udev --with-unwind --without-v4l2 --without-vkd3d --without-xcomposite --without-xcursor --without-xfixes --without-xinerama --without-xinput --without-xinput2 --with-xml --without-xrandr --without-xrender --without-xshape --without-xshm --with-xslt --without-xxf86vm --with-zlib --without-x --without-va</mutableString>
+                            <string key="title">--disable-option-checking --disable-tests --without-alsa --without-capi --with-cms --with-coreaudio --with-cups --with-curses --without-dbus --with-faudio --without-fontconfig --with-freetype --without-gcrypt --without-gettext --without-gettextpo --without-gphoto --with-glu --with-gnutls --without-gsm --without-gssapi --with-gstreamer --without-gtk3 --without-hal --without-inotify --with-jpeg --without-krb5 --with-ldap --with-mingw --with-mpg123 --without-netapi --with-openal --with-opencl --with-opengl --without-osmesa --without-oss --with-pcap --with-png --with-pthread --without-pulse --without-sane --with-sdl --with-tiff --without-udev --with-unwind --without-v4l2 --without-vkd3d --without-xcomposite --without-xcursor --without-xfixes --without-xinerama --without-xinput --without-xinput2 --with-xml --without-xrandr --without-xrender --without-xshape --without-xshm --with-xslt --without-xxf86vm --with-zlib --without-x --without-va</string>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>

@@ -39,13 +39,18 @@ NSFileManager *fm;
 {
     return [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
 }
+-(NSString*)wineskinPath
+{
+    return [[NSBundle mainBundle] bundlePath];
+}
 -(NSString*)cDrivePathForWrapper
 {
     return [NSPathUtilities getMacPathForWindowsDrive:'c' ofWrapper:self.wrapperPath];
 }
 -(NSString*)wswineBundlePath
 {
-    return [NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle",self.wrapperPath];
+    return [NSString stringWithFormat:@"%@/Contents/SharedSupport/wine",self.wrapperPath];
+    //return [NSString stringWithFormat:@"%@/Contents/SharedSupport/wswine.bundle",self.wrapperPath];
 }
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -102,7 +107,7 @@ NSFileManager *fm;
     [versionTextField setEnabled:state];
     [wineDebugTextField setEnabled:state];
     [extPopUpButton setEnabled:state];
-    [extEditButton setEnabled:state];
+    [extEditButton setEnabled:NO];
     [extPlusButton setEnabled:state];
     [extMinusButton setEnabled:state];
     [iconImageView setEditable:state];
@@ -135,7 +140,8 @@ NSFileManager *fm;
     }
     
     [winedbgDisabledButton setEnabled:state];
-    [monogeckoCheckBoxButton setEnabled:state];
+    [geckoCheckBoxButton setEnabled:state];
+    [monoCheckBoxButton setEnabled:state];
     [fntoggleCheckBoxButton setEnabled:state];
     
     if (engine.isCompatibleWithCommandCtrl)
@@ -280,6 +286,9 @@ NSFileManager *fm;
 	//display warning if final array is 0 length and exit method
 	if (finalList.count == 0)
 	{
+        //close busy window
+        [busyWindow orderOut:self];
+        
         [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"No new executables found!\n\nMaybe the installer failed...?\n\nIf you tried to install somewhere other than C: drive (drive_c in the wrapper) then you will get this message too.  All software must be installed in C: drive."];
         
 		[installerWindow makeKeyAndOrderFront:self];
@@ -405,7 +414,7 @@ NSFileManager *fm;
 			[advancedWindow makeKeyAndOrderFront:self];
 		else
 			[window makeKeyAndOrderFront:self];
-		[busyWindow orderOut:self];
+            [busyWindow orderOut:self];
 		return;
 	}
 	// populate choose exe list
@@ -425,7 +434,7 @@ NSFileManager *fm;
 	}
 	else
 		[chooseExeWindow makeKeyAndOrderFront:self];
-	[busyWindow orderOut:self];
+        [busyWindow orderOut:self];
 }
 - (IBAction)installerCancelButtonPressed:(id)sender
 {
@@ -766,17 +775,12 @@ NSFileManager *fm;
 }
 - (void)runATestRun
 {
-	@autoreleasepool
+	[self runWineskinLauncherWithDisabledButtonsWithFlag:@"debug"];
+    
+    if ([NSAlert showBooleanAlertOfType:NSAlertTypeSuccess withMessage:@"Do you wish to view the Test Run Log?" withDefault:YES])
     {
-		[self disableButtons];
-		[self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"debug"]];
-		[self enableButtons];
-		
-        if ([NSAlert showBooleanAlertOfType:NSAlertTypeSuccess withMessage:@"Do you wish to view the Test Run Log?" withDefault:YES])
-        {
-            NSString* logsFolderPath = [NSString stringWithFormat:@"%@/Contents/Resources/Logs",self.wrapperPath];
-            [self systemCommand:@"/usr/bin/open" withArgs:@[@"-e",[NSString stringWithFormat:@"%@/LastRunWine.log",logsFolderPath]]];
-        }
+        NSString* logsFolderPath = [NSString stringWithFormat:@"%@/Contents/Resources/Logs",self.wrapperPath];
+        [self systemCommand:@"/usr/bin/open" withArgs:@[@"-e",[NSString stringWithFormat:@"%@/LastRunWine.log",logsFolderPath]]];
 	}
 }
 
@@ -788,8 +792,44 @@ NSFileManager *fm;
 
 - (void)runACommandLineTestRun
 {
+    // Check for winetricks, if missing download
+    if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]]])
+    {
+        NSString *urlWhereWinetricksIs = [NSString stringWithFormat:@"https://raw.githubusercontent.com/winetricks/winetricks/master/src/winetricks?%@",[[NSNumber numberWithLong:rand()] stringValue]];
+        
+        //Use downloader to download
+        NSData *newVersion = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlWhereWinetricksIs] timeoutInterval:5];
+        //if new version looks messed up, prompt the download failed, and exit.
+        if (newVersion.length < 50)
+        {
+            [NSAlert showAlertOfType:NSAlertTypeError withMessage:@"Connection to the website failed. The site is either down currently, or there is a problem with your internet connection."];
+            
+            [winetricksWindow makeKeyAndOrderFront:self];
+            [busyWindow orderOut:self];
+            return;
+        }
+        
+        NSString* winetricksFilePath = [NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]];
+        [fm removeItemAtPath:winetricksFilePath];
+        [newVersion writeToFile:winetricksFilePath atomically:YES];
+        [self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",winetricksFilePath,nil]];
+    }
+    
 	@autoreleasepool
     {
+        //NSBundle *bundle = [NSBundle mainBundle];
+        
+        /* If no arguments have been passed, start a terminal */
+        //NSString *start_bin_dir = [NSString stringWithFormat:@"%@/Contents/Resources", bundle.resourcePath];
+        //NSString *wine_bin_dir = [NSString stringWithFormat:@"%@/SharedSupport/wine/bin", bundle.resourcePath];
+        
+        
+        //NSString *theScript = [NSString stringWithFormat:
+                               //@"tell application \"Terminal\" to do script \
+                              // \"setenv PATH \\\"%@:%@:$PATH\\\"; winehelp --clear\"", start_bin_dir, wine_bin_dir];
+        //NSAppleScript *bringToFrontScript = [[NSAppleScript alloc] initWithSource:theScript];
+        //[bringToFrontScript executeAndReturnError:nil];
+        
 		system([[NSString stringWithFormat: @"export PATH=\"%@/bin:$PATH\";open -a Terminal.app \"%@/Contents/Resources/winehelp\"",self.wswineBundlePath,[[NSBundle mainBundle] bundlePath]] UTF8String]);
 	}
 }
@@ -852,7 +892,7 @@ NSFileManager *fm;
                                       atPort:portManager];
     
     [portManager setPlistObject:customCommandsTextField.stringValue forKey:@"CLI Custom Commands"];
-    [portManager setPlistObject:wineDebugTextField.stringValue      forKey:@"WINEDEBUG="];
+    [portManager setPlistObject:wineDebugTextField.stringValue      forKey:WINESKIN_WRAPPER_PLIST_KEY_WINEDEBUG];
     [portManager synchronizePlist];
 }
 
@@ -874,7 +914,7 @@ NSFileManager *fm;
 		[customCommandsTextField setStringValue:[portManager plistObjectForKey:@"CLI Custom Commands"]];
     }
     
-	[wineDebugTextField setStringValue:[portManager plistObjectForKey:@"WINEDEBUG="]];
+	[wineDebugTextField setStringValue:[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINEDEBUG]];
 	NSArray *assArray = [[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ASSOCIATIONS] componentsSeparatedByString:@" "];
 	[extPopUpButton removeAllItems];
     
@@ -887,11 +927,12 @@ NSFileManager *fm;
     [extMinusButton setEnabled:validExtension];
     [extEditButton  setEnabled:validExtension];
     
-	[mapUserFoldersCheckBoxButton setState:[[portManager plistObjectForKey:@"Symlinks In User Folder"] intValue]];
+	[mapUserFoldersCheckBoxButton setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_SYMLINK_USERS] intValue]];
     [modifyMappingsButton         setEnabled:[mapUserFoldersCheckBoxButton state]];
     [enableWinetricksSilentButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_SILENT] intValue]];
     [WinetricksNoLogsButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_NOLOGS] intValue]];
-    [monogeckoCheckBoxButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO] intValue]];
+    [geckoCheckBoxButton      setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_GECKO] intValue]];
+    [monoCheckBoxButton      setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO] intValue]];
     [fntoggleCheckBoxButton       setState:[[portManager plistObjectForKey:WINESKIN_WRAPPER_PLIST_KEY_ENABLE_FNTOGGLE] intValue]];
     
     // Option does not work above 10.8 so disable it
@@ -1052,9 +1093,9 @@ NSFileManager *fm;
 {
     @autoreleasepool
     {
-        [self disableButtons];
+        [self disableButtons]; // This doesn't work on Apple Silicon
         [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[flag]];
-        [self enableButtons];
+        [self enableButtons]; // This doesn't work on Apple Silicon
     }
 }
 - (void)runWinecfg
@@ -1097,7 +1138,7 @@ NSFileManager *fm;
         for (NSString* fileToRemove in @[@".update-timestamp", @"drive_c", @"dosdevices", @"harddiskvolume0",
                                          @"system.reg", @"user.reg", @"userdef.reg", @"winetricksInstalled.plist", @"winetricks.log"])
         {
-            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/%@",self.wrapperPath,fileToRemove];
+            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/SharedSupport/prefix/%@",self.wrapperPath,fileToRemove];
             if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
         }
         
@@ -1107,13 +1148,23 @@ NSFileManager *fm;
             if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
         }
         
+        //TODO: Should remove winetricks related files?
+        for (NSString* fileToRemove in @[@"winetricks", @"winetricksInstalled.plist", @"winetricksHelpList.plist"])
+        {
+            NSString* filePath = [NSString stringWithFormat:@"%@/Contents/Resources/%@",self.wineskinPath,fileToRemove];
+            if ([fm fileExistsAtPath:filePath]) [fm removeItemAtPath:filePath];
+        }
+        
         //TODO: reset string back to nothing.exe
         [windowsExeTextField setStringValue:@"C:\nnothing.exe"];
         [self saveAllData];
         [self loadAllData];
         
+        //TODO: Doesn't always work on Apple Silicon
+        usleep(3000000); //Maybe a usleep before and after will help?
         //refresh
         [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"WSS-wineprefixcreate"]];
+        usleep(6000000);
         
         [advancedWindow makeKeyAndOrderFront:self];
         [busyWindow orderOut:self];
@@ -1148,7 +1199,7 @@ NSFileManager *fm;
     BOOL symlinksInUserFolder = [mapUserFoldersCheckBoxButton state];
     [modifyMappingsButton setEnabled:symlinksInUserFolder];
     
-    [portManager setPlistObject:[NSNumber numberWithBool:symlinksInUserFolder] forKey:@"Symlinks In User Folder"];
+    [portManager setPlistObject:[NSNumber numberWithBool:symlinksInUserFolder] forKey:WINESKIN_WRAPPER_PLIST_KEY_SYMLINK_USERS];
     [portManager synchronizePlist];
 }
 - (IBAction)modifyMappingsButtonPressed:(id)sender
@@ -1158,7 +1209,8 @@ NSFileManager *fm;
 	[modifyMappingsMyVideosTextField    setStringValue:[portManager plistObjectForKey:@"Symlink My Videos"]];
 	[modifyMappingsMyMusicTextField     setStringValue:[portManager plistObjectForKey:@"Symlink My Music"]];
 	[modifyMappingsMyPicturesTextField  setStringValue:[portManager plistObjectForKey:@"Symlink My Pictures"]];
-    [modifyMappingsDownloadsTextField  setStringValue:[portManager plistObjectForKey:@"Symlink Downloads"]];
+    [modifyMappingsDownloadsTextField   setStringValue:[portManager plistObjectForKey:@"Symlink Downloads"]];
+    [modifyMappingsTemplatesTextField   setStringValue:[portManager plistObjectForKey:@"Symlink Templates"]];
 	[modifyMappingsWindow makeKeyAndOrderFront:self];
 	[advancedWindow orderOut:self];
 }
@@ -1198,16 +1250,41 @@ NSFileManager *fm;
 {
     [NSWineskinPortDataWriter saveWinedbg:[winedbgDisabledButton state] atPort:portManager];
 }
-- (IBAction)monogeckoButtonPressed:(id)sender
+- (IBAction)geckoButtonPressed:(id)sender
 {
-    [portManager setPlistObject:@([monogeckoCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO_GECKO];
+    [portManager setPlistObject:@([geckoCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_GECKO];
     [portManager synchronizePlist];
 }
+
+
+- (IBAction)monoButtonPressed:(id)sender
+{
+    [portManager setPlistObject:@([monoCheckBoxButton state]) forKey:WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO];
+    [portManager synchronizePlist];
+}
+
+
 //*************************************************************
 //*********************** Winetricks **************************
 //*************************************************************
 - (IBAction)winetricksButtonPressed:(id)sender
 {
+    NSString* engineString = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    
+    //TODO: Add engine check logic into
+    //Workaround winetricks disabling some verbs for CX21
+    if (engine.isForceWinetricksNeeded)
+    {
+        [portManager setPlistObject:@TRUE forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_FORCE];
+        [portManager synchronizePlist];
+    }
+    else
+    {
+        [portManager setPlistObject:@FALSE forKey:WINESKIN_WRAPPER_PLIST_KEY_WINETRICKS_FORCE];
+        [portManager synchronizePlist];
+    }
+    
     [self winetricksRefreshButtonPressed:self];
 }
 - (IBAction)enableWinetricksSilentButtonPressed:(id)sender
@@ -1223,7 +1300,7 @@ NSFileManager *fm;
 - (IBAction)winetricksRefreshButtonPressed:(id)sender
 {
     // Check for winetricks file, if missing download
-    if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",self.wrapperPath]])
+    if (![fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]]])
     {
         [self winetricksUpdateButtonPressed:self];
     }
@@ -1258,6 +1335,8 @@ NSFileManager *fm;
 }
 - (IBAction)winetricksUpdateButtonPressed:(id)sender
 {
+    //NSString *urlWhereWinetricksIs = [NSString stringWithFormat:@"https://raw.githubusercontent.com/winetricks/winetricks/master/src/winetricks?%@",[[NSNumber numberWithLong:rand()] stringValue]];
+
 	//Get the URL where winetricks is located
 	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://raw.githubusercontent.com/Gcenx/WineskinServer/master/WineskinWinetricks/Location.txt?%@",[[NSNumber numberWithLong:rand()] stringValue]]];
     NSString *urlWhereWinetricksIs = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding timeoutInterval:5];
@@ -1265,7 +1344,7 @@ NSFileManager *fm;
 	urlWhereWinetricksIs = [urlWhereWinetricksIs stringByReplacingOccurrencesOfString:@"\n" withString:@""]; //remove \n
     
     // Only show Warning if winetricks is already installed
-    if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",self.wrapperPath]])
+    if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]]])
     {
         //confirm update
         if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:[NSString stringWithFormat:@"Are you sure you want to update to the latest version of Winetricks?\n\nThe latest version from...\n\t%@\nwill be downloaded and installed for this wrapper.",urlWhereWinetricksIs] withDefault:NO] == false)
@@ -1274,9 +1353,6 @@ NSFileManager *fm;
         }
     }
     
-    //random added to force recheck
-	urlWhereWinetricksIs = [NSString stringWithFormat:@"%@?%@",urlWhereWinetricksIs,[[NSNumber numberWithLong:rand()] stringValue]];
-	
     //show busy window
 	[busyWindow makeKeyAndOrderFront:self];
 	//hide Winetricks window
@@ -1294,13 +1370,13 @@ NSFileManager *fm;
 		return;
 	}
     
-    NSString* winetricksFilePath = [NSString stringWithFormat:@"%@/Contents/Resources/winetricks",self.wrapperPath];
+    NSString* winetricksFilePath = [NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]];
 	[fm removeItemAtPath:winetricksFilePath];
 	[newVersion writeToFile:winetricksFilePath atomically:YES];
 	[self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",winetricksFilePath,nil]];
     
 	//remove old list of packages and descriptions (it'll be rebuilt when refreshing the list)
-	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath]];
+	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]]];
 
 	//refresh window
 	[self winetricksRefreshButtonPressed:self];
@@ -1339,7 +1415,7 @@ NSFileManager *fm;
 	//[winetricksTabView selectTabViewItem:winetricksTabLog];
 	// delete log file
 	[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",self.wrapperPath]];
-    [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Winetricks.log",self.wrapperPath]];
+    //[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Winetricks.log",self.wrapperPath]];
 	//killing sh processes from Winetricks will cancel out Winetricks correctly
 	//get first list of running "sh" processes
 	NSArray *firstPIDlist = [self makePIDArray:@"sh"];
@@ -1471,7 +1547,7 @@ NSFileManager *fm;
 		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         
 		// List of all winetricks
-		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath]];
+		list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]]];
 		BOOL needsListRebuild = NO;
 		if (list == nil)
         {
@@ -1507,7 +1583,7 @@ NSFileManager *fm;
 		}
 		if (needsListRebuild)
 		{ // Invalid or missing list.  Rebuild it
-            NSArray *winetricksFile = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",self.wrapperPath] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"];
+            NSArray *winetricksFile = [[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"];
             NSMutableArray *linesToCheck = [[NSMutableArray alloc] init];
             NSArray *winetricksCategories;
             int i;
@@ -1586,11 +1662,11 @@ NSFileManager *fm;
 				if ([winetricksThisCategoryList count] == 0) continue;
 				[list setValue:winetricksThisCategoryList forKey:category];
 			}
-			[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath] atomically:YES];
+			[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]] atomically:YES];
 		}
         
         //Fix the permissions just to be safe here
-        NSString* winetricksHelpList = [NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath];
+        NSString* winetricksHelpList = [NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",[[NSBundle mainBundle] bundlePath]];
         [self systemCommand:@"/bin/chmod" withArgs:[NSArray arrayWithObjects:@"777",winetricksHelpList,nil]];
         
 		[self setWinetricksList:list];
@@ -1599,15 +1675,25 @@ NSFileManager *fm;
 		if ([defaults boolForKey:@"InstalledColumnShown"])
 		{
 			// List of installed winetricks
-			list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/winetricksInstalled.plist",self.wrapperPath]];
+			list = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[NSBundle mainBundle] bundlePath]]];
 			if (!list[WINETRICK_INSTALLED] || ![list[WINETRICK_INSTALLED] isKindOfClass:[NSArray class]])
 			{
                 // Invalid or missing list.  Rebuild it (it only happens on a newly created wrapper or after a wrapper rebuild
 				[self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:[NSArray arrayWithObjects:@"WSS-winetricks", @"list-installed", nil]];
                 
-				NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log", self.wrapperPath] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-                list = @{WINETRICK_INSTALLED: tempList};
-				[list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/winetricksInstalled.plist",self.wrapperPath] atomically:YES];
+                //TODO: Handle generating winetricksInstalled.plist better
+                if ([fm fileExistsAtPath:[NSString stringWithFormat:@"%@/Contents/SharedSupport/prefix/winetricks.log", self.wrapperPath]])
+                {
+                    NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/SharedSupport/prefix/winetricks.log", self.wrapperPath] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+                    list = @{WINETRICK_INSTALLED: tempList};
+                    [list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[NSBundle mainBundle] bundlePath]] atomically:YES];
+                }
+                else
+                {
+                    NSArray *tempList = [[[NSString stringWithContentsOfFile:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/WinetricksTemp.log", self.wrapperPath] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+                    list = @{WINETRICK_INSTALLED: tempList};
+                    [list writeToFile:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[NSBundle mainBundle] bundlePath]] atomically:YES];
+                }
 			}
 			[self setWinetricksInstalledList:list[WINETRICK_INSTALLED]];
 		}
@@ -1635,6 +1721,7 @@ NSFileManager *fm;
         }
 	}
 }
+//TODO: This does correctly lock on Apple Silicon
 - (void)setWinetricksBusy:(BOOL)isBusy;
 {
 	// disable X button
@@ -1656,6 +1743,7 @@ NSFileManager *fm;
     
 	if (isBusy)
 	{
+        //TODO: winetricksWaitWheel might cause crashing?
 		[winetricksWaitWheel startAnimation:self];
 		[winetricksOutlineView setEnabled:NO];
 		[winetricksCustomLine setEnabled:NO];
@@ -1692,8 +1780,8 @@ NSFileManager *fm;
 		winetricksDone = YES;
         
 		// Remove installed and cached packages lists since they need to be rebuilt
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/winetricksInstalled.plist",self.wrapperPath]];
-		[fm removeItemAtPath:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]]];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",[[NSBundle mainBundle] bundlePath]]];
+        [fm removeItemAtPath:[NSString stringWithFormat:@"%@/winetricks/winetricksCached.plist", [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]]];
 		usleep(500000); // Wait just a little, to make sure logs aren't overwritten before updateWinetrickOutput is done
 		[self winetricksRefreshButtonPressed:self];
 		[self winetricksSelectNoneButtonPressed:self];
@@ -2047,7 +2135,7 @@ NSFileManager *fm;
 	}
     
 	//confirm wrapper change
-    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:@"Are you sure you want to do this update? It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery. The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Frameworks\nContents/Resources/English.lproj" withDefault:NO] == false)
+    if ([NSAlert showBooleanAlertOfType:NSAlertTypeWarning withMessage:@"Are you sure you want to do this update? It will change out the wrappers main Wineskin files with newer copies from whatever Master Wrapper you have installed with Wineskin Winery. The following files/folders will be replaced in the wrapper:\nWineskin.app\nContents/MacOS\nContents/Frameworks\nContents/Resources/Base.lproj\nContents/Resources/en.lproj" withDefault:NO] == false)
     {
         return;
     }
@@ -2064,6 +2152,14 @@ NSFileManager *fm;
     NSString* oldNibPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinLauncher.nib",self.wrapperPath];
     if ([fm fileExistsAtPath:oldNibPath]) [fm removeItemAtPath:oldNibPath];
     
+    //delete winetricks
+    NSString* oldwinetricks = [NSString stringWithFormat:@"%@/Contents/Resources/winetricks",self.wrapperPath];
+    if ([fm fileExistsAtPath:oldwinetricks]) [fm removeItemAtPath:oldwinetricks];
+    
+    //delete winetricksHelpList.plist
+    NSString* oldwinetricksHelpList = [NSString stringWithFormat:@"%@/Contents/Resources/winetricksHelpList.plist",self.wrapperPath];
+    if ([fm fileExistsAtPath:oldwinetricksHelpList]) [fm removeItemAtPath:oldwinetricksHelpList];
+    
     //delete old WineskinMenuScripts folder
     NSString* oldWineskinMenuScriptsPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinMenuScripts",self.wrapperPath];
     if ([fm fileExistsAtPath:oldWineskinMenuScriptsPath]) [fm removeItemAtPath:oldWineskinMenuScriptsPath];
@@ -2076,16 +2172,15 @@ NSFileManager *fm;
     NSString* WineskinStartupScriptPath = [NSString stringWithFormat:@"%@/Contents/Resources/WineskinStartupScript",self.wrapperPath];
     if ([fm fileExistsAtPath:WineskinStartupScriptPath]) [fm removeItemAtPath:WineskinStartupScriptPath];
     
-    //Move to winetricksInstalled.plist /Logs
-    [fm moveItemAtPath:[NSString stringWithFormat:@"%@/Contents/Resources/winetricksInstalled.plist",self.wrapperPath]
-                toPath:[NSString stringWithFormat:@"%@/Contents/Resources/Logs/winetricksInstalled.plist",self.wrapperPath] error:nil];
+    //delete old English.lproj
+    NSString* oldEnglishMenu = [NSString stringWithFormat:@"%@/Contents/Resources/English.lproj",self.wrapperPath];
+    if ([fm fileExistsAtPath:oldEnglishMenu]) [fm removeItemAtPath:oldEnglishMenu];
+
+    //copy new Base.lproj, and copy in new
+    [self replaceFile:@"/Contents/Resources/Base.lproj" withVersionFromMasterWrapper:masterWrapperName];
     
-    //delete old winetricks.log
-    NSString* winetrickslogPath = [NSString stringWithFormat:@"%@/Contents/Resources/winetricks.log",self.wrapperPath];
-    if ([fm fileExistsAtPath:winetrickslogPath]) [fm removeItemAtPath:winetrickslogPath];
-    
-    //copy new English.lproj, and copy in new
-    [self replaceFile:@"/Contents/Resources/English.lproj" withVersionFromMasterWrapper:masterWrapperName];
+    //copy new en.lproj, and copy in new
+    [self replaceFile:@"/Contents/Resources/en.lproj" withVersionFromMasterWrapper:masterWrapperName];
     
     //copy new Scripts folder
     NSString* ScriptsPath = [NSString stringWithFormat:@"%@/Contents/Resources/Scripts",self.wrapperPath];
@@ -2105,15 +2200,15 @@ NSFileManager *fm;
     [self replaceFile:@"/Wineskin.app" withVersionFromMasterWrapper:masterWrapperName];
     
     //move wswine.bundle out of Frameworks
-    NSString* wswineBundleOriginalPath = self.wswineBundlePath;
-    NSString* wswineBundleTempPath = @"/tmp/wswineWSTEMP.bundle";
-    [fm moveItemAtPath:wswineBundleOriginalPath toPath:wswineBundleTempPath];
+    //NSString* wswineBundleOriginalPath = self.wswineBundlePath;
+    //NSString* wswineBundleTempPath = @"/tmp/wswineWSTEMP.bundle";
+    //[fm moveItemAtPath:wswineBundleOriginalPath toPath:wswineBundleTempPath];
     
     //replace Frameworks
     [self replaceFile:@"/Contents/Frameworks" withVersionFromMasterWrapper:masterWrapperName];
     
     //move wswine.bundle back into Frameworks
-    [fm moveItemAtPath:wswineBundleTempPath toPath:wswineBundleOriginalPath];
+    //[fm moveItemAtPath:wswineBundleTempPath toPath:wswineBundleOriginalPath];
     
     //open new Wineskin.app
     [self systemCommand:@"/usr/bin/open" withArgs:@[@"-n",[NSString stringWithFormat:@"%@/Wineskin.app",self.wrapperPath]]];
@@ -2260,7 +2355,8 @@ NSFileManager *fm;
 	[portManager setPlistObject:[modifyMappingsMyVideosTextField stringValue]    forKey:@"Symlink My Videos"];
 	[portManager setPlistObject:[modifyMappingsMyMusicTextField stringValue]     forKey:@"Symlink My Music"];
 	[portManager setPlistObject:[modifyMappingsMyPicturesTextField stringValue]  forKey:@"Symlink My Pictures"];
-    [portManager setPlistObject:[modifyMappingsDownloadsTextField stringValue]  forKey:@"Symlink Downloads"];
+    [portManager setPlistObject:[modifyMappingsDownloadsTextField stringValue]   forKey:@"Symlink Downloads"];
+    [portManager setPlistObject:[modifyMappingsTemplatesTextField stringValue]   forKey:@"Symlink Templates"];
     [portManager synchronizePlist];
 	
 	[advancedWindow makeKeyAndOrderFront:self];
@@ -2280,7 +2376,8 @@ NSFileManager *fm;
 	[modifyMappingsMyVideosTextField    setStringValue:@"$HOME/Movies"];
 	[modifyMappingsMyMusicTextField     setStringValue:@"$HOME/Music"];
 	[modifyMappingsMyPicturesTextField  setStringValue:@"$HOME/Pictures"];
-    [modifyMappingsDownloadsTextField  setStringValue:@"$HOME/Downloads"];
+    [modifyMappingsDownloadsTextField   setStringValue:@"$HOME/Downloads"];
+    [modifyMappingsTemplatesTextField   setStringValue:@"$HOME/Templates"];
 }
 
 -(NSString*)newPathForMappingOfFolder:(NSString*)folder
@@ -2360,6 +2457,16 @@ NSFileManager *fm;
     if (newPath)
     {
         [modifyMappingsDownloadsTextField setStringValue:newPath];
+    }
+}
+
+- (IBAction)modifyMappingsTemplatesBrowseButtonPressed:(id)sender
+{
+    NSString* newPath = [self newPathForMappingOfFolder:@"Templates"];
+    
+    if (newPath)
+    {
+        [modifyMappingsTemplatesTextField setStringValue:newPath];
     }
 }
 

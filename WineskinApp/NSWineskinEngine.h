@@ -40,6 +40,7 @@ typedef enum {
 -(BOOL)csmtUsesNewRegistry;
 -(BOOL)isCompatibleWithHighQualityMode;
 -(BOOL)isCompatibleWith16Bit;
+-(BOOL)isForceWinetricksNeeded;
 
 +(NSString*)localPathForEngine:(NSString*)engine;
 

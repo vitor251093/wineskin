@@ -7,13 +7,11 @@
 //
 
 #import "NSWineskinEngine.h"
-
 #import "NSTask+Extension.h"
 #import "NSAlert+Extension.h"
 #import "NSString+Extension.h"
 #import "NSFileManager+Extension.h"
 #import "NSMutableArray+Extension.h"
-
 #import "NSUtilities.h"
 #import "NSWebUtilities.h"
 #import "VMMVersion.h"
@@ -651,18 +649,20 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             
         case NSWineskinEngineCrossOver:
             
-            // As of 2017-10-02 (CX 16.2.5), CX last merge with Wine was with Wine 2.0, so it doesn't have Wine's CSMT,
-            // but Wine's CSMT may have came from CrossOver, so CrossOver CSMT possibly always had the new registry.
-            // TODO: Needs to check, and might change in the future in case 'false'
+            // CrossOver 18 is based on Wine 3.14
+            // https://www.codeweavers.com/products/more-information/changelog#18.0.0
             
-            return false;
-            
+            return [self isWineVersionAtLeast:@"18.0.0"];
+                        
         case NSWineskinEngineWineStaging:
             
             // Technically, Staging CSMT should have been replaced by Wine's in 1.9.10
             // TODO: Needs to check
             
             return [self isWineVersionAtLeast:@"1.9.10"];
+            
+        case NSWineskinEngineProton:
+            return true;
             
         case NSWineskinEngineWine:
             
@@ -747,7 +747,31 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     
     return true;
 }
-
+//TODO: Is force winetricks needed
+-(BOOL)isForceWinetricksNeeded
+{
+    switch (self.engineType)
+    {
+        case NSWineskinEngineCrossOverGames:
+            return false;
+            
+        case NSWineskinEngineCrossOver:
+            // Winetricks blocks wine-6.0 from installing .Net 4.5/4.8
+            //return [self isWineVersionAtLeast:@"21.0.0"];
+            return false;
+            
+        case NSWineskinEngineWineStaging:
+            return false;
+            
+        case NSWineskinEngineWine:
+            return false;
+            
+        default:
+            break;
+    }
+    
+    return true;
+}
 +(NSString*)localPathForEngine:(NSString*)engine
 {
     NSString* engineFile;

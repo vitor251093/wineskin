@@ -7,6 +7,7 @@
 //
 
 #import "NSWineskinEngine.h"
+#import "Wineskin_Winery_Prefix.pch"
 
 #define MINIMUM_ENGINE_NAME_LENGTH 4
 
@@ -14,8 +15,6 @@
 
 #define DEFAULT_WINESKIN_ENGINE_IDENTIFIER @"WS"
 #define DEFAULT_WINESKIN_ENGINE_VERSION    10
-
-#define WINESKIN_LIBRARY_ENGINES_FOLDER [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()]
 
 static NSString *const REGEX_VALID_WINESKIN_ENGINE =                 @"[A-Z]{2}[0-9]+Wine(CX|CXG|Staging|Proton)?(Gnutls|Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
 static NSString *const REGEX_VALID_WINESKIN_WINE_ENGINE =            @"[A-Z]{2}[0-9]+Wine(Gnutls|Vulkan)?(64Bit)?[0-9\\.]+[^\\n]*";
@@ -156,7 +155,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     NSString* supportedExtension = @".tar.7z";
     NSMutableArray* list = [[NSMutableArray alloc] init];
     
-    NSArray* fileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:WINESKIN_LIBRARY_ENGINES_FOLDER];
+    NSArray* fileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:WINESKIN_ENGINES];
     for (NSString* file in fileList)
     {
         if (file.length > IDENTIFIER_PREFIX_LENGTH)
@@ -492,6 +491,49 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     return [NSString stringWithFormat:@"http://dl.winehq.org/wine-builds/macosx/pool/%@.tar.gz",filename];
 }
 
+-(BOOL)isCompatibleWith32on64Bit
+{
+    switch (self.engineType)
+    {
+        case NSWineskinEngineCrossOverGames:
+            
+            //
+            // https://www.codeweavers.com/products/more-information/changelog#10.3.0
+            
+            return false;
+            
+        case NSWineskinEngineCrossOver:
+            
+            //
+            // https://www.codeweavers.com/products/more-information/changelog#19.0.0
+            if (self.is64Bit) return true;
+            return [self isWineVersionAtLeast:@"19.0.0"];
+            
+        case NSWineskinEngineWineStaging:
+            
+            //
+            // https://github.com/wine-staging/wine-staging/releases?after=v
+            if (self.is64Bit) return true;
+            return false;
+            
+        case NSWineskinEngineProton:
+            if (self.is64Bit) return true;
+            return false;
+            
+        case NSWineskinEngineWine:
+            
+            //
+            // https://www.winehq.org/announce/
+            if (self.is64Bit) return true;
+            return false;
+            
+        default:
+            break;
+    }
+    
+    return true;
+}
+
 -(BOOL)isCompatibleWithMacDriver
 {
     switch (self.engineType)
@@ -533,6 +575,70 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     
     return true;
 }
+
+-(BOOL)isCompatibleWithLatestFreeType
+{
+    // Freetype 2.8.1 breaks Wine
+    switch (self.engineType)
+    {
+        case NSWineskinEngineCrossOverGames:
+            
+            return false;
+            
+        case NSWineskinEngineCrossOver:
+            
+            // CrossOver 18 is based on Wine 3.14
+            // https://www.codeweavers.com/products/more-information/changelog#18.0.0
+            
+            return [self isWineVersionAtLeast:@"18.0.0"];
+            
+        case NSWineskinEngineWineStaging:
+            
+            // FreeType 2.8.1 compatibility fixes
+            // https://bugs.winehq.org/show_bug.cgi?id=43715
+            // https://bugs.winehq.org/show_bug.cgi?id=43716
+            
+            return [self isWineVersionAtLeast:@"2.18"];
+            
+        case NSWineskinEngineWine:
+            
+            // FreeType 2.8.1 compatibility fixes
+            // https://bugs.winehq.org/show_bug.cgi?id=43715
+            // https://bugs.winehq.org/show_bug.cgi?id=43716
+            
+            return [self isWineVersionAtLeast:@"2.18"];
+            
+        default:
+            break;
+    }
+    
+    return true;
+}
+
+// Legacy Engines used png14.14/15.15 these are no longer provided
+-(BOOL)requiresXquartz
+{
+    switch (self.engineType)
+    {
+        case NSWineskinEngineCrossOverGames:
+            return false;
+            
+        case NSWineskinEngineCrossOver:
+            return [self isWineVersionAtLeast:@"19.0.0"];
+            
+        case NSWineskinEngineWineStaging:
+            return [self isWineVersionAtLeast:@"5.8"];
+            
+        case NSWineskinEngineWine:
+            return [self isWineVersionAtLeast:@"5.8"];
+            
+        default:
+            break;
+    }
+    
+    return true;
+}
+
 -(BOOL)isCompatibleWithCsmt
 {
     switch (self.engineType)
@@ -595,12 +701,11 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             
         case NSWineskinEngineCrossOver:
             
-            // As of 2017-10-02 (CX 16.2.5), CX last merge with Wine was with Wine 2.0, so it doesn't have Wine's CSMT,
-            // but Wine's CSMT may have came from CrossOver, so CrossOver CSMT possibly always had the new registry.
-            // TODO: Needs to check, and might change in the future in case 'false'
+            // CrossOver 18 is based on Wine 3.14
+            // https://www.codeweavers.com/products/more-information/changelog#18.0.0
             
-            return false;
-            
+            return [self isWineVersionAtLeast:@"18.0.0"];
+                        
         case NSWineskinEngineWineStaging:
             
             // Technically, Staging CSMT should have been replaced by Wine's in 1.9.10
@@ -843,6 +948,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     if (self.vulkanEnabled) return true;
     if (self.gnutlsEnabled) return true;
     if (self.complement != nil && [self.complement isEqualToString:@"Fix"]) return true;
+    if (self.engineVersion == DEFAULT_WINESKIN_ENGINE_VERSION) return true;
     
     switch (self.engineType)
     {
@@ -860,6 +966,9 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             if (![self isWineVersionAtLeast:@"2.4-3"]) return true;
             break;
             
+        //            if ([self isWineVersionAtLeast:@"1.9.6"] && ![self isWineVersionAtLeast:@"1.9.10"]) return false;
+        //return true;
+
         case NSWineskinEngineWine:
             if (self.is64Bit) return false;
             if (![self isWineVersionAtLeast:@"2.0"]) return true;
@@ -875,7 +984,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
 +(NSString*)localPathForEngine:(NSString*)engine
 {
     NSArray* validExtensions = @[@"tar.7z"];
-    NSArray* enginesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:WINESKIN_LIBRARY_ENGINES_FOLDER];
+    NSArray* enginesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:WINESKIN_ENGINES];
     
     for (NSString* engineFileName in enginesList)
     {
@@ -897,7 +1006,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             
             if ([engine isEqualToString:engineFileNameNoExtension])
             {
-                return [NSString stringWithFormat:@"%@/%@",WINESKIN_LIBRARY_ENGINES_FOLDER,engineFileName];
+                return [NSString stringWithFormat:@"%@/%@",WINESKIN_ENGINES,engineFileName];
             }
         }
     }

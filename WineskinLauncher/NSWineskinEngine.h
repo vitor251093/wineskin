@@ -31,13 +31,13 @@ typedef enum {
 @property (nonatomic, strong) NSString* complement;
 @property (nonatomic) NSWineskinEngineType engineType;
 @property (nonatomic) BOOL is64Bit;
-    
+
 +(NSWineskinEngine*)wineskinEngineWithString:(NSString*)engineString;
 
 +(NSWineskinEngine*)wineskinEngineOfType:(NSWineskinEngineType)engineType is64Bit:(BOOL)is64Bit ofVersion:(NSString*)version withComplement:(NSString*)complement;
 
 +(NSWineskinEngine*)wineskinEngineOfPortAtPath:(NSString*)path;
-    
+
 -(NSString*)engineName;
 -(BOOL)isCompatibleWithMacDriver;
 -(BOOL)isMacDriverDefaultGraphics;

@@ -7,12 +7,9 @@
 //
 
 #import "NSWineskinPortDataWriter.h"
-
 #import "NSPathUtilities.h"
 #import "NSWineskinEngine.h"
-
 #import "NSComputerInformation.h"
-
 #import "NSData+Extension.h"
 #import "NSTask+Extension.h"
 #import "NSString+Extension.h"
@@ -52,6 +49,12 @@
         //TODO: some 32bit exe files need to use this when launched via wine64
         [port setPlistObject:@(![winPath.lowercaseString hasSuffix:@".exe"]) forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
         [port setPlistObject:flags                                           forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS];
+        
+        //TODO: Origin.exe needs to use Start.exe
+        if ([winPath contains:@"Origin.exe"])
+        {
+            [port setPlistObject:@TRUE       forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
+        }
     }
     else
     {
@@ -104,7 +107,7 @@
 }
 +(BOOL)saveCopyrightsAtPort:(NSPortManager*)port
 {
-    NSString *companyFile = [NSString stringWithFormat:@"%@/Contents/Resources/English.lproj/InfoPlist.strings",port.path];
+    NSString *companyFile = [NSString stringWithFormat:@"%@/Contents/Resources/en.lproj/InfoPlist.strings",port.path];
     
     long year = (long)[[[NSCalendar currentCalendar] components:NSYearCalendarUnit fromDate:NSDate.date] year];
     NSString* copyright = [NSString stringWithFormat:@"Copyright © 2014-%ld PortingKit.com. All rights reserved.", year];

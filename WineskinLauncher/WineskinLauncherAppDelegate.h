@@ -34,9 +34,7 @@
     NSString *wineTempLogFile;                      //location of wine temp log file
     NSString *x11LogFile;                           //location of x11 log file
 	BOOL fullScreenOption;                          //wether running fullscreen or rootless (RandR is rootless)
-	BOOL useGamma;                                  //wether or not gamma correction will be checked for
 	BOOL useXQuartz;                                //YES if using XQuartz over Mac Driver
-	NSMutableString *gammaCorrection;               //added in gamma correction
 	NSMutableString *fullScreenResolutionBitDepth;	//fullscreen bit depth for X server
 	NSString *currentResolution;                    //the resolution that was running when the wrapper was started
 	NSString *wrapperBundlePID;                     //PID of running wrapper bundle
@@ -50,18 +48,10 @@
     NSString *fontFix;                              //force freetype into using rendering mode from pre 2.7
     BOOL useMacDriver;                              //YES if using Mac Driver over X11
     NSString *wineServerName;                       //the name of the Wineserver we'll be launching
-    NSString *wineName;                             //the name of the Wine process we'll be launching
-    NSString *wine64Name;                           //the name of the Wine64 process we'll be launching
-    NSString *wineStagingName;                      //the name of the Wine-preloader process we'll be launching
-    NSString *wine32on64Name;                       //the name of the Wine32on64-preloader process we'll be launching
-    NSString *wineStaging64Name;                    //the name of the Wine64-preloader process we'll be launching
 	int bundleRandomInt1;
     int bundleRandomInt2;
     
 }
-// if Fn or Alt held on run
-- (void) doSpecialStartup;
-
 //run system command with output returned
 - (NSString *)systemCommand:(NSString *)command;
 
@@ -70,9 +60,6 @@
 
 //Any time its re-ran after its already running, for like opening extra files or Custom EXEs
 - (void)secondaryRun:(NSArray*)filesToOpen;
-
-//used to change the gamma setting since Xquartz cannot yet
-- (void)setGamma:(NSString *)inputValue;
 
 //used to change the global screen resolution for overriding randr
 - (void)setResolution:(NSString *)reso;
@@ -130,39 +117,6 @@
 
 //returns true if Wineserver for this wrapper is running
 - (BOOL)isWineserverRunning;
-
-//fix wine and wineserver names in engines to be unique for launch
-- (void)fixWineExecutableNames;
-
-//fix wine and wineserver names
-- (void)fixWine32ExecutableNames;
-
-//fix wine, wine64 and wineserver names
-- (void)fixWine64ExecutableNames;
-
-//fix wine-preloader and wineserver names
-- (void)fixWineStagingExecutableNames;
-
-//fix wine-preloader, wine64-preloader and wineserver names
-- (void)fixWineStaging64ExecutableNames;
-
-//fix wine-preloader, wine32on64-preloader and wineserver names
-- (void)fixWine32on64ExecutableNames;
-
-//fix wine-preloader, wine32on64-preloader, wine64-preloader and wineserver names
-- (void)fixWine32on64_64BitExecutableNames;
-
-//fix wine64 and wineserver names
-- (void)fixWine64_No_Wine32_ExecutableNames;
-
-//fix wine64-prealoder
--(void)fixWinestaging64_No_Wine32_ExecutableNames;
-
-//fix wine32on64-preloader & wine64 without wine
--(void)fixWine32on64_64Bit_No_Wine32_ExecutableNames;
-
-//fix wine32on64-preloader without wine & wine64
--(void)fixWine32on64_No_Wine32_ExecutableNames;
 
 //start wine
 - (void)startWine:(WineStart *)wineStart;

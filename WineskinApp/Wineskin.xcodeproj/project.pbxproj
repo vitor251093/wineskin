@@ -38,24 +38,44 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A11031EB249474BD00E16174 /* wine32on64 in Resources */ = {isa = PBXBuildFile; fileRef = A11031E9249474BC00E16174 /* wine32on64 */; };
+		A11031EC249474BD00E16174 /* wine64 in Resources */ = {isa = PBXBuildFile; fileRef = A11031EA249474BC00E16174 /* wine64 */; };
+		A12E8EAB2491CBE600401C0E /* unrar in Resources */ = {isa = PBXBuildFile; fileRef = A12E8EAA2491CBE600401C0E /* unrar */; };
+		A12E8EAE2492662B00401C0E /* wine in Resources */ = {isa = PBXBuildFile; fileRef = A10B62A2248FC277003FE411 /* wine */; };
+		A14ED5F926D5D5000022EC36 /* fntoggle in Resources */ = {isa = PBXBuildFile; fileRef = A1A1153B21EAD98D00D5A97F /* fntoggle */; };
+		A14ED61726E1021B0022EC36 /* wineconsole in Resources */ = {isa = PBXBuildFile; fileRef = A14ED60B26E1021B0022EC36 /* wineconsole */; };
+		A14ED61926E1021B0022EC36 /* winedbg in Resources */ = {isa = PBXBuildFile; fileRef = A14ED60D26E1021B0022EC36 /* winedbg */; };
+		A14ED61A26E1021B0022EC36 /* msiexec in Resources */ = {isa = PBXBuildFile; fileRef = A14ED60E26E1021B0022EC36 /* msiexec */; };
+		A14ED61B26E1021B0022EC36 /* regedit in Resources */ = {isa = PBXBuildFile; fileRef = A14ED60F26E1021B0022EC36 /* regedit */; };
+		A14ED61C26E1021B0022EC36 /* winecfg in Resources */ = {isa = PBXBuildFile; fileRef = A14ED61026E1021B0022EC36 /* winecfg */; };
+		A14ED61D26E1021B0022EC36 /* winepath in Resources */ = {isa = PBXBuildFile; fileRef = A14ED61126E1021B0022EC36 /* winepath */; };
+		A14ED61E26E1021B0022EC36 /* wineboot in Resources */ = {isa = PBXBuildFile; fileRef = A14ED61226E1021B0022EC36 /* wineboot */; };
+		A14ED61F26E1021B0022EC36 /* regsvr32 in Resources */ = {isa = PBXBuildFile; fileRef = A14ED61326E1021B0022EC36 /* regsvr32 */; };
+		A14ED62026E1021B0022EC36 /* winefile in Resources */ = {isa = PBXBuildFile; fileRef = A14ED61426E1021B0022EC36 /* winefile */; };
+		A14ED62126E1021B0022EC36 /* notepad in Resources */ = {isa = PBXBuildFile; fileRef = A14ED61526E1021B0022EC36 /* notepad */; };
+		A14ED62226E1021B0022EC36 /* winemine in Resources */ = {isa = PBXBuildFile; fileRef = A14ED61626E1021B0022EC36 /* winemine */; };
+		A1938A2D278168F700B99A8F /* wineserver in Resources */ = {isa = PBXBuildFile; fileRef = A1938A2C278168F700B99A8F /* wineserver */; };
 		A19CB3FB2433D36F00DDC9AF /* appdb in Resources */ = {isa = PBXBuildFile; fileRef = A19CB3FA2433D36F00DDC9AF /* appdb */; };
-		A1A1153C21EAD98D00D5A97F /* fntoggle in Resources */ = {isa = PBXBuildFile; fileRef = A1A1153B21EAD98D00D5A97F /* fntoggle */; };
-		A1CA021B21C6B16A00257CD5 /* WS7za in Resources */ = {isa = PBXBuildFile; fileRef = A1CA021A21C6B16A00257CD5 /* WS7za */; };
+		A1B70482245E56EC00B573A9 /* cabextract in Resources */ = {isa = PBXBuildFile; fileRef = A1B70481245E56EC00B573A9 /* cabextract */; };
+		A1C6AA8727012187007485C5 /* Codecs in Resources */ = {isa = PBXBuildFile; fileRef = A1C6AA8627012187007485C5 /* Codecs */; };
+		A1C6AA9527015225007485C5 /* 7z in Resources */ = {isa = PBXBuildFile; fileRef = A1C6AA9327015225007485C5 /* 7z */; };
+		A1C6AA9627015225007485C5 /* wineskin7z in Resources */ = {isa = PBXBuildFile; fileRef = A1C6AA9427015225007485C5 /* wineskin7z */; };
+		A1DD875F2495906300E4D0DE /* 7za in Resources */ = {isa = PBXBuildFile; fileRef = A1DD875E2495906300E4D0DE /* 7za */; };
+		A1E4C63426FEA74000A7B2A3 /* 7z.so in Resources */ = {isa = PBXBuildFile; fileRef = A1DD87662496EDBA00E4D0DE /* 7z.so */; };
+		A1E4C63727011E2800A7B2A3 /* 7zr in Resources */ = {isa = PBXBuildFile; fileRef = A1E4C63627011E2800A7B2A3 /* 7zr */; };
+		A1E4C63927011E3C00A7B2A3 /* 7zCon.sfx in Resources */ = {isa = PBXBuildFile; fileRef = A1E4C63827011E3C00A7B2A3 /* 7zCon.sfx */; };
 		A82645D5153ADC3D00FA0306 /* WineskinBanner2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A82645D4153ADC3D00FA0306 /* WineskinBanner2.jpg */; };
 		A82E5B8C133E73B8007AA611 /* CustomEXE.app in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2E12820240001EBA25 /* CustomEXE.app */; };
 		A82E5B90133E73EF007AA611 /* remakedefaults.reg in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2C12820230001EBA25 /* remakedefaults.reg */; };
-		A82E5B94133E7407007AA611 /* WSGamma in Resources */ = {isa = PBXBuildFile; fileRef = A868FC2512820212001EBA25 /* WSGamma */; };
 		A82E5B95133E740C007AA611 /* Wineskin.icns in Resources */ = {isa = PBXBuildFile; fileRef = A88CCE4E127B9CED007FBC32 /* Wineskin.icns */; };
 		A82E5B96133E7411007AA611 /* WineskinBanner.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */; };
 		A84DB68B153230490071D4F8 /* winehelp in Resources */ = {isa = PBXBuildFile; fileRef = A84DB68A153230490071D4F8 /* winehelp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		162AD88B1434CE2800FC0426 /* Defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Defaults.plist; sourceTree = "<group>"; };
-		1DDD58150DA1D0A300B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		256AC3D80F4B6AC300CF3369 /* WineskinAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WineskinAppDelegate.h; sourceTree = "<group>"; };
 		256AC3D90F4B6AC300CF3369 /* WineskinAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WineskinAppDelegate.m; sourceTree = "<group>"; };
 		256AC3F00F4B6AF500CF3369 /* Wineskin_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wineskin_Prefix.pch; sourceTree = "<group>"; };
@@ -113,12 +133,39 @@
 		4EA284021F003ABE00E61883 /* NSExeSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSExeSelection.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Wineskin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Wineskin-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Wineskin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wineskin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10B62A2248FC277003FE411 /* wine */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = wine; sourceTree = "<group>"; };
+		A11031E9249474BC00E16174 /* wine32on64 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = wine32on64; sourceTree = "<group>"; };
+		A11031EA249474BC00E16174 /* wine64 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = wine64; sourceTree = "<group>"; };
+		A12E8EAA2491CBE600401C0E /* unrar */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = unrar; sourceTree = "<group>"; };
+		A14D00CA2489AD13007806A5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A14D00CC2489AD18007806A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A14ED60926E1020B0022EC36 /* wineapploader.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = wineapploader.in; sourceTree = "<group>"; };
+		A14ED60B26E1021B0022EC36 /* wineconsole */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = wineconsole; sourceTree = "<group>"; };
+		A14ED60C26E1021B0022EC36 /* msidb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = msidb; sourceTree = "<group>"; };
+		A14ED60D26E1021B0022EC36 /* winedbg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winedbg; sourceTree = "<group>"; };
+		A14ED60E26E1021B0022EC36 /* msiexec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = msiexec; sourceTree = "<group>"; };
+		A14ED60F26E1021B0022EC36 /* regedit */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = regedit; sourceTree = "<group>"; };
+		A14ED61026E1021B0022EC36 /* winecfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winecfg; sourceTree = "<group>"; };
+		A14ED61126E1021B0022EC36 /* winepath */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winepath; sourceTree = "<group>"; };
+		A14ED61226E1021B0022EC36 /* wineboot */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = wineboot; sourceTree = "<group>"; };
+		A14ED61326E1021B0022EC36 /* regsvr32 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = regsvr32; sourceTree = "<group>"; };
+		A14ED61426E1021B0022EC36 /* winefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winefile; sourceTree = "<group>"; };
+		A14ED61526E1021B0022EC36 /* notepad */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = notepad; sourceTree = "<group>"; };
+		A14ED61626E1021B0022EC36 /* winemine */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winemine; sourceTree = "<group>"; };
+		A184191824946DD7008FDFC7 /* Wineskin.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Wineskin.entitlements; sourceTree = "<group>"; };
+		A1938A2C278168F700B99A8F /* wineserver */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = wineserver; sourceTree = "<group>"; };
 		A19CB3FA2433D36F00DDC9AF /* appdb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = appdb; sourceTree = "<group>"; };
 		A1A1153B21EAD98D00D5A97F /* fntoggle */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = fntoggle; sourceTree = "<group>"; };
-		A1CA021A21C6B16A00257CD5 /* WS7za */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = WS7za; path = "../Wineskin Winery/WS7za"; sourceTree = "<group>"; };
+		A1B70481245E56EC00B573A9 /* cabextract */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cabextract; sourceTree = "<group>"; };
+		A1C6AA8627012187007485C5 /* Codecs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Codecs; sourceTree = "<group>"; };
+		A1C6AA9327015225007485C5 /* 7z */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = 7z; sourceTree = "<group>"; };
+		A1C6AA9427015225007485C5 /* wineskin7z */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = wineskin7z; sourceTree = "<group>"; };
+		A1DD875E2495906300E4D0DE /* 7za */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7za; sourceTree = "<group>"; };
+		A1DD87662496EDBA00E4D0DE /* 7z.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = 7z.so; sourceTree = "<group>"; };
+		A1E4C63627011E2800A7B2A3 /* 7zr */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7zr; sourceTree = "<group>"; };
+		A1E4C63827011E3C00A7B2A3 /* 7zCon.sfx */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7zCon.sfx; sourceTree = "<group>"; };
 		A82645D4153ADC3D00FA0306 /* WineskinBanner2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner2.jpg; sourceTree = "<group>"; };
 		A84DB68A153230490071D4F8 /* winehelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = winehelp; sourceTree = "<group>"; };
-		A868FC2512820212001EBA25 /* WSGamma */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = WSGamma; sourceTree = "<group>"; };
 		A868FC2C12820230001EBA25 /* remakedefaults.reg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = remakedefaults.reg; sourceTree = "<group>"; };
 		A868FC2E12820240001EBA25 /* CustomEXE.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = CustomEXE.app; sourceTree = "<group>"; };
 		A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner.jpg; sourceTree = "<group>"; };
@@ -178,11 +225,13 @@
 		29B97314FDCFA39411CA2CEA /* Wineskin */ = {
 			isa = PBXGroup;
 			children = (
+				A184191824946DD7008FDFC7 /* Wineskin.entitlements */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				A14ED5F826D5D2D80022EC36 /* Recovered References */,
 			);
 			name = Wineskin;
 			sourceTree = "<group>";
@@ -199,14 +248,38 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A14ED60C26E1021B0022EC36 /* msidb */,
+				A14ED60E26E1021B0022EC36 /* msiexec */,
+				A14ED61526E1021B0022EC36 /* notepad */,
+				A14ED60F26E1021B0022EC36 /* regedit */,
+				A14ED61326E1021B0022EC36 /* regsvr32 */,
+				A14ED61226E1021B0022EC36 /* wineboot */,
+				A14ED61026E1021B0022EC36 /* winecfg */,
+				A14ED60B26E1021B0022EC36 /* wineconsole */,
+				A14ED60D26E1021B0022EC36 /* winedbg */,
+				A14ED61426E1021B0022EC36 /* winefile */,
+				A14ED61626E1021B0022EC36 /* winemine */,
+				A14ED61126E1021B0022EC36 /* winepath */,
+				A14ED60926E1020B0022EC36 /* wineapploader.in */,
 				A82645D4153ADC3D00FA0306 /* WineskinBanner2.jpg */,
 				A84DB68A153230490071D4F8 /* winehelp */,
 				A19CB3FA2433D36F00DDC9AF /* appdb */,
 				A868FC2E12820240001EBA25 /* CustomEXE.app */,
 				A868FC2C12820230001EBA25 /* remakedefaults.reg */,
-				A1CA021A21C6B16A00257CD5 /* WS7za */,
+				A1C6AA8627012187007485C5 /* Codecs */,
+				A1C6AA9327015225007485C5 /* 7z */,
+				A1C6AA9427015225007485C5 /* wineskin7z */,
+				A1DD87662496EDBA00E4D0DE /* 7z.so */,
+				A1E4C63827011E3C00A7B2A3 /* 7zCon.sfx */,
+				A1DD875E2495906300E4D0DE /* 7za */,
+				A1E4C63627011E2800A7B2A3 /* 7zr */,
+				A1B70481245E56EC00B573A9 /* cabextract */,
+				A12E8EAA2491CBE600401C0E /* unrar */,
+				A10B62A2248FC277003FE411 /* wine */,
+				A11031E9249474BC00E16174 /* wine32on64 */,
+				A11031EA249474BC00E16174 /* wine64 */,
+				A1938A2C278168F700B99A8F /* wineserver */,
 				A1A1153B21EAD98D00D5A97F /* fntoggle */,
-				A868FC2512820212001EBA25 /* WSGamma */,
 				A88CCE4E127B9CED007FBC32 /* Wineskin.icns */,
 				A88CCE4C127B9C02007FBC32 /* WineskinBanner.jpg */,
 				8D1107310486CEB800E47090 /* Wineskin-Info.plist */,
@@ -321,6 +394,13 @@
 			name = Controller;
 			sourceTree = "<group>";
 		};
+		A14ED5F826D5D2D80022EC36 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -357,13 +437,11 @@
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Wineskin" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 1;
 			knownRegions = (
-				English,
-				Japanese,
-				French,
-				German,
+				en,
+				Base,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Wineskin */;
 			projectDirPath = "";
@@ -379,19 +457,41 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C6AA8727012187007485C5 /* Codecs in Resources */,
+				A1E4C63426FEA74000A7B2A3 /* 7z.so in Resources */,
+				A1E4C63927011E3C00A7B2A3 /* 7zCon.sfx in Resources */,
+				A1C6AA9527015225007485C5 /* 7z in Resources */,
+				A1C6AA9627015225007485C5 /* wineskin7z in Resources */,
+				A1DD875F2495906300E4D0DE /* 7za in Resources */,
+				A1E4C63727011E2800A7B2A3 /* 7zr in Resources */,
+				A12E8EAE2492662B00401C0E /* wine in Resources */,
+				A11031EC249474BD00E16174 /* wine64 in Resources */,
+				A14ED62126E1021B0022EC36 /* notepad in Resources */,
+				A14ED61E26E1021B0022EC36 /* wineboot in Resources */,
+				A14ED62026E1021B0022EC36 /* winefile in Resources */,
+				A11031EB249474BD00E16174 /* wine32on64 in Resources */,
+				A14ED61F26E1021B0022EC36 /* regsvr32 in Resources */,
+				A84DB68B153230490071D4F8 /* winehelp in Resources */,
+				A19CB3FB2433D36F00DDC9AF /* appdb in Resources */,
+				A14ED5F926D5D5000022EC36 /* fntoggle in Resources */,
+				A14ED61C26E1021B0022EC36 /* winecfg in Resources */,
+				A1B70482245E56EC00B573A9 /* cabextract in Resources */,
+				A12E8EAB2491CBE600401C0E /* unrar in Resources */,
+				A1938A2D278168F700B99A8F /* wineserver in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
-				A1A1153C21EAD98D00D5A97F /* fntoggle in Resources */,
 				A82E5B96133E7411007AA611 /* WineskinBanner.jpg in Resources */,
 				A82E5B95133E740C007AA611 /* Wineskin.icns in Resources */,
-				A82E5B94133E7407007AA611 /* WSGamma in Resources */,
+				A14ED61926E1021B0022EC36 /* winedbg in Resources */,
 				A82E5B90133E73EF007AA611 /* remakedefaults.reg in Resources */,
 				A82E5B8C133E73B8007AA611 /* CustomEXE.app in Resources */,
 				162AD88C1434CE2800FC0426 /* Defaults.plist in Resources */,
-				A1CA021B21C6B16A00257CD5 /* WS7za in Resources */,
-				A84DB68B153230490071D4F8 /* winehelp in Resources */,
-				A19CB3FB2433D36F00DDC9AF /* appdb in Resources */,
+				A14ED62226E1021B0022EC36 /* winemine in Resources */,
+				A14ED61726E1021B0022EC36 /* wineconsole in Resources */,
 				A82645D5153ADC3D00FA0306 /* WineskinBanner2.jpg in Resources */,
+				A14ED61A26E1021B0022EC36 /* msiexec in Resources */,
+				A14ED61D26E1021B0022EC36 /* winepath in Resources */,
+				A14ED61B26E1021B0022EC36 /* regedit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,7 +537,7 @@
 		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				089C165DFE840E0CC02AAC07 /* English */,
+				A14D00CA2489AD13007806A5 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -445,7 +545,7 @@
 		1DDD58140DA1D0A300B32029 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1DDD58150DA1D0A300B32029 /* English */,
+				A14D00CC2489AD18007806A5 /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -457,14 +557,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = Wineskin.entitlements;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.9.0.7;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
+				CURRENT_PROJECT_VERSION = 2.9.1.0;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -479,9 +584,9 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				INFOPLIST_FILE = "Wineskin-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				"MACOSX_DEPLOYMENT_TARGET[sdk=macosx10.6][arch=i386]" = 10.6;
-				MARKETING_VERSION = 2.9.0.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				"MACOSX_DEPLOYMENT_TARGET[sdk=macosx10.6][arch=i386]" = 10.9;
+				MARKETING_VERSION = 2.9.1.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskin;
 				PRODUCT_NAME = Wineskin;
@@ -493,14 +598,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = Wineskin.entitlements;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2.9.0.7;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
+				CURRENT_PROJECT_VERSION = 2.9.1.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Wineskin_Prefix.pch;
@@ -513,8 +623,8 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				INFOPLIST_FILE = "Wineskin-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				MARKETING_VERSION = 2.9.0.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MARKETING_VERSION = 2.9.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskin;
 				PRODUCT_NAME = Wineskin;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -531,7 +641,7 @@
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
@@ -547,7 +657,7 @@
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 			};
