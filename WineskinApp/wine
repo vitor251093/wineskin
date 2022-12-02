@@ -23,17 +23,19 @@
 # see https://support.apple.com/en-us/HT204899
 if [[ -n ${WINETRICKS_FALLBACK_LIBRARY_PATH} ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH="${WINETRICKS_FALLBACK_LIBRARY_PATH}"
+else
+    export DYLD_FALLBACK_LIBRARY_PATH="$(dirname "$0")"/../../../Contents/Frameworks
 fi
 
 export WINESKINPATH="$(dirname "$0")"/../../../Contents/SharedSupport/wine/bin
 
-# macOS Catalina or greater check for wine32on64 and use if found
-if [[ ${OSTYPE:6} -ge 19 && -x "$(command -v "$WINESKINPATH"/wine32on64)" ]]; then exec "$WINESKINPATH/wine32on64" "$@"; fi
-
 # Pre macOS Catalina check for wine and use if found
 if [[ ${OSTYPE:6} -lt 19 && -x "$(command -v "$WINESKINPATH"/wine)" ]]; then exec "$WINESKINPATH/wine" "$@"; fi
 
-# Check for wine64 and use if found, fallback incase of 64Bit only Engine
+# macOS Catalina or greater check for wine32on64 and use if found
+if [[ ${OSTYPE:6} -ge 19 && -x "$(command -v "$WINESKINPATH"/wine32on64)" ]]; then exec "$WINESKINPATH/wine32on64" "$@"; fi
+
+# Check for wine64 and use if found, fallback incase of wow64 or 64Bit only Engine
 if [[ -x "$(command -v "$WINESKINPATH"/wine64)" ]]; then exec "$WINESKINPATH/wine64" "$@"; fi
 
 echo "Error: the wine loader was not found in $WINESKINPATH"

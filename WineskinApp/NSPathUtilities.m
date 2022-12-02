@@ -25,7 +25,7 @@
 
 +(NSString*)getMacPathForWindowsDrive:(char)driveLetter ofWrapper:(NSString*)file
 {
-    NSString* resourcesFolder = [NSString stringWithFormat:@"%@/Contents/Resources/",file];
+    NSString* resourcesFolder = [NSString stringWithFormat:@"%@/Contents/SharedSupport/prefix/",file];
     NSString* cxResourcesFolder = [NSString stringWithFormat:@"%@/Contents/SharedSupport/CrossOverGames/support/default/",file];
     if ([[NSFileManager defaultManager] directoryExistsAtPath:cxResourcesFolder]) resourcesFolder = cxResourcesFolder;
     

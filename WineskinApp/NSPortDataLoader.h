@@ -24,9 +24,6 @@
 +(BOOL)OptionModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
 +(BOOL)FontSmoothingIsEnabledAtPort:(NSString*)path;
 
-+(void)getValuesFromResolutionString:(NSString*)originalResolutionString
-                             inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues;
-
 +(NSImage*)getIconImageAtPort:(NSString*)path;
 
 +(BOOL)isCloseNicelyEnabledAtPort:(NSPortManager*)port;

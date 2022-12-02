@@ -23,6 +23,8 @@
 # see https://support.apple.com/en-us/HT204899
 if [[ -n ${WINETRICKS_FALLBACK_LIBRARY_PATH} ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH="${WINETRICKS_FALLBACK_LIBRARY_PATH}"
+else
+    export DYLD_FALLBACK_LIBRARY_PATH="$(dirname "$0")"/../../../Contents/Frameworks
 fi
 
 export WINESKINPATH="$(dirname "$0")"/../../../Contents/SharedSupport/wine/bin

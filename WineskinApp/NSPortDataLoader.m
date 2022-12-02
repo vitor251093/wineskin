@@ -163,60 +163,6 @@
     
     return FALSE;
 }
-+(void)getValuesFromResolutionString:(NSString*)originalResolutionString
-                             inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues
-{
-    if (originalResolutionString.length < 12)
-    {
-        resolutionValues(NO, nil, 24, 0);
-        return;
-    }
-    
-    NSString* resolutionString = originalResolutionString;
-    
-    NSRange sleepRange = [resolutionString rangeOfString:@"sleep"];
-    if (sleepRange.location == NSNotFound)
-    {
-        resolutionValues(NO, nil, 24, 0);
-        return;
-    }
-    
-    NSUInteger sleepLocation = sleepRange.location + sleepRange.length;
-    NSUInteger sleepLength = resolutionString.length - sleepLocation;
-    int sleep = [[resolutionString substringWithRange:NSMakeRange(sleepLocation, sleepLength)] intValue];
-    
-    NSRange xInEndOfResolution = [resolutionString rangeOfString:@"x" options:NSBackwardsSearch];
-    if (xInEndOfResolution.location == NSNotFound)
-    {
-        resolutionValues(NO, nil, 24, sleep);
-        return;
-    }
-    
-    NSUInteger colorsLocation = xInEndOfResolution.location + xInEndOfResolution.length;
-    NSUInteger colorsLength = sleepRange.location - colorsLocation;
-    if (colorsLocation + colorsLength > resolutionString.length)
-    {
-        resolutionValues(NO, nil, 24, sleep);
-        return;
-    }
-    
-    int colors = [[resolutionString substringWithRange:NSMakeRange(colorsLocation, colorsLength)] intValue];
-    
-    
-    BOOL virtualDesktop = false;
-    NSString* resolution = nil;
-    
-    if ([resolutionString hasPrefix:WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_NO_VIRTUAL_DESKTOP] == false)
-    {
-        virtualDesktop = true;
-        
-        NSUInteger resolutionLength = xInEndOfResolution.location;
-        resolution = [resolutionString substringWithRange:NSMakeRange(0, resolutionLength)];
-    }
-    
-    resolutionValues(virtualDesktop, resolution, colors, sleep);
-}
-
 +(BOOL)isImage:(NSImage*)icns2 equalsToImage:(NSImage*)icns
 {
     NSData *data1 = [[icns imageByFramingImageResizing:YES] TIFFRepresentation];

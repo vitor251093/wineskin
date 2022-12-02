@@ -59,8 +59,8 @@
                         attributes:nil error:nil];
 	[filemgr createDirectoryAtPath:[wineskinFolder stringByAppendingString:@"/Wrapper"] withIntermediateDirectories:YES
                         attributes:nil error:nil];
-    [filemgr createDirectoryAtPath:[wineskinFolder stringByAppendingString:@"/Runtime"] withIntermediateDirectories:YES
-                        attributes:nil error:nil];
+    //[filemgr createDirectoryAtPath:[wineskinFolder stringByAppendingString:@"/Runtime"] withIntermediateDirectories:YES
+    //                    attributes:nil error:nil];
 	//[filemgr createDirectoryAtPath:[wineskinFolder stringByAppendingString:@"/EngineBase"] withIntermediateDirectories:YES
                         //attributes:nil error:nil];
     //TODO: Swap from using /tmp to Sandbox
@@ -872,15 +872,15 @@
 
         //TODO: Find a cleaner way to remove *.a & *.la files instead of listing them
         //Remove these items
-        for (NSString* remove in @[@"lzcat", @"lzcmp", @"lzdiff", @"lzegrep", @"lzfgrep", @"lzgrep", @"lzless", @"lzma", @"lzmore", @"unlzma", @"unxz", @"xzcat", @"xzcmp", @"xzegrep", @"xzfgrep", @"altonegen", @"bsincgen", @"cjpeg", @"djpeg", @"fax2ps", @"fax2tiff", @"jpegtran", @"jpgicc", @"linkicc", @"lzmadec", @"lzmainfo", @"makehrtf", @"openal-info", @"pal2rgb", @"ppm2tiff", @"psicc", @"raw2tiff", @"rdjpgcom", @"s2tc_compress", @"s2tc_decompress", @"s2tc_from_s3tc", @"sdl2-config", @"tiff2bw", @"tiff2pdf", @"tiff2ps", @"tiff2rgba", @"tiffcmp", @"tiffcp", @"tiffcrop", @"tiffdither", @"tiffdump", @"tiffinfo", @"tiffmedian", @"tiffset", @"tiffsplit", @"tificc", @"tjbench", @"transicc", @"wrjpgcom", @"xml2-config", @"xmlcatalog", @"xmllint", @"xslt-config", @"xsltproc", @"xz", @"xzdec", @"xzdiff", @"xzgrep", @"xzless", @"xzmore", @"SDL2.framework", @"include", @"cmake", @"pkgconfig", @"libxslt-plugins", @"aclocal", @"doc", @"gtk-doc", @"man", @"openal", @"libxslt.a", @"libexslt.dylib", @"libFAudio.dylib", @"libopenal.dylib", @"libFAudio.0.dylib", @"liblcms2.dylib", @"liblzma.dylib", @"libopenal.1.dylib", @"libSDL2.dylib", @"libtiff.dylib", @"libtiffxx.dylib", @"libxml2.dylib", @"libxslt.dylib", @"libexslt.0.dylib", @"libexslt.a", @"libexslt.la", @"libFAudio.0.19.03.dylib", @"libjpeg.a", @"libjpeg.la", @"liblcms2.2.dylib", @"liblcms2.a", @"liblcms2.la", @"liblzma.5.dylib", @"liblzma.a", @"liblzma.la", @"libopenal.1.17.2.dylib", @"libSDL2-2.0.dylib", @"libSDL2.a", @"libSDL2main.a", @"libtiff.5.dylib", @"libtiff.a", @"libtiff.la", @"libtiffxx.5.dylib", @"libtiffxx.a", @"libtiffxx.la", @"libturbojpeg.a", @"libturbojpeg.la", @"libtxc_dxtn.a", @"libtxc_dxtn.la", @"libxml2.2.dylib", @"libxml2.a", @"libxml2.la", @"libxslt.1.dylib", @"libxslt.la", @"xml2Conf.sh", @"xsltConf.sh"])
-        {
-            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/%@",remove]];
-            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/bin/%@",remove]];
-            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib/%@",remove]];
-            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib64/%@",remove]];
-            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib32on64/%@",remove]];
-            [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/%@",remove]];
-        }
+        //for (NSString* remove in @[@"lzcat", @"lzcmp", @"lzdiff", @"lzegrep", @"lzfgrep", @"lzgrep", @"lzless", @"lzma", @"lzmore", @"unlzma", @"unxz", @"xzcat", @"xzcmp", @"xzegrep", @"xzfgrep", @"altonegen", @"bsincgen", @"cjpeg", @"djpeg", @"fax2ps", @"fax2tiff", @"jpegtran", @"jpgicc", @"linkicc", @"lzmadec", @"lzmainfo", @"makehrtf", @"openal-info", @"pal2rgb", @"ppm2tiff", @"psicc", @"raw2tiff", @"rdjpgcom", @"s2tc_compress", @"s2tc_decompress", @"s2tc_from_s3tc", @"sdl2-config", @"tiff2bw", @"tiff2pdf", @"tiff2ps", @"tiff2rgba", @"tiffcmp", @"tiffcp", @"tiffcrop", @"tiffdither", @"tiffdump", @"tiffinfo", @"tiffmedian", @"tiffset", @"tiffsplit", @"tificc", @"tjbench", @"transicc", @"wrjpgcom", @"xml2-config", @"xmlcatalog", @"xmllint", @"xslt-config", @"xsltproc", @"xz", @"xzdec", @"xzdiff", @"xzgrep", @"xzless", @"xzmore", @"SDL2.framework", @"include", @"cmake", @"pkgconfig", @"libxslt-plugins", @"aclocal", @"doc", @"gtk-doc", @"man", @"openal", @"libxslt.a", @"libexslt.dylib", @"libFAudio.dylib", @"libopenal.dylib", @"libFAudio.0.dylib", @"liblcms2.dylib", @"liblzma.dylib", @"libopenal.1.dylib", @"libSDL2.dylib", @"libtiff.dylib", @"libtiffxx.dylib", @"libxml2.dylib", @"libxslt.dylib", @"libexslt.0.dylib", @"libexslt.a", @"libexslt.la", @"libFAudio.0.19.03.dylib", @"libjpeg.a", @"libjpeg.la", @"liblcms2.2.dylib", @"liblcms2.a", @"liblcms2.la", @"liblzma.5.dylib", @"liblzma.a", @"liblzma.la", @"libopenal.1.17.2.dylib", @"libSDL2-2.0.dylib", @"libSDL2.a", @"libSDL2main.a", @"libtiff.5.dylib", @"libtiff.a", @"libtiff.la", @"libtiffxx.5.dylib", @"libtiffxx.a", @"libtiffxx.la", @"libturbojpeg.a", @"libturbojpeg.la", @"libtxc_dxtn.a", @"libtxc_dxtn.la", @"libxml2.2.dylib", @"libxml2.a", @"libxml2.la", @"libxslt.1.dylib", @"libxslt.la", @"xml2Conf.sh", @"xsltConf.sh"])
+        //{
+           // [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/%@",remove]];
+           // [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/bin/%@",remove]];
+           // [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib/%@",remove]];
+           // [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib64/%@",remove]];
+           // [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/lib32on64/%@",remove]];
+           // [fm removeItemAtPath:[NSString stringWithFormat:@"/tmp/wswine.bundle/share/%@",remove]];
+        //}
         
         //make "version" file
         NSString *configFileContents = [NSString stringWithFormat:@"%@",[fileOutputName stringValue]];

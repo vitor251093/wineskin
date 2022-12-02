@@ -28,33 +28,11 @@
 	IBOutlet NSWindow *aboutWindow;
 	IBOutlet NSWindow *installerWindow;
 	IBOutlet NSTextField *aboutWindowVersionNumber;
-	
-	//Screen Options window
-	IBOutlet NSWindow *screenOptionsWindow;
-    IBOutlet NSButton *useD3DBoostIfAvailableCheckBoxButton;
-    IBOutlet NSButton *autoDetectGPUInfoCheckBoxButton;
-    IBOutlet NSSlider *gammaSlider;
-    IBOutlet NSButton *useMacDriverRadioButton;
-    IBOutlet NSButton *useX11RadioButton;
-    IBOutlet NSTabView *macDriverX11TabView;
-    IBOutlet NSPopUpButton *colorDepth;
-    IBOutlet NSButton *defaultSettingsOverrideRadioButton;
-    IBOutlet NSButton *defaultSettingsAutomaticRadioButton;
-    IBOutlet NSButton *installerSettingsOverrideRadioButton;
-    IBOutlet NSButton *installerSettingsAutomaticRadioButton;
-    IBOutlet NSButton *windowModeNormalWindowsRadioButton;
-    IBOutlet NSButton *windowModeVirtualDesktopRadioButton;
-	IBOutlet NSButton *virtualDesktopFullscreenRadioButton;
-    IBOutlet NSButton *virtualDesktopWindowedRadioButton;
-	IBOutlet NSPopUpButton *virtualDesktopResolution;
-	IBOutlet NSButton *windowManagerCheckBoxButton;
-    IBOutlet NSButton* retinaModeCheckBoxButton;
     
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
 	IBOutlet NSButton *testRunButton;
 	IBOutlet NSButton *advancedInstallSoftwareButton;
-    IBOutlet NSButton *advancedSetScreenOptionsButton;
 	IBOutlet NSProgressIndicator *toolRunningPI;
 	IBOutlet NSTextField *toolRunningPIText;
 	IBOutlet NSTabView *tab;
@@ -123,14 +101,6 @@
 	IBOutlet NSButton *cEXEBrowseButton;
 	IBOutlet NSButton *cEXEIconBrowseButton;
 	IBOutlet NSMatrix *cEXEautoOrOvverrideDesktopToggle;
-	IBOutlet NSButtonCell *cEXEautoOrOvverrideDesktopToggleAutomaticButton;
-	IBOutlet NSMatrix *cEXEFullscreenRootlessToggle;
-	IBOutlet NSButtonCell *cEXEFullscreenRootlessToggleRootlessButton;
-	IBOutlet NSTabView *cEXEFullscreenRootlesToggleTabView;
-	IBOutlet NSMatrix *cEXENormalWindowsVirtualDesktopToggle;
-	IBOutlet NSButtonCell *cEXENormalWindowsVirtualDesktopToggleNormalWindowsButton;
-	IBOutlet NSPopUpButton *cEXEVirtualDesktopResolution;
-	IBOutlet NSPopUpButton *cEXEFullscreenResolution;
 	IBOutlet NSPopUpButton *cEXEColorDepth;
 	IBOutlet NSPopUpButton *cEXESwitchPause;
 	IBOutlet NSSlider *cEXEGammaSlider;
@@ -204,29 +174,12 @@
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender;
 - (IBAction)installWindowsSoftwareButtonPressed:(id)sender;
 - (IBAction)chooseExeOKButtonPressed:(id)sender;
-- (IBAction)setScreenOptionsPressed:(id)sender;
 - (IBAction)advancedButtonPressed:(id)sender;
 //Installer window methods
 - (IBAction)chooseSetupExecutableButtonPressed:(id)sender;
 - (IBAction)copyAFolderInsideButtonPressed:(id)sender;
 - (IBAction)moveAFolderInsideButtonPressed:(id)sender;
 - (IBAction)installerCancelButtonPressed:(id)sender;
-
-//Screen Options window methods
-- (void)saveScreenOptionsData;
-- (void)loadScreenOptionsData;
-- (IBAction)automaticClicked:(id)sender;
-- (IBAction)overrideClicked:(id)sender;
-- (IBAction)installerAutomaticClicked:(id)sender;
-- (IBAction)installerOverrideClicked:(id)sender;
-- (IBAction)normalWindowsClicked:(id)sender;
-- (IBAction)virtualDesktopClicked:(id)sender;
-- (IBAction)fullscreenClicked:(id)sender;
-- (IBAction)windowedClicked:(id)sender;
-- (IBAction)gammaChanged:(id)sender;
-- (IBAction)useMacDriverCheckBoxClicked:(id)sender;
-- (IBAction)useX11CheckBoxClicked:(id)sender;
-- (IBAction)retinaModeCheckBoxClicked:(id)sender;
 
 //advanced menu
 - (IBAction)testRunButtonPressed:(id)sender;
@@ -308,9 +261,6 @@
 - (IBAction)cEXEIconBrowseButtonPressed:(id)sender;
 - (IBAction)cEXEAutomaticButtonPressed:(id)sender;
 - (IBAction)cEXEOverrideButtonPressed:(id)sender;
-- (IBAction)cEXERootlessButtonPressed:(id)sender;
-- (IBAction)cEXEFullscreenButtonPressed:(id)sender;
-- (IBAction)cEXEGammaChanged:(id)sender;
 //extensions window
 - (IBAction)extSaveButtonPressed:(id)sender;
 - (IBAction)extCancelButtonPressed:(id)sender;

@@ -18,10 +18,10 @@
 ####################################################
 # Set all variables
 CMACOSFOLD="$(dirname "$0")"
-MACOSFOLD="$CMACOSFOLD/../../../Contents/MacOS"
-cd "$MACOSFOLD"
+MACOSFOLD="${CMACOSFOLD}/../../../Contents/MacOS"
+cd ${MACOSFOLD}
 MACOSFOLD="$(echo "$PWD")"
 CEXENAME="$(basename "${CMACOSFOLD%/Contents/MacOS}")"
 
 # Launch wrapper
-"$MACOSFOLD/WineskinLauncher" "CustomEXE" "$CEXENAME"
+${MACOSFOLD}/WineskinLauncher CustomEXE "${CEXENAME}"

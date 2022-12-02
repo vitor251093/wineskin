@@ -2,7 +2,7 @@
 #
 # Wrapper script for using a Wineskin Engine like Winehq wine bundle
 #
-# Copyright (C) 2021 Dean M Greer
+# Copyright (C) 2022 Dean M Greer
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -22,31 +22,36 @@
 cd "$(dirname "$0")"
 
 # wine wrappers, winetricks, 7z, cabextract & unrar
-export WINESKIN_APP="$PWD"
+export WINESKIN_APP="${PWD}"
 
 # WINEPREFIX location
-cd "../../../Contents/SharedSupport/prefix"; export WINEPREFIX="$PWD"
+cd "../../../Contents/SharedSupport/prefix"; export WINEPREFIX="${PWD}"
 
 # Wrappers wine PATH
-cd "../wine"; export WINEPATH="$PWD"
+cd "../wine"; export WINEPATH="${PWD}"
 
 # Wrappes wine/bin PATH
-export WINEBINPATH="$WINEPATH/bin"
+export WINEBINPATH="${WINEPATH}/bin"
 
 # Set $PATH
-export PATH="$WINESKIN_APP:$WINEBINPATH:$PATH"
+export PATH="${WINESKIN_APP}:${WINEBINPATH}:${PATH}"
 
 # Wineskins "RUNTIME"
-cd "../../Frameworks"; export WINESKIN_RUNTIME="$PWD"
+cd "../../Frameworks"; export WINESKIN_RUNTIME="${PWD}"
 
 # Custom export to workaround SIP DYLD_ stripping
-export WINETRICKS_FALLBACK_LIBRARY_PATH="$WINESKIN_RUNTIME:$HOME/Library/Application Support/Wineskin/Runtime:/opt/local/lib:$WINEPATH/lib:$WINEPATH/lib64:/usr/lib:/usr/libexec:/usr/lib/system:/opt/X11/lib"
+export WINETRICKS_FALLBACK_LIBRARY_PATH="${WINESKIN_RUNTIME}:${HOME}/Library/Application Support/Wineskin/Runtime:/opt/local/lib:${WINEPATH}/lib:${WINEPATH}/lib64:/usr/lib:/usr/libexec:/usr/lib/system:/opt/X11/lib"
 
 # Set Wineskin default WINEDEBUG options
-#export WINEDEBUG="-esync,-plugplay"
+export WINEDEBUG="-esync,-plugplay"
+
+# Set required MoltenVK setting
+export MVK_CONFIG_FULL_IMAGE_VIEW_SWIZZLE=1   #   XXX Required by DXVK for AMD500/Intel GPUs
+export MVK_ALLOW_METAL_FENCES=1               #   XXX Required by DXVK for Apple/NVidia GPUs (better FPS than CPU Emulation)
+export MVK_CONFIG_RESUME_LOST_DEVICE=1        #   XXX Required by WINE (doesn't handle VK_ERROR_DEVICE_LOST correctly)
 
 # Default directory location "should" be $HOME
-cd "$HOME"
+cd "${HOME}"
 
 # This section was taken from Winehq and tweaked
 clear

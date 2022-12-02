@@ -18,8 +18,9 @@
 #define IS_SYSTEM_MAC_OS_10_13_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.13"]  // High Sierra
 #define IS_SYSTEM_MAC_OS_10_14_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.14"]  // Mojave
 #define IS_SYSTEM_MAC_OS_10_15_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.15"]  // Catalina
-#define IS_SYSTEM_MAC_OS_11_00_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"11.00"]  // Big Sur
-#define IS_SYSTEM_NAC_OS_12_0_OR_SUPERIOR   [VMMComputerInformation isSystemMacOsEqualOrSuperiorTo:@"12.0"]   // Monterey
+#define IS_SYSTEM_MAC_OS_11_0_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"11.00"]  // Big Sur
+#define IS_SYSTEM_MAC_OS_12_0_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"12.0"]   // Monterey
+#define IS_SYSTEM_MAC_OS_13_0_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"13.0"]   // Ventura
 
 #import <Foundation/Foundation.h>
 

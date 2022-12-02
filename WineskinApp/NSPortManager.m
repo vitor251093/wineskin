@@ -117,7 +117,7 @@
     if (!winetrick) return false;
     [self runWithArguments:@[@"WSS-winetricks",winetrick]];
     
-    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",self.path];
+    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/SharedSupport/Logs/Winetricks.log",self.path];
     NSString* log = [NSString stringWithContentsOfFile:logPath encoding:NSASCIIStringEncoding];
     return log;
 }
@@ -176,7 +176,7 @@
 {
     if (!newLogs) return;
     
-    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/Resources/install.log",self.path];
+    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/SharedSupport/Logs/install.log",self.path];
     NSString* log = [NSString stringWithContentsOfFile:logPath encoding:NSASCIIStringEncoding];
     
     if (!log) log = @"";

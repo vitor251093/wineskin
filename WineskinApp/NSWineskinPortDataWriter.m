@@ -68,25 +68,6 @@
         [dictPath writeToFile:way atomically:YES encoding:NSStringEncodingConversionAllowLossy];
     }
 }
-+(void)setAutomaticScreenOptions:(BOOL)automatic fullscreen:(BOOL)fullscreen virtualDesktop:(BOOL)virtualDesktop resolution:(NSString*)resolution colors:(int)colors sleep:(int)sleep atPort:(NSPortManager*)port
-{
-    [port setPlistObject:@(automatic)  forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_ARE_AUTOMATIC];
-    [port setPlistObject:@(fullscreen) forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_IS_FULLSCREEN];
-    
-    if (!automatic && virtualDesktop)
-    {
-        [port setPlistObject:[NSString stringWithFormat:@"%@x%dsleep%d", resolution,colors,sleep]
-                      forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_CONFIGURATIONS];
-    }
-    else
-    {
-        [port setPlistObject:[NSString stringWithFormat:@"novdx%dsleep%d",colors,sleep]
-                      forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_CONFIGURATIONS];
-    }
-    
-    [port synchronizePlist];
-}
-
 //Saving Data instructions
 +(BOOL)saveCloseSafely:(NSNumber*)closeSafely atPort:(NSPortManager*)port
 {

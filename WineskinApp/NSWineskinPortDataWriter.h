@@ -13,10 +13,6 @@
 
 //Saving registry changes instructions
 +(BOOL)removeFromRegistryAppsThatRunAutomaticallyOnWrapperStartupAtPort:(NSPortManager*)port;
-
-//Misc instructions
-+(void)setAutomaticScreenOptions:(BOOL)automatic fullscreen:(BOOL)fullscreen virtualDesktop:(BOOL)virtualDesktop resolution:(NSString*)resolution colors:(int)colors sleep:(int)sleep atPort:(NSPortManager*)port;
-
 //Saving Data instructions
 +(BOOL)saveCloseSafely:(NSNumber*)closeSafely atPort:(NSPortManager*)port;
 +(BOOL)saveCopyrightsAtPort:(NSPortManager*)port;
