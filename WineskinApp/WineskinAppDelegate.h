@@ -31,6 +31,7 @@
     
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
+    IBOutlet NSButton *winetricksButton;
 	IBOutlet NSButton *testRunButton;
 	IBOutlet NSButton *advancedInstallSoftwareButton;
 	IBOutlet NSProgressIndicator *toolRunningPI;
@@ -57,15 +58,17 @@
 	IBOutlet NSButton *winecfgButton;
 	IBOutlet NSButton *regeditButton;
 	IBOutlet NSButton *taskmgrButton;
-	IBOutlet NSButton *uninstallerButton;
-	IBOutlet NSButton *rebuildWrapperButton;
-	IBOutlet NSButton *refreshWrapperButton;
-	IBOutlet NSButton *winetricksButton;
-	IBOutlet NSButton *customExeButton;
-	IBOutlet NSButton *changeEngineButton;
-	IBOutlet NSTextField *currentVersionTextField;
-	IBOutlet NSButton *updateWrapperButton;
+    //cmd
+    IBOutlet NSButton *uninstallerButton;
+    IBOutlet NSButton *customExeButton;
+    IBOutlet NSButton *logsButtonPressed;
     IBOutlet NSButton *commandLineWineTestButton;
+    //kill wineskin processes
+    IBOutlet NSButton *refreshWrapperButton;
+	IBOutlet NSButton *rebuildWrapperButton;
+    IBOutlet NSButton *updateWrapperButton;
+    IBOutlet NSButton *changeEngineButton;
+	IBOutlet NSTextField *currentVersionTextField;
 	
 	//advanced menu - Options Tab
 	IBOutlet NSButton *alwaysMakeLogFilesCheckBoxButton;

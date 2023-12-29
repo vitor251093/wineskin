@@ -24,7 +24,14 @@
 if [[ -n ${WINETRICKS_FALLBACK_LIBRARY_PATH} ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH="${WINETRICKS_FALLBACK_LIBRARY_PATH}"
 else
-    export DYLD_FALLBACK_LIBRARY_PATH="$(dirname "$0")"/../../../Contents/Frameworks
+    export WINETRICKS_FALLBACK_LIBRARY_PATH="$(dirname "$0")"/../../../Contents/Frameworks
+    export DYLD_FALLBACK_LIBRARY_PATH="${WINETRICKS_FALLBACK_LIBRARY_PATH}"
+fi
+
+if [[ -n ${WINEPREFIX} ]]; then
+    export WINEPREFIX="${WINEPREFIX}"
+else
+    export WINEPREFIX="$(dirname "$0")"/../../../Contents/SharedSupport/prefix
 fi
 
 export WINESKINPATH="$(dirname "$0")"/../../../Contents/SharedSupport/wine/bin

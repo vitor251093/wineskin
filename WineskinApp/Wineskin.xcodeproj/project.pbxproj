@@ -61,6 +61,7 @@
 		A1C6AA8727012187007485C5 /* Codecs in Resources */ = {isa = PBXBuildFile; fileRef = A1C6AA8627012187007485C5 /* Codecs */; };
 		A1C6AA9627015225007485C5 /* 7z in Resources */ = {isa = PBXBuildFile; fileRef = A1C6AA9427015225007485C5 /* 7z */; };
 		A1DD875F2495906300E4D0DE /* 7za in Resources */ = {isa = PBXBuildFile; fileRef = A1DD875E2495906300E4D0DE /* 7za */; };
+		A1E190F32974F6AD002184C0 /* curl in Resources */ = {isa = PBXBuildFile; fileRef = A1E190F22974F6AD002184C0 /* curl */; };
 		A1E4C63426FEA74000A7B2A3 /* 7z.so in Resources */ = {isa = PBXBuildFile; fileRef = A1DD87662496EDBA00E4D0DE /* 7z.so */; };
 		A1E4C63727011E2800A7B2A3 /* 7zr in Resources */ = {isa = PBXBuildFile; fileRef = A1E4C63627011E2800A7B2A3 /* 7zr */; };
 		A1E4C63927011E3C00A7B2A3 /* 7zCon.sfx in Resources */ = {isa = PBXBuildFile; fileRef = A1E4C63827011E3C00A7B2A3 /* 7zCon.sfx */; };
@@ -162,6 +163,7 @@
 		A1C6AA9427015225007485C5 /* 7z */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7z; sourceTree = "<group>"; };
 		A1DD875E2495906300E4D0DE /* 7za */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7za; sourceTree = "<group>"; };
 		A1DD87662496EDBA00E4D0DE /* 7z.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = 7z.so; sourceTree = "<group>"; };
+		A1E190F22974F6AD002184C0 /* curl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = curl; sourceTree = "<group>"; };
 		A1E4C63627011E2800A7B2A3 /* 7zr */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7zr; sourceTree = "<group>"; };
 		A1E4C63827011E3C00A7B2A3 /* 7zCon.sfx */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = 7zCon.sfx; sourceTree = "<group>"; };
 		A82645D4153ADC3D00FA0306 /* WineskinBanner2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = WineskinBanner2.jpg; sourceTree = "<group>"; };
@@ -269,6 +271,7 @@
 				A14ED61326E1021B0022EC36 /* regsvr32 */,
 				A868FC2C12820230001EBA25 /* remakedefaults.reg */,
 				A12E8EAA2491CBE600401C0E /* unrar */,
+				A1E190F22974F6AD002184C0 /* curl */,
 				A10B62A2248FC277003FE411 /* wine */,
 				A11031EA249474BC00E16174 /* wine64 */,
 				A14ED60926E1020B0022EC36 /* wineapploader.in */,
@@ -463,6 +466,7 @@
 				A1C6AA9627015225007485C5 /* 7z in Resources */,
 				A1DD875F2495906300E4D0DE /* 7za in Resources */,
 				A1E4C63727011E2800A7B2A3 /* 7zr in Resources */,
+				A1E190F32974F6AD002184C0 /* curl in Resources */,
 				A12E8EAE2492662B00401C0E /* wine in Resources */,
 				A11031EC249474BD00E16174 /* wine64 in Resources */,
 				A14ED62126E1021B0022EC36 /* notepad in Resources */,
@@ -567,7 +571,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 2.9.1.6;
+				CURRENT_PROJECT_VERSION = 2.9.2.0;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -584,9 +588,8 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				INFOPLIST_FILE = "Wineskin-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				"MACOSX_DEPLOYMENT_TARGET[sdk=macosx10.6][arch=i386]" = 10.9;
-				MARKETING_VERSION = 2.9.1.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 2.9.2.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskin;
 				PRODUCT_NAME = Wineskin;
@@ -607,7 +610,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 2.9.1.6;
+				CURRENT_PROJECT_VERSION = 2.9.2.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -623,8 +626,8 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				INFOPLIST_FILE = "Wineskin-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MARKETING_VERSION = 2.9.1.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 2.9.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.wineskin;
 				PRODUCT_NAME = Wineskin;
 				PROVISIONING_PROFILE_SPECIFIER = "";

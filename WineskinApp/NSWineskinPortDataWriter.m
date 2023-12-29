@@ -55,6 +55,11 @@
         {
             [port setPlistObject:@TRUE       forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
         }
+        //TODO: Steam.exe needs to use Start.exe
+        if ([winPath contains:@"Steam.exe"])
+        {
+            [port setPlistObject:@TRUE       forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
+        }
     }
     else
     {

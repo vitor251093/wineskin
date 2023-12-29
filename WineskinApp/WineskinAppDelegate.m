@@ -50,7 +50,6 @@ NSFileManager *fm;
 -(NSString*)wswineBundlePath
 {
     return [NSString stringWithFormat:@"%@/Contents/SharedSupport/wine",self.wrapperPath];
-    //return [NSString stringWithFormat:@"%@/Contents/SharedSupport/wswine.bundle",self.wrapperPath];
 }
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -60,11 +59,6 @@ NSFileManager *fm;
     {
         [NSApp terminate:nil];
     }
-    
-    //if (IS_SYSTEM_MAC_OS_11_0_OR_SUPERIOR)
-    //{
-    //    [NSAlert showAlertOfType:NSAlertTypeWarning withMessage:@"No new executables found!\n\nMaybe the installer failed...?\n\nIf you tried to install somewhere other than C: drive (drive_c in the wrapper) then you will get this message too.  All software must be installed in C: drive."];
-    //}
     
 	[self setWinetricksCachedList:[NSArray array]];
 	[self setWinetricksInstalledList:[NSArray array]];
@@ -103,6 +97,14 @@ NSFileManager *fm;
     NSString* engineString = [NSPortDataLoader engineOfPortAtPath:self.wrapperPath];
     NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
     
+    
+    [confirmQuitCheckBoxButton setEnabled:state];
+    [advancedInstallSoftwareButton setEnabled:state];
+    [winetricksButton setEnabled:state];
+    [testRunButton setEnabled:state];
+    
+    
+    // ****Configure****
     [windowsExeTextField setEnabled:state];
     [exeBrowseButton setEnabled:state];
     [customCommandsTextField setEnabled:state];
@@ -115,20 +117,47 @@ NSFileManager *fm;
     [extMinusButton setEnabled:state];
     [iconImageView setEditable:state];
     [iconBrowseButton setEnabled:state];
-    [advancedInstallSoftwareButton setEnabled:state];
-    [testRunButton setEnabled:state];
-    [winetricksButton setEnabled:state];
+    
+    
+    // ****Tools****
+    //winecfg
+    //regedit
+    //taskmgr
+    //cmd
+    //controll
+    //BLANK
     [customExeButton setEnabled:state];
+    //last run log
+    [logsButtonPressed setEnabled:state];
+    [commandLineWineTestButton setEnabled:state];
+    //kill wineskin processes
     [refreshWrapperButton setEnabled:state];
     [rebuildWrapperButton setEnabled:state];
     [updateWrapperButton setEnabled:state];
     [changeEngineButton setEnabled:state];
+    //BLANK
+    
+    
+    // ****Options****
     [alwaysMakeLogFilesCheckBoxButton setEnabled:state];
     [setMaxFilesCheckBoxButton setEnabled:state];
     [mapUserFoldersCheckBoxButton setEnabled:state];
     [modifyMappingsButton setEnabled:state];
-    [confirmQuitCheckBoxButton setEnabled:state];
-    [WinetricksNoLogsButton setEnabled:state];
+    [fntoggleCheckBoxButton setEnabled:state];
+    
+    if (engine.isCompatibleWithCommandCtrl)
+    {
+        [commandCheckBoxButton setEnabled:state];
+    } else {
+        [commandCheckBoxButton setEnabled:NO];
+    }
+    
+    if (engine.isCompatibleWithOptionAlt)
+    {
+        [optionCheckBoxButton setEnabled:state];
+    } else {
+        [optionCheckBoxButton setEnabled:NO];
+    }
     
     // Option does not work above 10.8 so disable it
     if (IS_SYSTEM_MAC_OS_10_9_OR_SUPERIOR)
@@ -141,20 +170,13 @@ NSFileManager *fm;
         [disableCPUsCheckBoxButton setEnabled:state];
     }
     
+    
+    // ****Advanced****
+    [WinetricksNoLogsButton setEnabled:state];
     [winedbgDisabledButton setEnabled:state];
     [geckoCheckBoxButton setEnabled:state];
     [monoCheckBoxButton setEnabled:state];
-    [fntoggleCheckBoxButton setEnabled:state];
     
-    if (engine.isCompatibleWithCommandCtrl)
-    {
-        [commandCheckBoxButton setEnabled:state];
-    }
-    
-    if (engine.isCompatibleWithOptionAlt)
-    {
-        [optionCheckBoxButton setEnabled:state];
-    }
     
     // TODO: The code below seems to be causing a crash sometimes. Remove?
     if (state) {
@@ -477,12 +499,15 @@ NSFileManager *fm;
 }
 - (void)runATestRun
 {
-	[self runWineskinLauncherWithDisabledButtonsWithFlag:@"debug"];
+    //TODO: disableButtons causes testrun to crash for some reason
+    //[self disableButtons];
+    [self systemCommand:[NSPathUtilities wineskinLauncherBinForPortAtPath:self.wrapperPath] withArgs:@[@"debug"]];
+    //[self enableButtons];
     
     if ([NSAlert showBooleanAlertOfType:NSAlertTypeSuccess withMessage:@"Do you wish to view the Test Run Log?" withDefault:YES])
     {
         NSString* logsFolderPath = [NSString stringWithFormat:@"%@/Contents/SharedSupport/Logs",self.wrapperPath];
-        [self systemCommand:@"/usr/bin/open" withArgs:@[@"-e",[NSString stringWithFormat:@"%@/LastRunWine.log",logsFolderPath]]];
+        [self systemCommand:@"/usr/bin/open" withArgs:@[@"-a", @"Console",[NSString stringWithFormat:@"%@/LastRunWine.log",logsFolderPath]]];
 	}
 }
 
@@ -813,7 +838,7 @@ NSFileManager *fm;
 }
 - (void)runUninstaller
 {
-    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-uninstaller"];
+    [self runWineskinLauncherWithDisabledButtonsWithFlag:@"WSS-control"];
 }
 - (IBAction)regeditButtonPressed:(id)sender
 {
@@ -1884,7 +1909,7 @@ NSFileManager *fm;
 - (IBAction)logsButtonPressed:(id)sender
 {
     NSString* logsFolder = [NSString stringWithFormat:@"%@/Contents/SharedSupport/Logs",self.wrapperPath];
-	[self systemCommand:@"/usr/bin/open" withArgs:@[@"-e",[NSString stringWithFormat:@"%@/LastRunWine.log",logsFolder]]];
+    [self systemCommand:@"/usr/bin/open" withArgs:@[@"-a", @"Console",[NSString stringWithFormat:@"%@/LastRunWine.log",logsFolder]]];
 }
 - (IBAction)commandLineShellButtonPressed:(id)sender
 {
@@ -2205,7 +2230,6 @@ NSFileManager *fm;
 	     || tableColumn == winetricksTableColumnDownloaded)
 	    && [item valueForKey:WINETRICK_NAME] == nil)
 		return @"";
-
 	if (tableColumn == winetricksTableColumnRun)
 	{
 		NSNumber *thisEntry = [[self winetricksSelectedList] valueForKey:[item valueForKey:WINETRICK_NAME]];

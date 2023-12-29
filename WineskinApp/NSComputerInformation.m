@@ -62,8 +62,8 @@ static NSString* _macOsVersion;
 
 +(BOOL)isComputerMacDriverCompatible
 {
-    // If the version is 10.7.5 or superior, it will work
-    return [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.7.5"];
+    // If the version is 10.6.8 or superior, it will work
+    return [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.6.8"];
 }
 
 @end

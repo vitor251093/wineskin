@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -1232,7 +1232,7 @@ Gw
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1475">
                                             <rect key="frame" x="16" y="8" width="194" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="Uninstaller (uninstaller)" bezelStyle="regularSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1476">
+                                            <buttonCell key="cell" type="bevel" title="Control Panel (control)" bezelStyle="regularSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1476">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -2781,6 +2781,7 @@ For more information see
                 <outlet property="installerSettingsAutomaticRadioButton" destination="mVA-v5-mQG" id="FZ8-BO-Acq"/>
                 <outlet property="installerSettingsOverrideRadioButton" destination="6mg-EK-7fX" id="Ely-iM-kXr"/>
                 <outlet property="installerWindow" destination="1928" id="1979"/>
+                <outlet property="logsButtonPressed" destination="778" id="7gd-gY-g8r"/>
                 <outlet property="macDriverX11TabView" destination="qU5-eT-wgq" id="anz-xb-1cP"/>
                 <outlet property="mapUserFoldersCheckBoxButton" destination="1541" id="1544"/>
                 <outlet property="menubarNameTextField" destination="722" id="786"/>
