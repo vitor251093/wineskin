@@ -51,8 +51,6 @@ typedef enum {
 -(BOOL)isCompatibleWithUplay;
 -(BOOL)isCompatibleWithGOGGalaxy;
 
--(BOOL)requiresManualDownload;
-
 +(NSString*)localPathForEngine:(NSString*)engine;
 
 @end

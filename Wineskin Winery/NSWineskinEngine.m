@@ -41,6 +41,7 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
     
     return NSOrderedSame;
 }
+
 +(NSComparisonResult)orderOfFirstWineskinEngine:(NSWineskinEngine*)wineskinEngine1 andSecondWineskinEngine:(NSWineskinEngine*)wineskinEngine2
 {
     if (wineskinEngine1.engineVersion > wineskinEngine2.engineVersion) return NSOrderedAscending;
@@ -934,44 +935,6 @@ static NSString *const REGEX_VALID_WINE_VERSION =                    @"[0-9]+(\\
             {
                 return true;
             }
-            break;
-            
-        default:
-            break;
-    }
-    
-    return false;
-}
-
--(BOOL)requiresManualDownload
-{
-    if (self.vulkanEnabled) return true;
-    if (self.gnutlsEnabled) return true;
-    if (self.complement != nil && [self.complement isEqualToString:@"Fix"]) return true;
-    if (self.engineVersion == DEFAULT_WINESKIN_ENGINE_VERSION) return true;
-    
-    switch (self.engineType)
-    {
-        case NSWineskinEngineCrossOverGames:
-            return true;
-            
-        case NSWineskinEngineCrossOver:
-            return true;
-            
-        case NSWineskinEngineProton:
-            return true;
-            
-        case NSWineskinEngineWineStaging:
-            if (self.is64Bit) return false;
-            if (![self isWineVersionAtLeast:@"2.4-3"]) return true;
-            break;
-            
-        //            if ([self isWineVersionAtLeast:@"1.9.6"] && ![self isWineVersionAtLeast:@"1.9.10"]) return false;
-        //return true;
-
-        case NSWineskinEngineWine:
-            if (self.is64Bit) return false;
-            if (![self isWineVersionAtLeast:@"2.0"]) return true;
             break;
             
         default:
