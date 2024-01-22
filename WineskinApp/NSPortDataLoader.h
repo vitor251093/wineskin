@@ -9,20 +9,21 @@
 #import <Foundation/Foundation.h>
 
 #import "NSPortManager.h"
+#import "NSWineskinEngine.h"
 
 @interface NSPortDataLoader : NSObject
 
 +(NSString*)wineskinEngineOfPortAtPath:(NSString*)path;
 +(NSString*)engineOfPortAtPath:(NSString*)path;
 
-+(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine;
++(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
 +(BOOL)winedbgIsDisabledAtPort:(NSString*)path;
 +(BOOL)decorateWindowIsEnabledAtPort:(NSString*)path;
 +(BOOL)direct3DBoostIsEnabledAtPort:(NSString*)path;
-+(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine;
-
-+(void)getValuesFromResolutionString:(NSString*)originalResolutionString
-                             inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues;
++(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
++(BOOL)CommandModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
++(BOOL)OptionModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine;
++(BOOL)FontSmoothingIsEnabledAtPort:(NSString*)path;
 
 +(NSImage*)getIconImageAtPort:(NSString*)path;
 

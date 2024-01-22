@@ -14,10 +14,6 @@
 
 //Saving registry changes instructions
 +(BOOL)removeFromRegistryAppsThatRunAutomaticallyOnWrapperStartupAtPort:(NSPortManager*)port;
-
-//Misc instructions
-+(void)setAutomaticScreenOptions:(BOOL)automatic fullscreen:(BOOL)fullscreen virtualDesktop:(BOOL)virtualDesktop resolution:(NSString*)resolution colors:(int)colors sleep:(int)sleep atPort:(NSPortManager*)port;
-
 //Saving Data instructions
 +(BOOL)saveCloseSafely:(NSNumber*)closeSafely atPort:(NSPortManager*)port;
 +(BOOL)saveCopyrightsAtPort:(NSPortManager*)port;
@@ -26,6 +22,9 @@
 +(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engine atPort:(NSPortManager*)port;
 +(BOOL)saveDecorateWindow:(BOOL)decorate atPort:(NSPortManager*)port;
 +(BOOL)saveRetinaMode:(BOOL)retinaModeOn withEngine:(NSString*)engine atPort:(NSPortManager*)port;
++(BOOL)saveCommandMode:(BOOL)commandModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port;
++(BOOL)saveOptionMode:(BOOL)optionModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port;
++(BOOL)saveFontSmoothingMode:(BOOL)fontsmoothingModeOn atPort:(NSPortManager*)port;
 
 +(BOOL)setMainExeName:(NSString*)name version:(NSString*)version icon:(NSImage*)icon path:(NSString*)path atPort:(NSPortManager*)port;
 +(BOOL)addCustomExeWithName:(NSString*)name version:(NSString*)version icon:(NSImage*)icon path:(NSString*)path atPortAtPath:(NSString*)portPath;

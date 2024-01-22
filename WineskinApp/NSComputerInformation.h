@@ -9,6 +9,7 @@
 #ifndef NSComputerInformation_Class
 #define NSComputerInformation_Class
 
+#define IS_SYSTEM_MAC_OS_10_6_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.6"]   // Snow Leopard
 #define IS_SYSTEM_MAC_OS_10_7_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.7"]   // Lion
 #define IS_SYSTEM_MAC_OS_10_8_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"]   // Mountain Lion
 #define IS_SYSTEM_MAC_OS_10_9_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.9"]   // Mavericks
@@ -17,6 +18,12 @@
 #define IS_SYSTEM_MAC_OS_10_12_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.12"]  // Sierra
 #define IS_SYSTEM_MAC_OS_10_13_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.13"]  // High Sierra
 #define IS_SYSTEM_MAC_OS_10_14_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.14"]  // Mojave
+#define IS_SYSTEM_MAC_OS_10_15_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.15"]  // Catalina
+#define IS_SYSTEM_MAC_OS_10_15_4_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.15.4"]  // Catalina ldtset
+#define IS_SYSTEM_MAC_OS_11_0_OR_SUPERIOR  [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"11.00"]  // Big Sur
+#define IS_SYSTEM_MAC_OS_12_0_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"12.0"]   // Monterey
+#define IS_SYSTEM_MAC_OS_13_0_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"13.0"]   // Ventura
+#define IS_SYSTEM_MAC_OS_14_0_OR_SUPERIOR   [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"14.0"]   // Sonoma
 
 #import <Foundation/Foundation.h>
 

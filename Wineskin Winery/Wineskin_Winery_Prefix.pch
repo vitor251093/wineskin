@@ -6,3 +6,20 @@
     #import <Cocoa/Cocoa.h>
     #import <ObjectiveC_Extension/ObjectiveC_Extension.h>
 #endif
+
+#define BINARY_7ZA      [NSString stringWithFormat:@"%@/Contents/Resources/7za",[[NSBundle mainBundle] bundlePath]]
+
+// These are Wineskin website URLs, which are used to download the Master Wrapper and the Engines
+#define WINESKIN_DOMAIN                     @"github.com/Gcenx/WineskinServer"
+#define WINESKIN_WEBSITE                    [NSString stringWithFormat:@"https://%@/raw/master/",WINESKIN_DOMAIN]
+#define WINESKIN_WEBSITE_WRAPPER_FOLDER     [NSString stringWithFormat:@"%@Wrapper/",WINESKIN_WEBSITE]
+#define WINESKIN_WEBSITE_WINERY_FOLDER      [NSString stringWithFormat:@"%@Winery/",WINESKIN_WEBSITE]
+#define WINESKIN_WEBSITE_ENGINES_FOLDER     [NSString stringWithFormat:@"%@Engines/",WINESKIN_WEBSITE]
+#define WINESKIN_WEBSITE_ENGINE_BASE_FOLDER [NSString stringWithFormat:@"%@EngineBase/",WINESKIN_WEBSITE]
+
+// There are the directories Winery uses
+#define WINESKIN_FOLDER                     [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin",NSHomeDirectory()]
+#define WINESKIN_ENGINES                     [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Engines",NSHomeDirectory()]
+#define WINESKIN_WRAPPER                    [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Wrapper",NSHomeDirectory()]
+#define WINESKIN_RUNTIME                    [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Runtime",NSHomeDirectory()]
+#define WINESKIN_SANDBOX                    [NSString stringWithFormat:@"%@/Library/Application Support/Wineskin/Sandbox",NSHomeDirectory()]

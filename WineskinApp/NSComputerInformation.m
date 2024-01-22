@@ -9,7 +9,7 @@
 #import "NSComputerInformation.h"
 
 #import "NSUtilities.h"
-
+#import "VMMVersion.h"
 #import "NSTask+Extension.h"
 #import "NSArray+Extension.h"
 #import "NSString+Extension.h"
@@ -51,7 +51,7 @@ static NSString* _macOsVersion;
 }
 +(BOOL)isSystemMacOsEqualOrSuperiorTo:(NSString*)version
 {
-    return [NSUtilities compareVersionString:version withVersionString:self.macOsVersion] != NSOrderedAscending;
+    return [VMMVersion compareVersionString:version withVersionString:self.macOsVersion] != VMMVersionCompareFirstIsNewest;
 }
 
 +(BOOL)isUsingFnKeysFunctions
@@ -63,8 +63,8 @@ static NSString* _macOsVersion;
 
 +(BOOL)isComputerMacDriverCompatible
 {
-    // If the version is 10.7.5 or superior, it will work
-    return [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.7.5"];
+    // If the version is 10.6.8 or superior, it will work
+    return [NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.6.8"];
 }
 
 @end

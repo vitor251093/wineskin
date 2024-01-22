@@ -49,8 +49,20 @@
     if ([[[winPath getFragmentAfter:nil andBefore:@":"] lowercaseString] isEqualToString:@"c"])
     {
         [port setPlistObject:[winPath componentsSeparatedByString:@":"][1]   forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH];
+        //TODO: some 32bit exe files need to use this when launched via wine64
         [port setPlistObject:@(![winPath.lowercaseString hasSuffix:@".exe"]) forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
         [port setPlistObject:flags                                           forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS];
+        
+        //TODO: Origin.exe needs to use Start.exe
+        if ([winPath contains:@"Origin.exe"])
+        {
+            [port setPlistObject:@TRUE       forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
+        }
+        //TODO: Steam.exe needs to use Start.exe
+        if ([winPath contains:@"Steam.exe"])
+        {
+            [port setPlistObject:@TRUE       forKey:WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_IS_NOT_EXE];
+        }
     }
     else
     {
@@ -64,25 +76,6 @@
         [dictPath writeToFile:way atomically:YES encoding:NSStringEncodingConversionAllowLossy];
     }
 }
-+(void)setAutomaticScreenOptions:(BOOL)automatic fullscreen:(BOOL)fullscreen virtualDesktop:(BOOL)virtualDesktop resolution:(NSString*)resolution colors:(int)colors sleep:(int)sleep atPort:(NSPortManager*)port
-{
-    [port setPlistObject:@(automatic)  forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_ARE_AUTOMATIC];
-    [port setPlistObject:@(fullscreen) forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_IS_FULLSCREEN];
-    
-    if (!automatic && virtualDesktop)
-    {
-        [port setPlistObject:[NSString stringWithFormat:@"%@x%dsleep%d", resolution,colors,sleep]
-                      forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_CONFIGURATIONS];
-    }
-    else
-    {
-        [port setPlistObject:[NSString stringWithFormat:@"novdx%dsleep%d",colors,sleep]
-                      forKey:WINESKIN_WRAPPER_PLIST_KEY_SCREEN_OPTIONS_CONFIGURATIONS];
-    }
-    
-    [port synchronizePlist];
-}
-
 //Saving Data instructions
 +(BOOL)saveCloseSafely:(NSNumber*)closeSafely atPort:(NSPortManager*)port
 {
@@ -103,7 +96,7 @@
 }
 +(BOOL)saveCopyrightsAtPort:(NSPortManager*)port
 {
-    NSString *companyFile = [NSString stringWithFormat:@"%@/Contents/Resources/English.lproj/InfoPlist.strings",port.path];
+    NSString *companyFile = [NSString stringWithFormat:@"%@/Contents/Resources/en.lproj/InfoPlist.strings",port.path];
     
     long year = (long)[[[NSCalendar currentCalendar] components:NSYearCalendarUnit fromDate:NSDate.date] year];
     NSString* copyright = [NSString stringWithFormat:@"Copyright © 2014-%ld PortingKit.com. All rights reserved.", year];
@@ -130,9 +123,11 @@
     NSString* graphicsValue = (macdriver ? @"\"mac,x11\"" : @"\"x11,mac\"");
     return [port setValues:@{@"Graphics":graphicsValue} forEntry:driversRegistry atRegistryFileNamed:USER_REG];
 }
-+(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engine atPort:(NSPortManager*)port
++(BOOL)saveDirect3DBoost:(BOOL)direct3DBoost withEngine:(NSString*)engineString atPort:(NSPortManager*)port
 {
-    if (![NSWineskinEngine isCsmtCompatibleWithEngine:engine])
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    
+    if (!engine.isCompatibleWithCsmt)
     {
         return FALSE;
     }
@@ -141,7 +136,7 @@
     NSString* value;
     NSString* direct3DRegistry = @"[Software\\\\Wine\\\\Direct3D]";
     
-    if ([NSWineskinEngine csmtUsesNewRegistryWithEngine:engine])
+    if (engine.csmtUsesNewRegistry)
     {
         key = @"csmt";
         value = (direct3DBoost ? @"dword:00000001" : @"dword:00000000");
@@ -162,9 +157,10 @@
     return [port setValues:@{@"Managed"  :decorateValue,
                              @"Decorated":decorateValue} forEntry:x11DriverRegistry atRegistryFileNamed:USER_REG];
 }
-+(BOOL)saveRetinaMode:(BOOL)retinaModeOn withEngine:(NSString*)engine atPort:(NSPortManager*)port
++(BOOL)saveRetinaMode:(BOOL)retinaModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port
 {
-    BOOL enableRetinaModeOn = retinaModeOn && [NSWineskinEngine isHighQualityModeCompatibleWithEngine:engine];
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    BOOL enableRetinaModeOn = retinaModeOn && engine.isCompatibleWithHighQualityMode;
     
     BOOL result = true;
     result = [port setValues:@{@"LogPixels": (enableRetinaModeOn ? @"dword:000000c0" : @"dword:00000060")}
@@ -175,7 +171,54 @@
                     forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
     return result;
 }
-
++(BOOL)saveCommandMode:(BOOL)commandModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port
+    {
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    BOOL enableCommandModeOn = commandModeOn && engine.isCompatibleWithCommandCtrl;
+        
+    BOOL result = true;
+    result = [port setValues:@{@"RightCommandIsCtrl": (enableCommandModeOn ? @"\"Y\"" : @"\"N\"")}
+                        forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    if (!result) return false;
+        
+    result = [port setValues:@{@"LeftCommandIsCtrl": (enableCommandModeOn ? @"\"Y\"" : @"\"N\"")}
+                    forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    return result;
+}
++(BOOL)saveOptionMode:(BOOL)optionModeOn withEngine:(NSString*)engineString atPort:(NSPortManager*)port
+{
+    NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
+    BOOL enableOptionModeOn = optionModeOn && engine.isCompatibleWithOptionAlt;
+    
+    BOOL result = true;
+    result = [port setValues:@{@"RightOptionIsAlt": (enableOptionModeOn ? @"\"Y\"" : @"\"N\"")}
+                    forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    if (!result) return false;
+    
+    result = [port setValues:@{@"LeftOptionIsAlt": (enableOptionModeOn ? @"\"Y\"" : @"\"N\"")}
+                    forEntry:@"[Software\\\\Wine\\\\Mac Driver]" atRegistryFileNamed:USER_REG];
+    return result;
+}
++(BOOL)saveFontSmoothingMode:(BOOL)fontsmoothingModeOn atPort:(NSPortManager*)port
+{
+    BOOL enableFontsmoothingModeOn = fontsmoothingModeOn;
+    
+    BOOL result = true;
+    result = [port setValues:@{@"FontSmoothing": (enableFontsmoothingModeOn ? @"\"2\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    if (!result) return false;
+    
+    result = [port setValues:@{@"FontSmoothingGamma": (enableFontsmoothingModeOn ? @"\"dword:00000578\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    
+    result = [port setValues:@{@"FontSmoothingOrientation": (enableFontsmoothingModeOn ? @"\"dword:00000001\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    
+    result = [port setValues:@{@"FontSmoothingType": (enableFontsmoothingModeOn ? @"\"dword:00000002\"" : @"\"0\"")}
+                    forEntry:@"[Control Panel\\\\Desktop]" atRegistryFileNamed:USER_REG];
+    
+    return result;
+}
 +(BOOL)setMainExeName:(NSString*)name version:(NSString*)version icon:(NSImage*)icon path:(NSString*)path atPort:(NSPortManager*)port
 {
     [port setPlistObject:version forKey:WINESKIN_WRAPPER_PLIST_KEY_VERSION];
@@ -187,11 +230,12 @@
     
     [self setMainExePath:path atPort:port];
     
-    if (name)
-    {
-        [port setPlistObject:name forKey:WINESKIN_WRAPPER_PLIST_KEY_NAME];
-        [port setPlistObject:[NSString stringWithFormat:@"%@.Wineskin.prefs",name] forKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER];
-    }
+    //TODO: FIX BundleID Generation here
+    //if (name)
+    //{
+        //[port setPlistObject:name forKey:WINESKIN_WRAPPER_PLIST_KEY_NAME];
+        //[port setPlistObject:[NSString stringWithFormat:@"com.%@.Wineskin",name] forKey:WINESKIN_WRAPPER_PLIST_KEY_IDENTIFIER];
+    //}
     
     [port synchronizePlist];
     

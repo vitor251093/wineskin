@@ -23,16 +23,16 @@
 	IBOutlet NSTextField *engineAvailableLabel;
 	IBOutlet NSTextField *updateAvailableLabel;
     IBOutlet NSButton *hideXQuartzEnginesCheckBox;
+    IBOutlet NSButton *compressEngineCheckBox;
 	IBOutlet NSButton *updateButton;
 	IBOutlet NSButton *createWrapperButton;
-	NSMutableArray<NSWineskinEngine*>* installedEnginesList;
-    NSMutableArray* installedMacDriverEnginesList;
 	
 	//downloading window
 	IBOutlet NSWindow *downloadingWindow;
 	IBOutlet NSTextField *urlInput;
 	IBOutlet NSTextField *urlOutput;
 	IBOutlet NSTextField *fileName;
+    IBOutlet NSTextField *fileOutputName;
 	IBOutlet NSTextField *fileNameDestination;
 	IBOutlet NSProgressIndicator *progressBar;
 	IBOutlet NSButton *cancelButton;
@@ -71,9 +71,10 @@
 	
 }
 @property (unsafe_unretained) IBOutlet NSWindow *window;
+@property (nonatomic) NSMutableArray<NSWineskinEngine*>* installedEnginesList;
+@property (nonatomic) NSMutableArray<NSWineskinEngine*>* installedMacDriverEnginesList;
 
 //main stuff
-- (void)runConverter;
 - (IBAction)aboutWindow:(id)sender;
 - (IBAction)helpWindow:(id)sender;
 - (void)makeFoldersAndFiles;

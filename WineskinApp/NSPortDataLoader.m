@@ -7,9 +7,6 @@
 //
 
 #import "NSPortDataLoader.h"
-
-#import "NSWineskinEngine.h"
-
 #import "NSUtilities.h"
 #import "NSPathUtilities.h"
 
@@ -22,9 +19,10 @@
 
 @implementation NSPortDataLoader
 
-+(NSString*)getPrimaryWineskinWrapperEngineAtPath:(NSString*)path
++(NSString*)wineskinEngineOfPortAtPath:(NSString*)path
 {
-    NSString* wswineVersion = [NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/version",path];
+    NSString* wswineVersion = [NSString stringWithFormat:@"%@/Contents/SharedSupport/wine/version",path];
+    //NSString* wswineVersion = [NSString stringWithFormat:@"%@/Contents/SharedSupport/wswine.bundle/version",path];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:wswineVersion])
     {
@@ -33,60 +31,14 @@
     
     return nil;
 }
-+(NSString*)getWineskinWrapperEngineFromInfFileAtPath:(NSString*)wineInfPath
-{
-    if ([[NSFileManager defaultManager] regularFileExistsAtPath:wineInfPath])
-    {
-        NSArray* frags = [[NSString stringWithContentsOfFile:wineInfPath encoding:NSASCIIStringEncoding] componentsSeparatedByString:@"\n"];
-        if (frags.count > 1)
-        {
-            NSString* newWrapperEngine = frags[1];
-            if ([newWrapperEngine contains:@"Wine"])
-            {
-                return [NSWineskinEngine mostRecentVersionOfEngine:newWrapperEngine];
-            }
-        }
-    }
-    
-    return nil;
-}
-+(NSString*)wineskinEngineOfPortAtPath:(NSString*)path
-{
-    NSString* primaryEngine = [self getPrimaryWineskinWrapperEngineAtPath:path];
-    BOOL primaryEngineExists = !!primaryEngine;
-    BOOL primaryEngineIsDesirable = [primaryEngine matchesWithRegex:REGEX_WINESKIN_ENGINE];
-    
-    if (primaryEngineExists && primaryEngineIsDesirable)
-    {
-        return primaryEngine;
-    }
-    
-    NSString* wineInfPath = [NSString stringWithFormat:@"%@/Contents/Frameworks/wswine.bundle/share/wine/wine.inf",path];
-    NSString* secondaryEngine = [self getWineskinWrapperEngineFromInfFileAtPath:wineInfPath];
-    BOOL secondaryEngineExists = !!secondaryEngine;
-    BOOL secondaryEngineIsDesirable = [secondaryEngine matchesWithRegex:REGEX_WINESKIN_ENGINE];
-    
-    if (secondaryEngineExists && secondaryEngineIsDesirable)
-    {
-        return secondaryEngine;
-    }
-    
-    if ([primaryEngine isEqualToString:secondaryEngine])
-    {
-        return primaryEngine;
-    }
-    
-    if ([primaryEngine hasPrefix:@"WS"]) return primaryEngine;
-    return secondaryEngine;
-}
 +(NSString*)engineOfPortAtPath:(NSString*)path
 {
     return [self wineskinEngineOfPortAtPath:path];
 }
 
-+(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine
++(BOOL)macDriverIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
 {
-    if ([NSWineskinEngine isMacDriverCompatibleWithEngine:engine])
+    if (engine.isCompatibleWithMacDriver)
     {
         NSPortManager* port = [NSPortManager managerWithPath:path];
         NSString* driversVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Drivers]" fromRegistryFileNamed:USER_REG];
@@ -134,14 +86,15 @@
     NSString* direct3DVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Direct3D]" fromRegistryFileNamed:USER_REG];
     if (direct3DVariable)
     {
-        NSString* engine = [NSPortDataLoader engineOfPortAtPath:path];
+        NSString* engineString = [NSPortDataLoader engineOfPortAtPath:path];
+        NSWineskinEngine* engine = [NSWineskinEngine wineskinEngineWithString:engineString];
         
-        if (![NSWineskinEngine isCsmtCompatibleWithEngine:engine])
+        if (!engine.isCompatibleWithCsmt)
         {
             return false;
         }
         
-        if ([NSWineskinEngine csmtUsesNewRegistryWithEngine:engine])
+        if (engine.csmtUsesNewRegistry)
         {
             direct3DVariable = [NSPortManager getValueForKey:@"csmt" fromRegistryString:direct3DVariable];
             if (direct3DVariable) return [direct3DVariable isEqualToString:@"dword:00000001"];
@@ -155,9 +108,9 @@
     
     return false;
 }
-+(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSString*)engine
++(BOOL)retinaModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
 {
-    if ([NSWineskinEngine isHighQualityModeCompatibleWithEngine:engine])
+    if (engine.isCompatibleWithHighQualityMode)
     {
         NSPortManager* port = [NSPortManager managerWithPath:path];
         NSString* macDriverVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Mac Driver]" fromRegistryFileNamed:USER_REG];
@@ -170,61 +123,48 @@
     
     return FALSE;
 }
-
-+(void)getValuesFromResolutionString:(NSString*)originalResolutionString
-                             inBlock:(void (^)(BOOL virtualDesktop, NSString* resolution, int colors, int sleep))resolutionValues
++(BOOL)CommandModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
 {
-    if (originalResolutionString.length < 12)
+    if (engine.isCompatibleWithCommandCtrl)
     {
-        resolutionValues(NO, nil, 24, 0);
-        return;
+        NSPortManager* port = [NSPortManager managerWithPath:path];
+        NSString* commandVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Mac Driver]" fromRegistryFileNamed:USER_REG];
+    if (commandVariable)
+    {
+        commandVariable = [NSPortManager getStringValueForKey:@"LeftCommandIsCtrl" fromRegistryString:commandVariable];
+        return commandVariable && [commandVariable isEqualToString:@"Y"];
+        }
     }
     
-    NSString* resolutionString = originalResolutionString;
-    
-    NSRange sleepRange = [resolutionString rangeOfString:@"sleep"];
-    if (sleepRange.location == NSNotFound)
-    {
-        resolutionValues(NO, nil, 24, 0);
-        return;
-    }
-    
-    NSUInteger sleepLocation = sleepRange.location + sleepRange.length;
-    NSUInteger sleepLength = resolutionString.length - sleepLocation;
-    int sleep = [[resolutionString substringWithRange:NSMakeRange(sleepLocation, sleepLength)] intValue];
-    
-    NSRange xInEndOfResolution = [resolutionString rangeOfString:@"x" options:NSBackwardsSearch];
-    if (xInEndOfResolution.location == NSNotFound)
-    {
-        resolutionValues(NO, nil, 24, sleep);
-        return;
-    }
-    
-    NSUInteger colorsLocation = xInEndOfResolution.location + xInEndOfResolution.length;
-    NSUInteger colorsLength = sleepRange.location - colorsLocation;
-    if (colorsLocation + colorsLength > resolutionString.length)
-    {
-        resolutionValues(NO, nil, 24, sleep);
-        return;
-    }
-    
-    int colors = [[resolutionString substringWithRange:NSMakeRange(colorsLocation, colorsLength)] intValue];
-    
-    
-    BOOL virtualDesktop = false;
-    NSString* resolution = nil;
-    
-    if ([resolutionString hasPrefix:WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_NO_VIRTUAL_DESKTOP] == false)
-    {
-        virtualDesktop = true;
-        
-        NSUInteger resolutionLength = xInEndOfResolution.location;
-        resolution = [resolutionString substringWithRange:NSMakeRange(0, resolutionLength)];
-    }
-    
-    resolutionValues(virtualDesktop, resolution, colors, sleep);
+    return FALSE;
 }
-
++(BOOL)OptionModeIsEnabledAtPort:(NSString*)path withEngine:(NSWineskinEngine*)engine
+{
+    if (engine.isCompatibleWithOptionAlt)
+    {
+        NSPortManager* port = [NSPortManager managerWithPath:path];
+        NSString* optionVariable = [port getRegistryEntry:@"[Software\\\\Wine\\\\Mac Driver]" fromRegistryFileNamed:USER_REG];
+        if (optionVariable)
+        {
+            optionVariable = [NSPortManager getStringValueForKey:@"RightOptionIsAlt" fromRegistryString:optionVariable];
+            return optionVariable && [optionVariable isEqualToString:@"Y"];
+        }
+    }
+    
+    return FALSE;
+}
++(BOOL)FontSmoothingIsEnabledAtPort:(NSString*)path
+{
+    NSPortManager* port = [NSPortManager managerWithPath:path];
+    NSString* optionVariable = [port getRegistryEntry:@"[Control Panel\\\\Desktop]" fromRegistryFileNamed:USER_REG];
+    if (optionVariable)
+    {
+        optionVariable = [NSPortManager getStringValueForKey:@"FontSmoothing" fromRegistryString:optionVariable];
+        return optionVariable && [optionVariable isEqualToString:@"2"];
+    }
+    
+    return FALSE;
+}
 +(BOOL)isImage:(NSImage*)icns2 equalsToImage:(NSImage*)icns
 {
     NSData *data1 = [[icns imageByFramingImageResizing:YES] TIFFRepresentation];
@@ -259,29 +199,25 @@
     return img;
 }
 
-+(NSString*)pathForBatFileAtCDrivePath:(NSString*)batPath atPort:(NSString*)portPath
-{
-    NSString* bat = [[NSString stringWithFormat:@"C:/%@",batPath] stringByReplacingOccurrencesOfString:@"//" withString:@"/"];
-    NSString* way = [NSPathUtilities getMacPathForWindowsPath:bat ofWrapper:portPath];
-    NSString* batContents = [NSString stringWithContentsOfFile:way encoding:NSASCIIStringEncoding];
-    return [batContents stringByReplacingOccurrencesOfString:@"\n" withString:@" & "];
-}
 +(NSString*)pathForMainExeAtPort:(NSString*)port
 {
-    NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
     NSString* path = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH;
+    NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
     
-    NSString* customFile = [NSUtilities getPlistItem:path fromWrapper:port];
-    NSString* flags = [NSUtilities getPlistItem:flag fromWrapper:port];
-    if (!flags) flags = @"";
+    NSString* progPath = [NSUtilities getPlistItem:path fromWrapper:port];
     
-    if ([customFile hasSuffix:@".bat"])
     {
-        return [self pathForBatFileAtCDrivePath:customFile atPort:port];
+        NSString* fullPath = [NSString stringWithFormat:@"C:/%@",progPath];
+        fullPath = [[fullPath stringByReplacingOccurrencesOfString:@"//" withString:@"/"]
+                    stringByReplacingOccurrencesOfString:@"/"  withString:@"\\"];
+        
+        NSString* flags = [NSUtilities getPlistItem:flag fromWrapper:port];
+        if (!flags) flags = @"";
+        
+        progPath = [NSString stringWithFormat:@"\"%@\" %@",fullPath,flags];
     }
     
-    return [[[NSString stringWithFormat:@"\"C:/%@\" %@",customFile,flags] stringByReplacingOccurrencesOfString:@"//" withString:@"/"]
-                                                                          stringByReplacingOccurrencesOfString:@"/"  withString:@"\\"];
+    return progPath;
 }
 +(NSString*)pathForCustomEXEFileAtPath:(NSString*)wrap withPlist:(NSString*)plist atPort:(NSString*)port
 {
@@ -289,11 +225,7 @@
     NSString* flag = WINESKIN_WRAPPER_PLIST_KEY_RUN_PATH_FLAGS;
     
     NSString* progPath = [NSUtilities getPlistItem:path fromPlist:plist fromWrapper:wrap];
-    if ([progPath hasSuffix:@".bat"])
-    {
-        progPath = [self pathForBatFileAtCDrivePath:progPath atPort:port];
-    }
-    else
+
     {
         NSString* fullPath = [NSString stringWithFormat:@"C:/%@",progPath];
         fullPath = [fullPath stringByReplacingOccurrencesOfString:@"//" withString:@"/"];

@@ -28,33 +28,12 @@
 	IBOutlet NSWindow *aboutWindow;
 	IBOutlet NSWindow *installerWindow;
 	IBOutlet NSTextField *aboutWindowVersionNumber;
-	
-	//Screen Options window
-	IBOutlet NSWindow *screenOptionsWindow;
-    IBOutlet NSButton *useD3DBoostIfAvailableCheckBoxButton;
-    IBOutlet NSButton *autoDetectGPUInfoCheckBoxButton;
-    IBOutlet NSSlider *gammaSlider;
-    IBOutlet NSButton *useMacDriverRadioButton;
-    IBOutlet NSButton *useX11RadioButton;
-    IBOutlet NSTabView *macDriverX11TabView;
-    IBOutlet NSPopUpButton *colorDepth;
-    IBOutlet NSButton *defaultSettingsOverrideRadioButton;
-    IBOutlet NSButton *defaultSettingsAutomaticRadioButton;
-    IBOutlet NSButton *installerSettingsOverrideRadioButton;
-    IBOutlet NSButton *installerSettingsAutomaticRadioButton;
-    IBOutlet NSButton *windowModeNormalWindowsRadioButton;
-    IBOutlet NSButton *windowModeVirtualDesktopRadioButton;
-	IBOutlet NSButton *virtualDesktopFullscreenRadioButton;
-    IBOutlet NSButton *virtualDesktopWindowedRadioButton;
-	IBOutlet NSPopUpButton *virtualDesktopResolution;
-	IBOutlet NSButton *windowManagerCheckBoxButton;
-    IBOutlet NSButton* retinaModeCheckBoxButton;
     
 	//advanced menu
 	IBOutlet NSWindow *advancedWindow;
+    IBOutlet NSButton *winetricksButton;
 	IBOutlet NSButton *testRunButton;
 	IBOutlet NSButton *advancedInstallSoftwareButton;
-    IBOutlet NSButton *advancedSetScreenOptionsButton;
 	IBOutlet NSProgressIndicator *toolRunningPI;
 	IBOutlet NSTextField *toolRunningPIText;
 	IBOutlet NSTabView *tab;
@@ -79,15 +58,17 @@
 	IBOutlet NSButton *winecfgButton;
 	IBOutlet NSButton *regeditButton;
 	IBOutlet NSButton *taskmgrButton;
-	IBOutlet NSButton *uninstallerButton;
-	IBOutlet NSButton *rebuildWrapperButton;
-	IBOutlet NSButton *refreshWrapperButton;
-	IBOutlet NSButton *winetricksButton;
-	IBOutlet NSButton *customExeButton;
-	IBOutlet NSButton *changeEngineButton;
-	IBOutlet NSTextField *currentVersionTextField;
-	IBOutlet NSButton *updateWrapperButton;
+    //cmd
+    IBOutlet NSButton *uninstallerButton;
+    IBOutlet NSButton *customExeButton;
+    IBOutlet NSButton *logsButtonPressed;
     IBOutlet NSButton *commandLineWineTestButton;
+    //kill wineskin processes
+    IBOutlet NSButton *refreshWrapperButton;
+	IBOutlet NSButton *rebuildWrapperButton;
+    IBOutlet NSButton *updateWrapperButton;
+    IBOutlet NSButton *changeEngineButton;
+	IBOutlet NSTextField *currentVersionTextField;
 	
 	//advanced menu - Options Tab
 	IBOutlet NSButton *alwaysMakeLogFilesCheckBoxButton;
@@ -95,13 +76,16 @@
 	IBOutlet NSButton *mapUserFoldersCheckBoxButton;
 	IBOutlet NSButton *modifyMappingsButton;
 	IBOutlet NSButton *confirmQuitCheckBoxButton;
+    IBOutlet NSButton *fntoggleCheckBoxButton;
+    IBOutlet NSButton *commandCheckBoxButton;
+    IBOutlet NSButton *optionCheckBoxButton;
     
     //advanced menu - Advanced Tab
     IBOutlet NSButton *WinetricksNoLogsButton;
     IBOutlet NSButton *disableCPUsCheckBoxButton;
     IBOutlet NSButton *winedbgDisabledButton;
-    IBOutlet NSButton *monogeckoCheckBoxButton;
-    IBOutlet NSButton *fntoggleCheckBoxButton;
+    IBOutlet NSButton *geckoCheckBoxButton;
+    IBOutlet NSButtonCell *monoCheckBoxButton;
 
 	//change engine window
 	IBOutlet NSWindow *changeEngineWindow;
@@ -120,14 +104,6 @@
 	IBOutlet NSButton *cEXEBrowseButton;
 	IBOutlet NSButton *cEXEIconBrowseButton;
 	IBOutlet NSMatrix *cEXEautoOrOvverrideDesktopToggle;
-	IBOutlet NSButtonCell *cEXEautoOrOvverrideDesktopToggleAutomaticButton;
-	IBOutlet NSMatrix *cEXEFullscreenRootlessToggle;
-	IBOutlet NSButtonCell *cEXEFullscreenRootlessToggleRootlessButton;
-	IBOutlet NSTabView *cEXEFullscreenRootlesToggleTabView;
-	IBOutlet NSMatrix *cEXENormalWindowsVirtualDesktopToggle;
-	IBOutlet NSButtonCell *cEXENormalWindowsVirtualDesktopToggleNormalWindowsButton;
-	IBOutlet NSPopUpButton *cEXEVirtualDesktopResolution;
-	IBOutlet NSPopUpButton *cEXEFullscreenResolution;
 	IBOutlet NSPopUpButton *cEXEColorDepth;
 	IBOutlet NSPopUpButton *cEXESwitchPause;
 	IBOutlet NSSlider *cEXEGammaSlider;
@@ -179,6 +155,7 @@
 	IBOutlet NSTextField *modifyMappingsMyMusicTextField;
 	IBOutlet NSTextField *modifyMappingsMyPicturesTextField;
     IBOutlet NSTextField *modifyMappingsDownloadsTextField;
+    IBOutlet NSTextField *modifyMappingsTemplatesTextField;
 }
 
 @property (unsafe_unretained) IBOutlet NSWindow *window;
@@ -200,29 +177,12 @@
 - (IBAction)wineskinWebsiteButtonPressed:(id)sender;
 - (IBAction)installWindowsSoftwareButtonPressed:(id)sender;
 - (IBAction)chooseExeOKButtonPressed:(id)sender;
-- (IBAction)setScreenOptionsPressed:(id)sender;
 - (IBAction)advancedButtonPressed:(id)sender;
 //Installer window methods
 - (IBAction)chooseSetupExecutableButtonPressed:(id)sender;
 - (IBAction)copyAFolderInsideButtonPressed:(id)sender;
 - (IBAction)moveAFolderInsideButtonPressed:(id)sender;
 - (IBAction)installerCancelButtonPressed:(id)sender;
-
-//Screen Options window methods
-- (void)saveScreenOptionsData;
-- (void)loadScreenOptionsData;
-- (IBAction)automaticClicked:(id)sender;
-- (IBAction)overrideClicked:(id)sender;
-- (IBAction)installerAutomaticClicked:(id)sender;
-- (IBAction)installerOverrideClicked:(id)sender;
-- (IBAction)normalWindowsClicked:(id)sender;
-- (IBAction)virtualDesktopClicked:(id)sender;
-- (IBAction)fullscreenClicked:(id)sender;
-- (IBAction)windowedClicked:(id)sender;
-- (IBAction)gammaChanged:(id)sender;
-- (IBAction)useMacDriverCheckBoxClicked:(id)sender;
-- (IBAction)useX11CheckBoxClicked:(id)sender;
-- (IBAction)retinaModeCheckBoxClicked:(id)sender;
 
 //advanced menu
 - (IBAction)testRunButtonPressed:(id)sender;
@@ -265,13 +225,16 @@
 - (IBAction)mapUserFoldersCheckBoxButtonPressed:(id)sender;
 - (IBAction)confirmQuitCheckBoxButtonPressed:(id)sender;
 - (IBAction)modifyMappingsButtonPressed:(id)sender;
+- (IBAction)fntoggleCheckBoxButton:(id)sender;
+- (IBAction)commandCheckBoxButton:(id)sender;
+- (IBAction)optionCheckBoxButton:(id)sender;
 
 //advanced menu - Advanced Tab
 - (IBAction)WinetricksNoLogsButtonPressed:(id)sender;
 - (IBAction)disableCPUsButtonPressed:(id)sender;
 - (IBAction)winedbgDisabledButtonPressed:(id)sender;
-- (IBAction)monogeckoButtonPressed:(id)sender;
-- (IBAction)fntoggleCheckBoxButton:(id)sender;
+- (IBAction)geckoButtonPressed:(id)sender;
+- (IBAction)monoButtonPressed:(id)sender;
 
 //Winetricks
 - (IBAction)winetricksButtonPressed:(id)sender;
@@ -301,9 +264,6 @@
 - (IBAction)cEXEIconBrowseButtonPressed:(id)sender;
 - (IBAction)cEXEAutomaticButtonPressed:(id)sender;
 - (IBAction)cEXEOverrideButtonPressed:(id)sender;
-- (IBAction)cEXERootlessButtonPressed:(id)sender;
-- (IBAction)cEXEFullscreenButtonPressed:(id)sender;
-- (IBAction)cEXEGammaChanged:(id)sender;
 //extensions window
 - (IBAction)extSaveButtonPressed:(id)sender;
 - (IBAction)extCancelButtonPressed:(id)sender;
@@ -317,6 +277,7 @@
 - (IBAction)modifyMappingsMyMusicBrowseButtonPressed:(id)sender;
 - (IBAction)modifyMappingsMyPicturesBrowseButtonPressed:(id)sender;
 - (IBAction)modifyMappingsDownloadsBrowseButtonPressed:(id)sender;
+- (IBAction)modifyMappingsTemplatesBrowseButtonPressed:(id)sender;
 //ICE
 - (void)installEngine;
 

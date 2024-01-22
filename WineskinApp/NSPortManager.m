@@ -117,7 +117,7 @@
     if (!winetrick) return false;
     [self runWithArguments:@[@"WSS-winetricks",winetrick]];
     
-    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/Resources/Logs/Winetricks.log",self.path];
+    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/SharedSupport/Logs/Winetricks.log",self.path];
     NSString* log = [NSString stringWithContentsOfFile:logPath encoding:NSASCIIStringEncoding];
     return log;
 }
@@ -176,7 +176,7 @@
 {
     if (!newLogs) return;
     
-    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/Resources/install.log",self.path];
+    NSString* logPath = [NSString stringWithFormat:@"%@/Contents/SharedSupport/Logs/install.log",self.path];
     NSString* log = [NSString stringWithContentsOfFile:logPath encoding:NSASCIIStringEncoding];
     
     if (!log) log = @"";
@@ -209,7 +209,7 @@
 }
 -(NSArray*)getAvailableWinetricksList
 {
-    NSString* winetricksPath = [NSString stringWithFormat:@"%@/Wineskin.app/Contents/Resources/winetricks",self.path];
+    NSString* winetricksPath = [NSString stringWithFormat:@"%@/Wineskin.app/Contents/Resources/winetricks",[[NSBundle mainBundle] bundlePath]];
     NSString* winetricksRaw = [[NSString alloc] initWithContentsOfFile:winetricksPath encoding:NSASCIIStringEncoding error:nil];
     
     NSMutableArray* newList = [[NSMutableArray alloc] init];
@@ -300,7 +300,7 @@
         return cxPath;
     }
     
-    return [NSString stringWithFormat:@"%@/Contents/Resources/%@.reg",self.path,reg];
+    return [NSString stringWithFormat:@"%@/Contents/SharedSupport/prefix/%@.reg",self.path,reg];
 }
 -(BOOL)addRegistry:(NSString*)lines fromRegistryFileNamed:(NSString*)reg
 {

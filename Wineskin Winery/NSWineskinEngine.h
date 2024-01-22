@@ -11,6 +11,7 @@
 typedef enum {
     NSWineskinEngineWine,
     NSWineskinEngineWineStaging,
+    NSWineskinEngineProton,
     NSWineskinEngineCrossOver,
     NSWineskinEngineCrossOverGames,
     NSWineskinEngineOther
@@ -24,16 +25,22 @@ typedef enum {
 @property (nonatomic, strong) NSString* complement;
 @property (nonatomic) NSWineskinEngineType engineType;
 @property (nonatomic) BOOL is64Bit;
+@property (nonatomic) BOOL vulkanEnabled;
+@property (nonatomic) BOOL gnutlsEnabled;
 
 +(NSMutableArray<NSWineskinEngine*>*)getListOfAvailableEngines;
 
 +(NSWineskinEngine*)wineskinEngineWithString:(NSString*)engineString;
 
-+(NSWineskinEngine*)wineskinEngineOfType:(NSWineskinEngineType)engineType is64Bit:(BOOL)is64Bit ofVersion:(NSString*)version withComplement:(NSString*)complement;
++(NSWineskinEngine*)wineskinEngineOfType:(NSWineskinEngineType)engineType is64Bit:(BOOL)is64Bit withGnutlsEnabled:(BOOL)gnutlsEnabled withVulkanEnabled:(BOOL)vulkanEnabled ofVersion:(NSString*)version withComplement:(NSString*)complement;
 
 -(NSString*)engineName;
 -(NSString*)localPath;
+-(NSString*)wineOfficialBuildDirectLink;
+-(BOOL)isCompatibleWith32on64Bit;
 -(BOOL)isCompatibleWithMacDriver;
+-(BOOL)isCompatibleWithLatestFreeType;
+-(BOOL)requiresXquartz;
 -(BOOL)isCompatibleWithCsmt;
 -(BOOL)csmtUsesNewRegistry;
 -(BOOL)isCompatibleWithHighQualityMode;

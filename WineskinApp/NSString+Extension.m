@@ -26,6 +26,79 @@
     return [regex evaluateWithObject:self];
 }
 
+-(NSString*)newUUIDString
+{
+    @autoreleasepool
+    {
+        if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.8"] == false)
+        {
+            @autoreleasepool
+            {
+                CFUUIDRef udid = CFUUIDCreate(NULL);
+                NSString* newUUID = (NSString *) CFBridgingRelease(CFUUIDCreateString(NULL, udid));
+                CFRelease(udid);
+                return newUUID;
+            }
+        }
+        
+        return [[NSUUID UUID] UUIDString];
+    }
+}
+-(NSArray<NSString*>*)componentsMatchingWithRegex:(NSString*)regexString
+{
+    NSMutableArray* matches;
+    
+    // Is class NSRegularExpression available
+    if ([NSComputerInformation isSystemMacOsEqualOrSuperiorTo:@"10.7"] == false)
+    {
+        // TODO: Find a different way to replace NSRegularExpression... there must be a better way
+        
+        @autoreleasepool
+        {
+            NSString* uuid = [self newUUIDString];
+            NSString* pyFileName  = [NSString stringWithFormat:@"pythonRegex%@.py",uuid];
+            NSString* datFileName = [NSString stringWithFormat:@"pythonFile%@.dat",uuid];
+            
+            NSString* pythonScriptPath = [NSString stringWithFormat:@"%@%@",NSTemporaryDirectory(),pyFileName ];
+            NSString* stringFilePath   = [NSString stringWithFormat:@"%@%@",NSTemporaryDirectory(),datFileName];
+            
+            NSArray* pythonScriptContentsArray = @[@"import re",
+                                                   @"import os",
+                                                   @"dir_path = os.path.dirname(os.path.abspath(__file__))",
+                                                   [NSString stringWithFormat:@"text_file = open(dir_path + \"/%@\", \"r\")",datFileName],
+                                                   @"text = text_file.read()",
+                                                   [NSString stringWithFormat:@"regex = re.compile(r\"(%@)\")",regexString],
+                                                   @"matches = regex.finditer(text)",
+                                                   @"for match in matches:",
+                                                   @"    print match.group()"];
+            NSString* pythonScriptContents = [pythonScriptContentsArray componentsJoinedByString:@"\n"];
+            
+            [self                 writeToFile:stringFilePath   atomically:YES encoding:NSASCIIStringEncoding];
+            [pythonScriptContents writeToFile:pythonScriptPath atomically:YES encoding:NSASCIIStringEncoding];
+            
+            NSString* output = [NSTask runProgram:@"python" atRunPath:nil withFlags:@[pythonScriptPath] wait:YES];
+            matches = [[output componentsSeparatedByString:@"\n"] mutableCopy];
+            [matches removeObject:@""];
+        }
+        
+        return matches;
+    }
+    
+    @autoreleasepool
+    {
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:0 error:NULL];
+        NSArray* rangeArray = [regex matchesInString:self options:0 range:NSMakeRange(0, self.length)];
+        
+        matches = [[NSMutableArray alloc] init];
+        for (NSTextCheckingResult *match in rangeArray)
+        {
+            [matches addObject:[self substringWithRange:match.range]];
+        }
+    }
+    
+    return matches;
+}
+
 +(NSString*)humanReadableSizeForBytes:(long long int)bytes withDecimalMeasureSystem:(BOOL)measure
 {
     NSString* result = @"";
@@ -108,19 +181,26 @@
     return nil;
 }
 
--(int)initialIntValue
+-(NSNumber*)initialIntegerValue
 {
-    NSMutableString* originalString = [self mutableCopy];
-    NSMutableString* newString = [NSMutableString stringWithString:@""];
-    NSRange firstCharRange = NSMakeRange(0, 1);
+    NSNumber* numberValue;
     
-    while (originalString.length > 0 && [originalString characterAtIndex:0] >= '0' && [originalString characterAtIndex:0] <= '9')
+    @autoreleasepool
     {
-        [newString appendString:[originalString substringWithRange:firstCharRange]];
-        [originalString deleteCharactersInRange:firstCharRange];
+        NSMutableString* originalString = [self mutableCopy];
+        NSMutableString* newString = [NSMutableString stringWithString:@""];
+        NSRange firstCharRange = NSMakeRange(0, 1);
+        
+        while (originalString.length > 0 && [originalString characterAtIndex:0] >= '0' && [originalString characterAtIndex:0] <= '9')
+        {
+            [newString appendString:[originalString substringWithRange:firstCharRange]];
+            [originalString deleteCharactersInRange:firstCharRange];
+        }
+        
+        if (newString.length > 0) numberValue = [[NSNumber alloc] initWithInt:newString.intValue];
     }
     
-    return newString.intValue;
+    return numberValue;
 }
 
 +(NSString*)stringWithContentsOfFile:(NSString*)file encoding:(NSStringEncoding)enc

@@ -8,16 +8,39 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum {
+    NSWineskinEngineWine,
+    NSWineskinEngineWineStaging,
+    NSWineskinEngineProton,
+    NSWineskinEngineCrossOver,
+    NSWineskinEngineCrossOverGames,
+    NSWineskinEngineOther
+} NSWineskinEngineType;
+
 @interface NSWineskinEngine : NSObject
 
-+(NSMutableArray*)getListOfLocalEngines;
+-(NSString*)engineName;
+@property (nonatomic, strong) NSString* engineIdentifier;
+@property (nonatomic) int engineVersion;
+@property (nonatomic, strong) NSString* wineVersion;
+@property (nonatomic, strong) NSString* complement;
+@property (nonatomic) NSWineskinEngineType engineType;
+@property (nonatomic) BOOL is64Bit;
+@property (nonatomic) BOOL vulkanEnabled;
+@property (nonatomic) BOOL gnutlsEnabled;
 
-+(BOOL)isMacDriverCompatibleWithEngine:(NSString*)engineString;
-+(BOOL)isCsmtCompatibleWithEngine:(NSString*)engineString;
-+(BOOL)csmtUsesNewRegistryWithEngine:(NSString*)engineString;
-+(BOOL)isHighQualityModeCompatibleWithEngine:(NSString*)engineString;
++(NSMutableArray<NSWineskinEngine*>*)getListOfLocalEngines;
 
-+(NSString*)mostRecentVersionOfEngine:(NSString*)engine;
++(NSWineskinEngine*)wineskinEngineWithString:(NSString*)engineString;
+
+-(BOOL)isCompatibleWithMacDriver;
+-(BOOL)isCompatibleWithCsmt;
+-(BOOL)isCompatibleWithCommandCtrl;
+-(BOOL)isCompatibleWithOptionAlt;
+-(BOOL)csmtUsesNewRegistry;
+-(BOOL)isCompatibleWithHighQualityMode;
+-(BOOL)isCompatibleWith16Bit;
+-(BOOL)isForceWinetricksNeeded;
 
 +(NSString*)localPathForEngine:(NSString*)engine;
 
