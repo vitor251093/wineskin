@@ -1137,7 +1137,7 @@ static NSPortManager* portManager;
                 [NSString stringWithFormat:@"export PATH=\"%@/:/usr/bin:/bin:/usr/sbin:/sbin\";",pathToWineBinFolder],
                 [NSString stringWithFormat:@"export WINEPREFIX=\"%@\";",winePrefix],
                 [NSString stringWithFormat:@"DYLD_FALLBACK_LIBRARY_PATH=\"%@\"",dyldFallBackLibraryPath],
-                [NSString stringWithFormat:@"%@;",HIDEBOOT],
+                [NSString stringWithFormat:@"%@\";",HIDEBOOT],
                 [NSString stringWithFormat:@"%@ wineboot",wineExecutable]];
             [self systemCommand:[command componentsJoinedByString:@" "]];
             usleep(3000000);
