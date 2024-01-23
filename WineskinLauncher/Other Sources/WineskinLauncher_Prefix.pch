@@ -67,8 +67,8 @@
 #define WINESKIN_WRAPPER_PLIST_KEY_DISABLE_MONO                  @"Skip Mono"
 #define WINESKIN_WRAPPER_PLIST_KEY_SYMLINK_USERS                 @"Symlinks In User Folder"
 #define WINESKIN_WRAPPER_PLIST_KEY_WINEDEBUG                     @"WINEDEBUG"
-#define WINESKIN_WRAPPER_PLIST_KEY_ESYNC                         @"wineesync"
-#define WINESKIN_WRAPPER_PLIST_KEY_MSYNC                         @"winemsync"
+#define WINESKIN_WRAPPER_PLIST_KEY_ESYNC                         @"WINEESYNC"
+#define WINESKIN_WRAPPER_PLIST_KEY_MSYNC                         @"WINEMSYNC"
 
 // Wineskin Plist values
 #define WINESKIN_WRAPPER_PLIST_VALUE_SCREEN_OPTIONS_CURRENT_RESOLUTION @"Current Resolution"
